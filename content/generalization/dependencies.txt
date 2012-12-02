@@ -1,0 +1,2 @@
+tag: linear-regression
+reason: Linear regression is an instructive example highlighting various issues of generalization.

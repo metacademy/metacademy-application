@@ -1,0 +1,7 @@
+tag: bayesian-logistic-regression
+reason: This is an approximate inference algorithm for Bayesian logistic regression.
+
+tag: variational-bayes
+
+tag: logistic-gaussian-bound
+reason: We use the Gaussian lower bound on the logistic for tractability.

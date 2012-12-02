@@ -1,0 +1,2 @@
+* GDA is an example of a generative model. [generative-vs-discriminative]
+* The generalization to more than two classes is known as Fisher discriminant analysis. [fisher-discriminant-analysis]

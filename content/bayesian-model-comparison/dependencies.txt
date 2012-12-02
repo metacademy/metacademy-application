@@ -1,0 +1,5 @@
+tag: bayesian-parameter-estimation
+reason: Most techniques for Bayesian model comparison involve estimating the parameters as well.
+
+tag: model-selection
+reason: Bayesian model comparison is one method for model selection.

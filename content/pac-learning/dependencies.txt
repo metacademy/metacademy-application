@@ -1,0 +1,3 @@
+tag: generalization
+reason: PAC learning is a way of analyzing the generalization performance of learning algorithms.
+ 

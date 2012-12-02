@@ -1,0 +1,8 @@
+tag: kl-divergence
+reason: KL divergence is part of the variational objective function.
+
+tag: entropy
+reason: Entropy is part of the variational objective function.
+
+tag: inference-in-probabilistic-models
+

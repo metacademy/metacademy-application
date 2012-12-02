@@ -1,0 +1,9 @@
+tag: linear-regression
+reason: Linear regression is an instructive example of generalized linear models.
+
+tag: logistic-regression
+reason: Logistic regression is an instructive example of generalized linear models.
+
+tag: exponential-families
+reason: Generalized linear models are defined in terms of exponential family distributions.
+

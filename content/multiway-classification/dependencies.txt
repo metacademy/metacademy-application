@@ -1,0 +1,3 @@
+tag: binary-linear-classifiers
+reason: A common way to fit multiway classifiers is to fit a series of binary classifiers.
+ 

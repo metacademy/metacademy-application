@@ -1,0 +1,12 @@
+tag: gaussian-discriminant-analysis
+reason: GDA is an instructive example of a generative model.
+
+tag: logistic-regression
+reason: Logistic regression is an instructive example of a discriminative model.
+
+tag: naive-bayes
+reason: Naive Bayes is an instructive example of a generative model.
+
+tag: generalization
+reason: Generalization and the bias/variance tradoff are important issues in comparing generative and discriminative models.
+ 

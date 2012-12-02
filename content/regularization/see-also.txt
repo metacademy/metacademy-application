@@ -1,0 +1,7 @@
+* Common regularizers include:
+** $L_1$ regularization, which encourages sparsity [l1-regularization]
+** $L_2$ regularization, which shrinks the coefficients towards zero [l2-regularization]
+** group sparsity, where multiple coefficients are encouraged to be zero or nonzero together [group-sparsity]
+** Tikhonov regularization, which penalizes the sensitivity of the model's outputs to noises in the inputs [tikhonov-regularization]
+* The trace norm is a regularizer for matrices which has been used in the Netflix competition. [trace-norm-regularization]
+* Regularization can equivalently be viewed as adding constraints to a model, a view taken in structural risk minimization [structural-risk-minimization]

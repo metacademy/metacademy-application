@@ -1,0 +1,6 @@
+* Techniques for approximating Gaussian process classification [approximating-gp-classification]
+* Gaussian processes have a variety of uses in machine learning, including:
+** regression [gaussian-process-regression]
+** black-box optimization (where we only get to evaluate the function, and doing so is expensive) [bayesian-optimization-with-gaussian-processes]
+** reinforcement learning [gaussian-processes-for-reinforcement-learning]
+* Techniques for constructing kernel functions [constructing-kernels]

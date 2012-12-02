@@ -1,0 +1,5 @@
+tag: svm-optimality-conditions
+reason: Motivating SMO requires the SVM optimality conditions.
+
+tag: coordinate-descent
+reason: SMO is a coordinate descent algorithm.

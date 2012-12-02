@@ -1,0 +1,7 @@
+tag: gaussian-process-classification
+
+tag: laplace-approximation
+reason: The Laplace approximation is one way to approximate GP classification.
+
+tag: logistic-regression-irls
+reason: The update rule is similar to IRLS for logistic regression.

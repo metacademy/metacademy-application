@@ -1,0 +1,2 @@
+tag: maximum-likelihood
+reason: EM is a way of finding (approximate) maximum likelihood parameters.

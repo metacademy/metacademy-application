@@ -1,0 +1,3 @@
+tag: least-squares-for-classification
+
+tag: gaussian-discriminant-analysis

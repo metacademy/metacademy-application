@@ -1,0 +1,3 @@
+tag: maximum-likelihood-multivariate-gaussians
+reason: Mixture of Gaussians modeling involves fitting multivariate Gaussian distributions.
+

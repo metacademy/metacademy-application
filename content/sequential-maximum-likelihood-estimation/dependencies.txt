@@ -1,0 +1,4 @@
+tag: maximum-likelihood
+
+tag: robbins-monro
+reason: Sequential maximum likelihood estimation uses the Robbins-Monro procedure.

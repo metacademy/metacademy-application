@@ -1,0 +1,2 @@
+tag: linear-least-squares
+reason: The linear regression parameters are fit by solving a linear least squares problem. The issues involved in linear least squares, such as stability, are important in fitting linear regression as well. Several algorithms for linear least squares have interesting statistical interpretations.

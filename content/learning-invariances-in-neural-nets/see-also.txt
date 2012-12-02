@@ -1,0 +1,7 @@
+* Some particular strategies for learning invariances:
+** building it explicitly into the architecture, as in convolutional nets [convolutional-nets]
+** augmenting the training set with warped examples [augmenting-training-set-warped]
+** tangent propagation, which penalizes instability with respect to transformations [tangent-propagation]
+** Tikhonov regularization, which penalizes instability with respect to noise [tikhonov-regularization]
+* Learning invariances is a major goal in the field of representation learning. [representation-learning-invariances]
+* The representations in the human visual system are also invariant to various transformations. [invariances-in-visual-system]

@@ -1,0 +1,4 @@
+* Often basis function expansions do not give us enough flexibility to model the nonlinear structure we're interested in. More powerful methods include:
+** Neural networks, which allow the basis functions to be adapted to the data. [feed-forward-neural-nets]
+** Kernels, which a way of implicitly representing a very high-dimensional (possibly infinite dimensional) feature expansion in terms of a kernel function between data points [kernel-ridge-regression]
+** Representation learining, an area of machine learning which tries to learn high-level feature representations automatically from the raw data [representation-learning]

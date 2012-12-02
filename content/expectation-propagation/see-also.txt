@@ -1,0 +1,2 @@
+* EP can be used to estimate the partition function of a graphical model. [ep-partition-function]
+* Variational Bayes is an alternative variational inference method which is often simpler and faster but less accurate. [variational-bayes]

@@ -1,0 +1,20 @@
+* Examples of maximum likelihood estimation include:
+** Linear regression [linear-regression-as-maximum-likelihood]
+** Logistic regression [logistic-regression]
+** Mixture of Gaussians modeling [mixture-of-gaussians]
+* Maximum likelihood enjoys several guarantees under very general conditions:
+** consistency [consistency-of-maximum-likelihood]
+** efficiency (in the statistical sense) [efficiency-of-maximum-likelihood]
+* For many commonly used distributions, we can find the global optimum because the optimization problem is convex. [maximum-likelihood-and-convex-optimization]
+* Maximum likelihood can be prone to overfitting when there is not enough data to estimate the parameters. [generalization]
+* Some techniques for avoiding overfitting include:
+** Regularized maximum likelihood [regularized-maximum-likelihood]
+** Bayesian parameter estimation [bayesian-parameter-estimation]
+** Model selection [model-selection]
+** Feature selection [feature-selection]
+** Early stopping [early-stopping]
+* Some commonly used optimization algorithms for maximum likelihood estimation include:
+** gradient descent [gradient-descent]
+** expectation-maximization (EM) [expectation-maximization]
+** second-order methods [second-order-optimization-methods]
+* In exponential family models, maximum likelihood can be equivalently interpreted as maximum entropy modeling. [ml-as-maxent]

@@ -1,0 +1,8 @@
+tag: bayesian-parameter-estimation
+reason: This is an example of Bayesian parameter estimation.
+
+tag: multinomial-distribution
+reason: We're estimating parameters for the multinomial distribution.
+
+tag: dirichlet-distribution
+reason: The Dirichlet distribution is the conjugate prior for the multinomial distribution.

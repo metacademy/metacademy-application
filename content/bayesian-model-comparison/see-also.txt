@@ -1,0 +1,5 @@
+* From a Bayesian standpoint, it's better to average predictions over many models than to select just one. This is known as Bayesian model averaging. [bayesian-model-averaging]
+* Some general classes of methods for estimating Bayes factors include:
+** sequential Monte Carlo [smc-partition-function]
+** Markov chain Monte Carlo (MCMC) [mcmc-partition-function]
+** variational Bayes [variational-bayes]

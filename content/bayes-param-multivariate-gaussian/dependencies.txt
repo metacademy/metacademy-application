@@ -1,0 +1,14 @@
+tag: bayesian-parameter-estimation
+
+tag: ml-multivariate-gaussian
+reason: Bayesian parameter estimation for multivariate Gaussians has a similar form to the maximum likelihood estimator.
+
+tag: multivariate-gaussians-information-form
+reason: The prior over covariance is easiest to express in information form.
+
+tag: wishart-distribution
+reason: The Wishart distribution is the conjugate prior for the precision matrix of a multivariate Gaussian.
+
+tag: student-t-distribution
+reason: The predictive distribution is a student-t distribution.
+

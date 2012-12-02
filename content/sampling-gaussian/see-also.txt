@@ -1,0 +1,1 @@
+* How to sample from a multivariate Gaussian [sampling-multivariate-gaussian]

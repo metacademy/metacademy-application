@@ -1,0 +1,6 @@
+* Some other useful mathematical tricks for proving generalization bounds:
+** Chebyshev's inequality [chebyshev-inequality]
+** Chernoff bounds [chernoff-bounds]
+* Some other useful mathematical tools for analyzing learning algorithms:
+** VC dimension
+** Rademacher complexity

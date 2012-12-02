@@ -1,0 +1,5 @@
+* Viewing linear regression as maximum likelihood estimation leads to a number of generalization, including:
+** Bayesian linear regression [bayesian-linear-regression]
+** Other noise models [robust-linear-regression]
+* Linear regression is a kind of generalized linear model. [generalized-linear-models]
+

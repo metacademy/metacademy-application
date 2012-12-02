@@ -1,0 +1,8 @@
+tag: gaussian-discriminant-analysis
+reason: FDA is a generalization of GDA to more than two classes.
+
+tag: multiway-classification
+reason: FDA can be used for multiway classification.
+
+tag: generalized-eigenvalue-problems
+reason: FDA is a generalized eigenvalue problem.

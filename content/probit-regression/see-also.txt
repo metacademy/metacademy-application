@@ -1,0 +1,2 @@
+* Probit regression is less robust to outliers than logistic regression. [classification-loss-comparison]
+* Probit functions are convenient in probabilistic models because they allow for sampling algorithms which fit the latent Gaussian variables. [sampling-for-probit]

@@ -1,0 +1,5 @@
+tag: gradient-descent
+
+tag: robbins-monro
+reason: The Robbins-Monro procedure is one way of ensuring that stochastic gradient descent converges.
+

@@ -1,0 +1,2 @@
+tag: linear-regression-as-maximum-likelihood
+reason: The maximum likelihood interpretation of linear regression tells us how to generalize it to multiple outputs.

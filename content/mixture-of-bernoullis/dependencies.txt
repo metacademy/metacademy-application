@@ -1,0 +1,2 @@
+tag: naive-bayes
+reason: Mixture of Bernoullis has the same form as naive Bayes.

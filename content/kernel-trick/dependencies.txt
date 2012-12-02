@@ -1,0 +1,5 @@
+tag: basis-function-expansions
+reason: The kernel trick is a way of compactly representing very high-dimensional basis function expansions.
+
+tag: psd-matrices
+reason: The definition of a kernel involves PSD matrices.

@@ -1,0 +1,4 @@
+* Natural gradient allows us to speed up stochastic gradient descent by accounting for the curvature of the objective function. [natural-gradient]
+* Second-order optimization methods more generally often converge faster than first order methods, though they are harder to do in a stochastic framework. [second-order-optimization]
+* In large-scale machine learning, stochastic gradient descent achieves a good tradeoff between statistical error and optimization error. [tradeoffs-large-scale-learning]
+

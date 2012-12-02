@@ -1,0 +1,7 @@
+* The perceptron was proposed in the 50s, although it's still in use. More modern algorithms have a similar form, but are put on a more mathematical footing:
+** logistic regression, which is formulated as a probabilistic model [logistic-regression]
+** support vector machines (SVMs), which are formulated as an optimization problem [support-vector-machines]
+* The perceptron algorithm can be used to learn to predict structured objects (e.g. trees and graphs), not just binary values. [structural-perceptron]
+* The perceptron convergence proof requires the assumption that the data are linearly separable by a nonzero margin. Support vector machines (SVMs) are geared towards the same case. [support-vector-machines]
+* The perceptron can be kernelized in order to capture nonlinear dependencies. [kernel-perceptron]
+ 

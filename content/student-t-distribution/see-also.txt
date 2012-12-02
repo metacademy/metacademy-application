@@ -1,0 +1,4 @@
+* The student-t distribution is the predictive distribution for Bayesian parameter estimation of Gaussian distributions with unknown variance. [bayes-param-multivariate-gaussian]
+* The distribution is related to the t-test from frequentist statistics. [t-test]
+* This is an example of a heavy-tailed distribution. [heavy-tailed-distributions]
+* In the multivariate case, the t-distribution can be generalized to Gaussian scale mixtures. [gaussian-scale-mixtures]

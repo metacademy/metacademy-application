@@ -1,0 +1,3 @@
+tag: backpropagation
+
+tag: newton-rhapson

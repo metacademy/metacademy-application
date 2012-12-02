@@ -1,0 +1,11 @@
+* Other methods for projecting data onto a low-dimensional subspace include:
+** principal component analysis (PCA) [principal-component-analysis]
+** factor analysis [factor-analysis]
+* Often we can get a better visualization of the data using a nonlinear embedding. Some methods for doing this include:
+** multidimensional scaling (MDS) [multidimensional-scaling]
+** Isomap [isomap]
+** locally linear embedding [locally-linear-embedding]
+** stochastic neighbor embedding [stochastic-neighbor-embedding]
+* If the goal is classification rather than visualization, consider some other algorithms more directly geared towards the task:
+** multiway logistic regression [multiway-logistic-regression]
+** multiclass support vector machines (SVMs) [multiclass-svms]

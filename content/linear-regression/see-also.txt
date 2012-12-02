@@ -1,0 +1,20 @@
+* Linear regression is a model for predicting real-valued targets. Other kinds of targets include:
+** binary [binary-classification]
+** categorical [multiway-classification]
+** ordinal (i.e. only the ordering of the values is significant) [ordinal-regression]
+* Vanilla linear regression is prone to over-fitting. [generalization]
+* Some extensions which deal with overfitting include:
+** ridge regression [ridge-regression]
+** L1-regularized linear regression (Lasso) [lasso]
+** PCA preprocessing [pca-preprocessing]
+** Feature selection [feature-selection]
+** Model selection [model-selection]
+* Vanilla linear regression is also sensitive to outliers. Some more robust alternatives include:
+** robust linear regression [robust-linear-regression]
+** support vector regression [support-vector-regression]
+* The closed-form solution here does not scale well to large-scale problems (more than tens of thousands of variables). For these cases, look into stochastic algorithms. [sgd-linear-regression]
+* Not all variables of interest can be modeled as linear functions of the input variables. To model nonlinear dependencies, check out:
+** basis function expansions [basis-function-expansions]
+** neural networks [feed-forward-neural-nets]
+** kernel methods [kernel-ridge-regression]
+* Linear regression can be interpreted as maximum likelihood estimation under a Gaussian noise model. [linear-regression-as-maximum-likelihood]

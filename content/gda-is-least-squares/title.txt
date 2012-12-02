@@ -1,0 +1,1 @@
+GDA is equivalent to least squares

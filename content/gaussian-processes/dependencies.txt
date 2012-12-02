@@ -1,0 +1,5 @@
+tag: kernel-trick
+reason: Gaussian processes are defined in terms of kernels.
+
+tag: multivariate-gaussian-distribution
+reason: Gaussian processes are a generalization of the multivariate Gaussian distribution to possibly infinite spaces.

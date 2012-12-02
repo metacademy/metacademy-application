@@ -1,0 +1,6 @@
+* Some commonly used MCMC algorithms include:
+** Gibbs sampling, where one variable is resampled given the others [gibbs-sampling]
+** Metropolis-Hastings, a very general technique [metropolis-hastings]
+* Sequential importance sampling is an alternative family of sampling techniques. [sequential-importance-sampling]
+* While MCMC is normally used as an approximate inference technique, it can also be used to get exact samples. [mcmc-exact-samples]
+* We can analyze the mixing rate of MCMC samplers using spectral graph theory. [analyzing-mcmc-mixing]

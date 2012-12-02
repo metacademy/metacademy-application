@@ -1,0 +1,2 @@
+* The EM algorithm for Gaussian mixtures is analogous to k-means. [k-means]
+* Variational inference in a Bayesian mixture of Gaussians model has a similar form to EM [variational-mixture-of-gaussians]

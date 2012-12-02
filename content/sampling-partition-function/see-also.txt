@@ -1,0 +1,4 @@
+* Naive importance sampling is generally not a good estimator. More powerful methods include:
+** annealed importance sampling (AIS) [ais-partition-function]
+** sequential importance sampling (SIS) [sis-partition-function]
+** Chib's method [chibs-method]

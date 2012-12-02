@@ -1,0 +1,4 @@
+* The evidence approximation requires integrating out the model parameters. Variational Bayes gives a way of doing this. [variational-bayes]
+* An alternative to the evidence approximation is to define a prior over the hyperparameters and integrate them out. This is an instance of hierarchical Bayesian modeling. [hierarchical-bayesian-modeling]
+* The evidence approximation can be computed exactly in the case of Gaussian processes. [evidence-approximation-gaussian-processes]
+

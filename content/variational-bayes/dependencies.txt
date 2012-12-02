@@ -1,0 +1,5 @@
+tag: bayesian-model-comparison
+reason: Variational Bayes is a way of approximating Bayesian model comparison.
+
+tag: variational-inference
+reason: Variational Bayes is an application of variational inference techniques.

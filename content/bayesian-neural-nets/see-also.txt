@@ -1,0 +1,2 @@
+* Markov chain Monte Carlo (MCMC) methods are useful for sampling from the posterior. [mcmc-parameter-estimation]
+* Bayesian neural nets converge to Gaussian processes in the limit of infinitely many units. [bayesian-neural-nets-as-gaussian-processes]

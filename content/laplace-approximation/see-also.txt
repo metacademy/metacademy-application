@@ -1,0 +1,10 @@
+* Some other approximations to Bayesian parameter estimation include:
+** variational Bayes [variational-bayes]
+** Markov chain Monte Carlo (MCMC) [mcmc-parameter-estimation]
+* The Bayesian information criterion (BIC) can be justified in terms of the Laplace approximation. [justifying-aic-and-bic]
+* Some other ways to approximate the model evidence include:
+** variational Bayes [variational-bayes]
+** MCMC [mcmc-partition-function]
+* The Laplace approximation approximates the posterior with a Gaussian. Other Gaussian approximations are more accurate, though often slower and more complicated to implement:
+** expectation propagation [expectation-propagation-for-parameter-estimation]
+** Gaussian lower bound to the logistic function [variational-logistic-regression]

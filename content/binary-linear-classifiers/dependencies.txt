@@ -1,0 +1,2 @@
+tag: linear-regression
+reason: Linear regression provides useful intuitions for thinking about binary linear classification.

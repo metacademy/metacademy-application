@@ -1,0 +1,2 @@
+tag: linear-regression
+reason: Linear regression is a simple model which motivates basis function expansions, which are applicable to linear models more generally.

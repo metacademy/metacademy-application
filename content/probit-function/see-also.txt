@@ -1,0 +1,4 @@
+* Techniques for numerically approximating the probit function [approximating-probit-function]
+* The probit function is used in probabilistic models such as:
+** probit regression [probit-regression]
+** thresholded Gaussian observation models [thresholded-gaussian-observations]

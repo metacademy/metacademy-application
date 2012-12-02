@@ -1,0 +1,4 @@
+* The SVM can be optimized with the sequential minimal optimization (SMO) algorithm. [sequential-minimal-optimization]
+* The main advantage of SVMs is that they can be kernelized in order to capture nonlinear dependencies. [kernel-svm]
+* Comparison of loss functions for classification [comparing-classification-losses]
+* The SVM can be justified as optimizing a tradeoff between bias and variance. [statistical-learning-theory-for-svm]

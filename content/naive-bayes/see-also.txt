@@ -1,0 +1,6 @@
+* Naive Bayes is a generative model. [generative-vs-discriminative]
+* Here are some other commonly used classification algorithms:
+** perceptron [perceptron]
+** logistic regression [logistic-regression]
+** support vector machines (SVMs) [support-vector-machines]
+** Gaussian discriminant analysis [gaussian-discriminant-analysis]

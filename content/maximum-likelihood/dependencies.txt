@@ -1,0 +1,12 @@
+tag: probability-distributions
+reason: Maximum likelihood is a way of fitting probabilistic models which define distributions over the data.
+
+tag: gaussian-distribution
+reason: Fitting a Gaussian distribution is an instructive example of maximum likelihood estimation.
+
+tag: bernoulli-distribution
+reason: Fitting a Bernoulli distribution is an instructive example of maximum likelihood estimation.
+
+tag: unconstrained-optimization-problems
+reason: Maximum likelihood estimation requires solving an optimization problem.
+

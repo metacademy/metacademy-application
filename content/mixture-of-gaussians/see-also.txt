@@ -1,0 +1,10 @@
+* K-means is a simpler clustering model which is faster to fit and often used as an initialization. [k-means]
+* When there isn't enough data to fit a general mixture of Gaussians, here are some alternative models:
+** Bayesian mixture of Gaussians [bayesian-mixture-of-gaussians]
+** mixture of factor analyzers [mixture-of-factor-analyzers]
+** co-clustering [co-clustering]
+** Bayesian clustered tensor factorization [bayesian-clustered-tensor-factorization]
+* When the clusters aren't likely to be shaped like Gaussians, consider these clustering models:
+** spectral clustering [spectral-clustering]
+** mean-shift [mean-shift]
+* Chinese restaurant processes let us fit a mixture of Gaussians when the number of components isn't known in advance. [crp-clustering]

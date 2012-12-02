@@ -1,0 +1,8 @@
+tag: multivariate-gaussian-distribution
+reason: The von Mises distribution is defined in terms of the multivariate Gaussian distribution.
+
+tag: conditional-distributions
+reason: The von Mises distribution is defined by conditioning on the unit sphere.
+
+tag: maximum-likelihood
+reason: One of the main advantages of the von Mises distribution is that maximum likelihood estimation is easy.

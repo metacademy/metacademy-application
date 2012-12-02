@@ -1,0 +1,14 @@
+tag: logistic-regression
+
+tag: bayesian-linear-regression
+reason: Many of the ideas from Bayesian linear regression transfer to Bayesian logistic regression.
+
+tag: laplace-approximation
+reason: The Laplace approximation is a simple way to approximate Bayesian logistic regression.
+
+tag: evidence-approximation
+reason: The evidence approximation is a simple way to choose hyperparameters in Bayesian logistic regression.
+
+tag: bayesian-decision-theory
+reason: Decision theory tells us how to make predictions from Bayesian parameter estimation.
+ 

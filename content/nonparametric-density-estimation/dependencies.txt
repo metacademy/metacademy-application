@@ -1,0 +1,6 @@
+tag: multinomial-distribution
+reason: Multinomials are part of the definition of the distribution.
+
+tag: multivariate-gaussian-distribution
+reason: Multivariate Gaussians are often used in nonparametric density modeling.
+

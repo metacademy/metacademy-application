@@ -1,0 +1,4 @@
+* Other ways of sampling from a 1-D distribution include:
+** rejection sampling [rejection-sampling]
+** slice sampling, an iterative method [slice-sampling]
+** the polar coordinates trick for sampling from a Gaussian [sampling-gaussian]

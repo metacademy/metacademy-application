@@ -1,0 +1,4 @@
+tag: svm-optimality-conditions
+reason: Kernelizing the SVM requires deriving the optimality conditions.
+
+tag: kernel-trick

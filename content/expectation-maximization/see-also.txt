@@ -1,0 +1,7 @@
+* Some examples of EM:
+** Gaussian mixture models [em-gaussian-mixtures]
+** Factor analysis [em-factor-analysis]
+** Baum-Welch algorithm for learning hidden Markov models [baum-welch]
+* Some theoretical justifications of EM:
+** Each step can be shown to increase the likelihood of the data. [em-analysis]
+** EM can be viewed as coordinate ascent on a lower bound of the data likelihood. [em-variational-interpretation]

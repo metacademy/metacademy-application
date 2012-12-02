@@ -1,0 +1,5 @@
+tag: backpropagation
+reason: Tangent propagation is based on the same idea as backpropagation.
+
+tag: learning-invariances-in-neural-nets
+reason: Tangent propagation is a technique for learning invariances in neural nets.

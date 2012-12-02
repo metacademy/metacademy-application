@@ -1,0 +1,5 @@
+* Here are some other commonly used multiway classification algorithms:
+** naive Bayes [naive-bayes]
+** multi-class support vector machines (SVMs) [multiclass-svms]
+* Multinomial logistic regression is a discriminative model. [generative-vs-discriminative]
+* Multinomial logistic regression is a kind of generalized linear model. [generalized-linear-models]

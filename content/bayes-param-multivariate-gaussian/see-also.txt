@@ -1,0 +1,10 @@
+* These techniques are used in various models, including:
+** Bayesian linear regression [bayesian-linear-regression]
+** Bayesian mixture of Gaussians [bayesian-mixture-of-gaussians]
+* The Wishart process allows us to model dependencies between different Wishart-distributed random variables. [wishart-process]
+* When there's not enough data to estimate a full covariance matrix, here are some related models with more structure:
+** principal component analysis (PCA) [principal-component-analysis]
+** factor analysis [factor-analysis]
+** probabilistic matrix factorization (PMF) [probabilistic-matrix-factorization]
+** sparse Gaussian graphical models [learning-sparse-gaussian-graphical-models]
+

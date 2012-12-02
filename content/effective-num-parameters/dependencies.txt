@@ -1,0 +1,5 @@
+tag: smoother-matrix
+reason: The effective number of parameters is the trace of the smoother matrix.
+
+tag: generalization
+reason: The effective number of parameters is a way of analyzing generalization performance.

@@ -1,0 +1,9 @@
+tag: bayesian-parameter-estimation
+
+tag: exponential-families
+
+tag: bayesian-parameter-estimation-multinomial
+reason: The multinomial distribution is an instructive example.
+
+tag: maximum-likelihood-in-exponential-families
+reason: Bayesian parameter estimation has a similar form to maximum likelihood estimation.

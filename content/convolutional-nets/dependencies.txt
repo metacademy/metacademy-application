@@ -1,0 +1,5 @@
+tag: learning-invariances-in-neural-nets
+reason: Convolutional nets are a neural net architecture that enforces invariance to translation.
+
+tag: convolution
+reason: Convolutional nets are defined in terms of convolution.

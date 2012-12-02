@@ -1,0 +1,4 @@
+tag: support-vector-machine
+
+tag: kkt-conditions
+reason: The optimality conditions for SVMs are an instance of the KKT conditions.

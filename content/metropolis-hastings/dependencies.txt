@@ -1,2 +1,2 @@
 tag: markov-chain-monte-carlo
-resaon: M-H is an example of an MCMC algorithm.
+reason: M-H is an example of an MCMC algorithm.

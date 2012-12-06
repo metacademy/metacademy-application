@@ -6,8 +6,11 @@ import graphs
 
 WRAP_WIDTH = 12
 
+############################ read nodes as directories #########################
 
 def read_node(path, tag):
+    """Read a Node object from a directory which optionally contains title.txt,
+    dependencies.txt, and see-also.txt."""
     full_path = os.path.join(path, tag)
 
     title_file = os.path.join(full_path, 'title.txt')
@@ -50,22 +53,27 @@ def read_node(path, tag):
 
     return graphs.Node(tag, title, dependencies, pointers)
 
-
-
 def read_nodes(path):
+    """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
     tags = os.listdir(path)
     tags.remove('README')
     nodes = [read_node(path, tag) for tag in tags]
     return {node.tag: node for node in nodes}
 
 
+
+################################# write .dot files #############################
+
 def underscorify(s):
+    """Convert a string to a form that can be used in filenames, URLs, etc. by making everything
+    lowercase and replacing non-letters with underscores."""
     temp = s.lower()
     temp = re.sub(r'[^a-z ]', ' ', temp)
     temp = temp.strip()
     return re.sub(r'\W+', '_', temp)
 
 def wrap(s, width):
+    """Wrap a long string to avoid elongated graph nodes."""
     parts = s.split()
     result = ''
     total = 0
@@ -82,6 +90,7 @@ def wrap(s, width):
 
 
 def write_graph(nodes, graph, outfile=None):
+    """Write a .dot file corresponding to a dict of nodes and a Graph object giving the connections."""
     if outfile is None:
         outstr = sys.stdout
     else:

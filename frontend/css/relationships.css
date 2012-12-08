@@ -6,6 +6,10 @@
     border: 4px solid black;
     overflow: hidden;
 }
+    
+#dataselector{
+ text-align:center;    
+}                    
 
 .column {
     position: relative;
@@ -34,7 +38,7 @@
     padding-top: 10px;
     padding-bottom:10px;
     border-top: 4px black solid;
-}
+} 
 
 #bottomtitle {
     font-weight: bold;
@@ -104,44 +108,4 @@ line.link {
     stroke-opacity: 0.6;
 }
 
-button {
-    -moz-border-bottom-colors: none;
-    -moz-border-image: none;
-    -moz-border-left-colors: none;
-    -moz-border-right-colors: none;
-    -moz-border-top-colors: none;
-    background-color: #222222;
-    background-image: -moz-linear-gradient(center top, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.11));
-    border-color: -moz-use-text-color -moz-use-text-color #222222;
-    border-radius: 0 0 0 0;
-    border-style: none none solid;
-    border-width: 0 0 1px;
-    box-shadow: 0 1px 3px #999999;
-    color: #FFFFFF;
-    font: 14px Helvetica Neue;
-    margin: 0px;
-    padding: 6px 10px;
-    text-rendering: optimizelegibility;
-    text-shadow: 0 -1px 1px #222222;
-    margin-right: -9px;
-    margin-top: 5px;
-    margin-left: 5px;
-}
 
-button.first {
-    border-bottom-left-radius: 5px;
-    border-top-left-radius: 5px;
-}
-
-button.last {
-    border-bottom-right-radius: 5px;
-    border-top-right-radius: 5px;
-}
-
-button.active {
-    background-color: #416685;
-}
-
-button:hover {
-    background-color: steelblue;
-}

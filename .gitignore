@@ -32,4 +32,10 @@ nosetests.xml
 # Mr Developer
 .mr.developer.cfg
 .project
-.pydevproject
+.pydevproject        
+
+# tmp folders
+tmp
+
+# Mac
+.DS_Store

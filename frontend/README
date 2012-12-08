@@ -5,4 +5,10 @@ cd frontend
 python -m SimpleHTTPServer
 Open: 
 	http://localhost:8000/html/kmap-tester.html
-	with a modern javascript-enabled browser
+with a modern javascript-enabled browser
+
+
+Basic use:
+	-drag to pan
+	-mouse scroll to zoom
+	-double click to quick-zoom

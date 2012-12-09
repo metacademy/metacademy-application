@@ -23,7 +23,12 @@
 			// load new data    
 			var svgd = document.importNode(svgFileData.documentElement,true); 
 			jQuery('#leftpanel').append(svgd);  
-
+               
+			// sort the edges and nodes so that edges don't overlap the nodes
+			gelems = d3.selectAll('.node,.edge');
+			gdata = gelems[0].map(function(itm){if (d3.select(itm).attr('class') == 'node'){return 1} return 0});
+			gelems.data(gdata).sort()
+			
 			// add dynamic properties to nodes 
 			last_node = -1;
 			d3.selectAll(".node")
@@ -68,7 +73,8 @@
 			transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
 			otrans = transprops[2].split(" ").map(Number); 
 			var dzoom = d3.behavior.zoom();
-			dzoom.translate(otrans);                       
+			dzoom.translate(otrans);        
+			              
 
 			// make graph zoomable/translatable
 			var vis = d3.select("svg") 

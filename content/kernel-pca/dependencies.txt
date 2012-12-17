@@ -1,0 +1,3 @@
+tag: principal-component-analysis
+
+tag: kernel-trick

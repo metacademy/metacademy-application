@@ -1,0 +1,15 @@
+* Some ways PCA is commonly used:
+** to visualize datasets by projecting into a low-dimensional space [pca-visualization]
+** as a preprocessing step for supervised learning; the idea is to improve generalization or computational efficiency by reducing the dimensionality of the inputs [pca-preprocessing]
+** latent semantic analysis (LSA), a way of uncovering topics from text
+* Some generalizations of PCA and related models:
+** probabilistic PCA, where the same algorithm is interpreted as fitting a generative model [probabilistic-pca]
+** factor analysis, another related generative model where each input dimension can have a separate noise variance [factor-analysis]
+** Bayesian PCA [bayesian-pca]
+** probabilistic matrix factorization (PMF), a PCA-like model for predicing missing entries of a matrix [probabilistic-matrix-factorization]
+** kernel PCA, which implicitly maps the data to a high-dimensional space before computing the PCA vectors [kernel-pca]
+* For very high-dimensional spaces, directly computing the leading eigenvectors is impractical. In these situations, expectation-maximization (EM) can be more practical. [em-for-pca]
+* Fisher discriminant analysis is another projection similar to PCA, but which uses class labels also. [fisher-discriminant-analysis]
+
+
+

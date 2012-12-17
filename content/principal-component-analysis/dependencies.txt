@@ -1,0 +1,9 @@
+tag: variational-formulation-of-eigenvalues
+reason: The variational formulation of eigenvalues explains why the maximum variance criterion yields an eigenvalue problem.
+
+tag; singular-value-decomposition
+reason: PCA can be seen as computing the SVD of the data matrix.
+
+tag: covariance-matrix
+reason: PCA is defined in terms of the covariance matrix.
+

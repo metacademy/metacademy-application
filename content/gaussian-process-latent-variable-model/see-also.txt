@@ -1,0 +1,5 @@
+* Other algorithms for learning nonlinear embeddings include:
+** Isomap, which tries to model distances along a neighborhood graph [isomap]
+** locally linear embedding [locally-linear-embedding]
+** t-SNE, an embedding which tries to model short distances and ignore long ones [t-sne]
+** Gaussian process latent variable models, a Bayesian model similar in spirit to MDS [gaussian-process-latent-variable-model]

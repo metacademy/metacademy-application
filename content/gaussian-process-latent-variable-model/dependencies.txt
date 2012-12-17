@@ -1,0 +1,6 @@
+tag: multidimensional scaling
+reason: GP-LVMs are a Bayesian model inspired by MDS.
+
+tag: gaussian-process-regression
+reason: The GP-LVM model is closely related to Gaussian process regression.
+

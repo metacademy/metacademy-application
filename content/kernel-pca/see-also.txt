@@ -1,0 +1,5 @@
+* Some other ways of learning nonlinear representations of data:
+** feed-forward neural nets, which adapt the representations in the context of some other learning objective [feed-forward-neural-nets]
+** spectral embeddings, a very similar algorithm based on spectral graph theory [spectral-embeddings]
+
+

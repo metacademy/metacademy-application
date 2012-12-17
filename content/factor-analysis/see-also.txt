@@ -1,0 +1,4 @@
+* Other models related to factor analysis:
+** Principal component analysis (PCA), which finds the maximum variance directions by solving an eigenvalue problem [principal-component-analysis]
+** probabilistic PCA, a similar generative model, but where the noise covariance is spherical rather than diagonal [probabilistic-pca]
+** probabilistic matrix factorization (PMF), a Bayesian model for predicting missing entries of a matrix [probabilistic-matrix-factorization]

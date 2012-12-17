@@ -1,0 +1,8 @@
+tag: probabilistic-models
+reason: Factor analysis is a probabilistic model.
+
+tag: expectation-maximization
+reason: We can use EM to learn the parameters.
+
+tag: computations-on-multivariate-gaussians
+reason: Factor analysis requires manipulating multivariate Gaussians.

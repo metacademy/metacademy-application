@@ -1,0 +1,3 @@
+* Probabilistic matrix factorization (PMF) is another Bayesian formulation of PCA, used for predicting missing entries of a matrix. [probabilistic-matrix-factorization]
+* We can perform inference in this model using Gibbs sampling. [gibbs-sampling]
+ 

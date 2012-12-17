@@ -1,0 +1,4 @@
+tag: expectation-maximization
+
+tag: probabilistic-pca
+reason: EM is a way of fitting the probabilistic PCA model.

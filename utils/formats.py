@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import pdb
 
 import graphs
 
@@ -56,7 +57,7 @@ def read_node(path, tag):
 def read_nodes(path):
     """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
     tags = os.listdir(path)
-    tags.remove('README')
+    tags = filter(lambda(x): x[0] != '.' and x != 'README' ,tags) # remove hidden files and readme from list
     nodes = [read_node(path, tag) for tag in tags]
     return {node.tag: node for node in nodes}
 
@@ -74,6 +75,10 @@ def underscorify(s):
 
 def wrap(s, width):
     """Wrap a long string to avoid elongated graph nodes."""
+    if s is None:
+        print 'warning nonetype'
+        return ''
+
     parts = s.split()
     result = ''
     total = 0
@@ -89,22 +94,39 @@ def wrap(s, width):
     return result
 
 
-def write_graph(nodes, graph, outfile=None):
-    """Write a .dot file corresponding to a dict of nodes and a Graph object giving the connections."""
-    if outfile is None:
+def write_graph(nodes, graph, outp_title=None, write_json=False):
+    """Write a .dot file corresponding to a dict of nodes and a Graph object giving the connections and a corresponding json file."""
+    if outp_title is None:
         outstr = sys.stdout
+        write_json = False
     else:
-        outstr = open(outfile, 'w')
+        outstr = open(outp_title + '.dot', 'w')
+        if write_json:
+            json_items = []
 
     print >> outstr, 'digraph G {'
 
     tags = nodes.keys()
     for t in tags:
         title = nodes[t].title
-        print >> outstr, '    %s [label="%s"];' % (t.replace('-', '_'), wrap(title, WRAP_WIDTH))
+        usetag = t.replace('-', '_')
+        print >> outstr, '    %s [label="%s"];' % (usetag, wrap(title, WRAP_WIDTH))
+        if write_json:
+            node = nodes[t]
+            pt_arr = map(lambda(x): '{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (x.from_tag, x.to_tag, x.blurb), node.pointers)
+            pt_str = ','.join(pt_arr)
+            dep_arr = map(lambda(x): '{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (x.parent_tag, x.child_tag, x.reason), node.dependencies)
+            dep_str = ','.join(dep_arr)
+            json_items.append('"%s":{"title":"%s","dependencies":[%s],"pointers":[%s]}' % (usetag, title, dep_str, pt_str))
 
     for parent, child in graph.edges:
         print >> outstr, '    %s -> %s;' % (parent.replace('-', '_'), child.replace('-', '_'))
     
     print >> outstr, '}'
+    outstr.close()
 
+    if write_json:
+        json_str = '{' + ','.join(json_items) +'}'
+        json_outf = open(outp_title +'.json', 'w')
+        json_outf.write(json_str)
+        json_outf.close()

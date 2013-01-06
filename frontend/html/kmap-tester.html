@@ -1,142 +1,208 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="Content-Type" content="text/html"/>  
-	<script type="text/javascript" src="../javascript/d3.v2.js"></script> 
-	<script type="text/javascript" src="../javascript/jquery-latest.js"></script> 
-	<link rel="stylesheet" href="../css/standard.css"/> 
-	<link rel="stylesheet" href="../css/relationships.css" type="text/css" media="screen"/> 
-	<title>Knowledge Graph Demo</title>    
-	<script type="text/javascript">   
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html"/>
+    <script type="text/javascript" src="../javascript/d3.v2.js"></script>
+    <script type="text/javascript" src="../javascript/jquery-latest.js"></script>
+    <script type="text/javascript" src="../javascript/tooltipsy.min.js"></script>
+    <link rel="stylesheet" href="../css/standard.css"/>
+    <link rel="stylesheet" href="../css/relationships.css" type="text/css" media="screen"/>
+    <title>Knowledge Graph Demo</title>
+    <script type="text/javascript">
 
-	// load the SVG file using AJAX  
-	function load_svg(svg_name){ 
-		if (svg_name.length==0){
-			return   
-		}                       
 
-		jQuery.get('../svg/' + svg_name + '.svg', function(svgFileData){ 
-			// remove previous data 
-			jQuery("svg").remove();
+        // load the SVG file using AJAX
+        function load_svg(svg_name) {
+            if (svg_name.length == 0) {
+                return
+            }
 
-			// load new data    
-			var svgd = document.importNode(svgFileData.documentElement,true); 
-			jQuery('#leftpanel').append(svgd);  
-               
-			// sort the edges and nodes so that edges don't overlap the nodes
-			gelems = d3.selectAll('.node,.edge');
-			gdata = gelems[0].map(function(itm){if (d3.select(itm).attr('class') == 'node'){return 1} return 0});
-			gelems.data(gdata).sort()
-			
-			// add dynamic properties to nodes 
-			last_node = -1;
-			d3.selectAll(".node")
-			.on("mouseover", function(){
-				node = d3.select(this);
-				if(node.attr('clicked') == null){
-					node.select('ellipse').attr('fill','yellow') 
-				}
-			})
-			.on("mouseout", function(){  
-				node = d3.select(this);
-				if(node.attr('clicked') == null){
-					node.select('ellipse').attr('fill','white') 
-				}
-			})  
-			.on("click", function(d) {   
-				this_node = d3.select(this).attr('clicked','true');   
-				this_node.select('ellipse')
-				.attr("fill", "green");
-				jQuery("#righttext").html(this_node.text());
-				if (last_node == -1) { 
-					last_node = this_node; 
-					return;
-				}
-				else{
-					last_node.attr("clicked",null)
-					.select('ellipse')
-					.attr("fill", "white"); 
-				} 
+            jQuery.get('../maps/' + svg_name + '.svg', function (svgFileData) {
+                // remove previous data
+                jQuery("svg").remove();
 
-				if (this_node.attr('id') == last_node.attr('id')){
-					last_node = -1;
-					jQuery("#righttext").html(""); 
-				}
-				else{
-					last_node = this_node;
-				} 
+                // load new data
+                var svgd = document.importNode(svgFileData.documentElement, true);
+                jQuery('#leftpanel').append(svgd);
 
-			})  
+                // sort the edges and nodes so that edges don't overlap the nodes
+                gelems = d3.selectAll('.node,.edge');
+                gdata = gelems[0].map(function (itm) {
+                    if (d3.select(itm).attr('class') == 'node') {
+                        return 1
+                    }
+                    return 0
+                });
+                gelems.data(gdata).sort()
 
-			// obtain orginal transformation since graphviz produces unnormalized coordinates
-			transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
-			otrans = transprops[2].split(" ").map(Number); 
-			var dzoom = d3.behavior.zoom();
-			dzoom.translate(otrans);        
-			              
+                // add dynamic properties to nodes
+                last_node = -1;
+                d3.selectAll(".node")
+                        .on("mouseover", function () {
+                            node = d3.select(this);
+                            if (node.attr('clicked') == null) {
+                                node.select('ellipse').attr('fill', '#E6EEEE')
+                            }
+                        })
+                        .on("mouseout", function () {
+                            node = d3.select(this);
+                            if (node.attr('clicked') == null) {
+                                node.select('ellipse').attr('fill', 'white')
+                            }
+                        })
+                        .on("click", function (d) {
+                            this_node = d3.select(this).attr('clicked', 'true');
+                            this_node.select('ellipse')
+                                    .attr("fill", "#F5EEEE"); // Example of property change TODO change
 
-			// make graph zoomable/translatable
-			var vis = d3.select("svg") 
-			.attr("pointer-events", "all") 
-			.attr("viewBox",null)      
-			.call(dzoom.on("zoom", redraw))  
-			.select(".graph"); 
+                            node_data = jdata[this_node.select('title').text()];
+                            text_panel = d3.select("#righttext");
+                            text_panel.html("");
 
-			// helper function to redraw svg graph with correct coordinates
-			function redraw() {
-				vis.attr("transform",
-				"translate(" + d3.event.translate + ")"
-				+ " scale(" + d3.event.scale + ")");
-			}     
-		});   
-	} 
-	
-	// load the first dataset in the list (for now)
-	jQuery(document).ready(function(){
-		load_svg(jQuery('#data-select').val());
-	});  
-	</script>  
-	
+                            text_panel.append("div")
+                                    .attr("class", "data-title")
+                                    .text(node_data['title']);
+
+                            text_panel.append("div")
+                                    .attr("class", "data-description")
+                                    .text("[lorem ipsum]");  // TODO -- add data content/references (wikipedia for starters?)
+
+                            // add pointer info
+                            if (node_data['pointers'].length > 0) {
+                                text_panel.append('div')
+                                        .attr('class', 'data-subtitle')
+                                        .text('See Also');
+                                dp_enter = text_panel.append("div")
+                                        .attr("class", "data-pointers")
+                                        .append("ul")
+                                        .selectAll('li')
+                                        .data(node_data['pointers'])
+                                        .enter()
+                                        .append('li')
+                                        .text(function (d) {
+                                            return  '- ' + d.to_tag;
+                                        })
+                                        .append('span')
+                                        .attr('class', 'help-ptr hastip')
+                                        .attr('title', function (d) {
+                                            return d.blurb;
+                                        })
+                            }
+
+                            // add dependencies info
+                            if (node_data['dependencies'].length > 0) {
+                                text_panel.append('div')
+                                        .attr('class', 'data-subtitle')
+                                        .text('Dependencies');
+                                text_panel.append("div")
+                                        .attr("class", "data-dependencies")
+                                        .append("ul")
+                                        .selectAll('li')
+                                        .data(node_data['dependencies'])
+                                        .enter()
+                                        .append('li')
+                                        .text(function (d) {
+                                            return  '- ' + d.from_tag;
+                                        })
+                                        .append('span')
+                                        .attr('class', 'help-ptr hastip')
+                                        .attr('title', function (d) {
+                                            return d.reason;
+                                        });
+                            }
+
+                            // tooltip for hover
+                            jQuery('.hastip').tooltipsy();
+
+                            if (last_node == -1) {
+                                last_node = this_node;
+                                return;
+                            }
+                            else {
+                                last_node.attr("clicked", null)
+                                        .select('ellipse')
+                                        .attr("fill", "white");
+                            }
+
+                            if (this_node.attr('id') == last_node.attr('id')) {
+                                last_node = -1;
+                                text_panel.html("");
+                            }
+                            else {
+                                last_node = this_node;
+                            }
+
+                        })
+
+                // obtain orginal transformation since graphviz produces unnormalized coordinates
+                transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
+                otrans = transprops[2].split(" ").map(Number);
+                var dzoom = d3.behavior.zoom();
+                dzoom.translate(otrans);
+
+
+                // make graph zoomable/translatable
+                var vis = d3.select("svg")
+                        .attr("pointer-events", "all")
+                        .attr("viewBox", null)
+                        .call(dzoom.on("zoom", redraw))
+                        .select(".graph");
+
+                // helper function to redraw svg graph with correct coordinates
+                function redraw() {
+                    vis.attr("transform",
+                            "translate(" + d3.event.translate + ")"
+                                    + " scale(" + d3.event.scale + ")");
+                }
+
+
+            });
+            jQuery.getJSON('../maps/' + svg_name + '.json', function (res_data) {
+                jdata = res_data;
+            });
+        }
+
+        // load the first dataset in the list (for now)
+        jQuery(document).ready(function () {
+            load_svg(jQuery('#data-select').val());
+        });
+    </script>
+
 </head>
 
 <body>
-	<div id="main">
+<div id="main">
 
-		<div id="leftpanel" class="column">
-			<div id="leftheader">                     
-			</div>                                         
+    <div id="leftpanel" class="column">
+        <select id="data-select" onchange="load_svg(this.value)">
+            <option value="subset">Subset</option>
+            <option value="full_graph">Full Graph</option>
+        </select>
 
-		</div>
-		<div id="rightpanel" class="column">   
-			<div id="dataselector">
-				<select id ="data-select" onchange="load_svg(this.value)"> 
-					<option value="subset">Subset</option>
-					<option value="full_graph">Full Graph</option>
-				</select>              
-			</div>
+    </div>
+    <div id="rightpanel" class="column">
+        <div id="righttext">
 
-			<div id="righttext">
-
-			</div>  
-		</div>
-		<!-- <div id="bottompanel" class="column">
-		<div id="bottomtitle" class="title">
-		<p>
-		<span style="font-weight: normal; font-style: italic;">--Click a node to load information about it--</span>
-		</p>
-		<p>
-		<span style="font-weight: normal; font-style: italic;">--Zoom by scrolling, pan by drag-n-clicking--</span>
-		</p>
-		<p>
-		<span style="font-weight: normal; font-style: italic;">--Hover/click legend to filter the display--</span>
-		</p>
-		</div>  
-		<div id="bottomtext" class="">
-		</div>
-		</div>   -->
-	</div>                                                                                                                                                                  
-</body>      
+        </div>
+    </div>
+    <!-- <div id="bottompanel" class="column">
+    <div id="bottomtitle" class="title">
+    <p>
+    <span style="font-weight: normal; font-style: italic;">--Click a node to load information about it--</span>
+    </p>
+    <p>
+    <span style="font-weight: normal; font-style: italic;">--Zoom by scrolling, pan by drag-n-clicking--</span>
+    </p>
+    <p>
+    <span style="font-weight: normal; font-style: italic;">--Hover/click legend to filter the display--</span>
+    </p>
+    </div>
+    <div id="bottomtext" class="">
+    </div>
+    </div>   -->
+</div>
+</body>
 </html>          
 
 

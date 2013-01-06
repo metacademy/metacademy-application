@@ -1,25 +1,3 @@
-/*
-Place color references here
-*/
-
-.dark-data, .dark-title {
-    background-color: #9C9C9C;
-}
-
-.dark-data:hover {
-    background-color: #8e8c8c;
-    cursor: pointer;
-}
-
-.light-data, .light-title {
-    background-color: #D1D1D1;
-}
-
-.light-data:hover {
-    background-color: #BABABA;
-    cursor: pointer;
-}
-
 p{
     margin-top: 1px;
     margin-bottom: 1px;
@@ -72,21 +50,8 @@ h2 {
     margin-bottom: 30px;
 }
 
-ul {
-    text-align: center;
-}
 
-.paper {
-    margin-left: auto;
-    margin-right: auto;
-    table-layout: fixed;
-    border: 50px solid transparent;
-    -o-border-image: url("/static/images/paper.png") 50;
-    -webkit-border-image: url("/static/images/paper.png") 50;
-    -moz-border-image: url("/static/images/paper.png") 50;
-    border-image: url("/static/images/paper.png") 50; /* border-image doesn't show on ie9 */
-    overflow: hidden;
-}
+
 
 .container {
     margin: 20px 0px 20px 0px;
@@ -115,11 +80,6 @@ div.container_title a {
     text-align: center;
 }
 
-ul {
-    list-style: none inside;
-    margin-left: 0px;
-    padding-left: 0px;
-}
 
 /*tabbed navigation lists*/
 .tabs {

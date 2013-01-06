@@ -1,3 +1,51 @@
+.tooltipsy
+{
+    padding: 10px;
+    max-width: 200px;
+    color: #303030;
+    background-color: #F5EEEE;
+    border: 2px solid #885415;
+}
+
+ul {
+    text-align: left;
+    margin-left: 2px;
+    padding-left: 5px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    list-style-type: disc;
+}
+
+div.extra-info{
+    float:right;
+}
+span.help-ptr{
+   background: url("/images/qmark.jpg") no-repeat center right;
+   width:20px;
+   height: 15px;
+   display: inline-block;
+    float:right;
+}
+
+.data-title{
+    text-align: center;
+    font-weight: bolder;
+    font-size: 20px;
+    padding: 5px 0px 10px 0px;
+}
+
+.data-subtitle{
+    text-align:left;
+    margin-top:10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.data-description{
+    font-style: italic;
+}
+
+
 #main {
     margin-top: 20px;
     margin-left: auto;
@@ -7,8 +55,9 @@
     overflow: hidden;
 }
     
-#dataselector{
- text-align:center;    
+#data-select{
+ text-align:center;
+ float:left;
 }                    
 
 .column {
@@ -16,9 +65,10 @@
     float: left;
 }
 
+
 #leftpanel {
-    width: 750px;
-    height: 500px; /*the height of the main area */
+    width: 700px;
+    height: 600px; /*the height of the main area */
     overflow: hidden;
     text-align: left;
 }
@@ -26,8 +76,8 @@
 #rightpanel {
     padding-top: 5px;
     padding-left: 5px;
-    width: 150px;
-    height: 500px; /*the height of the main area */
+    width: 200px;
+    height: 600px; /*the height of the main area */
     overflow: auto;
     border-left: 4px black solid;
 }
@@ -50,6 +100,7 @@
     text-align: justify;
     padding: 5px 5px 0 5px;
 }
+
 
 /* LEGEND */
 #legend {
@@ -93,14 +144,8 @@ line {
     stroke: black;
 }
 
-text {
-    font-family: Arial;
-    font-size: 9pt;
-}
-
-circle.node {
-    stroke: #222222;
-    stroke-width: 1.2px;
+.node {
+    cursor: default;
 }
 
 line.link {

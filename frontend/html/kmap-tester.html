@@ -26,7 +26,7 @@
                 var svgd = document.importNode(svgFileData.documentElement, true);
                 jQuery('#leftpanel').append(svgd);
 
-                // sort the edges and nodes so that edges don't overlap the nodes
+                // sort the edges and nodes so that edges don't overlap the nodes 
                 gelems = d3.selectAll('.node,.edge');
                 gdata = gelems[0].map(function (itm) {
                     if (d3.select(itm).attr('class') == 'node') {

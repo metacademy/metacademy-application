@@ -26,7 +26,7 @@
                 var svgd = document.importNode(svgFileData.documentElement, true);
                 jQuery('#leftpanel').append(svgd);
 
-                // sort the edges and nodes so that edges don't overlap the nodes 
+                // sort the edges and nodes so that edges don't overlap the nodes
                 gelems = d3.selectAll('.node,.edge');
                 gdata = gelems[0].map(function (itm) {
                     if (d3.select(itm).attr('class') == 'node') {
@@ -54,7 +54,7 @@
                         .on("click", function (d) {
                             this_node = d3.select(this).attr('clicked', 'true');
                             this_node.select('ellipse')
-                                    .attr("fill", "#F5EEEE"); // Example of property change TODO change
+                                    .attr("fill", "#F5EEEE"); // Example of property change
 
                             node_data = jdata[this_node.select('title').text()];
                             text_panel = d3.select("#righttext");
@@ -68,26 +68,32 @@
                                     .attr("class", "data-description")
                                     .text("[lorem ipsum]");  // TODO -- add data content/references (wikipedia for starters?)
 
-                            // add pointer info
+                            // add pointer (see-also) info
                             if (node_data['pointers'].length > 0) {
                                 text_panel.append('div')
                                         .attr('class', 'data-subtitle')
                                         .text('See Also');
                                 dp_enter = text_panel.append("div")
                                         .attr("class", "data-pointers")
-                                        .append("ul")
-                                        .selectAll('li')
+                                        .selectAll('div')
                                         .data(node_data['pointers'])
                                         .enter()
-                                        .append('li')
-                                        .text(function (d) {
-                                            return  '- ' + d.to_tag;
-                                        })
-                                        .append('span')
-                                        .attr('class', 'help-ptr hastip')
+                                        .append('div')
+                                        .attr('class', 'list-entry');
+
+                                dp_enter.append('div')
+                                        .attr('class', 'help-ptr')
+                                        .append('img')
+                                        .attr('src', '/images/qmark.jpg')
+                                        .attr('class', 'list-img hastip')
                                         .attr('title', function (d) {
                                             return d.blurb;
-                                        })
+                                        });
+                                dp_enter.append('div')
+                                        .attr('class', 'list-text')
+                                        .text(function (d) {
+                                            return d.to_tag.replace('-',' ');
+                                        });
                             }
 
                             // add dependencies info
@@ -95,21 +101,30 @@
                                 text_panel.append('div')
                                         .attr('class', 'data-subtitle')
                                         .text('Dependencies');
-                                text_panel.append("div")
+
+                                var lent = text_panel.append("div")
                                         .attr("class", "data-dependencies")
-                                        .append("ul")
-                                        .selectAll('li')
+                                        .selectAll('div')
                                         .data(node_data['dependencies'])
                                         .enter()
-                                        .append('li')
-                                        .text(function (d) {
-                                            return  '- ' + d.from_tag;
-                                        })
-                                        .append('span')
-                                        .attr('class', 'help-ptr hastip')
+                                        .append('div')
+                                        .attr('class', 'list-entry');
+
+                                lent.append('div')
+                                        .attr('class', 'help-ptr')
+                                        .append('img')
+                                        .attr('src', '/images/qmark.jpg')
+                                        .attr('class', 'list-img hastip')
                                         .attr('title', function (d) {
                                             return d.reason;
                                         });
+
+                                lent.append('div')
+                                        .attr('class', 'list-text')
+                                        .text(function (d) {
+                                            return d.from_tag.replace('-',' ');
+                                        });
+
                             }
 
                             // tooltip for hover

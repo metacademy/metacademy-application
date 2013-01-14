@@ -112,10 +112,7 @@ def write_graph_dot(nodes, graph, outstr=None):
 #################################### JSON ######################################
 
 
-def node_to_json(nodes, tag, outstr=None):
-    if outstr is None:
-        outstr = sys.stdout
-
+def node_to_json(nodes, tag):
     node = nodes[tag]
     pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, p.blurb)
               for p in node.pointers]

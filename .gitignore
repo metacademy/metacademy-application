@@ -39,3 +39,6 @@ tmp
 
 # Mac
 .DS_Store
+
+# local configuration
+config.py

@@ -93,40 +93,47 @@ def wrap(s, width):
             total += 1
     return result
 
-
-def write_graph(nodes, graph, outp_title=None, write_json=False):
-    """Write a .dot file corresponding to a dict of nodes and a Graph object giving the connections and a corresponding json file."""
-    if outp_title is None:
+def write_graph_dot(nodes, graph, outstr=None):
+    if outstr is None:
         outstr = sys.stdout
-        write_json = False
-    else:
-        outstr = open(outp_title + '.dot', 'w')
-        if write_json:
-            json_items = []
 
     print >> outstr, 'digraph G {'
 
-    tags = nodes.keys()
-    for t in tags:
-        title = nodes[t].title
-        usetag = t.replace('-', '_')
-        print >> outstr, '    %s [label="%s"];' % (usetag, wrap(title, WRAP_WIDTH))
-        if write_json:
-            node = nodes[t]
-            pt_arr = map(lambda(x): '{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (x.from_tag, x.to_tag, x.blurb), node.pointers)
-            pt_str = ','.join(pt_arr)
-            dep_arr = map(lambda(x): '{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (x.parent_tag, x.child_tag, x.reason), node.dependencies)
-            dep_str = ','.join(dep_arr)
-            json_items.append('"%s":{"title":"%s","dependencies":[%s],"pointers":[%s]}' % (usetag, title, dep_str, pt_str))
+    for tag, node in nodes.items():
+        usetag = tag.replace('-', '_')
+        print >> outstr, '    %s [label="%s"];' % (usetag, wrap(node.title, WRAP_WIDTH))
 
     for parent, child in graph.edges:
         print >> outstr, '    %s -> %s;' % (parent.replace('-', '_'), child.replace('-', '_'))
-    
-    print >> outstr, '}'
-    outstr.close()
 
-    if write_json:
-        json_str = '{' + ','.join(json_items) +'}'
-        json_outf = open(outp_title +'.json', 'w')
-        json_outf.write(json_str)
-        json_outf.close()
+    print >> outstr, '}'
+
+
+#################################### JSON ######################################
+
+
+def node_to_json(nodes, tag, outstr=None):
+    if outstr is None:
+        outstr = sys.stdout
+
+    node = nodes[tag]
+    pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, p.blurb)
+              for p in node.pointers]
+    pt_str = ','.join(pt_arr)
+    dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, d.reason)
+               for d in node.dependencies]
+    dep_str = ','.join(dep_arr)
+    return '{"title":"%s","dependencies":[%s],"pointers":[%s]}' % (node.title, dep_str, pt_str)
+    
+
+
+def write_graph_json(nodes, graph, outstr=None):
+    if outstr is None:
+        outstr = sys.stdout
+
+    json_items = []
+    json_items = ['"%s":%s' % (tag, node_to_json(nodes, tag))
+                  for tag in nodes.keys()]
+    json_str = '{' + ','.join(json_items) +'}'
+    outstr.write(json_str)
+

@@ -3,22 +3,31 @@ import os
 import formats
 import graphs
 
+import config
 
 
-def generate_full_graph(path, outp_title, create_json=True):
+def generate_full_graph(path, outp_title):
     """Construct the full knowledge graph.
 
     path -- the location of the content, e.g. knoweldge-maps/content
     dot_file -- the output .dot file
     svg_file -- the output .svg file
     """
+    dot_file = '%s.dot' % outp_title
+    svg_file = '%s.svg' % outp_title
+    json_file = '%s.json' % outp_title
+    
     nodes = formats.read_nodes(path)
     nodes = graphs.remove_missing_links(nodes)
     graph = graphs.Graph.from_node_dependencies(nodes)
-    formats.write_graph(nodes, graph, outp_title, create_json)
-    os.system('dot -Tsvg %s.dot -o %s.svg' % (outp_title, outp_title))
 
-def visualize_related_nodes(path, tag, outp_title, create_json=True):
+    formats.write_graph_dot(nodes, graph, open(dot_file, 'w'))
+    os.system('dot -Tsvg %s -o %s' % (dot_file, svg_file))
+    formats.write_graph_json(nodes, graph, open(json_file, 'w'))
+
+        
+
+def visualize_related_nodes(path, tag, outp_title):
     """Construct the knowledge graph limited to the ancestors and descendants of a given node.
     Useful for understanding the bottleneck scores.
 
@@ -27,6 +36,10 @@ def visualize_related_nodes(path, tag, outp_title, create_json=True):
     dot_file -- the output .dot file
     svg_file -- the output .svg file
     """
+    dot_file = '%s.dot' % outp_title
+    svg_file = '%s.svg' % outp_title
+    json_file = '%s.json' % outp_title
+    
     nodes = formats.read_nodes(path) # TODO should we always read all nodes?
     nodes = graphs.remove_missing_links(nodes)
     graph = graphs.Graph.from_node_dependencies(nodes)
@@ -38,10 +51,12 @@ def visualize_related_nodes(path, tag, outp_title, create_json=True):
     nodes = graphs.remove_missing_links(nodes)
     graph = graphs.Graph.from_node_dependencies(nodes)
     
-    formats.write_graph(nodes, graph, outp_title, create_json)
-    os.system('dot -Tsvg %s.dot -o %s.svg' % (outp_title, outp_title))
+    formats.write_graph_dot(nodes, graph, open(dot_file, 'w'))
+    os.system('dot -Tsvg %s -o %s' % (dot_file, svg_file))
+    formats.write_graph_json(nodes, graph, open(json_file, 'w'))
 
 if __name__ == "__main__":
-    path = '/Users/cradreed/SideProjects/knowledge-maps/content/'
-    generate_full_graph(path,'/Users/cradreed/SideProjects/knowledge-maps/frontend/maps/full_graph')
-    visualize_related_nodes(path, 'variational-bayes', '/Users/cradreed/SideProjects/knowledge-maps/frontend/maps/subset', create_json=True)
+    output_dir = config.MAPS_OUTPUT_PATH
+    path = config.CONTENT_PATH
+    generate_full_graph(path, os.path.join(output_dir, 'full_graph'))
+    visualize_related_nodes(path, 'variational-bayes', os.path.join(output_dir, 'subset'))

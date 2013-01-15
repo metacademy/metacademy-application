@@ -1,5 +1,6 @@
 import BaseHTTPServer
 import cStringIO
+import sys
 import traceback
 import urlparse
 
@@ -7,6 +8,25 @@ import os; print os.getcwd()
 
 import config
 from utils import formats, graphs
+
+"""A simple server to serve as a placeholder. Basically spits out graphs
+in various formats. It responds to the following requests:
+
+  GET full_graph                      get a JSON object representing the full graph
+  GET nodes/node-name                 get the JSON representation of a single node
+  GET nodes/node-name/map             get the part of the graph that a node depends on
+  GET nodes/node-name/related         get the part of the graph that's related to a node
+                                         (ancestors/descendants)
+
+It can also produce SVG and DOT output for all the graph requests.
+You can specify this with a query field in the URL, e.g.
+
+  GET full_graph?format=svg
+
+Start the server by typing (from the main knowledge-maps directory):
+
+  python backend/simple_server.py 8000
+"""
 
 
 nodes = None
@@ -130,9 +150,21 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     
 
-def test():
-    BaseHTTPServer.test(HandlerClass=HTTPRequestHandler)
+def run_server(port):
+    server_address = ('', port)
+
+    httpd = BaseHTTPServer.HTTPServer(server_address, HTTPRequestHandler)
+    sa = httpd.socket.getsockname()
+    print "Serving HTTP on", sa[0], "port", sa[1], "..."
+    httpd.serve_forever()
+    
+
+
 
 if __name__ == '__main__':
-    test()
+    if len(sys.argv) >= 2:
+        port = int(sys.argv[1])
+    else:
+        port = 8000
+    run_server(port)
 

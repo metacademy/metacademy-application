@@ -1,8 +1,11 @@
+# TODO: Remove from future commits? -Colorado
+
 import BaseHTTPServer
 import cStringIO
 import sys
 import traceback
 import urlparse
+import pdb
 
 import os; print os.getcwd()
 
@@ -48,7 +51,8 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         load_graph()
 
         parse = urlparse.urlparse(self.path)
-        
+#        pdb.set_trace()
+
         parts = parse.path.lower().split('/')
         assert parts[0] == ''
         parts = parts[1:]

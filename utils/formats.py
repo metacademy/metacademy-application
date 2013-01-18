@@ -54,12 +54,15 @@ def read_node(path, tag):
 
     return graphs.Node(tag, title, dependencies, pointers)
 
-def read_nodes(path):
+def read_nodes(path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
     tags = os.listdir(path)
     tags = filter(lambda(x): x[0] != '.' and x != 'README' ,tags) # remove hidden files and readme from list
-    nodes = [read_node(path, tag) for tag in tags]
-    return {node.tag: node for node in nodes}
+    if onlytitle:
+        return tags
+    else:
+        nodes = [read_node(path, tag) for tag in tags]
+        return {node.tag: node for node in nodes}
 
 
 
@@ -129,7 +132,7 @@ def write_graph_json(nodes, graph, outstr=None):
         outstr = sys.stdout
 
     json_items = []
-    json_items = ['"%s":%s' % (tag, node_to_json(nodes, tag))
+    json_items = ['"%s":%s' % (tag.replace('-','_'), node_to_json(nodes, tag))
                   for tag in nodes.keys()]
     json_str = '{' + ','.join(json_items) +'}'
     outstr.write(json_str)

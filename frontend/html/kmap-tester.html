@@ -3,22 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html"/>
-    <script type="text/javascript" src="../javascript/d3.v2.js"></script>
-    <script type="text/javascript" src="../javascript/jquery-latest.js"></script>
-    <script type="text/javascript" src="../javascript/tooltipsy.min.js"></script>
-    <link rel="stylesheet" href="../css/standard.css"/>
-    <link rel="stylesheet" href="../css/relationships.css" type="text/css" media="screen"/>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/d3.v2.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/jquery-latest.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/relationships.css" type="text/css" media="screen"/>
     <title>Knowledge Graph Demo</title>
     <script type="text/javascript">
 
 
         // load the SVG file using AJAX
-        function load_svg(svg_name) {
-            if (svg_name.length == 0) {
+        function load_svg(node_name) {
+            if (node_name.length == 0) {
                 return
             }
 
-            jQuery.get('../maps/' + svg_name + '.svg', function (svgFileData) {
+            if (node_name == 'full_graph') {
+                var get_url = '/full_graph'
+            } else {
+                var get_url = '/nodes/' + node_name.replace(/_/g, '-') + '/map'
+            }
+
+            jQuery.get(get_url + "?format=svg", function (svgFileData) {
                 // remove previous data
                 jQuery("svg").remove();
 
@@ -27,8 +33,8 @@
                 jQuery('#leftpanel').append(svgd);
 
                 // sort the edges and nodes so that edges don't overlap the nodes
-                gelems = d3.selectAll('.node,.edge');
-                gdata = gelems[0].map(function (itm) {
+                var gelems = d3.selectAll('.node,.edge');
+                var gdata = gelems[0].map(function (itm) {
                     if (d3.select(itm).attr('class') == 'node') {
                         return 1
                     }
@@ -52,12 +58,12 @@
                             }
                         })
                         .on("click", function (d) {
-                            this_node = d3.select(this).attr('clicked', 'true');
+                            var this_node = d3.select(this).attr('clicked', 'true');
                             this_node.select('ellipse')
                                     .attr("fill", "#F5EEEE"); // Example of property change
 
-                            node_data = jdata[this_node.select('title').text()];
-                            text_panel = d3.select("#righttext");
+                            var node_data = jdata[this_node.select('title').text()];
+                            var text_panel = d3.select("#righttext");
                             text_panel.html("");
 
                             text_panel.append("div")
@@ -73,7 +79,7 @@
                                 text_panel.append('div')
                                         .attr('class', 'data-subtitle')
                                         .text('See Also');
-                                dp_enter = text_panel.append("div")
+                                var dp_enter = text_panel.append("div")
                                         .attr("class", "data-pointers")
                                         .selectAll('div')
                                         .data(node_data['pointers'])
@@ -84,15 +90,15 @@
                                 dp_enter.append('div')
                                         .attr('class', 'help-ptr')
                                         .append('img')
-                                        .attr('src', '/images/qmark.jpg')
+                                        .attr('src', '{{ STATIC_URL }}images/qmark.jpg')
                                         .attr('class', 'list-img hastip')
                                         .attr('title', function (d) {
-                                            return d.blurb;
+                                            return d.blurb=="None" ? "" : d.blurb;
                                         });
                                 dp_enter.append('div')
                                         .attr('class', 'list-text')
                                         .text(function (d) {
-                                            return d.to_tag.replace('-',' ');
+                                            return d.to_tag.replace('-', ' ');
                                         });
                             }
 
@@ -113,21 +119,29 @@
                                 lent.append('div')
                                         .attr('class', 'help-ptr')
                                         .append('img')
-                                        .attr('src', '/images/qmark.jpg')
+                                        .attr('src', '{{ STATIC_URL }}images/qmark.jpg')
                                         .attr('class', 'list-img hastip')
                                         .attr('title', function (d) {
-                                            return d.reason;
+                                            return d.reason=="None" ? "" : d.reason;
                                         });
 
                                 lent.append('div')
                                         .attr('class', 'list-text')
                                         .text(function (d) {
-                                            return d.from_tag.replace('-',' ');
+                                            return d.from_tag.replace('-', ' ');
                                         });
 
                             }
 
-                            // tooltip for hover
+                            // add "focus" button
+                            text_panel.append("div")
+                                    .attr('class','topic-focus')
+                                    .append("button")
+                                    .text('Focus on Topic')
+                                    .attr('class','topic-focus')
+                                    .on('click',function(d){load_svg(this_node.select('title').text().replace('_','-'));});
+
+                            // tooltip for pretty hover info
                             jQuery('.hastip').tooltipsy();
 
                             if (last_node == -1) {
@@ -151,11 +165,10 @@
                         })
 
                 // obtain orginal transformation since graphviz produces unnormalized coordinates
-                transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
-                otrans = transprops[2].split(" ").map(Number);
+                var transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
+                var otrans = transprops[2].split(" ").map(Number);
                 var dzoom = d3.behavior.zoom();
                 dzoom.translate(otrans);
-
 
                 // make graph zoomable/translatable
                 var vis = d3.select("svg")
@@ -171,9 +184,8 @@
                                     + " scale(" + d3.event.scale + ")");
                 }
 
-
             });
-            jQuery.getJSON('../maps/' + svg_name + '.json', function (res_data) {
+            jQuery.getJSON(get_url + '?format=json', function (res_data) {
                 jdata = res_data;
             });
         }
@@ -182,6 +194,7 @@
         jQuery(document).ready(function () {
             load_svg(jQuery('#data-select').val());
         });
+
     </script>
 
 </head>
@@ -191,8 +204,9 @@
 
     <div id="leftpanel" class="column">
         <select id="data-select" onchange="load_svg(this.value)">
-            <option value="subset">Subset</option>
-            <option value="full_graph">Full Graph</option>
+            {% for node_tag in node_list %}
+                <option value="{{ node_tag }}">{{ node_tag }}</option>
+            {% endfor %}
         </select>
 
     </div>
@@ -201,21 +215,6 @@
 
         </div>
     </div>
-    <!-- <div id="bottompanel" class="column">
-    <div id="bottomtitle" class="title">
-    <p>
-    <span style="font-weight: normal; font-style: italic;">--Click a node to load information about it--</span>
-    </p>
-    <p>
-    <span style="font-weight: normal; font-style: italic;">--Zoom by scrolling, pan by drag-n-clicking--</span>
-    </p>
-    <p>
-    <span style="font-weight: normal; font-style: italic;">--Hover/click legend to filter the display--</span>
-    </p>
-    </div>
-    <div id="bottomtext" class="">
-    </div>
-    </div>   -->
 </div>
 </body>
 </html>          

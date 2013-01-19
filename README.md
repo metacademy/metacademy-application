@@ -6,9 +6,9 @@ An apt-get for knowledge.
 Current testing instructions (Colorado Reed 18 Jan 2013)    
 1) Install django: see https://www.djangoproject.com/download/
 2) From agfk project directory:
-		python manage.py runserver [port number; default is 8000]
+		. run_test_servers.sh
 3) Open: 
-	http://localhost:[port number]/kmap
+	http://localhost:8010/kmap
 		with a modern javascript-enabled browser
 
 Basic use:

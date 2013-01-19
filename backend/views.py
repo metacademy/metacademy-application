@@ -1,54 +1,43 @@
 import utils.formats as formats
 import config
+from backend.settings import CONTENT_SERVER
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from utils.graph_utils import get_node_json,get_map,get_related_nodes, get_all_nodes
 import os
 import pdb
+import urllib
+import urllib2
 
 """
-Django view functions: handles web requests
+Django view functions: handles web requests and queries content server for content
 """
 
-def get_kmap_browser(request):
-    node_list = formats.read_nodes(config.CONTENT_PATH, onlytitle=True)
+def get_kmap_browser_view(request):
+    """
+    returns k-map browser
+    """
+    node_list = formats.read_nodes(config.CONTENT_PATH, onlytitle=True) # TODO: move this to content server?
     node_list.sort()
     node_list.insert(0,'full_graph')
-    return render_to_response('kmap-tester.html', {'node_list':node_list}, context_instance=RequestContext(request), )
-
-def get_full_graph(request):
-    fmt = request.GET.get('format','json')
-    return HttpResponse(get_all_nodes(fmt), content_type=get_content_type(fmt))
+    return render_to_response('kmap-tester.html', {'node_list':node_list, 'content_server':CONTENT_SERVER}, context_instance=RequestContext(request), )
 
 
-def get_node_content(request, node, node_aux=None):
+def get_content(request):
     """
-    Return requested node content
+    Return requested content from content server
     """
     fmt = request.GET.get('format','json')
-    if not node_aux:
-        assert fmt == 'json'
-        text = get_node_json(node)
-    elif node_aux == 'related':
-        text = get_related_nodes(node, fmt=fmt)
-    elif node_aux == 'map':
-        text = get_map(node, fmt=fmt)
-    else:
-        raise RuntimeError('Invalid resource: %s' % os.path.join(request,node,node_aux))
-
-    return HttpResponse(text, content_type=get_content_type(fmt))
+    full_url = CONTENT_SERVER + request.path + '?' + urllib.urlencode(request.GET)
+    data = urllib2.urlopen(full_url)
+    return HttpResponse(data, content_type=_get_content_type(fmt))
 
 
-def get_content_type(fmt):
+def _get_content_type(fmt):
     return  {'json': 'application/json',
                          'svg': 'image/svg+xml',
                          'dot': 'text/plain',
                          }[fmt]
-
-
-
-
 
 
 

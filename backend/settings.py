@@ -2,7 +2,7 @@
 import os
 import config
 # in config, set: SECRET_KEY;       
-
+CONTENT_SERVER = 'http://localhost:' + str(config.CONTENT_SERVER_PORT)
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
 AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../')) 
 

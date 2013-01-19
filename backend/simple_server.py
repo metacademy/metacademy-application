@@ -1,5 +1,3 @@
-# TODO: Remove from future commits? -Colorado
-
 import BaseHTTPServer
 import cStringIO
 import sys
@@ -51,11 +49,9 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         load_graph()
 
         parse = urlparse.urlparse(self.path)
-#        pdb.set_trace()
 
         parts = parse.path.lower().split('/')
-        assert parts[0] == ''
-        parts = parts[1:]
+        parts = filter(bool, parts)
 
         query = urlparse.parse_qs(parse.query)
         if 'format' in query:
@@ -67,10 +63,9 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                  'svg': 'image/svg+xml',
                  'dot': 'text/plain',
                  }[fmt]
-
         try:
             if parts[0] == 'full_graph':
-                assert len(parts) == 1
+                assert len(parts)==1
                 text = self.get_full_graph(fmt=fmt)
                 ctype = 'application/json'
             elif parts[0] == 'nodes':
@@ -150,9 +145,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         rel_graph = graphs.Graph.from_node_dependencies(rel_nodes)
 
         return self.format_graph(rel_nodes, rel_graph, fmt)
-        
 
-    
 
 def run_server(port):
     server_address = ('', port)

@@ -1,0 +1,5 @@
+tag: bayesian-model-averaging
+reason: Reversible jump MCMC is intended for Bayesian model averaging.
+
+tag: metropolis-hastings
+reason: Reversible jump MCMC is a special case of Metropolis-Hastings.

@@ -1,0 +1,13 @@
+tag: mixture-of-gaussians
+reason: Mixture of Gaussians is the canonical example of CRP clustering.
+
+tag: bayesian-parameter-estimation
+reason: CRP clustering is a kind of Bayesian model.
+
+tag: chinese-restaurant-process
+
+tag: collapsed-gibbs-sampling
+reason: Collapsed Gibbs sampling is a simple way of performing inference in a CRP clustering model.
+
+tag: exchangeability
+reason: A CRP clustering model is a kind of exchangeable model.

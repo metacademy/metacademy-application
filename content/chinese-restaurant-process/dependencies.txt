@@ -1,0 +1,8 @@
+tag: dirichlet-distribution
+reason: The Chinese restaurant process is the infinite limit of the Dirichlet-multinomial distribution.
+
+tag: multinomial-distribution
+reason: The Chinese restaurant process is the infinite limit of the Dirichlet-multinomial distribution.
+
+tag: gamma-function
+reason: The PMF for the IBP includes the gamma distribution.

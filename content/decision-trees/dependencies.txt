@@ -1,0 +1,2 @@
+tag: maximum-likelihood
+reason: Decision trees are fit using maximum likelihood.

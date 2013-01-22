@@ -1,0 +1,14 @@
+tag: chinese-restaurant-process
+reason: The CRP is a useful analogue for understanding the IBP.
+
+tag: bernoulli-distribution
+reason: The IBP is the infinite limit of the beta-Bernoulli distribution.
+
+tag: beta-distribution
+reason: The IBP is the infinite limit of the beta-Bernoulli distribution.
+
+tag: poisson-distribution
+reason: The IBP model definition includes the Poisson distribution.
+
+tag: gamma-function
+reason: The PMF for the IBP includes the gamma function.

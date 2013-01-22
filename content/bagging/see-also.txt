@@ -1,0 +1,1 @@
+* Boosting is another classifier combination method which sounds similar to bagging, but is meant to improve accuracy rather than reduce variance. [boosting-vs-bagging]

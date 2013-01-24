@@ -1,0 +1,2 @@
+tag: kruskals-algorithm
+reason: One version of agglomerative clustering is equivalent to Kruskal's algorithm.

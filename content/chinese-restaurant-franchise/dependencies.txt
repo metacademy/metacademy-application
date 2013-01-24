@@ -1,0 +1,5 @@
+tag: latent-dirichlet-allocation
+reason: An important motivator for the CRF is Bayesian topic models.
+
+tag: crp-clustering
+reason: CRF topic models can be seen as a hierarchical extension of CRP clustering.

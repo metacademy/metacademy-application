@@ -1,0 +1,4 @@
+tag: chinese-restaurant-franchise
+reason: The CRF is one canonical interpretation of the HDP.
+
+tag: dirichlet-process

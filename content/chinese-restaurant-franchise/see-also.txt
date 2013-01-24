@@ -1,0 +1,1 @@
+* The CRF can be interpreted as a hierarchical Dirichlet process. [hierarchical-dirichlet-process]

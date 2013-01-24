@@ -1,0 +1,5 @@
+tag: agglomerative-clustering
+reason: The Dirichlet diffusion tre is a hierarchical clustering model.
+
+tag: dirichlet-process
+reason: The Dirichlet diffusion tree is inspired by the Dirichlet process.

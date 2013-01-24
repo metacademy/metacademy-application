@@ -1,0 +1,7 @@
+tag: latent-semantic-analysis
+
+tag: probabilistic-models
+reason: pLSA is a kind of probabilistic model.
+
+tag: maximum-likelihood
+reason: pLSA is fit using maximum likelihood.

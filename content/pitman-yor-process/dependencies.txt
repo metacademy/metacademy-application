@@ -1,0 +1,2 @@
+tag: chinese-restaurant-process
+reason: The Pitman-Yor process is a generalization of the CRP.

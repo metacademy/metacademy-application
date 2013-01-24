@@ -1,0 +1,5 @@
+tag: principal-component-analysis
+reason: NMF is motivated as an alternative to PCA.
+
+tag: constrained-optimization-problems
+reason: NMF is a constrained optimization problem.

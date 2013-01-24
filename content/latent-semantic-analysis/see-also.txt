@@ -1,0 +1,2 @@
+* LSA has an odd interpretation when viewed as a probabilistic model. Probabilistic LSA is a similar model with a more principled probabilistic interpretation. [probabilistic-lsa]
+* LSA is commonly used in information retrieval. There, it's referred to as latent semantic indexing. [latent-semantic-indexing]

@@ -265,3 +265,11 @@ def descendants_set(nodes, graph, tag):
                 queue.append(child)
 
     return descendants
+
+def missing_dependencies(nodes):
+    dependencies = set()
+    for node in nodes.values():
+        for d in node.dependencies:
+            dependencies.add(d.parent_tag)
+
+    return dependencies.difference(set(nodes.keys()))

@@ -9,7 +9,7 @@ WRAP_WIDTH = 12
 
 ############################ read nodes as directories #########################
 
-def read_node(path, tag):
+def read_node(path, tag, assert_exists=False):
     """Read a Node object from a directory which optionally contains title.txt,
     dependencies.txt, and see-also.txt."""
     full_path = os.path.join(path, tag)
@@ -18,6 +18,8 @@ def read_node(path, tag):
     if os.path.exists(title_file):
         title = open(title_file).readlines()[0].strip()
     else:
+        if assert_exists:
+            raise RuntimeError('%s/title.txt does not exist' % tag)
         title = None
 
     dependencies_file = os.path.join(full_path, 'dependencies.txt')
@@ -38,6 +40,8 @@ def read_node(path, tag):
                 curr_dep.reason = parts[1].strip()
             else:
                 raise RuntimeError('Error reading line in %s/dependencies.txt: %s' % (tag, line))
+    elif assert_exists:
+        raise RuntimeError('%s/dependencies.txt does not exist' % tag)
 
     see_also_file = os.path.join(full_path, 'see-also.txt')
     pointers = []
@@ -51,6 +55,8 @@ def read_node(path, tag):
                 to_tag = m.group(2)
                 ptr = graphs.Pointer(tag, to_tag, blurb)
                 pointers.append(ptr)
+    elif assert_exists:
+        raise RuntimeError('%s/see-also.txt does not exist' % tag)
 
     return graphs.Node(tag, title, dependencies, pointers)
 
@@ -63,6 +69,31 @@ def read_nodes(path, onlytitle=False):
     else:
         nodes = [read_node(path, tag) for tag in tags]
         return {node.tag: node for node in nodes}
+
+def check_format(path):
+    tags = os.listdir(path)
+    tags = filter(lambda(x): x[0] != '.' and x != 'README' ,tags) # remove hidden files and readme from list
+
+    # make sure files exist and are formatted correctly
+    nodes = []
+    for tag in tags:
+        try:
+            nodes.append(read_node(path, tag, assert_exists=True))
+        except RuntimeError as e:
+            print e
+
+    # make sure tags do not have spaces
+    for node in nodes:
+        if re.search(r'\s', node.tag):
+            print 'Node tag "%s" contains whitespace' % node.tag
+        for d in node.dependencies:
+            if re.search(r'\s', d.parent_tag):
+                print 'Node "%s" has dependency "%s" which contains whitespace' % (node.tag, d.parent_tag)
+        for p in node.pointers:
+            if re.search(r'\s', p.to_tag):
+                print 'Node "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
+
+    
 
 
 

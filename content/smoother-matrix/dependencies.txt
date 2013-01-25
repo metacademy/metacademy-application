@@ -1,8 +1,8 @@
-tag: ridge regression
+tag: ridge-regression
 reason: The smoother matrix is a part of the closed-form solution to linear regression or ridge regression.
 
 tag: generalization
 reason: The smoother matrix is a way of analyzing the generalization performance of linear regression.
 
-tag: projection matrices
+tag: projection-matrices
 reason: In the case of linear regression, the smoother matrix is a projection matrix.

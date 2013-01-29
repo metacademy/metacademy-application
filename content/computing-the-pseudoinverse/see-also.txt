@@ -1,0 +1,1 @@
+* In many situations where you think you want to compute a pseudoinverse, it could be more stable to formulate the algorithm in terms of the QR decomposition. [qr-decomposition]

@@ -1,0 +1,4 @@
+* Eigenvalues are closely related to the characteristic polynomial of a matrix. [characteristic-polynomial]
+* The determinant of a matrix is the product of the eigenvalues. [determinant-product-of-eigenvalues]
+* The Spectral Theorem states that symmetric matrices have a full set of eigenvalues with orthogonal eigenvectors. [spectral-decomposition]
+* Eigenvalues are used in solving linear ordinary differential equations. [matrix-odes-eigenvalues]

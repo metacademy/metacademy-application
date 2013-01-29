@@ -1,0 +1,4 @@
+tag: matrices
+
+tag: subspaces
+reason: The rank is defined in terms of the dimension of a certain subspace.

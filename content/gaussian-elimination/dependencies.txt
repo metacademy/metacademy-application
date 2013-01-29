@@ -1,0 +1,5 @@
+tag: systems-of-linear-equations
+reason: Gaussian elimination is a way of solving linear systems.
+
+tag: permutation-matrices
+reason: Permutation matrices give a useful shorthand for talking about pivoting. 

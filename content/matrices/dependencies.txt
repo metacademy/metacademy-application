@@ -1,0 +1,3 @@
+tag: dot-product
+reason: Matrix multiplication is defined in terms of the dot product.
+

@@ -1,0 +1,5 @@
+tag: spectral-decomposition
+reason: The SVD is equivalent to the spectral decomposition of a particular PSD matrix.
+
+tag: positive-semidefinite-matrices
+reason: The SVD is equivalent to the spectral decomposition of a particular PSD matrix.

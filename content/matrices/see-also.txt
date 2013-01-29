@@ -1,0 +1,5 @@
+* Common operations on matrices include:
+** matrix inverse, which is useful for solving systems of linear equations [matrix-inverse]
+** eigenvalues, a central concept in many areas of science and engineering [eigenvalues]
+** the singular value decomposition, a canonical representation of matrices closely related to eigenvalues [singular-value-decomposition]
+* Many properties of matrix multiplication can be generalized to linear operators on vector spaces. [linear-operators]

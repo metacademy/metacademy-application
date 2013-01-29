@@ -1,0 +1,2 @@
+* If the matrix is symmetric positive definite, we never need to pivot; in this case, the factorization is known as the Cholesky decomposition. [cholesky-decomposition]
+ 

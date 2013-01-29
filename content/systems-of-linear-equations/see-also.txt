@@ -1,0 +1,1 @@
+* The inverse of a matrix can be interpreted in terms of systems of linear equations. [matrix-inverse]

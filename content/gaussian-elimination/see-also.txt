@@ -1,0 +1,3 @@
+* Gaussian elimination can be viewed as factorizing a matrix into a lower triangular and an upper triangular matrix. [lu-factorization]
+* If the matrix is symmetric positive definite, we never need to pivot; in this case, the algorithm is known as the Cholesky decomposition. [cholesky-decomposition]
+

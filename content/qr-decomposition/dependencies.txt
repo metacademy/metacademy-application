@@ -1,0 +1,5 @@
+tag: linear-least-squares
+reason: The QR decomposition is a way of solving linear least squares problems.
+
+tag: gram-schmidt
+reason: The Gram-Schmidt procedure is a simple algorithm for computing the QR decomposition.

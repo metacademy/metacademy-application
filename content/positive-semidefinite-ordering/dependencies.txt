@@ -1,0 +1,4 @@
+tag: partial-orders
+reason: The PSD ordering is a partial order.
+
+tag: positive-semidefinite-matrices

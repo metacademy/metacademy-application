@@ -1,0 +1,2 @@
+tag: linear-least-squares
+reason: The pseudoinverse of a matrix is a way of thinking about solutions to linear least squares problems.

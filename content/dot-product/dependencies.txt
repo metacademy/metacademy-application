@@ -1,0 +1,2 @@
+tag: vectors
+reason: The dot product is defined on vectors.

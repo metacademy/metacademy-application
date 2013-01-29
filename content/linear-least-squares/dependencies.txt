@@ -1,0 +1,5 @@
+tag: orthogonal-matrices
+reason: Orthogonal matrices are part of the QR decomposition, one solution technique.
+
+tag: systems-of-linear-equations
+reason: Linear least squares generalizes solving systems of linear equations.

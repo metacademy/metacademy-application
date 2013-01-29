@@ -1,0 +1,2 @@
+* The pseudoinverse is one way of thinking about linear regression, a statistical model. [linear-regression]
+* The conductivity of a circuit can be viewed as the pseudoinverse of a matrix. [conductivity-as-pseudoinverse]

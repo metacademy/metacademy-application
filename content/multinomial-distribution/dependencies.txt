@@ -1,0 +1,5 @@
+tag: binomial-distribution
+reason: The multinomial distribution is a generalization of the binomial distribution.
+
+tag: multinomial-coefficients
+reason: Multinomial coefficients are used to define the multinomial distribution.

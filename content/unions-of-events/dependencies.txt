@@ -1,0 +1,3 @@
+tag: probability
+
+tag: multinomial-coefficients

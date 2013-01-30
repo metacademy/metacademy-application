@@ -1,0 +1,11 @@
+* Some important properties of random variables:
+** expected value, the value it takes "on average" [expected-value]
+** independence, i.e. one variable's distribution not depending on the other [independence]
+** variance, how much the value tends to deviate from the mean [variance]
+** entropy, a measure of the amount of uncertainty [entropy]
+* Some distributions of interest:
+** the binomial distribution, which counts the number of times an event occurs between identical and independent trials [binomial-distribution]
+** the multinomial distribution, where it takes values from a discrete set, each with some probability [multinomial-distribution]
+** the Poisson distribution, used for modeling numbers of events that happen independently, such as earthquakes [poisson-distribution]
+** the exponential distribution [exponential-distribution]
+** the Gaussian distribution, a "bell curve" which appears extremely frequently in nature and is widely used in statistical modeling [gaussian-distribution]

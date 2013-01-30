@@ -1,0 +1,5 @@
+* The gamma distribution is a generalization of the exponential distribution. [gamma-distribution]
+* The geometric distribution is a geometric analogue of the exponential distribution. [geometric-distribution]
+* The exponential distribution is the only memoryless continuous distribution. [memorylessness]
+* Equivalently, it is the only continuous distribution with constant failure rate. [failure-rate]
+

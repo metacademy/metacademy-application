@@ -1,0 +1,4 @@
+tag: random-variables
+
+tag: multinomial-coefficients
+reason: Binomial coefficients are used to define the binomial distribution.

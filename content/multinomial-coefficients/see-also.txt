@@ -1,0 +1,1 @@
+* Multinomial coefficients are used to define the multinomial distribution. [multinomial-distribution]

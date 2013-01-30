@@ -1,0 +1,4 @@
+tag: independence
+
+tag: marginalization
+reason: Marginalization is used to define independent random variables.

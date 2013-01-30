@@ -1,0 +1,3 @@
+* Bayes nets are a framework for sophisticated probabilistic reasoning about many variables of interest using things like Bayes' rule. [bayes-nets]
+* Bayesian statistics is a branch of statistics loosely inspired by Bayesian reasoning. [bayes-rule]
+

@@ -1,0 +1,3 @@
+* Poisson processes are a kind of stochastic process where counts of events within a set follow a Poisson distribution. [poisson-process]
+* For large values of the scale parameter, the Poisson distribution is well approximated by a Gaussian distribution. This follows from the Central Limit Theorem. [central-limit-theorem]
+* The Poisson distribution is a member of the exponential family. [exponential-family]

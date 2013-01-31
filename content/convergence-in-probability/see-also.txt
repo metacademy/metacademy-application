@@ -1,0 +1,5 @@
+* Some examples of convergence in probability:
+** the weak law of large numbers [weak-law-of-large-numbers]
+* Some other notions of convergence of sequences of random variables:
+** convergence in distribution, where the empirical CDF converges to something [convergence-in-distribution]
+** almost sure convergence, where the sequence converges to a value with probability 1 [almost-sure-convergence]

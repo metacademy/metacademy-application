@@ -1,0 +1,7 @@
+* The gamma function can be approximated with Stirling's formula. [stirlings-formula]
+* The gamma function features centrally in the Riemann hypothesis. [riemann-hypothesis]
+* The gamma function is needed to define several probability distributions:
+** gamma distribution [gamma-distribution]
+** beta distribution [beta-distribution]
+** Dirichlet distribution [dirichlet-distribution]
+* The gamma function is an example of an analytic function. [analytic-functions]

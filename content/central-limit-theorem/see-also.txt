@@ -1,0 +1,8 @@
+* Proof of the theorem [central-limit-theorem-proof]
+* The theorem can be generalized to:
+** the multivariate case. [multivariate-central-limit-theorem]
+** martingales [martingale-central-limit-theorem]
+* Other results about sums of series:
+** Weak law of large numbers [weak-law-of-large-numbers]
+** Strong law of large numbers [strong-law-of-large-numbers]
+** Chernoff bounds [chernoff-bounds]

@@ -1,0 +1,6 @@
+* Variational Bayes is a class of approximate inference algorithms which try to minimize the KL divergence between distributions. [variational-bayes]
+* KL divergence is a special case of more general families of divergences:
+** alpha divergences [alpha-divergences]
+** Bregman divergence [bregman-divergence]
+* KL divergence is locally approximated by the Fisher information metric. [fisher-information-metric-approximates-kl-divergence]
+* Mutual information can be defined in terms of KL divergence. [mutual-information-and-kl-divergence]

@@ -1,0 +1,4 @@
+tag: conditional-distributions
+reason: Conditional entropy is defined in terms of conditional distributions.
+
+tag: entropy

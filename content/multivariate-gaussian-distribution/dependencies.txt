@@ -1,0 +1,10 @@
+tag: gaussian-distribution
+
+tag: covariance-matrices
+reason: The multivariate Gaussian distribution is parameterized in terms of a mean vector and covariance matrix.
+
+tag: determinant
+reason: The determinant of the covariance matrix is part of the normalizing constant.
+
+tag: matrix-inverse
+reason: The inverse of the covariance matrix is part of the PDF.

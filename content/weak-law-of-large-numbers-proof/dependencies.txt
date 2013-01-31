@@ -1,0 +1,4 @@
+tag: weak-law-of-large-numbers
+
+tag: chebyshevs-inequality
+reason: The theorem follows almost directly from Chebyshev's inequality.

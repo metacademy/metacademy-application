@@ -1,0 +1,5 @@
+tag: variance
+reason: The MGF is closely related to moments of a distribution.
+
+tag: independent-random-variables
+reason: MGFs are a powerful tool for analyzing sums of independent random variables.

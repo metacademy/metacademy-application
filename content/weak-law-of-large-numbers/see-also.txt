@@ -1,0 +1,4 @@
+* Proof of the theorem [weak-law-of-large-numbers-proof]
+* The strong law of large numbers is a stronger form of this theorem, but which applies in more restricted cases. [strong-law-of-large-numbers]
+* The central limit theorem characterizes the distribution of the average value more precisely. [central-limit-theorem]
+

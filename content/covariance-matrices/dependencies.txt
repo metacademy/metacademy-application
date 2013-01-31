@@ -1,0 +1,4 @@
+tag: covariance
+
+tag: positive-semidefinite-matries
+reason: The covariance matrix is a PSD matrix.

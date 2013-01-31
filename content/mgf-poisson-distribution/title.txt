@@ -1,0 +1,1 @@
+Moment generating function of the Poisson distribution

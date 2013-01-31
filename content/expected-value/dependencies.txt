@@ -1,0 +1,2 @@
+tag: random-variables
+reason: Expected value is a property of random variables.

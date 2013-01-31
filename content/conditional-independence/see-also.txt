@@ -1,0 +1,5 @@
+* Conditional independence is fundamental to probabilistic graphical models, including:
+** Markov chains, memoryless random sequences where each state is independent of the past conditioned on the previous state [markov-chains]
+** Bayesian networks, which (roughly) represent causal structure [bayesian-networks]
+** Markov random fields, which model which random variables directly interact with each other [markov-random-fields]
+

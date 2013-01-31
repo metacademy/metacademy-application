@@ -1,0 +1,3 @@
+* Chernoff bounds are another method for bounding the probability of extreme values. [chernoff-bounds]
+* The inequality can be extended to higher-order moments. [chebyshev-inequality-higher-order]
+* Chebyshev's bound can be used to prove the weak law of large numbers. [weak-law-of-large-numbers-proof]

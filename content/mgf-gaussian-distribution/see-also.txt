@@ -1,0 +1,4 @@
+* The MGF of the Gaussian distribution is crucial for deriving several important results:
+** The central limit theorem, which characterizes the asymptotic distribution of sums of random variables [central-limit-theorem-proof]
+** Chernoff bounds, which bound the probability of extreme values of sums of random variables [chernoff-bounds-proof]
+

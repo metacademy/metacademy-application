@@ -1,0 +1,5 @@
+tag: sequences-of-random-variables
+reason: Convergence in distribution is a property of sequences of random variables.
+
+tag: cumulative-distribution-function
+reason: Convergence in distribution is defined in terms of the CDF.

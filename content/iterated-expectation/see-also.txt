@@ -1,0 +1,4 @@
+* Some uses of iterated expectations:
+** they justify the use of Monte Carlo estimators [monte-carlo-methods]
+** they are used in the definition of martingales [martingales]
+

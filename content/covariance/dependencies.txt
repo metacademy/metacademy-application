@@ -1,0 +1,5 @@
+tag: variance
+reason: Covariance is a generalization of variance.
+
+tag: independent-random-variables
+reason: Independent random variables have zero covariance.

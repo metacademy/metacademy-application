@@ -1,0 +1,2 @@
+tag: covariance
+reason: The Cauchy-Schwartz inequality relates variances and covariances.

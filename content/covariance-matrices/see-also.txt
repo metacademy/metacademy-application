@@ -1,0 +1,3 @@
+* The multivariate Gaussian is a widely used distribution parameterized in terms of a mean vector and covariance matrix. [multivariate-gaussian-distribution]
+* The Cauchy-Schwartz inequality for covariance follows from the fact that covariance matrices are PSD. [cauchy-schwartz-inequality-probability]
+* Principal component analysis is a data analysis method applied to the covariance matrix. [principal-component-analysis]

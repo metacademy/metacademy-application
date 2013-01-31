@@ -1,0 +1,13 @@
+* Mathematical tricks for manipulating multivariate Gaussians [multivariate-gaussian-distribution-tricks]
+* Some reasons that the multivariate Gaussian distribution is often seen in nature:
+** the central limit theorem says that sums of large numbers of independent random variables are approximately Gaussian [multivariate-central-limit-theorem]
+** the variance of many statistical estimators approaches a Gaussian as more data points are observed [maximum-likelihood-asymptotically-gaussian]
+* Multivariate Gaussians are popular in computer science because they give efficient ways to account for dependencies between random variables. [computations-on-multivariate-gaussians]
+* The parameters of a multivariate Gaussian can be estimated from data using:
+** maximum likelihood [maximum-likelihood-multivariate-gaussian]
+** Bayesian parameter estimation [bayesian-parameter-estimation-multivariate-gaussian]
+* Some statistical models which use multivariate Gaussians:
+** mixture of Gaussians models, which are used to cluster data points [mixture-of-gaussians]
+** Bayesian linear regression [bayesian-linear-regression]
+* Multivariate Gaussians are an exponential family distribution. [exponential-family]
+

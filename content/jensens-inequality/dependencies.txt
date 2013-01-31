@@ -1,0 +1,5 @@
+tag: convexity
+reason: Jensen's inequality applies to convex functions.
+
+tag: expectation
+reason: Jensen's inequality involves expectations.

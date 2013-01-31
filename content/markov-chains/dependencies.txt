@@ -1,0 +1,5 @@
+tag: sequences-of-random-variables
+reason: Markov chains are sequences of random variables.
+
+tag: conditional-independence
+reason: Markov chains are defined in terms of a conditional independence property.

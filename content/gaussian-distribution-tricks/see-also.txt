@@ -1,0 +1,1 @@
+* Many of these tricks can be extended to multivariate Gaussians. [multivariate-gaussian-distribution-tricks]

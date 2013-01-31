@@ -1,0 +1,8 @@
+tag: entropy
+reason: KL divergence is closely related to entropy.
+
+tag: differential-entropy
+reason: KL divergence is closely related to entropy.
+
+tag: jensens-inequality
+reason: Jensen's inequality shows that KL divergence is nonnegative.

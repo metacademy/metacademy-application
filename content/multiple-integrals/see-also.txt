@@ -1,0 +1,10 @@
+* Some uses of multiple integrals:
+** Computing the probability that a continuous random variable takes a value in some set [random-variables]
+* The Riemann integral formalizes these notions. [riemann-integral]
+* Some tricks for evaluating multiple integrals:
+** changing the order of integration [eval-multi-int-changing-order]
+** change of variables [eval-multi-int-change-of-variables]
+** polar coordinates [eval-multi-int-polar-coordinates]
+** spherical coordinates [eval-multi-int-spherical-coordinates]
+** cylindrical coordinates [eval-multi-int-cylindrical-coordinates]
+* Measure theory offers a more general notion of integration. [measures]

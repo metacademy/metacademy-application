@@ -1,0 +1,5 @@
+tag: taylor-approximations
+reason: Second-order Taylor approximations are used to characterize optimal solutions.
+
+tag: positive-semidefinite-matrices
+reason: A point is a minimum if the second-order Taylor approximation is positive definite.

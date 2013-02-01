@@ -1,0 +1,8 @@
+tag: eval-multi-int-polar-coordinates
+reason: Polar coordinates are an instructive example.
+
+tag: determinant
+reason: The change of variables formula involves the determinant of the Jacobian.
+
+tag: jacobian
+reason: The change of variables formula involves the determinant of the Jacobian.

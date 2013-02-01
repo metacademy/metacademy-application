@@ -1,0 +1,4 @@
+* Some uses of Taylor approximations:
+** Characterizing optimal solutions to optimization problems [unconstrained-optimization-problems]
+** The delta method for approximating the error of a statistical estimator [delta-method]
+** Newton-Rhapson, a convex optimization algorithm [newton-rhapson]

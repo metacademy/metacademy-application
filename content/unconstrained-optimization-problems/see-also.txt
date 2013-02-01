@@ -1,0 +1,6 @@
+* Lagrange multipliers can be used to solve optimization problems with equality or inequality constraints. [lagrange-multipliers]
+* Some examples of optimization problems:
+** Fitting parameters of a statistical model using maximum likelihood [maximum-likelihood]
+** Linear least squares [linear-least-squares]
+* Convex optimization problems are a very broad class of optimization problems for which we can often find a global optimimum. [convex-optimization]
+

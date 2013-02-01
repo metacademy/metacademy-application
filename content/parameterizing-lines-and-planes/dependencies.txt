@@ -1,0 +1,5 @@
+tag: cross-product
+reason: The cross product is needed to satisfy orthogonality constraints.
+
+tag: systems-of-linear-equations
+reason: Lines and planes can be represented in terms of linear systems.

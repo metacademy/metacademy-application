@@ -1,0 +1,11 @@
+* We can't always find a closed form solution to an optimization problem. Here are some computational techniques we can use:
+** projected gradient descent [projected-gradient-descent]
+** interior point methods [interior-point-methods]
+* Some widely used classes of optimization problems:
+** convex optimization problems [convex-optimization]
+** linear least squares [linear-least-squares]
+** linear programs [linear-programs]
+** quadratic programs [quadratic-programs]
+** second-order conic programs [second-order-conic-programs]
+** semidefinite programs [semidefinite-programs]
+

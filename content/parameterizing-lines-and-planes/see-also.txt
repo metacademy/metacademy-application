@@ -1,0 +1,1 @@
+* These ideas can be extended to parameterize surfaces. [parameterizing-surfaces]

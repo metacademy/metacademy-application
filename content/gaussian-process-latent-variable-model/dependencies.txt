@@ -1,4 +1,4 @@
-tag: multidimensional-scaling
+tag: multidimensional scaling
 reason: GP-LVMs are a Bayesian model inspired by MDS.
 
 tag: gaussian-process-regression

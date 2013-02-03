@@ -27,10 +27,13 @@ class Dependency:
     child_tag -- the tag of the node which depends on parent_tag
     reason -- a verbal description of the reason for the dependency
     """
-    def __init__(self, parent_tag, child_tag, reason):
+    def __init__(self, parent_tag, child_tag, reason=None):
         self.parent_tag = parent_tag
         self.child_tag = child_tag
-        self.reason = reason
+        if reason:
+            self.reason = reason.replace('"',"'")
+        else:
+            self.reason = None
 
     def __repr__(self):
         return 'Dependency(parent_tag=%r, child_tag=%r, reason=%r)' % (self.parent_tag, self.child_tag, self.reason)
@@ -42,10 +45,13 @@ class Pointer:
     to_tag -- the tag of the node being linked to
     blurb -- a verbal annotation of why it's relevant
     """
-    def __init__(self, from_tag, to_tag, blurb):
+    def __init__(self, from_tag, to_tag, blurb=None):
         self.from_tag = from_tag
         self.to_tag = to_tag
-        self.blurb = blurb
+        if blurb:
+            self.blurb = blurb.replace('"',"'")
+        else:
+            self.blurb = None
 
     def __repr__(self):
         return 'Pointer(from_tag=%r, to_tag=%r, blurb=%r)' % (self.from_tag, self.to_tag, self.blurb)

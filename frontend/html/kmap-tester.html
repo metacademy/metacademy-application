@@ -1,201 +1,237 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html"/>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/d3.v2.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/jquery-latest.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/relationships.css" type="text/css" media="screen"/>
-    <title>Knowledge Graph Demo</title>
-    <script type="text/javascript">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html"/>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/d3.v2.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/jquery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/relationships.css" type="text/css" media="screen"/>
+<title>Knowledge Graph Demo</title>
+<script type="text/javascript">
 
+// TODO make a js aux function file
+function print_error(xhr, status) {
+//    print_error
+    switch (status) {
+        case 404:
+            console.error('File not found');
+            break;
+        case 500:
+            console.error('Server error');
+            break;
+        case 0:
+            console.error('Request aborted');
+            break;
+        default:
+            console.error('Unknown error ' + status + ' ' + xhr.status);
+    }
+}
 
-        // load the SVG file using AJAX
-        function load_svg(node_name) {
-            if (node_name.length == 0) {
-                return
-            }
+// load the SVG file using AJAX
+var jdata = null;
+function load_svg(node_name) {
+    if (node_name.length == 0) {
+        return
+    }
 
-            if (node_name == 'full_graph') {
-                var get_url = '/full_graph'
-            } else {
-                var get_url = '/nodes/' + node_name.replace(/_/g, '-') + '/map'
-            }
+    if (node_name == 'full_graph') {
+        var get_url = '/full_graph'
+    } else {
+        var get_url = '/nodes/' + node_name.replace(/_/g, '-') + '/map'
+    }
 
-            jQuery.get(get_url + "?format=svg", function (svgFileData) {
-                // remove previous data
-                jQuery("svg").remove();
+    jQuery.ajax({
+        type:'GET',
+        url:get_url + '?format=svg',
+        async:false,
+        success:function (svgFileData) {
+            // remove previous data
+            jQuery("svg").remove();
 
-                // load new data
-                var svgd = document.importNode(svgFileData.documentElement, true);
-                jQuery('#leftpanel').append(svgd);
+            // load new data
+            var svgd = document.importNode(svgFileData.documentElement, true);
+            jQuery('#leftpanel').append(svgd);
 
-                // sort the edges and nodes so that edges don't overlap the nodes
-                var gelems = d3.selectAll('.node,.edge');
-                var gdata = gelems[0].map(function (itm) {
-                    if (d3.select(itm).attr('class') == 'node') {
-                        return 1
-                    }
-                    return 0
-                });
-                gelems.data(gdata).sort()
-
-                // add dynamic properties to nodes
-                last_node = -1;
-                d3.selectAll(".node")
-                        .on("mouseover", function () {
-                            node = d3.select(this);
-                            if (node.attr('clicked') == null) {
-                                node.select('ellipse').attr('fill', '#E6EEEE')
-                            }
-                        })
-                        .on("mouseout", function () {
-                            node = d3.select(this);
-                            if (node.attr('clicked') == null) {
-                                node.select('ellipse').attr('fill', 'white')
-                            }
-                        })
-                        .on("click", function (d) {
-                            var this_node = d3.select(this).attr('clicked', 'true');
-                            this_node.select('ellipse')
-                                    .attr("fill", "#F5EEEE"); // Example of property change
-
-                            var node_data = jdata[this_node.select('title').text()];
-                            var text_panel = d3.select("#righttext");
-                            text_panel.html("");
-
-                            text_panel.append("div")
-                                    .attr("class", "data-title")
-                                    .text(node_data['title']);
-
-                            text_panel.append("div")
-                                    .attr("class", "data-description")
-                                    .text("[lorem ipsum]");  // TODO -- add data content/references (wikipedia for starters?)
-
-                            // add pointer (see-also) info
-                            if (node_data['pointers'].length > 0) {
-                                text_panel.append('div')
-                                        .attr('class', 'data-subtitle')
-                                        .text('See Also');
-                                var dp_enter = text_panel.append("div")
-                                        .attr("class", "data-pointers")
-                                        .selectAll('div')
-                                        .data(node_data['pointers'])
-                                        .enter()
-                                        .append('div')
-                                        .attr('class', 'list-entry');
-
-                                dp_enter.append('div')
-                                        .attr('class', 'help-ptr')
-                                        .append('img')
-                                        .attr('src', '{{ STATIC_URL }}images/qmark.jpg')
-                                        .attr('class', 'list-img hastip')
-                                        .attr('title', function (d) {
-                                            return d.blurb=="None" ? "" : d.blurb;
-                                        });
-                                dp_enter.append('div')
-                                        .attr('class', 'list-text')
-                                        .text(function (d) {
-                                            return d.to_tag.replace('-', ' ');
-                                        });
-                            }
-
-                            // add dependencies info
-                            if (node_data['dependencies'].length > 0) {
-                                text_panel.append('div')
-                                        .attr('class', 'data-subtitle')
-                                        .text('Dependencies');
-
-                                var lent = text_panel.append("div")
-                                        .attr("class", "data-dependencies")
-                                        .selectAll('div')
-                                        .data(node_data['dependencies'])
-                                        .enter()
-                                        .append('div')
-                                        .attr('class', 'list-entry');
-
-                                lent.append('div')
-                                        .attr('class', 'help-ptr')
-                                        .append('img')
-                                        .attr('src', '{{ STATIC_URL }}images/qmark.jpg')
-                                        .attr('class', 'list-img hastip')
-                                        .attr('title', function (d) {
-                                            return d.reason=="None" ? "" : d.reason;
-                                        });
-
-                                lent.append('div')
-                                        .attr('class', 'list-text')
-                                        .text(function (d) {
-                                            return d.from_tag.replace('-', ' ');
-                                        });
-
-                            }
-
-                            // add "focus" button
-                            text_panel.append("div")
-                                    .attr('class','topic-focus')
-                                    .append("button")
-                                    .text('Focus on Topic')
-                                    .attr('class','topic-focus')
-                                    .on('click',function(d){load_svg(this_node.select('title').text().replace('_','-'));});
-
-                            // tooltip for pretty hover info
-                            jQuery('.hastip').tooltipsy();
-
-                            if (last_node == -1) {
-                                last_node = this_node;
-                                return;
-                            }
-                            else {
-                                last_node.attr("clicked", null)
-                                        .select('ellipse')
-                                        .attr("fill", "white");
-                            }
-
-                            if (this_node.attr('id') == last_node.attr('id')) {
-                                last_node = -1;
-                                text_panel.html("");
-                            }
-                            else {
-                                last_node = this_node;
-                            }
-
-                        })
-
-                // obtain orginal transformation since graphviz produces unnormalized coordinates
-                var transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
-                var otrans = transprops[2].split(" ").map(Number);
-                var dzoom = d3.behavior.zoom();
-                dzoom.translate(otrans);
-
-                // make graph zoomable/translatable
-                var vis = d3.select("svg")
-                        .attr("pointer-events", "all")
-                        .attr("viewBox", null)
-                        .call(dzoom.on("zoom", redraw))
-                        .select(".graph");
-
-                // helper function to redraw svg graph with correct coordinates
-                function redraw() {
-                    vis.attr("transform",
-                            "translate(" + d3.event.translate + ")"
-                                    + " scale(" + d3.event.scale + ")");
+            // sort the edges and nodes so that edges don't overlap the nodes
+            var gelems = d3.selectAll('.node,.edge');
+            var gdata = gelems[0].map(function (itm) {
+                if (d3.select(itm).attr('class') == 'node') {
+                    return 1
                 }
-
+                return 0
             });
-            jQuery.getJSON(get_url + '?format=json', function (res_data) {
-                jdata = res_data;
-            });
-        }
+            gelems.data(gdata).sort()
 
-        // load the first dataset in the list (for now)
-        jQuery(document).ready(function () {
-            load_svg(jQuery('#data-select').val());
-        });
+            // add dynamic properties to nodes
+            last_node = -1;
+            d3.selectAll(".node")
+                    .on("mouseover", function () {
+                        node = d3.select(this);
+                        if (node.attr('clicked') == null) {
+                            node.select('ellipse').attr('fill', '#E6EEEE')
+                        }
+                    })
+                    .on("mouseout", function () {
+                        node = d3.select(this);
+                        if (node.attr('clicked') == null) {
+                            node.select('ellipse').attr('fill', 'white')
+                        }
+                    })
+                    .on("click", function (d) {
+                        var this_node = d3.select(this).attr('clicked', 'true');
+                        this_node.select('ellipse')
+                                .attr("fill", "#F5EEEE"); // Example of property change
 
-    </script>
+                        // TODO make sure we have jdata
+                        var node_data = jdata[this_node.select('title').text()];
+                        var text_panel = d3.select("#righttext");
+                        text_panel.html("");
+
+                        text_panel.append("div")
+                                .attr("class", "data-title")
+                                .text(node_data['title']);
+
+                        text_panel.append("div")
+                                .attr("class", "data-description")
+                                .text("[lorem ipsum]");  // TODO -- add data content/references (wikipedia for starters?)
+
+                        // add pointer (see-also) info
+                        if (node_data['pointers'].length > 0) {
+                            text_panel.append('div')
+                                    .attr('class', 'data-subtitle')
+                                    .text('See Also');
+                            var dp_enter = text_panel.append("div")
+                                    .attr("class", "data-pointers")
+                                    .selectAll('div')
+                                    .data(node_data['pointers'])
+                                    .enter()
+                                    .append('div')
+                                    .attr('class', 'list-entry');
+
+                            dp_enter.append('div')
+                                    .attr('class', 'help-ptr')
+                                    .append('img')
+                                    .attr('src', '{{ STATIC_URL }}images/qmark.jpg')
+                                    .attr('class', 'list-img hastip')
+                                    .attr('title', function (d) {
+                                        return d.blurb == "None" ? "" : d.blurb;
+                                    });
+                            dp_enter.append('div')
+                                    .attr('class', 'list-text')
+                                    .text(function (d) {
+                                        return d.to_tag.replace('-', ' ');
+                                    });
+                        }
+
+                        // add dependencies info
+                        if (node_data['dependencies'].length > 0) {
+                            text_panel.append('div')
+                                    .attr('class', 'data-subtitle')
+                                    .text('Dependencies');
+
+                            var lent = text_panel.append("div")
+                                    .attr("class", "data-dependencies")
+                                    .selectAll('div')
+                                    .data(node_data['dependencies'])
+                                    .enter()
+                                    .append('div')
+                                    .attr('class', 'list-entry');
+
+                            lent.append('div')
+                                    .attr('class', 'help-ptr')
+                                    .append('img')
+                                    .attr('src', '{{ STATIC_URL }}images/qmark.jpg')
+                                    .attr('class', 'list-img hastip')
+                                    .attr('title', function (d) {
+                                        return d.reason == "None" ? "" : d.reason;
+                                    });
+
+                            lent.append('div')
+                                    .attr('class', 'list-text')
+                                    .text(function (d) {
+                                        return d.from_tag.replace('-', ' ');
+                                    });
+
+                        }
+
+                        // add "focus" button
+                        text_panel.append("div")
+                                .attr('class', 'topic-focus')
+                                .append("button")
+                                .text('Focus on Topic')
+                                .attr('class', 'topic-focus')
+                                .on('click', function (d) {
+                                    load_svg(this_node.select('title').text().replace('_', '-'));
+                                });
+
+                        // tooltip for pretty hover info
+                        jQuery('.hastip').tooltipsy();
+
+                        if (last_node == -1) {
+                            last_node = this_node;
+                            return;
+                        }
+                        else {
+                            last_node.attr("clicked", null)
+                                    .select('ellipse')
+                                    .attr("fill", "white");
+                        }
+
+                        if (this_node.attr('id') == last_node.attr('id')) {
+                            last_node = -1;
+                            text_panel.html("");
+                        }
+                        else {
+                            last_node = this_node;
+                        }
+
+                    })
+
+            // obtain orginal transformation since graphviz produces unnormalized coordinates
+            var transprops = d3.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
+            var otrans = transprops[2].split(" ").map(Number);
+            var dzoom = d3.behavior.zoom();
+            dzoom.translate(otrans);
+
+            // make graph zoomable/translatable
+            var vis = d3.select("svg")
+                    .attr("pointer-events", "all")
+                    .attr("viewBox", null)
+                    .call(dzoom.on("zoom", redraw))
+                    .select(".graph");
+
+            // helper function to redraw svg graph with correct coordinates
+            function redraw() {
+                vis.attr("transform",
+                        "translate(" + d3.event.translate + ")"
+                                + " scale(" + d3.event.scale + ")");
+            }
+
+        },
+        error:print_error
+    });
+
+    jQuery.ajax({
+        type:'GET',
+        url:get_url + '?format=json',
+        async:false,
+        success:function (data) {
+            jdata = data;
+            console.log("valid AJAX call for json graph data");
+        },
+        error:print_error
+    });
+
+}
+
+// load the first dataset in the list (for now)
+jQuery(document).ready(function () {
+    load_svg(jQuery('#data-select').val());
+});
+
+</script>
 
 </head>
 
@@ -205,7 +241,7 @@
     <div id="leftpanel" class="column">
         <select id="data-select" onchange="load_svg(this.value)">
             {% for node_tag in node_list %}
-                <option value="{{ node_tag }}">{{ node_tag }}</option>
+            <option value="{{ node_tag }}">{{ node_tag }}</option>
             {% endfor %}
         </select>
 

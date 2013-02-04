@@ -1,0 +1,8 @@
+* Bayes nets are closely related to Markov random fields (MRFs), a graphical model formalism which is good at representing soft constraints between variables. [markov-random-fields]
+* Neither Bayes nets nor MRFs are strictly more powerful than the other. [bayes-nets-vs-mrfs-representation]
+* Bayes nets can also be characterized in terms of their conditional independencies. The conditional independencies can be found using d-separation. [d-separation]
+* Often we are interested in
+** inferring the conditional probabilities of some variables given others [bayes-net-inference]
+** learning the parameters of the network from data [bayes-net-parameter-learning]
+* The Bayes net representation assumes all the relevant information about the problem is contained in the joint distribution over all the variables. Causal networks are a closely related formalism which captures more details about the causal relationships. [causal-networks]
+

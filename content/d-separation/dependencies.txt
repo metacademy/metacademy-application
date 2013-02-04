@@ -1,0 +1,5 @@
+tag: bayesian-networks
+reason: d-separation is a way of analyzing Bayes nets.
+
+tag: conditional-independence
+reason: d-separation is a way of finding conditional independencies.

@@ -1,0 +1,3 @@
+* Some probabilistic models allow for more efficient conditioning by exploiting problem structure:
+** Gaussian Markov random fields, which exploit sparsity in the precision matrix [gaussian-markov-random-fields]
+** Linear-Gaussian models, which exploit sparsity in the Cholesky decomposition [linear-gaussian-models]

@@ -1,0 +1,4 @@
+* Trees are interesting because several important problems can be solved exactly, and efficiently:
+** Conditional probability queries, using belief propagation [belief-propagation-on-trees]
+** Parameter learning [tree-graph-parameter-learning]
+** Learning the tree structure (i.e. Chow-Liu trees) [chow-liu-trees]

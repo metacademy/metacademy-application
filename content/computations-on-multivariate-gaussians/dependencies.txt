@@ -1,0 +1,2 @@
+tag: degenerate-gaussians
+reason: Some computations on multivariate Gaussians can produce degenerate results.

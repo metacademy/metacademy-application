@@ -1,0 +1,5 @@
+tag: multivariate-gaussian-distribution
+reason: Linear-Gaussian models define multivariate Gaussian distributions.
+
+tag: bayesian-networks
+reason: Linear-Gaussian models are a kind of Bayes net.

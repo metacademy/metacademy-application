@@ -1,0 +1,3 @@
+tag: variable-elimination
+reason: Belief propagation can be viewed as a way of reusing variable elimination computations.
+

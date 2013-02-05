@@ -1,0 +1,6 @@
+* If we apply the BP update rules in a non-tree graph, it often still works; this is known as loopy BP. [loopy-belief-propagation]
+* We can apply (exact) BP to any MRF using the junction tree representation, although possibly with a large increase in complexity [junction-trees]
+* The special case of Gaussian graphical models [gaussian-bp-on-trees]
+* Some HMM inference algorithms can be interpreted as belief propagation [hmm-inference-as-bp]
+* If we have a polytree or chordal MRF, we can convert it to a factor graph and then run BP. [factor-graph-bp] 
+* BP can be interpreted as fixed point updates to an optimization problem involving Bethe free energy. [variational-interpretation-of-bp]

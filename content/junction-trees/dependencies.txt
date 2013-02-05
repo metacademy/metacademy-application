@@ -1,0 +1,7 @@
+tag: variable-elimination
+reason: We can construct junction trees using variable elimination.
+
+tag: belief-propagation-on-trees
+reason: Junction trees are a way of applying exact BP to arbitrary graphs.
+
+tag: chordal-mrfs

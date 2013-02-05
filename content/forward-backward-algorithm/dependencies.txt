@@ -1,0 +1,2 @@
+tag: hidden-markov-models
+reason: Forward-backward is an algorithm for inference in HMMs.

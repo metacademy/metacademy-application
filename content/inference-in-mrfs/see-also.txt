@@ -1,0 +1,12 @@
+* Under widely held assumptions, there is no efficient exact inference algorithm for graphical models. [complexity-of-inference]
+* We can perform inference in Bayes nets by converting them to MRFs. [inference-in-bayes-nets]
+* Here are some algorithms for exact inference:
+** variable elimination, a conceptually simple one [variable-elimination]
+** belief propagation, an extension of variable elimination which reuses computations [belief-propagation-on-trees]
+* When exact inference is infeasible, we must resort to approximate inference algorithms, such as:
+** loopy belief propagation, which applies the BP update rules on non-tree graphs [loopy-belief-propagation]
+** Markov chain Monte Carlo, a sampling-based method [markov-chain-monte-carlo]
+** variational inference, which tries to find a tractable approximation to the posterior [variational-inference]
+* Inference is at most cubic in Gaussian graphical models, and often much better [inference-in-gaussian-mrfs]
+
+

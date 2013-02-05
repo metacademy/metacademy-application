@@ -1,0 +1,6 @@
+tag: forward-backward-algorithm
+reason: Kalman smoothing can be seen as a special case of the forward-backward algorithm.
+
+tag: computations-on-multivariate-gaussians
+reason: Kalman filtering requires a lot of operations on multivariate Gaussians.
+

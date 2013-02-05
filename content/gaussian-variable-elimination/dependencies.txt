@@ -1,0 +1,5 @@
+tag: inference-in-gaussian-mrfs
+reason: Gaussian variable elimination is an inference algorithm for Gaussian MRFs.
+
+tag: variable-elimination
+

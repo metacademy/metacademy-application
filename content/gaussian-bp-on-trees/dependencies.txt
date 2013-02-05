@@ -1,0 +1,4 @@
+tag: gaussian-variable-elimination
+reason: Gaussian BP is a way of sharing computations in Gaussian variable elimination.
+
+tag: belief-propagation-on-trees

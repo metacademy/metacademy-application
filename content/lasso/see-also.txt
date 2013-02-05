@@ -7,6 +7,6 @@
 * Other uses of L1 regularization include:
 ** sparse coding for learning representations [sparse-coding]
 ** learning sparse undirected graphical models [learning-sparse-undirected-models]
-** compressed sensing [compressed sensing]
+** compressed sensing [compressed-sensing]
 
  

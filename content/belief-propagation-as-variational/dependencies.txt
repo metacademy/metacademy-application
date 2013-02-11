@@ -1,0 +1,3 @@
+tag: variational-inference
+
+tag: belief-propagation-on-trees

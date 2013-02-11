@@ -1,0 +1,7 @@
+* Loopy BP is guaranteed to converge to the correct mean for Gaussian graphical models. [gaussian-loopy-bp]
+* Loopy BP is guaranteed to converge for  a graph with a single loop. [loopy-bp-single-loop]
+* Tree-reweighted belief propagation is an algorithm inspired by the same ideas, but where the approximation to KL divergence is convex and gives an upper bound on the partition function. [tree-reweighted-belief-propagation]
+* Some other inference algorithms based on variational principles:
+** expectation propagation, which approximates BP messages in terms of expectations [expectation-propagation]
+** mean field approximation, where different variables are approximated as independent in the posterior [mean-field-approximation]
+** variational Bayes, a general framework for posterior inference in Bayesian models [variational-bayes]

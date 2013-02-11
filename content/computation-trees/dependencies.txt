@@ -1,0 +1,2 @@
+tag: loopy-belief-propagation
+reason: Computation trees are an abstraction used to analyze loopy BP.

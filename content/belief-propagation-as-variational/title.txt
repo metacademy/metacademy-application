@@ -1,0 +1,1 @@
+Belief propagation as variational inference

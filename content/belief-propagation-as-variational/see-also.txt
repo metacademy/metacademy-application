@@ -1,1 +1,2 @@
 * Loopy BP can be viewed as optimizing the Bethe free energy approximation to the same objective function. [loopy-bp-as-variational]
+

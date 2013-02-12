@@ -1,0 +1,5 @@
+* For any parameter learning problem, we care how well the learned parameters can generalize to new data. [generalization]
+* Bayesian parameter estimation is a way to avoid overfitting and incorporate prior knowledge. [bayesian-estimation-bayes-net-params]
+* The expectation-maximization algorithm gives a way of dealing with missing entries. [learning-bayes-nets-missing-data]
+* It's possible to learn the structure itself, i.e. which edges should be included. [bayes-net-structure-learning]
+* We can learn parameters for Markov random fields using similar principles. [mrf-parameter-learning]

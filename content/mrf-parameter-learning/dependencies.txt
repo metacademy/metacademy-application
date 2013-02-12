@@ -1,0 +1,5 @@
+tag: mrf-inference
+reason: Inference is a necessary part of MRF parameter learning.
+
+tag: mrfs-as-exponential-families
+reason: The maximum likelihood solution for MRFs can be derived from the exponential family interpretation.

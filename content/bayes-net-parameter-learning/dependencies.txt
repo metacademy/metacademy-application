@@ -1,0 +1,4 @@
+tag: maximum-likelihood
+reason: Maximum likelihood is a simple way to learn Bayes net parameters.
+
+tag: bayesian-networks

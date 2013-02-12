@@ -1,0 +1,4 @@
+tag: bayes-net-parameter-learning
+
+tag: expectation-maximization
+reason: We can use the EM algorithm to fill in missing data.

@@ -1,0 +1,6 @@
+tag: bayesian-estimation-bayes-net-params
+reason: The same Bayesian analysis is used to derive the Bayesian scoring criterion.
+
+tag: bayesian-model-comparison
+reason: The Bayesian scoring criterion is the Bayes factor for a particular model.
+

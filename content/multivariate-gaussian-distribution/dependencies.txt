@@ -6,5 +6,5 @@ reason: The multivariate Gaussian distribution is parameterized in terms of a me
 tag: determinant
 reason: The determinant of the covariance matrix is part of the normalizing constant.
 
-tag: matrix-inverse
+tag: systems-of-linear-equations
 reason: The inverse of the covariance matrix is part of the PDF.

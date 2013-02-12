@@ -1,5 +1,5 @@
 tag: gaussian-distribution
 
-tag: evaluating-multiple-integrals-polar-coordinates
+tag: eval-multi-int-polar-coordinates
 reason: Computing the normalizing constant requires using polar coordinates.
 

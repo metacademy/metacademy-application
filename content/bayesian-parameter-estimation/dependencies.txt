@@ -16,7 +16,7 @@ reason: Estimating the mean and variance of a Gaussian random variable are instr
 tag: gamma-distribution
 reason: Estimating the variance of a normal random variable with an inverse-Gamma prior is an instructive example of Bayesian parameter estimation.
 
-tag: conditional-distribution
+tag: conditional-distributions
 reason: In Bayesian parameter estimation, we need to reason with the conditional distributions over parameters.
 
 tag: marginalization

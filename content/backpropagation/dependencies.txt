@@ -4,5 +4,5 @@ reason: Backpropagation is an algorithm for training feed-forward neural nets.
 tag: stochastic-gradient-descent
 reason: Backpropagation is a kind of gradient descent.
 
-tag: jacobian-matrix
+tag: jacobian
 reason: Backpropagation follows from the chain rule for Jacobian matrices.

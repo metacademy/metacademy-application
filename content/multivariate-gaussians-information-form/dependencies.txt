@@ -1,1 +1,1 @@
-tag: multivariate-gaussians
+tag: multivariate-gaussian-distribution

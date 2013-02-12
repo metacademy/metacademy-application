@@ -1,3 +1,4 @@
 tag: kalman-filtering-and-smoothing
 
-tag: gaussian-belief-propagation
+tag: gaussian-bp-on-trees
+

@@ -7,5 +7,5 @@ reason: PMF can be seen as a Bayesian version of probabilistic PCA.
 tag: gibbs-sampling
 reason: We can sample the parameters using Gibbs sampling.
 
-tag: computations-on-gaussians
+tag: computations-on-multivariate-gaussians
 reason: PMF is motivated by only needing to perform linear algebraic operations on small matrices.

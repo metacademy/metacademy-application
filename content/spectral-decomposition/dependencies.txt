@@ -7,5 +7,5 @@ reason: The spectral decomposition includes orthogonal factors.
 tag: change-of-basis
 reason: The spectral decomposition can be viewed as a change of basis.
 
-tag: matrix-inverse
+tag: systems-of-linear-equations
 reason: The spectral decomposition gives insight into the inverse of a symmetric matrix.

@@ -3,5 +3,5 @@ reason: This is an approximate inference algorithm for Bayesian logistic regress
 
 tag: variational-bayes
 
-tag: logistic-gaussian-bound
+tag: gaussian-logistic-bound
 reason: We use the Gaussian lower bound on the logistic for tractability.

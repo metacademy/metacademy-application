@@ -1,0 +1,5 @@
+* Entropy determines the amount by which a message can be compressed. [entropy-and-compression]
+* Relationship with entropy from statistical mechanics [entropy-stat-mech]
+* Conditional entropy gives the amount of uncertainty in one random variable when the value of another one is known [conditional-entropy]
+* Differential entropy is the analogue of entropy for continuous random variables. [differential-entropy]
+

@@ -1,4 +1,4 @@
-tag: mrf-inference
+tag: inference-in-mrfs
 reason: Inference is a necessary part of MRF parameter learning.
 
 tag: mrfs-as-exponential-families

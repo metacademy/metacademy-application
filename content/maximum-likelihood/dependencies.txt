@@ -1,4 +1,4 @@
-tag: probability-distributions
+tag: probabilistic-models
 reason: Maximum likelihood is a way of fitting probabilistic models which define distributions over the data.
 
 tag: gaussian-distribution

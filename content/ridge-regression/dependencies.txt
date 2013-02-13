@@ -1,0 +1,7 @@
+tag: linear-regression
+reason: Ridge regression is a variant on linear regression.
+
+tag: generalization
+reason: Ridge regression is a way of improving generalization.
+
+

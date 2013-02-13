@@ -1,0 +1,3 @@
+* This notion of independence can be extended to random variables. [independent-random-variables]
+* Independence can also be characterized in terms of conditional distributions. [conditional-distributions]
+

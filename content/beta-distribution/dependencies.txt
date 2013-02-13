@@ -1,0 +1,7 @@
+tag: gamma-function
+reason: The gamma function is part of the normalizing constant of the beta distribution.
+
+tag: random-variables
+
+tag: uniform-distribution
+reason: The uniform distribution is an important special case of the beta distribution.

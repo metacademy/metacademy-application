@@ -1,0 +1,3 @@
+* Ridge regression is an example of regularization. [regularization]
+* Ridge regression can be viewed as a Bayesian model with a Gaussian prior over the parameters. [bayesian-linear-regression]
+* The number of effective parameters in ridge regression is smaller than the actual number of parameters. [smoother-matrix]

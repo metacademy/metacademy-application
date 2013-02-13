@@ -1,0 +1,1 @@
+* Variable elimination in Gaussian graphical models can be viewed as the Cholesky factorization of the covariance. [gaussian-variable-elimination-as-gaussian-elimination]

@@ -1,0 +1,5 @@
+tag: maximum-likelihood
+reason: The BIC is often used to regularize maximum likelihood estimation.
+
+tag: generalization
+reason: The BIC is a way of improving generalization.

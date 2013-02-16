@@ -7,5 +7,3 @@ reason: Logistic regression is like linear regression, but with a different obse
 tag: ridge-regression
 reason: The logistic regression solution is usually regularized to prevent degenerate solutions.
 
-tag: bernoulli-distribution
-reason: Logistic regression is defined in terms of the Bernoulli distribution.

@@ -1,0 +1,3 @@
+tag: markov-random-fields
+reason: The Hammersley-Clifford theorem gives a way of characterizing MRFs.
+

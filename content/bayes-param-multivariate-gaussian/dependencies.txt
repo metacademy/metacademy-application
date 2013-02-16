@@ -1,6 +1,6 @@
 tag: bayesian-parameter-estimation
 
-tag: ml-multivariate-gaussian
+tag: maximum-likelihood-multivariate-gaussian
 reason: Bayesian parameter estimation for multivariate Gaussians has a similar form to the maximum likelihood estimator.
 
 tag: multivariate-gaussians-information-form

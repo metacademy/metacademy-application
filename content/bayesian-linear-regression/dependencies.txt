@@ -1,7 +1,7 @@
 tag: ridge-regression
 reason: Bayesian linear regression has a similar form to ridge regression.
 
-tag: regularization-as-map
+tag: regularization-as-map-estimation
 reason: This makes clear the relationship with ridge regression.
 
 tag: bayesian-parameter-estimation

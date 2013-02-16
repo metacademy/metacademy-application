@@ -1,0 +1,5 @@
+tag: maximum-likelihood
+reason: The AIC is often used to regularize maximum likelihood estimation.
+
+tag: generalization
+reason: The AIC is a way of improving generalization.

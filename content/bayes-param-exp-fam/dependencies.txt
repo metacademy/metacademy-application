@@ -7,3 +7,6 @@ reason: The multinomial distribution is an instructive example.
 
 tag: maximum-likelihood-in-exponential-families
 reason: Bayesian parameter estimation has a similar form to maximum likelihood estimation.
+
+tag: conjugate-priors
+reason: Conjugate priors have an especially nice form in exponential families.

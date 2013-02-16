@@ -1,0 +1,3 @@
+* The most important property of symmetric matrices is that they have a full set of orthogonal eigenvectors. [spectral-decomposition]
+* Positive semidefinite matrices are an important subclass of symmetric matrices, where all of the eigenvalues are nonnegative. [positive-semidefinite-matrices]
+* Quadratic forms, represented by symmetric matrices, are used in second-order Taylor approximations. [taylor-approximations]

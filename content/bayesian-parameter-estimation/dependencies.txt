@@ -7,9 +7,6 @@ reason: Bayes' rule is an important conceptual component of Bayesian parameter e
 tag: beta-distribution
 reason: The beta-Bernoulli distribution is an instructive example of Bayesian parameter estimation.
 
-tag: bernoulli-distribution
-reason: The beta-Bernoulli distribution is an instructive example of Bayesian parameter estimation.
-
 tag: gaussian-distribution
 reason: Estimating the mean and variance of a Gaussian random variable are instructive examples of Bayesian parameter estimation.
 

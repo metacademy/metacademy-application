@@ -1,0 +1,4 @@
+* Some additional examples of conjugate priors:
+** The Wishart distribution is the conjugate prior for the precision matrix of a multivariate Gaussian. [wishart-distribution]
+** The Dirichlet distribution is the conjugate prior for the multinomial distribution. [dirichlet-distribution]
+* Conjugate priors often have nice forms for exponential families. [bayes-param-exp-fam]

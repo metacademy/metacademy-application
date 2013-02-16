@@ -1,0 +1,8 @@
+tag: variance
+reason: The Fisher information can be defined as the variance of a function.
+
+tag: maximum-likelihood
+reason: The Fisher information is defined in terms of the likelihood function and used to analyze the accuracy of maximum likelihood.
+
+tag: taylor-approximations
+reason: Fisher information can be viewed as the curvature of the likelihood function around the optimum.

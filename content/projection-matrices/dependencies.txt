@@ -1,0 +1,5 @@
+tag: pseudoinverse
+reason: Projection matrices can be computed using the pseudoinverse.
+
+tag: spectral-decomposition
+reason: Projection matrices can be characterized in terms of the spectral decomposition.

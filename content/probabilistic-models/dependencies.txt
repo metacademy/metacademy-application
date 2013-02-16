@@ -1,0 +1,8 @@
+tag: marginalization
+reason: Marginalization is an operation we commonly want to perform in probabilistic models.
+
+tag: expected-value
+reason: We often want to compute expectations in probabilistic models.
+
+tag: conditional-distributions
+reason: Conditioning is an operation we commonly want to perform in probabilistic models.

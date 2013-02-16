@@ -1,0 +1,7 @@
+tag: fisher-information
+
+tag: covariance-matrices
+reason: The Fisher information matrix is defined in terms of covariance.
+
+tag: positive-semidefinite-matrices
+reason: The Fisher information matrix is PSD.

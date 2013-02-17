@@ -7,13 +7,38 @@
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/jquery-latest.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/relationships.css" type="text/css" media="screen"/>
 <title>Knowledge Graph Demo</title>
 <script type="text/javascript">
+var windowSize = {
+    height:0,
+    mainHeight:0,
+    rightPanelHeight:0,
+    headerHeight:0,
+    setDimensions:function () {
+        windowSize.height = jQuery(window).height();
+        windowSize.headerHeight = jQuery('#header').height();
+        windowSize.mainHeight = windowSize.height - windowSize.headerHeight;
+        windowSize.rightPanelHeight = windowSize.height;
+        windowSize.updateSizes();
+    },
+    updateSizes:function () {
+        jQuery('#main').css('height', windowSize.mainHeight + 'px');
+        jQuery('#rightpanel').css('height', (windowSize.rightPanelHeight) + 'px');
+    },
+    init:function () {
+        if (jQuery('#main').length) {
+            windowSize.setDimensions();
+            jQuery(window).resize(function () {
+                windowSize.setDimensions();
+            });
+        }
+    }
+};
+
 
 // TODO make a js aux function file
 function print_error(xhr, status) {
-//    print_error
+//    print_error from ajax calls
     switch (status) {
         case 404:
             console.error('File not found');
@@ -54,6 +79,10 @@ function load_svg(node_name) {
             var svgd = document.importNode(svgFileData.documentElement, true);
             jQuery('#leftpanel').append(svgd);
 
+            // *************************************************
+            // ***** post-processing from graphviz output ******
+            // *************************************************
+
             // sort the edges and nodes so that edges don't overlap the nodes
             var gelems = d3.selectAll('.node,.edge');
             var gdata = gelems[0].map(function (itm) {
@@ -62,9 +91,22 @@ function load_svg(node_name) {
                 }
                 return 0
             });
-            gelems.data(gdata).sort()
+            gelems.data(gdata).sort();
 
-            // add dynamic properties to nodes
+            // change title to id and remove title
+            gelems.attr('id',function(){return d3.select(this).select('title').text()})
+            gelems.selectAll("title").remove(); // remove the title for a cleaner hovering experience
+            d3.select('g').selectAll("title").remove(); // also remove title from graph
+
+            // make the svg canvas fill the entire screen TODO: more elegant way to do this?
+            d3.select('svg').attr('width','10000pt');
+            d3.select('svg').attr('height','10000pt');
+
+
+            // *************************************************
+            // *****   add dynamic properties to nodes    ******
+            // *************************************************
+
             last_node = -1;
             d3.selectAll(".node")
                     .on("mouseover", function () {
@@ -85,7 +127,7 @@ function load_svg(node_name) {
                                 .attr("fill", "#F5EEEE"); // Example of property change
 
                         // TODO make sure we have jdata
-                        var node_data = jdata[this_node.select('title').text()];
+                        var node_data = jdata[this_node.attr('id')];
                         var text_panel = d3.select("#righttext");
                         text_panel.html("");
 
@@ -163,10 +205,10 @@ function load_svg(node_name) {
                                 .text('Focus on Topic')
                                 .attr('class', 'topic-focus')
                                 .on('click', function (d) {
-                                    load_svg(this_node.select('title').text().replace('_', '-'));
+                                    load_svg(this_node.attr('id').replace('_', '-'));
                                 });
 
-                        // tooltip for pretty hover info
+                        // tooltip for pretty hover info TODO consider writing this yourself
                         jQuery('.hastip').tooltipsy();
 
                         if (last_node == -1) {
@@ -213,6 +255,7 @@ function load_svg(node_name) {
         error:print_error
     });
 
+    // get json graph data (dependencies, see-also, etc)
     jQuery.ajax({
         type:'GET',
         url:get_url + '?format=json',
@@ -228,6 +271,7 @@ function load_svg(node_name) {
 
 // load the first dataset in the list (for now)
 jQuery(document).ready(function () {
+    windowSize.init();
     load_svg(jQuery('#data-select').val());
 });
 
@@ -236,19 +280,26 @@ jQuery(document).ready(function () {
 </head>
 
 <body>
-<div id="main">
-
-    <div id="leftpanel" class="column">
-        <select id="data-select" onchange="load_svg(this.value)">
-            {% for node_tag in node_list %}
-            <option value="{{ node_tag }}">{{ node_tag }}</option>
-            {% endfor %}
-        </select>
-
+<div id="header">
+    <div class="dtable">
+        <div class="dvcenter">
+            <select id="data-select" onchange="load_svg(this.value)">
+                {% for node_tag in node_list %}
+                <option value="{{ node_tag }}">{{ node_tag }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
-    <div id="rightpanel" class="column">
-        <div id="righttext">
+</div>
 
+<div id="main">
+    <div class="colcontainer">
+        <div id="leftpanel" class="column colmask rightmenu">
+        </div>
+        <div id="rightpanel" class="column">
+            <div id="righttext">
+
+            </div>
         </div>
     </div>
 </div>

@@ -1,33 +1,144 @@
+/* header */
+#header {
+	position: relative;
+    height: 25px;
+    width: 100%;
+    background: #999999;
+    overflow: hidden;
+    border-bottom: 2px black solid;
+}
+
+/* body elements */
+body {
+	margin:0;
+	padding:0;
+	border:0;			/* removes the border around the viewport in old versions of IE */
+	width:100%;
+    height:100%;
+    font: 18px Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+}
+
+#main {
+    clear:both;
+    float:left;
+    width: 100%;
+    height:100%;
+    /*border: 4px solid black;*/
+    overflow: hidden;
+    position:relative;	/* This fixes the IE7 overflow hidden bug */
+    background: #ededed;
+}
+
+.colcontainer{
+    float:left;
+   	width:100%;
+   	position:relative;
+    right:18%;			/* right column width */
+   	background:#fff;		/* left column background colour */
+}
+
+.column {
+    float:left;
+   	position:relative;
+   	padding:0 0 1em 0;
+   	overflow:hidden;
+}
+
+#leftpanel {
+    width:82%;			/* left column content width (left column width minus left and right padding) */
+   	left:18%;			/* (right column width) plus (left column left padding) */
+    border-right: 2px black solid;
+}
+
+#rightpanel {
+	width:16%;			/* right column content width (right column width minus left and right padding) */
+	left:19%;			/* (right column width) plus (left column left and right padding) plus (right column left padding) */
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 100%;
+}
+
+/* special styles */
+.dtable{
+    display:table;
+    width:100%;
+    text-align:right
+}
+
+.dvcenter{
+    display:table-cell;
+    vertical-align:middle;
+    height: 100%;
+}
+
+
+.tooltipsy {
+    padding: 10px;
+    max-width: 200px;
+    color: #303030;
+    background-color: #F5EEEE;
+    border: 2px solid #885415;
+}
+
+button.topic-focus {
+    margin-top: 15px;
+    line-height: 20px;
+    font-weight: bold;
+}
+
+div.topic-focus{
+    text-align: center;
+}
+
+div.list-entry {
+    overflow: hidden;
+    width: 100%;
+    margin-left: 8px;
+}
+
+
+div.list-text {
+    float: right;
+    width:90%;
+    height: 100%;
+    right: 0;
+}
+
+div.help-ptr{
+    float: left;
+    height: 100%;
+    width: 10%;
+}
+
+img.list-img {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.data-title {
+    text-align: center;
+    font-weight: bolder;
+    font-size: 20px;
+    padding: 5px 0px 10px 0px;
+}
+
+.data-subtitle {
+    text-align: left;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.data-description {
+    font-style: italic;
+}
+
+
+/* general styles */
+
 p{
     margin-top: 1px;
     margin-bottom: 1px;
-}
-
-#header {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    width: 950px;
-}
-
-#header hr {
-    width: 950px;
-    border-color: #000;
-    color: #000;
-    background-color: #000;
-    margin-bottom: 1em;
-}
-
-body {
-    margin: 0px;
-    padding: 0px;
-    font: 16px Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
-}
-
-#main{
-    width:80%;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 a {
@@ -50,192 +161,28 @@ h2 {
     margin-bottom: 30px;
 }
 
-
-
-
-.container {
-    margin: 20px 0px 20px 0px;
+/*Graph Properties*/
+path {
+    stroke: #15317E;
+    stroke-width: 2;
+    stroke-opacity: 0.6;
+    fill: none;
 }
 
-.container_title {
-    margin: 0;
-    padding: 3px 5px 3px 3px;
-    background-color: #E6EEEE;
-    font-weight: bold;
-    border: 2px solid #CDCDCD;
-    text-align: center;
+circle {
+    fill: #15317E;
+    fill-opacity: 1.0;
 }
 
-div.container_title a {
-    font-size: 15px;
-    color: black;
+line {
+    stroke: black;
 }
 
-.container_title {
-    background-color: #E6EEEE;
-    border: 2px solid #CDCDCD;
-    font-weight: bold;
-    margin: 0;
-    padding: 3px 5px 3px 3px;
-    text-align: center;
+.node {
+    cursor: default;
 }
 
-
-/*tabbed navigation lists*/
-.tabs {
-    font-size: 10pt;
-    border: 2px solid #CDCDCD;
+line.link {
+    stroke: #999999;
+    stroke-opacity: 0.6;
 }
-
-ul.tab_nav {
-    list-style: none;
-    margin: 0;
-    padding: 3px 5px 3px 3px;
-    background-color: #E6EEEE;
-    font-weight: bold;
-}
-
-ul.tab_nav li {
-    display: inline;
-    border: 1px;
-}
-
-ul.tab_nav li a {
-    padding: 3px 5px;
-    color: #000;
-    text-decoration: none;
-}
-
-ul.tab_nav li a.selected, ul.tab_nav li a:hover {
-    background-color: #F5EEEE;
-    color: #000;
-}
-
-ul.tab_nav li a:focus {
-    outline: 0;
-}
-
-div.tabs div {
-    padding: 12px 5px 5px;
-    background-color: #F5EEEE;
-    font-size: 11pt;
-}
-
-/* Div Tables And table-like displays*/
-div.dtable {
-    display: table;
-    margin: auto;
-}
-
-div.drow {
-    display: table-row;
-}
-
-div.dcell {
-    display: table-cell;
-}
-
-div.cell-descript {
-    text-align: center;
-    font-weight: bold;
-    padding-top: 5px;
-}
-
-ul.cell-list{
-    border: 2px solid;
-}
-
-li.cell-title {
-    font-weight: bold;
-    padding: 10px 5px;
-}
-
-li.cell-elem {
-    padding: 5px 5px;
-}
-
-/*navigation bar*/
-
-#navigation {
-    margin: 0;
-    padding: 0;
-    clear: both;
-    height: 25px;
-    background: #9C9C9C;
-    border-bottom: outset 1px #333232;
-}
-
-ul.nav-main, ul.nav-main li {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-ul.nav-main {
-    position: relative;
-}
-
-ul.nav-main li:hover > ul {
-    visibility: visible;
-}
-
-ul.nav-main li.hover, ul.nav-main li:hover {
-    position: relative;
-    cursor: pointer;
-}
-
-ul.nav-main li {
-    float: left;
-    display: block;
-}
-
-ul.nav-main li a {
-    display: block;
-    padding: 4px 10px 0 10px;
-    height: 22px;
-}
-
-ul.nav-main li:hover {
-    background: #D1D1D1;
-}
-
-ul.nav-sub {
-    visibility: hidden;
-    position: absolute;
-    padding: 10px;
-    top: 25px;
-    left: -1px;
-    z-index: 598;
-    background: #D1D1D1;
-    border-right: 1px solid #000;
-    border-bottom: 1px solid #000;
-    border-left: 1px solid #000;
-}
-
-ul.nav-sub li {
-    list-style: none;
-    display: block;
-    padding: 0;
-    height: 27px;
-    float: none;
-    width: 145px;
-    border-bottom: 1px solid #5a5a5a;
-    background: none;
-}
-
-ul.nav-sub li:hover {
-    background-color: #BABABA;
-}
-
-ul.nav-sub li a {
-    list-style: none;
-    display: block;
-    padding: 6px 5px 6px 5px;
-    height: 15px;
-    float: none;
-    width: 145px;
-    background: none;
-    font: 12px Arial, Helvetica, sans-serif;
-}
-
-

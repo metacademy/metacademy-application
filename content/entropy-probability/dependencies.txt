@@ -1,2 +1,0 @@
-tag: expected-value
-reason: Entropy is defined in terms of an expectation.

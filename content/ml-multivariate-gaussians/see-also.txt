@@ -1,6 +1,0 @@
-* Bayesian parameter estimation for multivariate Gaussians [bayes-param-multivariate-gaussians]
-* When there's not enough data to estimate a full covariance matrix, here are some related models with more structure:
-** principal component analysis (PCA) [principal-component-analysis]
-** factor analysis [factor-analysis]
-** probabilistic matrix factorization (PMF) [probabilistic-matrix-factorization]
-** sparse Gaussian graphical models [learning-sparse-gaussian-graphical-models]

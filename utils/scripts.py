@@ -54,9 +54,3 @@ def visualize_related_nodes(path, tag, outp_title):
     formats.write_graph_dot(nodes, graph, open(dot_file, 'w'))
     os.system('dot -Tsvg %s -o %s' % (dot_file, svg_file))
     formats.write_graph_json(nodes, graph, open(json_file, 'w'))
-
-if __name__ == "__main__":
-    output_dir = config.MAPS_OUTPUT_PATH
-    path = config.CONTENT_PATH
-    generate_full_graph(path, os.path.join(output_dir, 'full_graph'))
-    visualize_related_nodes(path, 'variational-bayes', os.path.join(output_dir, 'subset'))

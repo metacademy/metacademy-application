@@ -15,6 +15,7 @@ body {
 	border:0;			/* removes the border around the viewport in old versions of IE */
 	width:100%;
     height:100%;
+    overflow: hidden;
     font: 18px Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
 }
 
@@ -23,7 +24,6 @@ body {
     float:left;
     width: 100%;
     height:100%;
-    /*border: 4px solid black;*/
     overflow: hidden;
     position:relative;	/* This fixes the IE7 overflow hidden bug */
     background: #ededed;
@@ -54,7 +54,7 @@ body {
 	width:16%;			/* right column content width (right column width minus left and right padding) */
 	left:19%;			/* (right column width) plus (left column left and right padding) plus (right column left padding) */
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
 }
 

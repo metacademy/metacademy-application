@@ -1,0 +1,29 @@
+source: coursera_ng
+lecture: The problem of overfitting
+link: https://class.coursera.org/ml/lecture/39
+lecture: Model selection and train/validation/test sets
+link: https://class.coursera.org/ml/lecture/preview_view/61
+lecture: Diagnosing bias and variance
+link: https://class.coursera.org/ml/lecture/preview_view/62
+mark: star
+
+source: esl
+edition: 1
+section: 7.1
+pages: 193-196
+
+source: murphy
+edition: 1
+section: 1.4.7-1.4.8
+pages: 22-24
+
+source: bishop
+edition: 1
+section: 1.1
+pages: 4-12
+mark: star
+
+
+
+
+

@@ -1,0 +1,24 @@
+source: cs229
+chapter: 1
+section: 3
+pages: 11-13
+link: http://cs229.stanford.edu/notes/cs229-notes1.pdf
+dependencies: linear-regression
+
+source: wikipedia
+page: Maximum likelihood
+link: http://en.wikipedia.org/wiki/Maximum_likelihood
+mark: star
+directions: Read the Principles and Examples sections.
+
+source: rice
+edition: 3
+section: 8.5-8.5.1
+pages: 267-274
+
+source: aima
+edition: 2
+section: 20.2 (up to Bayesian parameter learning)
+pages: 716-720
+mark: star
+

@@ -12,3 +12,5 @@ reason: The Wishart distribution is the conjugate prior for the precision matrix
 tag: student-t-distribution
 reason: The predictive distribution is a student-t distribution.
 
+tag: computations-on-multivariate-gaussians
+reason: We need to perform various operations with multivariate Gaussians to obtain the posterior over the mean vector.

@@ -1,0 +1,2 @@
+* Look at the special case of a univariate Gaussian. What are the conjugate priors for the mean and precision parameters?
+

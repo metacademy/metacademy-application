@@ -1,0 +1,3 @@
+* Work through the derivations.
+* If you assign independent priors to the mean and variance parameters, why doesn't the posterior have the same form?
+* Convince yourself that integrating out the variance parameter should give you a heavier tailed distribution than a Gaussian.

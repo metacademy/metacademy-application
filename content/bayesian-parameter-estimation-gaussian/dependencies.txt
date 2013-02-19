@@ -1,0 +1,10 @@
+tag: bayesian-parameter-estimation
+
+tag: gaussian-distribution
+
+tag: gamma-distribution
+reason: The inverse gamma distribution is the conjugate prior for the scale parameter.
+
+tag: student-t-distribution
+reason: The predictive distribution, with the scale parameter integrated out, is a student-t distribution.
+ 

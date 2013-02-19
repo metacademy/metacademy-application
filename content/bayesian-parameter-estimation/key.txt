@@ -1,0 +1,5 @@
+* If you have a beta prior on the bias of a coin and you observe five tosses, all of which are heads, why don't you assign probability zero to tails?
+* Why isn't Bayesian parameter estimation the same as choosing the most likely parameter setting under the posterior?  Give an example where the two produce different results.
+* Why does the posterior distribution tend to get more peaked as you observe more data?
+
+ 

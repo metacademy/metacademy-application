@@ -1,0 +1,1 @@
+One way of fitting logistic regression is using Newton's method. This winds up having an intuitive form, where each update takes the form of a linear regression problem and the data points are all assigned weights depending how far they are from the decision boundary.

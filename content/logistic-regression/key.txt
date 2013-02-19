@@ -1,0 +1,2 @@
+* Try deriving the gradient descent updates.
+* If the two classes are linearly separable and you don't use any regularization, what happens to the weight vector?

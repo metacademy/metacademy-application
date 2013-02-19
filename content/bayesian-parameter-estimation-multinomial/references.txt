@@ -1,0 +1,11 @@
+source: bishop
+edition: 1
+section: 2.2
+pages: 74-77
+mark: star
+
+source: murphy
+edition: 1
+section: 3.4
+pages: 78-82
+mark: star

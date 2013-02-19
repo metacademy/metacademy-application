@@ -1,17 +1,8 @@
-tag: maximum-likelihood
-reason: We motivate Bayesian parameter estimation by contrasting it with maximum likelihood estimation.
-
 tag: bayes-rule
 reason: Bayes' rule is an important conceptual component of Bayesian parameter estimation.
 
 tag: beta-distribution
 reason: The beta-Bernoulli distribution is an instructive example of Bayesian parameter estimation.
-
-tag: gaussian-distribution
-reason: Estimating the mean and variance of a Gaussian random variable are instructive examples of Bayesian parameter estimation.
-
-tag: gamma-distribution
-reason: Estimating the variance of a normal random variable with an inverse-Gamma prior is an instructive example of Bayesian parameter estimation.
 
 tag: conditional-distributions
 reason: In Bayesian parameter estimation, we need to reason with the conditional distributions over parameters.

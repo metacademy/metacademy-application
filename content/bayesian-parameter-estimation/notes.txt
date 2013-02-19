@@ -1,0 +1,1 @@
+* Don't worry about computing the integrals with the beta distribution: this is a one-time trick you don't use very often.

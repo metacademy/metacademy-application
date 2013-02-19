@@ -1,0 +1,18 @@
+source: murphy
+edition: 1
+section: 8.3.3-8.3.4
+pages: 249-251
+mark: star
+
+source: bishop
+edition: 1
+section: 4.3.3
+pages: 207-208
+mark: star
+
+source: cs229
+chapter: 1
+section: 20
+pages: 20-21
+
+

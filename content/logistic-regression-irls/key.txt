@@ -1,0 +1,3 @@
+* Work through the derivation.
+* Convince yourself it's reasonable that data points farther from the boundary should have lower weights.
+ 

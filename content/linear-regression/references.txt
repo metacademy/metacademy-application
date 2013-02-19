@@ -24,7 +24,6 @@ link: https://class.coursera.org/neuralnets-2012-001/lecture/preview_view/35
 source: coursera_ng
 lecture_sequence: Linear regression with one variable
 lecture_sequence: Linear regression with multiple variables
-link: https://class.coursera.org/ml/lecture/index
 mark: star
 
 

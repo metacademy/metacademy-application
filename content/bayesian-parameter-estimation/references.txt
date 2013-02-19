@@ -1,0 +1,26 @@
+source: murphy
+edition: 1
+section: 3.1-3.3
+pages: 65-78
+mark: star
+
+source: pgm
+edition: 1
+section: 17.3
+pages: 733-741
+mark: star
+
+source: bishop
+edition: 1
+section: 2.1
+pages: 68-74
+
+source: gelman
+edition: 1
+section: 2.1-2.3
+pages: 33-39
+
+source: coursera_hinton
+lecture: Introduction to the full Bayesian approach
+link: https://class.coursera.org/neuralnets-2012-001/lecture/preview_view/103
+

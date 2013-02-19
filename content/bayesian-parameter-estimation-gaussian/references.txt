@@ -1,0 +1,7 @@
+source: bishop
+edition: 1
+section: 2.3.6-2.3.7 (except for the part about multivariate Gaussians)
+pages: 97-105
+mark: star
+
+

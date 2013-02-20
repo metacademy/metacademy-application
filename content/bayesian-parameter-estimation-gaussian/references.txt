@@ -4,4 +4,10 @@ section: 2.3.6-2.3.7 (except for the part about multivariate Gaussians)
 pages: 97-105
 mark: star
 
+source: mackay
+edition: 1
+section: 24
+pages: 319-323
+mark: star
+
 

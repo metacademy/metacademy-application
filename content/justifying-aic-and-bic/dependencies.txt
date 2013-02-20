@@ -2,7 +2,7 @@ tag: akaike-information-criterion
 
 tag: bayesian-information-criterion
 
-tag: effective-num-parameters
+tag: ridge-regression-as-svd
 reason: The AIC and BIC are defined in terms of the effective number of parameters.
 
 tag: bayesian-model-comparison

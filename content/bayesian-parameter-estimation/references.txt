@@ -24,3 +24,12 @@ source: coursera_hinton
 lecture: Introduction to the full Bayesian approach
 link: https://class.coursera.org/neuralnets-2012-001/lecture/preview_view/103
 
+source: barber
+edition: 1-online
+section: 9.1
+pages: 189-193
+mark: star
+
+
+
+

@@ -27,3 +27,9 @@ lecture: Regularized logistic regression
 link: https://class.coursera.org/ml/lecture/preview_view/42
 mark: star
 
+source: barber
+edition: 1-online
+section: 17.4-17.4.3
+pages: 350-355
+mark: star
+

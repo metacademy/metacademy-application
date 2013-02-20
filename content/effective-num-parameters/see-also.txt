@@ -1,6 +1,0 @@
-* VC dimension is a more general way of determining the complexity of a model class which often coincides with the number of parameters. [vc-dimension]
-* Some model selection criteria which depend on the number of parameters of a model include:
-** the $C_p$ statistic [cp-statistic]
-** the Akaike information criterion (AIC) [akaike-information-criterion]
-** the Bayesian information criterion (BIC) [bayesian-information-criterion]
-

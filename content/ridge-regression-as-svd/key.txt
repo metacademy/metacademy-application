@@ -1,0 +1,3 @@
+* What is the effective number of degrees of freedom for unregularized linear regression?  (Is it always the number of input dimensions?)
+* Explain (in terms of the SVD) why ridge regression makes the same predictions if you rotate the input dimensions.
+* If you are using features expressed in different units, why is it a good idea to normalize the features to unit variance before running ridge regression?

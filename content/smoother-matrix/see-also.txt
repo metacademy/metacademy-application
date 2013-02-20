@@ -1,5 +1,0 @@
-* The smoother matrix lets us define the effective number of parameters of a regression model. [effective-num-parameters]
-* It lets us define the $C_p$ statistic, a quantity used in model selection. [cp-statistic]
-* The smoother matrix is conceptually related to the solutions of kenel regression algorithms:
-** kernel ridge regression [kernel-ridge-regression]
-** Gaussian process regression [gaussian-process-regression]

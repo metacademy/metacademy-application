@@ -26,4 +26,9 @@ lecture_sequence: Linear regression with one variable
 lecture_sequence: Linear regression with multiple variables
 mark: star
 
+source: barber
+edition: 1-online
+section: 17.1-17.2 (up to 17.2.1)
+pages: 343-346
+
 

@@ -1,7 +1,5 @@
-
-
 /*
-PARAMETERS
+ PARAMETERS
  */
 
 // controls right panel content widths and margins
@@ -10,7 +8,7 @@ var rp_lmarg_use = 1;
 var rp_rmarg_use = 1;
 
 /*
-HELPER FUNCTIONS
+ HELPER FUNCTIONS
  */
 
 // object to control window resizing
@@ -57,9 +55,9 @@ function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
 }
 
 function printError(xhr, status) {
-/*
-   print errors from ajax calls
- */
+    /*
+     print errors from ajax calls
+     */
     switch (status) {
         case 404:
             console.error('File not found');
@@ -73,6 +71,32 @@ function printError(xhr, status) {
         default:
             console.error('Unknown error ' + status + ' ' + xhr.status);
     }
+}
+
+function beautifyText(){
+    /*
+    shorten and clean up displayed text
+     */
+    $('.shorten').each(function () {
+        var content = $(this).html();
+        var break_loc = content.indexOf(". ")+1;
+        char_limit = break_loc==0||break_loc>150 ? 150:break_loc;
+        if (content.length > char_limit) {
+            var short_content = content.substring(0, char_limit);
+            var long_content = content.substring(char_limit, content.length-1);
+            var html = short_content + '<span>' + "..." + '&nbsp;</span> <span class="morecontent">' + long_content + '</span><a href="" class="morelink">' + '>>' + '</a>';
+            $(this).html(html);
+        }
+
+    });
+
+    $('.morelink').on('click', function() {
+        var $this = $(this);
+        $this.hide();
+        $this.prev().prev().hide();
+        $this.prev().show();
+        return false;
+      });
 }
 
 
@@ -139,13 +163,13 @@ function load_svg(node_name) {
             var last_node = -1;
             d3.selectAll(".node")
                 .on("mouseover", function () {
-                    node = d3.select(this);
+                    var node = d3.select(this);
                     if (node.attr('clicked') == null) {
                         node.select('ellipse').attr('fill', '#E6EEEE')
                     }
                 })
                 .on("mouseout", function () {
-                    node = d3.select(this);
+                    var node = d3.select(this);
                     if (node.attr('clicked') == null) {
                         node.select('ellipse').attr('fill', 'white')
                     }
@@ -187,7 +211,8 @@ function load_svg(node_name) {
 
                     text_panel.append("div")
                         .attr("class", "data-description")
-                        .text("[lorem ipsum]");  // TODO -- add data content/references (wikipedia for starters?)
+                        .attr("class", "shorten")
+                        .text(node_data['summary']);  // TODO -- add data content/references (wikipedia for starters?)
 
                     // add pointer (see-also) info
                     if (node_data['pointers'].length > 0) {
@@ -260,8 +285,9 @@ function load_svg(node_name) {
 
                     // tooltip for pretty hover info TODO consider writing this yourself
                     $('.hastip').tooltipsy();
+                    beautifyText();
 
-                })
+                });
 
             // *************************************************
             // **************   Post Processing   **************

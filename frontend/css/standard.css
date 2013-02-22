@@ -59,6 +59,13 @@ body {
 }
 
 /* special styles */
+span.morecontent {
+    display: none;
+}
+a.morelink{
+    color: #0000ff;
+}
+
 .dtable{
     display:table;
     width:100%;
@@ -129,8 +136,9 @@ img.list-img {
     font-size: 16px;
 }
 
+
 .data-description {
-    font-style: italic;
+    /*font-style: italic;*/
 }
 
 

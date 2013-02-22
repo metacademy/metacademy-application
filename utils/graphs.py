@@ -7,18 +7,18 @@ class Node:
 
     tag -- a shorthand form to reference a node from elsewhere in the graph
     title -- the title which will be displayed to the user
+    summary -- brief summary of the node's concept
     dependencies -- a list of Dependency objects giving the immediate dependencies
     pointers -- a list of Pointer objects representing the see-also links
     """
-    def __init__(self, tag, title, dependencies, pointers):
-        self.tag = tag
-        self.title = title
-        self.dependencies = dependencies
-        self.pointers = pointers
+    def __init__(self, *init_data, **kwargs):
+            for dictionary in init_data:
+                for key in dictionary:
+                    setattr(self, key, dictionary[key])
+            for key in kwargs:
+                setattr(self, key, kwargs[key])
 
-    def __repr__(self):
-        return 'Node(tag=%r, title=%r, dependencies=%r, pointers=%r)' % (self.tag, self.title, self.dependencies,
-                                                                         self.pointers)
+# TODO add __repr__ method
 
 class Dependency:
     """A struct representing a dependency link in the graph.
@@ -115,9 +115,10 @@ def remove_missing_links(nodes):
     dependencies or see-also links which aren't contained in the set of nodes."""
     new_nodes = {}
     for tag, node in nodes.items():
-        new_deps = [d for d in node.dependencies if d.parent_tag in nodes]
-        new_pointers = [p for p in node.pointers if p.to_tag in nodes]
-        new_nodes[tag] = Node(node.tag, node.title, new_deps, new_pointers)
+        nprops = vars(node)
+        nprops['dependencies'] = [d for d in node.dependencies if d.parent_tag in nodes]
+        nprops['pointers'] = [p for p in node.pointers if p.to_tag in nodes]
+        new_nodes[tag] = Node(nprops)
     return new_nodes
 
 

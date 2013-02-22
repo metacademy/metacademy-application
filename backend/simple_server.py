@@ -47,7 +47,6 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         load_graph()
-
         parse = urlparse.urlparse(self.path)
 
         parts = parse.path.lower().split('/')

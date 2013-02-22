@@ -11,9 +11,10 @@ WRAP_WIDTH = 12
 
 def read_node(path, tag, assert_exists=False):
     """Read a Node object from a directory which optionally contains title.txt,
-    dependencies.txt, and see-also.txt."""
+    dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
     full_path = os.path.join(path, tag)
 
+    ### process title
     title_file = os.path.join(full_path, 'title.txt')
     if os.path.exists(title_file):
         title = open(title_file).readlines()[0].strip()
@@ -22,6 +23,13 @@ def read_node(path, tag, assert_exists=False):
             raise RuntimeError('%s/title.txt does not exist' % tag)
         title = None
 
+    ### process summary
+    summary_file = os.path.join(full_path, 'summary.txt')
+    summary = ""
+    if os.path.exists(summary_file):
+        summary = open(summary_file).read().strip().replace('"',"'")
+
+    ### process dependencies
     dependencies_file = os.path.join(full_path, 'dependencies.txt')
     dependencies = []
     if os.path.exists(dependencies_file):
@@ -43,6 +51,7 @@ def read_node(path, tag, assert_exists=False):
     elif assert_exists:
         raise RuntimeError('%s/dependencies.txt does not exist' % tag)
 
+    ### process see-also
     see_also_file = os.path.join(full_path, 'see-also.txt')
     pointers = []
     if os.path.exists(see_also_file):
@@ -58,7 +67,7 @@ def read_node(path, tag, assert_exists=False):
     elif assert_exists:
         raise RuntimeError('%s/see-also.txt does not exist' % tag)
 
-    return graphs.Node(tag, title, dependencies, pointers)
+    return graphs.Node({'tag':tag, 'title':title, 'summary':summary, 'dependencies':dependencies, 'pointers':pointers})
 
 def read_nodes(path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
@@ -110,7 +119,6 @@ def underscorify(s):
 def wrap(s, width):
     """Wrap a long string to avoid elongated graph nodes."""
     if s is None:
-        print 'warning nonetype'
         return ''
 
     parts = s.split()
@@ -148,13 +156,20 @@ def write_graph_dot(nodes, graph, outstr=None):
 
 def node_to_json(nodes, tag):
     node = nodes[tag]
+
     pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, p.blurb)
               for p in node.pointers]
     pt_str = ','.join(pt_arr)
     dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, d.reason)
                for d in node.dependencies]
     dep_str = ','.join(dep_arr)
-    return '{"title":"%s","dependencies":[%s],"pointers":[%s]}' % (node.title, dep_str, pt_str)
+
+    nvars = vars(node).copy() # copy so we don't alter the node object
+    del(nvars["dependencies"])
+    del(nvars["pointers"])
+    nstring = ','.join('"%s":"%s"' % item for item in nvars.items())
+
+    return '{%s,"dependencies":[%s],"pointers":[%s]}' % (nstring, dep_str, pt_str)
     
 
 
@@ -162,7 +177,6 @@ def write_graph_json(nodes, graph, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
-    json_items = []
     json_items = ['"%s":%s' % (tag.replace('-','_'), node_to_json(nodes, tag))
                   for tag in nodes.keys()]
     json_str = '{' + ','.join(json_items) +'}'

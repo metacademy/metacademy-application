@@ -3,7 +3,7 @@
 	position: relative;
     height: 25px;
     width: 100%;
-    background: #999999;
+    background: #333;
     overflow: hidden;
     border-bottom: 2px black solid;
 }
@@ -26,7 +26,7 @@ body {
     height:100%;
     overflow: hidden;
     position:relative;	/* This fixes the IE7 overflow hidden bug */
-    background: #ededed;
+    background: rgba(245, 238, 238, 0.44);
 }
 
 .colcontainer{
@@ -76,8 +76,8 @@ body {
     padding: 10px;
     max-width: 200px;
     color: #303030;
-    background-color: #F5EEEE;
-    border: 2px solid #885415;
+    background-color: #f6fefe;
+    border: 2px solid #000000;
 }
 
 button.topic-focus {

@@ -1,16 +1,13 @@
 source: esl
 edition: 1
-section: 3.4.3, "The Lasso"
-pages: 64-65
+location: Section 3.4.3, subsection "The Lasso," pgs. 64-65
 mark: star
 
 source: bishop
 edition: 1
-section: 3.1.4
-pages: 144-146
+location: Section 3.1.4, pgs. 144-146
 
 source: murphy
 edition: 1
-section: 13.3-13.3.4
-pages: 429-438
+location: Sections 13.3-13.3.4, pgs. 429-438
 mark: star

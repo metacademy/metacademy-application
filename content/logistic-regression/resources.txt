@@ -1,35 +1,21 @@
 source: bishop
 edition: 1
-section: 4.3.2
-pages: 205-206
+location: Section 4.3.2, pages 205-206
 
 source: murphy
 edition: 1
-section: 8-8.3.2
-pages: 245-249
+location: Sections 8-8.3.2, pages 245-249
 
 source: cs229
-chapter: 1
-section: 5
-pages: 16-19
+location: Chapter 1, section 5, pages 16-19
 mark: star
 
 source: coursera_ng
-lecture: Hypothesis representation
-link: https://class.coursera.org/ml/lecture/preview_view/34
-lecture: Decision boundary
-link: https://class.coursera.org/ml/lecture/preview_view/35
-lecture: Cost function
-https://class.coursera.org/ml/lecture/preview_view/58
-lecture: Simplified cost function and gradient descent
-https://class.coursera.org/ml/lecture/preview_view/36
-lecture: Regularized logistic regression
-link: https://class.coursera.org/ml/lecture/preview_view/42
+location: Lectures "Hypothesis representation," "Decision boundary", "Cost function," "Simplified cost function and gradient descent," and "Regularized logistic regression"
 mark: star
 
 source: barber
 edition: 1-online
-section: 17.4-17.4.3
-pages: 350-355
+location: Sections 17.4-17.4.3, pages 350-355
 mark: star
 

@@ -1,34 +1,25 @@
 source: cs229
-chapter: 1
-section: 1 and 2
-pages: 1-11
+location: Chapter 1, sections 1 and 2, pgs. 1-11
 mark: star
 
 source: esl
 edition: 1
-section: 2.3.1
-pages: 11-14
+location: Section 2.3.1, pgs. 11-14
 
 source: bishop
 edition: 1
-section: 3.1-3.1.1
-pages: 137-142
+location: Sections 3.1-3.1.1, pgs. 137-142
 dependencies: maximum-likelihood
 
 source: coursera_hinton
-lecture: Learning the weights of a linear neuron
-link: https://class.coursera.org/neuralnets-2012-001/lecture/preview_view/33
-lecture: The error surface for a linear neuron
-link: https://class.coursera.org/neuralnets-2012-001/lecture/preview_view/35
+location: Lectures "Learning the weight of a linear neuron" and "The error surface of a linear neuron"
 
 source: coursera_ng
-lecture_sequence: Linear regression with one variable
-lecture_sequence: Linear regression with multiple variables
+location: Lecture sequences "Linear regression with one variable" and "Linear regression with multiple variables"
 mark: star
 
 source: barber
 edition: 1-online
-section: 17.1-17.2 (up to 17.2.1)
-pages: 343-346
+location: Sections 17.1-17.2.1, pgs. 343-346
 
 

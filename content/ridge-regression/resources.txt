@@ -1,24 +1,18 @@
 source: coursera_ng
-lecture: Cost function
-link: https://class.coursera.org/ml/lecture/preview_view/40
-lecture: Regularized linear regression
-link: https://class.coursera.org/ml/lecture/preview_view/41
+location: Lectures "Cost function" and "Regularized linear regression"
 
 source: murphy
 edition: 1
-section: 7.5.1
-pages: 225-227
+location: Section 7.5.1, pages 225-227
 dependencies: map-parameter-estimation
 
 source: bishop
 edition: 1
-section: 3.1.4
-pages: 144-146
+location: Section 3.1.4, pages 144-146
 
 source: esl
 edition: 1
-section: 3.4.3, "ridge regression"
-pages: 59-64
+location: Section 3.4.3, subsection "Ridge regression," pages 59-64
 mark: star
 dependencies: singular-value-decomposition
 

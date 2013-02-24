@@ -1,11 +1,9 @@
 source: bishop
 edition: 1
-section: 2.2
-pages: 74-77
+location: Section 2.2, pgs. 74-77
 mark: star
 
 source: murphy
 edition: 1
-section: 3.4
-pages: 78-82
+location: Section 3.4, pgs. 78-82
 mark: star

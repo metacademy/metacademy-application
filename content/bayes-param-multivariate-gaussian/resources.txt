@@ -1,11 +1,9 @@
 source: murphy
 edition: 1
-section: 4.6-4.6.2
-pages: 127-131
+location: Sections 4.6-4.6.2, pgs. 127-131
 mark: star
 
 source: bishop
 edition: 1
-section: 2.3.6
-pages: 97-102
+location: Section 2.3.6, pgs. 97-102
 

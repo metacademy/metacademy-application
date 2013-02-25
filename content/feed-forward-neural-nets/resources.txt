@@ -1,0 +1,18 @@
+source: bishop
+edition: 1
+location: Section 5.1, pages 227-232
+mark: star
+
+source: esl
+edition: 1
+location Section 11.3, pages 350-354
+
+source: aima
+edition: 2
+location: Section 20.5, pages 736-748
+mark: star
+
+source: coursera_ng
+location: Lecture series "Neural networks: representation"
+mark: star
+

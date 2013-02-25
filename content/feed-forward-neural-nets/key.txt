@@ -1,0 +1,7 @@
+* How can you set the weights of a single sigmoid unit in order to represent:
+** the AND of two binary inputs
+** the OR of two binary inputs
+** a step function of one input x, where the step is at x=1
+* How can you set the weights of a network with one hidden layer in order to represent the XOR of two binary inputs?
+* Show that a single sigmoid unit can't represent XOR.
+

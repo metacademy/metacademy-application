@@ -1,0 +1,1 @@
+Feed-forward neural networks are a supervised learning architecture consisting of a set of neuron-like "units," each one of which computes a simple function of its inputs. Because layers of such neurons can be stacked, neural nets are capable of learning complex nonlinear functions of the inputs.  

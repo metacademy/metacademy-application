@@ -1,0 +1,3 @@
+* Work through the derivation.
+* How many operations does it take to compute the gradient in a feed-forward network with one hidden layer and K units in each layer?
+* Why is it a problem when the hidden units are "saturated," i.e. take values very close to 0 or 1?

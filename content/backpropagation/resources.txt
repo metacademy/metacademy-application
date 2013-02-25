@@ -1,0 +1,23 @@
+source: aima
+edition: 1
+location: Section 20.5, subsection "Multilayer feed-forward neural networks," pages 744-748
+
+source: bishop
+edition: 1
+location: Sections 5.2-5.3, pages 232-249
+mark: star
+
+source: esl
+edition: 1
+location: Section 11.4, pages 353-355
+
+source: coursera_ng
+location: Lecture series "Neural networks: learning"
+mark: star
+
+source: coursera_hinton
+location: Lectures "Learning the weights of a logistic output neuron," "The backpropagation algorithm," and "Using the derivatives computed by backpropagation"
+mark: star
+
+
+

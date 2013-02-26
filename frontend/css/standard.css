@@ -1,6 +1,6 @@
 /* header */
 #header {
-	position: relative;
+    position: relative;
     height: 25px;
     width: 100%;
     background: #333;
@@ -10,74 +10,100 @@
 
 /* body elements */
 body {
-	margin:0;
-	padding:0;
-	border:0;			/* removes the border around the viewport in old versions of IE */
-	width:100%;
-    height:100%;
+    margin: 0;
+    padding: 0;
+    border: 0; /* removes the border around the viewport in old versions of IE */
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    font: 18px Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    font: Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    font-size: 1.0em;
 }
 
 #main {
-    clear:both;
-    float:left;
+    clear: both;
+    float: left;
     width: 100%;
-    height:100%;
+    height: 100%;
     overflow: hidden;
-    position:relative;	/* This fixes the IE7 overflow hidden bug */
+    position: relative; /* This fixes the IE7 overflow hidden bug */
     background: rgba(245, 238, 238, 0.44);
 }
 
-.colcontainer{
-    float:left;
-   	width:100%;
-   	position:relative;
-    right:18%;			/* right column width */
-   	background:#fff;		/* left column background colour */
+.colcontainer {
+    float: left;
+    width: 100%;
+    position: relative;
+    right: 18%; /* right column width */
+    background: #fff; /* left column background colour */
 }
 
 .column {
-    float:left;
-   	position:relative;
-   	padding:0 0 1em 0;
-   	overflow:hidden;
+    float: left;
+    position: relative;
+    padding: 0 0 1em 0;
+    overflow: hidden;
 }
 
 #leftpanel {
-    width:82%;			/* left column content width (left column width minus left and right padding) */
-   	left:18%;			/* (right column width) plus (left column left padding) */
+    width: 82%; /* left column content width (left column width minus left and right padding) */
+    left: 18%; /* (right column width) plus (left column left padding) */
     border-right: 2px black solid;
 }
 
 #rightpanel {
-	width:16%;			/* right column content width (right column width minus left and right padding) */
-	left:19%;			/* (right column width) plus (left column left and right padding) plus (right column left padding) */
+    width: 16%; /* right column content width (right column width minus left and right padding) */
+    left: 19%; /* (right column width) plus (left column left and right padding) plus (right column left padding) */
     overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
 }
 
 /* special styles */
+
+.gold-text {
+    color: #ffd700;
+}
+
+.cost-dollar{
+    color: #008000;
+    font-family: Times, "Gill Sans", sans-serif;
+}
+
+.center{
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.left{
+    float: left;
+}
+
+.bold{
+    font-weight: bold;
+}
+
+.info-loc {
+    font-family: Georgia, sans-serif;
+    font-size: 0.9em;
+}
+
 span.morecontent {
     display: none;
 }
-a.morelink{
-    color: #0000ff;
+
+.dtable {
+    display: table;
+    width: 100%;
+    text-align: right
 }
 
-.dtable{
-    display:table;
-    width:100%;
-    text-align:right
-}
-
-.dvcenter{
-    display:table-cell;
-    vertical-align:middle;
+.dvcenter {
+    display: table-cell;
+    vertical-align: middle;
     height: 100%;
 }
-
 
 .tooltipsy {
     padding: 10px;
@@ -93,58 +119,71 @@ button.topic-focus {
     font-weight: bold;
 }
 
-div.topic-focus{
+div.topic-focus {
     text-align: center;
+    margin-bottom: 100px;
+}
+
+div.resource-entry {
+    margin-bottom: 10px;
+}
+
+div.res-extras{
+    display: none;
+    margin-top: 3px;
+}
+
+div.res-extra-ent{
+    font-family: Georgia, sans-serif;
+    font-size: 14px;
+    font-style: italic;
+    margin-bottom: 3px;
 }
 
 div.list-entry {
     overflow: hidden;
     width: 100%;
-    margin-left: 8px;
 }
 
-
 div.list-text {
+    margin-bottom: 3px;
     float: right;
-    width:90%;
+    width: 90%;
     height: 100%;
     right: 0;
 }
 
-div.help-ptr{
+div.bullet-ptr {
     float: left;
     height: 100%;
     width: 10%;
+    min-width: 10px;
+    text-align: center;
 }
 
 img.list-img {
-    margin-right: 5px;
     vertical-align: middle;
 }
 
 .data-title {
     text-align: center;
-    font-weight: bolder;
-    font-size: 20px;
-    padding: 5px 0px 10px 0px;
+    font-weight: bold;
+    font-size: 1.3em;
+    padding: 5px 0px 5px 0px;
 }
 
 .data-subtitle {
     text-align: left;
     margin-top: 10px;
+    margin-bottom: 3px;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 1.25em;
+    color: rgb(20, 94, 23);
 }
-
-
-.data-description {
-    /*font-style: italic;*/
-}
-
 
 /* general styles */
 
-p{
+p {
     margin-top: 1px;
     margin-bottom: 1px;
 }
@@ -156,6 +195,28 @@ a {
 
 a:active {
     color: #0050FF;
+}
+
+a.morelink {
+    font:Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: rgb(0, 0, 122);
+}
+
+.list-text a{
+    color: rgb(138, 10, 10);
+    text-decoration: underline;
+}
+
+a.moreres{
+    font: 14px Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    text-decoration: none;
+    color: rgb(0, 0, 122);
+}
+
+a.direct-link{
+    color:black;
 }
 
 h1 {

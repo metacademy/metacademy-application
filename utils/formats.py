@@ -2,6 +2,8 @@ import os
 import re
 import sys
 import pdb
+from backend import settings
+from backend.db_handler import db
 
 import graphs
 
@@ -12,6 +14,7 @@ WRAP_WIDTH = 12
 def read_node(path, tag, assert_exists=False):
     """Read a Node object from a directory which optionally contains title.txt,
     dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
+    # TODO: normalize string cleaning (get rid of double quotes that mess up json)
     full_path = os.path.join(path, tag)
 
     ### process title
@@ -27,7 +30,36 @@ def read_node(path, tag, assert_exists=False):
     summary_file = os.path.join(full_path, 'summary.txt')
     summary = ""
     if os.path.exists(summary_file):
-        summary = open(summary_file).read().strip().replace('"',"'")
+        summary = open(summary_file).read().strip().replace('"', "'")
+
+    ### process resources
+    resources_file = os.path.join(full_path, 'resources.txt')
+    resources = []
+    if os.path.exists(resources_file):
+        with open(resources_file) as resource_entries:
+            src = {}
+            for line in resource_entries:
+                line = line.strip().replace('"', "'")
+                if line[:6] == "source":
+                    if src:
+                        resources.append(src)
+                    src = {}
+                try:
+                    attrs = line.strip().split(':')
+                    if len(attrs) > 1 and len(attrs[0]) > 0:
+                        src[attrs[0].strip()] = ':'.join(attrs[1:]).strip()
+                except IndexError:
+                    raise RuntimeError('%s/resources has incorrect format: %s' % (tag, line))
+
+    ### process comprehension key
+    ckey_file = os.path.join(full_path,'key.txt')
+    ckeys = []
+    if os.path.exists(ckey_file):
+        with open(ckey_file) as ckey_entries:
+            for line in ckey_entries:
+                line = line.strip()
+                if len(line) > 0:
+                    ckeys.append(line.replace('"',"'"))
 
     ### process dependencies
     dependencies_file = os.path.join(full_path, 'dependencies.txt')
@@ -67,22 +99,28 @@ def read_node(path, tag, assert_exists=False):
     elif assert_exists:
         raise RuntimeError('%s/see-also.txt does not exist' % tag)
 
-    return graphs.Node({'tag':tag, 'title':title, 'summary':summary, 'dependencies':dependencies, 'pointers':pointers})
+    return graphs.Node(
+        {'tag': tag, 'resources': resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
+         'pointers': pointers, 'ckeys':ckeys})
+
 
 def read_nodes(path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
-    tags = os.listdir(path)
-    tags = filter(lambda(x): x[0] != '.' and x != 'README' ,tags) # remove hidden files and readme from list
+    tags = _filter_non_nodes(os.listdir(path))
     if onlytitle:
         return tags
     else:
         nodes = [read_node(path, tag) for tag in tags]
         return {node.tag: node for node in nodes}
 
-def check_format(path):
-    tags = os.listdir(path)
-    tags = filter(lambda(x): x[0] != '.' and x != 'README' ,tags) # remove hidden files and readme from list
 
+def _filter_non_nodes(tags):
+    return filter(lambda(x): x[0] != '.' and x != 'README' and x != 'resource_db.sqlite',
+        tags) # remove hidden files and readme from list
+
+
+def check_format(path):
+    tags = _filter_non_nodes(os.listdir(path))
     # make sure files exist and are formatted correctly
     nodes = []
     for tag in tags:
@@ -102,9 +140,6 @@ def check_format(path):
             if re.search(r'\s', p.to_tag):
                 print 'Node "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
 
-    
-
-
 
 ################################# write .dot files #############################
 
@@ -115,6 +150,7 @@ def underscorify(s):
     temp = re.sub(r'[^a-z ]', ' ', temp)
     temp = temp.strip()
     return re.sub(r'\W+', '_', temp)
+
 
 def wrap(s, width):
     """Wrap a long string to avoid elongated graph nodes."""
@@ -135,6 +171,7 @@ def wrap(s, width):
             total += 1
     return result
 
+
 def write_graph_dot(nodes, graph, outstr=None):
     if outstr is None:
         outstr = sys.stdout
@@ -153,32 +190,71 @@ def write_graph_dot(nodes, graph, outstr=None):
 
 #################################### JSON ######################################
 
-
 def node_to_json(nodes, tag):
+    ### select node and form title, summary, pointer and dependencies strings
     node = nodes[tag]
+    ret_lst = []
+    if node.title:
+        ret_lst.append('"title":"%s"' % node.title)
+    if node.summary:
+        ret_lst.append('"summary":"%s"' % node.summary)
+    if node.pointers:
+        pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, p.blurb)
+                  for p in node.pointers]
+        if pt_arr:
+            ret_lst.append('"pointers":[%s]' % ','.join(pt_arr))
+    if node.dependencies:
+        dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, d.reason)
+                   for d in node.dependencies]
+        if dep_arr:
+            ret_lst.append('"dependencies":[%s]' % ','.join(dep_arr))
 
-    pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, p.blurb)
-              for p in node.pointers]
-    pt_str = ','.join(pt_arr)
-    dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, d.reason)
-               for d in node.dependencies]
-    dep_str = ','.join(dep_arr)
+    ### add the relevant resources info
+    if node.resources:
+        rscrc_lst = []
+        for resrc in node.resources:
+            rscrc_lst.append('%s' % dict_to_json(resrc))
+        if rscrc_lst:
+            res_str = '[' + ','.join(rscrc_lst) + ']'
+            ret_lst.append('"resources":%s' % res_str)
 
-    nvars = vars(node).copy() # copy so we don't alter the node object
-    del(nvars["dependencies"])
-    del(nvars["pointers"])
-    nstring = ','.join('"%s":"%s"' % item for item in nvars.items())
+    if node.ckeys:
+        ret_lst.append('"ckeys":[' + ','.join(['"%s"' % ck for ck in node.ckeys]) + ']')
 
-    return '{%s,"dependencies":[%s],"pointers":[%s]}' % (nstring, dep_str, pt_str)
-    
+
+    ### return final node string
+    return '{%s}' % ','.join(ret_lst)
 
 
 def write_graph_json(nodes, graph, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
-    json_items = ['"%s":%s' % (tag.replace('-','_'), node_to_json(nodes, tag))
+    # get the individual node data
+    json_items = ['"%s":%s' % (tag.replace('-', '_'), node_to_json(nodes, tag))
                   for tag in nodes.keys()]
-    json_str = '{' + ','.join(json_items) +'}'
+
+    ### make resources entry in json data
+    # TODO perhaps make a "Nodes" object to simplify these statements
+    resrc_keys = set(
+        ['"' + rsrc + '"' for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources] for rsrc in
+         rlist])
+    rdb = db(settings.RESOURCE_DB)
+    resrcs = rdb.fetch('SELECT * FROM %s WHERE key IN (%s)' % (settings.RESOURCE_DB_TABLE, ','.join(resrc_keys)))
+    res_list = []
+    for res in resrcs:
+        res_list.append('"%s":%s' % (res["key"], dict_to_json(res)))
+    if res_list:
+        res_str = '{' + ','.join(res_list) + '}'
+    else:
+        res_str = '{}'
+
+    json_items.append('"node_resources":%s' % res_str)
+
+    ### write total json object with node and resources data
+    json_str = '{' + ','.join(json_items) + '}'
     outstr.write(json_str)
 
+
+def dict_to_json(indict):
+    return '{' + ','.join(['"%s":"%s"' % (ikey, indict[ikey]) for ikey in indict.keys()]) + '}'

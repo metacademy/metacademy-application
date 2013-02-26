@@ -11,6 +11,18 @@ var rp_rmarg_use = 1;
  HELPER FUNCTIONS
  */
 
+/* IE indexOf function */
+if (!Array.indexOf) {
+    Array.prototype.indexOf = function (obj) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] == obj) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+
 // object to control window resizing
 var windowSize = {
     height:0,
@@ -37,6 +49,48 @@ var windowSize = {
         }
     }
 };
+
+function isUrl(s) {
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+    return regexp.test(s);
+}
+
+function wrapLink(title, loc, aclass) {
+    aclass = aclass ? "class=" + aclass : "";
+    return "<a target='_blank' href='" + loc + "'" + aclass + ">" + title + "</a>";
+}
+
+function wrapDiv(content, props) {
+    return '<div' + (props ? ' ' + props : '') + '>' + content + '</div>';
+}
+
+function buildResourceDiv(rsrc_db_ent, rsrc_node) {
+    /*
+     Builds the additonal info resources div
+     */
+    var extra_info = [];
+    var ignore_fields = ["source", "location", "mark"];
+    for (attr in rsrc_node) {
+        if (rsrc_node.hasOwnProperty(attr) && ignore_fields.indexOf(attr) === -1) {
+            extra_info.push(wrapDiv(attr + ': ' + rsrc_node[attr], 'class="res-extra-ent"'));
+        }
+    }
+
+    if ('notes' in rsrc_db_ent) {
+        if (rsrc_db_ent.notes) {
+            extra_info.push(wrapDiv('note: ' + rsrc_db_ent.notes, 'class="res-extra-ent"'));
+        }
+    }
+
+    if (extra_info.length > 0) {
+        var ret_text = wrapDiv(extra_info.join("\n"), 'class=res-extras') + wrapDiv('<a href="" class="moreres">' + '[additional info]' + '</a>');
+    }
+    else {
+        var ret_text = "";
+    }
+
+    return ret_text;
+}
 
 function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
     /*
@@ -73,30 +127,42 @@ function printError(xhr, status) {
     }
 }
 
-function beautifyText(){
+function beautifyText() {
     /*
-    shorten and clean up displayed text
+     shorten and clean up displayed text
      */
     $('.shorten').each(function () {
+        var maxchar = 250;
         var content = $(this).html();
-        var break_loc = content.indexOf(". ")+1;
-        char_limit = break_loc==0||break_loc>150 ? 150:break_loc;
-        if (content.length > char_limit) {
-            var short_content = content.substring(0, char_limit);
-            var long_content = content.substring(char_limit, content.length-1);
-            var html = short_content + '<span>' + "..." + '&nbsp;</span> <span class="morecontent">' + long_content + '</span><a href="" class="morelink">' + '>>' + '</a>';
+        if (content.length > maxchar) {
+            var break_loc = content.substring(0, maxchar).indexOf(". ") + 1; // try to break on a sentence
+            if (break_loc === -1) {
+                break_loc = lastIndexOf(content.substring(0, maxchar).lastIndexOf(" "));
+                if (break_loc === -1) {
+                    break_loc = maxchar;
+                }
+            }
+            var short_content = content.substring(0, break_loc);
+            var long_content = content.substring(break_loc, content.length);
+            var html = short_content + '<span>' + "..." + '&nbsp;</span> <span class="morecontent">' + long_content + '</span><a href="" class="morelink">' + '[more]' + '</a>';
             $(this).html(html);
         }
-
     });
 
-    $('.morelink').on('click', function() {
+    $('.morelink').on('click', function () {
         var $this = $(this);
         $this.hide();
         $this.prev().prev().hide();
         $this.prev().show();
         return false;
-      });
+    });
+
+    $('.moreres').on('click', function () {
+        var $this = $(this);
+        $this.hide();
+        $this.parent().prev().show();
+        return false;
+    });
 }
 
 
@@ -107,11 +173,11 @@ function beautifyText(){
 // load the SVG file using AJAX
 var jdata = null;
 function load_svg(node_name) {
-    if (node_name.length == 0) {
+    if (node_name.length === 0) {
         return
     }
 
-    if (node_name == 'full_graph') {
+    if (node_name === 'full_graph') {
         var get_url = '/full_graph'
     } else {
         var get_url = '/nodes/' + node_name.replace(/_/g, '-') + '/map'
@@ -137,7 +203,7 @@ function load_svg(node_name) {
             // sort the edges and nodes so that edges don't overlap the nodes
             var gelems = d3.selectAll('.node,.edge');
             var gdata = gelems[0].map(function (itm) {
-                if (d3.select(itm).attr('class') == 'node') {
+                if (d3.select(itm).attr('class') === 'node') {
                     return 1
                 }
                 return 0
@@ -179,7 +245,7 @@ function load_svg(node_name) {
                     var text_panel = d3.select("#righttext");
 
                     // First check to see if the node was already clicked and change previous node properties
-                    if (last_node == -1) {
+                    if (last_node === -1) {
                         last_node = this_node;
                         setRightPanelWidth(rp_content_width, rp_lmarg_use, rp_rmarg_use);
                     }
@@ -188,7 +254,7 @@ function load_svg(node_name) {
                             .select('ellipse')
                             .attr("fill", "white");
 
-                        if (this_node.attr('id') == last_node.attr('id')) {
+                        if (this_node.attr('id') === last_node.attr('id')) {
                             last_node = -1;
                             text_panel.html("");
                             setRightPanelWidth(0);
@@ -205,45 +271,83 @@ function load_svg(node_name) {
                     var node_data = jdata[this_node.attr('id')];
                     text_panel.html("");
 
-                    text_panel.append("div")
-                        .attr("class", "data-title")
-                        .text(node_data['title']);
+                    // add title
+                    if ('title' in node_data) {
+                        text_panel.append("div")
+                            .attr("class", "data-title")
+                            .text(node_data['title']);
+                    }
 
-                    text_panel.append("div")
-                        .attr("class", "data-description")
-                        .attr("class", "shorten")
-                        .text(node_data['summary']);  // TODO -- add data content/references (wikipedia for starters?)
+                    // add summary
+                    if ('summary' in node_data) {
+                        text_panel.append("div")
+                            .attr("class", "data-description shorten")
+                            .text(node_data['summary']);
+                    }
 
-                    // add pointer (see-also) info
-                    if (node_data['pointers'].length > 0) {
+                    // add resources
+                    if ('resources' in node_data) {
+                        // sort the elements so starred entries come first
+                        node_data['resources'].sort(function (a, b) {
+                            var ma = Number("mark" in a);
+                            var mb = Number("mark" in b);
+                            return (mb > ma) ? 1 : ((ma > mb) ? -1 : 0);
+                        });
                         text_panel.append('div')
                             .attr('class', 'data-subtitle')
-                            .text('See Also');
-                        var dp_enter = text_panel.append("div")
-                            .attr("class", "data-pointers")
+                            .text('Learning Resources');
+                        var rents = text_panel.append('div')
+                            .attr("class", "resources")
                             .selectAll('div')
-                            .data(node_data['pointers'])
+                            .data(node_data['resources'])
                             .enter()
                             .append('div')
-                            .attr('class', 'list-entry');
+                            .attr('class', 'resource-entry');
+                        rents.append('div')
+                            .attr('class', 'list-entry')
+                            .html(function (d) {
+                                // Add an appropriate styled bullet with appropriate title
+                                var bullet = "mark" in d ? '<span class="gold-text">&#9733;</span>' : '&#8226;';
+                                bullet = '<div class="bullet-ptr">' + bullet + '</div>'
 
-                        dp_enter.append('div')
-                            .attr('class', 'help-ptr')
-                            .append('img')
-                            .attr('src', '/static/images/qmark.jpg')
-                            .attr('class', 'list-img hastip')
-                            .attr('title', function (d) {
-                                return d.blurb == "None" ? "" : d.blurb;
-                            });
-                        dp_enter.append('div')
-                            .attr('class', 'list-text')
-                            .text(function (d) {
-                                return d.to_tag.replace('-', ' ');
+                                // obtain resource info
+                                var rsrc = jdata.node_resources[d.source];
+                                var title = "title" in rsrc ? rsrc.title : d.source;
+                                title = "location" in rsrc ? wrapLink(title, rsrc.location) : title;
+                                var info_loc = "location" in d ? d.location : "";
+                                if (isUrl(info_loc)) {
+                                    info_loc = wrapLink("direct link", info_loc, "direct-link");
+                                }
+                                // is it free?
+                                var cost_mark = Number(rsrc.free) ? "" : '<span class="cost-dollar"> $</span>';
+
+                                // create display
+                                var disp = '<div class="list-text">' + title + cost_mark
+                                    + '<div class="info-loc">[' + info_loc + "]</div>" + buildResourceDiv(rsrc, d) + "</div>";
+                                return bullet + disp;
+                            })
+                    }
+
+                    // add comprehension questions
+                    if ('ckeys' in node_data) {
+                        text_panel.append('div')
+                            .attr('class', 'data-subtitle')
+                            .text('Comprehension');
+
+                        var ckents = text_panel.append("div")
+                            .attr('class', 'ckeys')
+                            .selectAll('div')
+                            .data(node_data['ckeys'])
+                            .enter()
+                            .append('div')
+                            .attr('class', 'list-entry resource-entry')
+                            .html(function (d) {
+                                return  '<div class="bullet-ptr"> &#8226;</div><div class="list-text">' + d.replace('* ', '') + '</div>';
                             });
                     }
 
                     // add dependencies info
-                    if (node_data['dependencies'].length > 0) {
+                    if ('dependencies' in node_data) {
                         text_panel.append('div')
                             .attr('class', 'data-subtitle')
                             .text('Dependencies');
@@ -257,12 +361,12 @@ function load_svg(node_name) {
                             .attr('class', 'list-entry');
 
                         lent.append('div')
-                            .attr('class', 'help-ptr')
+                            .attr('class', 'bullet-ptr')
                             .append('img')
                             .attr('src', '/static/images/qmark.jpg')
                             .attr('class', 'list-img hastip')
                             .attr('title', function (d) {
-                                return d.reason == "None" ? "" : d.reason;
+                                return d.reason === "None" ? "" : d.reason;
                             });
 
                         lent.append('div')
@@ -270,8 +374,36 @@ function load_svg(node_name) {
                             .text(function (d) {
                                 return d.from_tag.replace('-', ' ');
                             });
-
                     }
+
+                    // add pointer (see-also) info
+                    if ('pointers' in node_data) {
+                        text_panel.append('div')
+                            .attr('class', 'data-subtitle')
+                            .text('See Also');
+                        var dp_enter = text_panel.append("div")
+                            .attr("class", "data-pointers")
+                            .selectAll('div')
+                            .data(node_data['pointers'])
+                            .enter()
+                            .append('div')
+                            .attr('class', 'list-entry');
+
+                        dp_enter.append('div')
+                            .attr('class', 'bullet-ptr')
+                            .append('img')
+                            .attr('src', '/static/images/qmark.jpg')
+                            .attr('class', 'list-img hastip')
+                            .attr('title', function (d) {
+                                return d.blurb === "None" ? "" : d.blurb;
+                            });
+                        dp_enter.append('div')
+                            .attr('class', 'list-text')
+                            .text(function (d) {
+                                return d.to_tag.replace('-', ' ');
+                            });
+                    }
+
 
                     // add "focus" button
                     text_panel.append("div")
@@ -283,7 +415,7 @@ function load_svg(node_name) {
                             load_svg(this_node.attr('id').replace('_', '-'));
                         });
 
-                    // tooltip for pretty hover info TODO consider writing this yourself
+                    // tooltip for pretty hover info TODO consider writing this yourself since it is GPL
                     $('.hastip').tooltipsy();
                     beautifyText();
 
@@ -314,9 +446,10 @@ function load_svg(node_name) {
 
         },
         error:printError
-    });
+    })
+    ;
 
-    // 2nd AJAX call: get json graph data (dependencies, see-also, etc)
+// 2nd AJAX call: get json graph data (dependencies, see-also, etc)
     $.ajax({
         type:'GET',
         url:get_url + '?format=json',

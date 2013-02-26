@@ -4,7 +4,9 @@ import config
 # in config, set: SECRET_KEY;       
 CONTENT_SERVER = 'http://localhost:' + str(config.CONTENT_SERVER_PORT)
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
-AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../')) 
+AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../'))
+RESOURCE_DB = os.path.join(AGFK_PATH,'content/resource_db.sqlite')
+RESOURCE_DB_TABLE = "resources"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

@@ -1,9 +1,13 @@
+from backend import settings
+from backend.db_handler import db
 import utils.formats as formats
 import config
+from forms import ResourceForm
 from backend.settings import CONTENT_SERVER
-from django.http import HttpResponse
-from django.shortcuts import render_to_response, redirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
+from django import forms
 import os
 import pdb
 import urllib
@@ -38,6 +42,24 @@ def _get_content_type(fmt):
                          'svg': 'image/svg+xml',
                          'dot': 'text/plain',
                          }[fmt]
+
+def process_resource_form(request):
+    """
+    Add resources to resource database via a form
+    """
+    if request.method == 'POST':
+        form = ResourceForm(request.POST)
+        if form.is_valid():
+            rdb = db(settings.RESOURCE_DB)
+            if not rdb.check_table_existence(settings.RESOURCE_DB_TABLE):
+                rdb.add_table('%s (key Text PRIMARY KEY, title Text, location Text, resource_type Text, free Boolean, notes Text)' % settings.RESOURCE_DB_TABLE)
+            rdb.execute("INSERT OR REPLACE INTO %s (key, title, location, resource_type, free, notes) VALUES(?, ?, ?, ?, ?, ?)" % settings.RESOURCE_DB_TABLE,
+            [form.cleaned_data['key'], form.cleaned_data['title'], form.cleaned_data['location'],
+             form.cleaned_data['resource_type'], form.cleaned_data['cost']=="free", form.cleaned_data['notes']])
+            return HttpResponseRedirect('/resource-submission/')
+    else:
+        form = ResourceForm()
+    return render(request, 'resource_submission.html', {'form': form,})
 
 
 

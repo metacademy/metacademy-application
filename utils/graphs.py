@@ -18,6 +18,12 @@ class Node:
             for key in kwargs:
                 setattr(self, key, kwargs[key])
 
+    def get_resource_keys(self):
+        keys = None
+        if self.resources:
+            keys = [rdic['source'] for rdic in self.resources]
+        return keys
+
 # TODO add __repr__ method
 
 class Dependency:

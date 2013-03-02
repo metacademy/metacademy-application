@@ -16,7 +16,7 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font: Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    font-family: Helvetica;
     font-size: 1.0em;
 }
 
@@ -67,7 +67,7 @@ body {
 
 .cost-dollar{
     color: #008000;
-    font-family: Times, "Gill Sans", sans-serif;
+    font-family: Times, "Gill Sans", Helvetica;
 }
 
 .center{
@@ -85,7 +85,7 @@ body {
 }
 
 .info-loc {
-    font-family: Georgia, sans-serif;
+    font-family: Helvetica;
     font-size: 0.9em;
 }
 
@@ -134,7 +134,7 @@ div.res-extras{
 }
 
 div.res-extra-ent{
-    font-family: Georgia, sans-serif;
+    font-family: Helvetica;
     font-size: 14px;
     font-style: italic;
     margin-bottom: 3px;
@@ -198,7 +198,7 @@ a:active {
 }
 
 a.morelink {
-    font:Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    font-family:Helvetica;
     font-size: 0.9em;
     text-decoration: none;
     color: rgb(0, 0, 122);
@@ -210,7 +210,8 @@ a.morelink {
 }
 
 a.moreres{
-    font: 14px Calibri, "Gill Sans", "Trebuchet MS", sans-serif;
+    font-size: 14px;
+    font-family:Helvetica;
     text-decoration: none;
     color: rgb(0, 0, 122);
 }

@@ -1,0 +1,1 @@
+Tikhonov regularization, named for Andrey Tikhonov, is the most commonly used method of regularization of ill-posed problems. 

@@ -1,0 +1,1 @@
+In mathematical statistics and information theory, the Fisher information (sometimes simply called information) can be defined as the variance of the score, or as the expected value of the observed information. 

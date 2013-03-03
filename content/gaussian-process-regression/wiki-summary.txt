@@ -1,0 +1,1 @@
+Kriging is a geostatistical estimator that infers the value of a random field at an unobserved location (e.g. 

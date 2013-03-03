@@ -1,0 +1,1 @@
+In mathematics, a generalized inverse or pseudoinverse of a matrix A is a matrix that has some properties of the inverse matrix of A but not necessarily all of them. 

@@ -1,0 +1,1 @@
+The iterative proportional fitting procedure (IPFP, also known as biproportional fitting in statistics, RAS algorithm in economics and matrix raking or matrix scaling in computer science) is an iterative algorithm for estimating cell values of a contingency table such that the marginal totals remain fixed and the estimated table decomposes into an outer product. 

@@ -1,0 +1,1 @@
+In probability theory and statistics, the cumulative distribution function (CDF), or just distribution function, describes the probability that a real-valued random variable X with a given probability distribution will be found at a value less than or equal to x. 

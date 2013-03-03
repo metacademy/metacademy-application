@@ -1,0 +1,1 @@
+In probability theory, Boole's inequality, also known as the union bound, says that for any finite or countable set of events, the probability that at least one of the events happens is no greater than the sum of the probabilities of the individual events. 

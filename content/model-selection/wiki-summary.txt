@@ -1,0 +1,1 @@
+Model selection is the task of selecting a statistical model from a set of candidate models, given data. 

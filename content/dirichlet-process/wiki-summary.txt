@@ -1,0 +1,1 @@
+In probability theory, a Dirichlet process is a random process that is a probability distribution whose domain is itself a random distribution. 

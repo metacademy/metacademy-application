@@ -1,0 +1,1 @@
+In mathematics, the directional derivative of a multivariate differentiable function along a given vector v at a given point x intuitively represents the instantaneous rate of change of the function, moving through x with a velocity specified by v. 

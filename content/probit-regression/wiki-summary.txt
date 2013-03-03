@@ -1,0 +1,1 @@
+In statistics, a probit model is a type of regression where the dependent variable can only take two values, for example married or not married. 

@@ -136,9 +136,9 @@ function beautifyText() {
         var content = $(this).html();
         if (content.length > maxchar) {
             var break_loc = content.substring(0, maxchar).indexOf(". ") + 1; // try to break on a sentence
-            if (break_loc === -1) {
-                break_loc = lastIndexOf(content.substring(0, maxchar).lastIndexOf(" "));
-                if (break_loc === -1) {
+            if (break_loc === 0) {
+                break_loc = content.substring(0, maxchar).lastIndexOf(" ") + 1;
+                if (break_loc === 0) {
                     break_loc = maxchar;
                 }
             }
@@ -280,11 +280,25 @@ function load_svg(node_name) {
 
                     // add summary
                     if ('summary' in node_data) {
-                        text_panel.append("div")
-                            .attr("class", "data-description shorten")
-                            .text(node_data['summary']);
+                        var spanel = text_panel.append('div')
+                            .attr('class','data-description');
+                        var sum = node_data['summary']
+                        // check if summary is from wikipedia
+                        if (sum.substring(0, 6) === '*Wiki*') {
+                            sum = sum.substring(6);
+                            spanel.append('a')
+                                .attr('target','_blank')
+                                .attr('href', 'http://www.en.wikipedia.org/wiki/'
+                                  + encodeURI(node_data['title'] ? node_data['title'] : this_node.attr('id')))
+                                .append('img')
+                                .attr('class','hastip wiki-img')
+                                .attr('title','summary from wikipedia -- click to load wikipedia entry')
+                                .attr('src','/static/images/wiki.png');
+                        }
+                        spanel.append("span")
+                            .attr("class", "shorten")
+                            .text(sum);
                     }
-
                     // add resources
                     if ('resources' in node_data) {
                         // sort the elements so starred entries come first
@@ -416,7 +430,7 @@ function load_svg(node_name) {
                         });
 
                     // tooltip for pretty hover info TODO consider writing this yourself since it is GPL
-                    $('.hastip').tooltipsy();
+                    $('.hastip').tooltipsy({offset: [1, 1]});
                     beautifyText();
 
                 });
@@ -454,6 +468,7 @@ function load_svg(node_name) {
         type:'GET',
         url:get_url + '?format=json',
         async:false,
+        scriptCharset:"utf-8",
         success:function (data) {
             jdata = data;
             console.log("valid AJAX call for json graph data");

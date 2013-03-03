@@ -1,0 +1,1 @@
+Differential entropy (also referred to as continuous entropy) is a concept in information theory that extends the idea of (Shannon) entropy, a measure of average surprisal of a random variable, to continuous probability distributions.

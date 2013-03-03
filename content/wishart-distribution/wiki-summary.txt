@@ -1,0 +1,1 @@
+In statistics, the Wishart distribution is a generalization to multiple dimensions of the chi-squared distribution, or, in the case of non-integer degrees of freedom, of the gamma distribution. 

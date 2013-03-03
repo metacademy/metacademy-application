@@ -1,0 +1,1 @@
+In probability theory, the law of large numbers (LLN) is a theorem that describes the result of performing the same experiment a large number of times. 

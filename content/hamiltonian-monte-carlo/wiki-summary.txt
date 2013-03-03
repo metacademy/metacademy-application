@@ -1,0 +1,1 @@
+In mathematics and physics, the hybrid Monte Carlo algorithm, also known as Hamiltonian Monte Carlo, is a Markov chain Monte Carlo method for obtaining a sequence of random samples from a probability distribution for which direct sampling is difficult. 

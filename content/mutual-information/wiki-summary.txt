@@ -1,0 +1,1 @@
+In probability theory and information theory, the mutual information (sometimes known by the archaic term transinformation) of two random variables is a quantity that measures the mutual dependence of the two random variables. 

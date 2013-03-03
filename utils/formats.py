@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
 import os
 import re
 import sys
+import urllib, urllib2
+from xml.dom.minidom import parse as parseXML
 import pdb
 from backend import settings
 from backend.db_handler import db
@@ -28,9 +31,40 @@ def read_node(path, tag, assert_exists=False):
 
     ### process summary
     summary_file = os.path.join(full_path, 'summary.txt')
+    wiki_summary_file = os.path.join(full_path, 'wiki-summary.txt')
     summary = ""
+    usewiki = False
     if os.path.exists(summary_file):
-        summary = open(summary_file).read().strip().replace('"', "'")
+        sfile = summary_file
+    elif os.path.exists(wiki_summary_file):
+        sfile = wiki_summary_file
+        usewiki = True
+    else:
+        # try to obtain a wiki summary
+        sfile = None
+        if title:
+            ttl = title
+        else:
+            ttl = tag
+        wiki_ep = 'http://en.wikipedia.org/w/api.php'
+        urlparams = '?action=query&redirects&prop=extracts&exintro&explaintext&exsectionformat=plain&exsentences=1&format=xml&titles=%s' %  urllib.quote_plus(ttl)
+        rquest = urllib2.Request(wiki_ep + urlparams)
+        xmlresp = parseXML(urllib2.urlopen(rquest))
+        extxt = xmlresp.getElementsByTagName('extract')
+        if len(extxt):
+            summary = extxt[0].firstChild.wholeText.replace('\n',' ')
+            usewiki = True
+        else:
+            summary = ''
+        # cache the wiki summary
+        with open(wiki_summary_file, 'w') as wikif:
+            wikif.write(summary.encode('utf-8'))
+
+    if sfile:
+        summary = unicode(open(sfile).read().strip().replace('\\','\\\\').replace('"', '\\"'),'utf-8')
+
+    if usewiki and len(summary):
+        summary = '*Wiki*' + summary
 
     ### process resources
     resources_file = os.path.join(full_path, 'resources.txt')
@@ -39,7 +73,7 @@ def read_node(path, tag, assert_exists=False):
         with open(resources_file) as resource_entries:
             src = {}
             for line in resource_entries:
-                line = line.strip().replace('"', "'")
+                line = line.strip().replace('"', '\\"')
                 if line[:6] == "source":
                     if src:
                         resources.append(src)
@@ -250,10 +284,10 @@ def write_graph_json(nodes, graph, outstr=None):
         res_str = '{}'
 
     json_items.append('"node_resources":%s' % res_str)
-
+#    json_items.encode('utf-8')
     ### write total json object with node and resources data
     json_str = '{' + ','.join(json_items) + '}'
-    outstr.write(json_str)
+    outstr.write(json_str.encode('utf-8'))
 
 
 def dict_to_json(indict):

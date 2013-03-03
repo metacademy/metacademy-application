@@ -1,0 +1,1 @@
+In linear algebra, a symmetric matrix is a square matrix that is equal to its transpose. 

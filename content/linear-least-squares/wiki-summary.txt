@@ -1,0 +1,1 @@
+Linear least squares, is one of the mathematics/statistical problem solving methods, using least squares algorithmic technique to increase solution approximation accuracy, corresponding with a particular problem's complexity:

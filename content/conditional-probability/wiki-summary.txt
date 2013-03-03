@@ -1,0 +1,1 @@
+In probability theory, a conditional probability is the probability that an event will occur, when another event is known to occur or to have occurred. 

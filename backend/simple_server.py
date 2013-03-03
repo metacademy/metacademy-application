@@ -91,7 +91,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def send_text(self, text, ctype):
         self.send_response(200)
-        self.send_header('Content-type', ctype)
+        self.send_header('Content-type', ctype + ';charset=utf-8') # TODO make encoding an option?
         self.send_header('Content-length', len(text))
         self.end_headers()
         self.wfile.write(text)

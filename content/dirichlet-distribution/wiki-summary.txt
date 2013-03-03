@@ -1,0 +1,1 @@
+In probability and statistics, the Dirichlet distribution (after Johann Peter Gustav Lejeune Dirichlet), often denoted [\operatorname{Dir}(\boldsymbol\alpha)], is a family of continuous multivariate probability distributions parametrized by a vector [\boldsymbol\alpha] of positive reals. 

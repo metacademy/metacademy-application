@@ -1,0 +1,1 @@
+In statistics, the generalized linear model (GLM) is a flexible generalization of ordinary linear regression that allows for response variables that have other than a normal distribution. 

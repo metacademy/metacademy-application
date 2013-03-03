@@ -1,0 +1,1 @@
+The proposition in probability theory known as the law of total expectation, the law of iterated expectations, the tower rule, the smoothing theorem, among other names, states that if X is an integrable random variable (i.e., a random variable satisfying E( | X | ) < ∞) and Y is any random variable, not necessarily integrable, on the same probability space, then

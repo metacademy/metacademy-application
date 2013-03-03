@@ -1,0 +1,1 @@
+In statistics, importance sampling is a general technique for estimating properties of a particular distribution, while only having samples generated from a different distribution rather than the distribution of interest. 

@@ -1,0 +1,1 @@
+In statistics, the use of Bayes factors is a Bayesian alternative to classical hypothesis testing.Bayesian model comparison is a method of model selection based on Bayes factors.

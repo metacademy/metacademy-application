@@ -1,0 +1,1 @@
+In computational geometry, the perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs. 

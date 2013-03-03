@@ -1,0 +1,1 @@
+Structural risk minimization (SRM) is an inductive principle of use in machine learning. 

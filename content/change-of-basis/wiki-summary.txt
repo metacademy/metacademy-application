@@ -1,0 +1,1 @@
+In linear algebra, a basis for a vector space of dimension n is a sequence of n vectors α1, ..., αn with the property that every vector in the space can be expressed uniquely as a linear combination of the basis vectors. 

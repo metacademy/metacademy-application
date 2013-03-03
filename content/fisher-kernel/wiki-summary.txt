@@ -1,0 +1,1 @@
+In statistical classification, the Fisher kernel, named in honour of Sir Ronald Fisher, is a function that measures the similarity of two objects on the basis of sets of measurements for each object and a statistical model. 

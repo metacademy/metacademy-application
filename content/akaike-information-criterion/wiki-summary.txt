@@ -1,0 +1,1 @@
+The Akaike information criterion is a measure of the relative goodness of fit of a statistical model. 

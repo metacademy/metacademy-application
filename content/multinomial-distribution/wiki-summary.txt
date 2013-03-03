@@ -1,0 +1,1 @@
+In probability theory, the multinomial distribution is a generalization of the binomial distribution. 

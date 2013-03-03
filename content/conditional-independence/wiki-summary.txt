@@ -1,0 +1,1 @@
+In probability theory, two events R and B are conditionally independent given a third event Y precisely if the occurrence or non-occurrence of R and the occurrence or non-occurrence of B are independent events in their conditional probability distribution given Y. 

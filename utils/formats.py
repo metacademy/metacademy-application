@@ -2,11 +2,11 @@
 import os
 import re
 import sys
-import urllib, urllib2
-from xml.dom.minidom import parse as parseXML
 import pdb
 from backend import settings
 from backend.db_handler import db
+from backend.settings import RESOURCE_DB
+from global_resources import NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, WIKI_SUMMARY_PREFIX, WIKI_SUMMARY, NODE_SUMMARY, NODE_TITLE, NODE_SEE_ALSO, RESOURCE_DB_NAME, RESOURCE_DB_TABLE
 
 import graphs
 
@@ -21,53 +21,34 @@ def read_node(path, tag, assert_exists=False):
     full_path = os.path.join(path, tag)
 
     ### process title
-    title_file = os.path.join(full_path, 'title.txt')
+    title_file = os.path.join(full_path, NODE_TITLE)
     if os.path.exists(title_file):
         title = open(title_file).readlines()[0].strip()
     else:
         if assert_exists:
-            raise RuntimeError('%s/title.txt does not exist' % tag)
+            raise RuntimeError('%s/%s does not exist' % (tag, NODE_TITLE))
         title = None
 
     ### process summary
-    summary_file = os.path.join(full_path, 'summary.txt')
-    wiki_summary_file = os.path.join(full_path, 'wiki-summary.txt')
+    summary_file = os.path.join(full_path, NODE_SUMMARY)
+    wiki_summary_file = os.path.join(full_path, WIKI_SUMMARY)
     summary = ""
     usewiki = False
+    sfile = None
     if os.path.exists(summary_file):
         sfile = summary_file
     elif os.path.exists(wiki_summary_file):
         sfile = wiki_summary_file
         usewiki = True
-    else:
-        # try to obtain a wiki summary
-        sfile = None
-        if title:
-            ttl = title
-        else:
-            ttl = tag
-        wiki_ep = 'http://en.wikipedia.org/w/api.php'
-        urlparams = '?action=query&redirects&prop=extracts&exintro&explaintext&exsectionformat=plain&exsentences=1&format=xml&titles=%s' %  urllib.quote_plus(ttl)
-        rquest = urllib2.Request(wiki_ep + urlparams)
-        xmlresp = parseXML(urllib2.urlopen(rquest))
-        extxt = xmlresp.getElementsByTagName('extract')
-        if len(extxt):
-            summary = extxt[0].firstChild.wholeText.replace('\n',' ')
-            usewiki = True
-        else:
-            summary = ''
-        # cache the wiki summary
-        with open(wiki_summary_file, 'w') as wikif:
-            wikif.write(summary.encode('utf-8'))
 
     if sfile:
-        summary = unicode(open(sfile).read().strip().replace('\\','\\\\').replace('"', '\\"'),'utf-8')
+        summary = unicode(open(sfile).read().strip().replace('\\', '\\\\').replace('"', '\\"'), 'utf-8')
 
     if usewiki and len(summary):
-        summary = '*Wiki*' + summary
+        summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
 
     ### process resources
-    resources_file = os.path.join(full_path, 'resources.txt')
+    resources_file = os.path.join(full_path, NODE_RESOURCES)
     resources = []
     if os.path.exists(resources_file):
         with open(resources_file) as resource_entries:
@@ -84,19 +65,21 @@ def read_node(path, tag, assert_exists=False):
                         src[attrs[0].strip()] = ':'.join(attrs[1:]).strip()
                 except IndexError:
                     raise RuntimeError('%s/resources has incorrect format: %s' % (tag, line))
+            if src:
+                resources.append(src)
 
     ### process comprehension key
-    ckey_file = os.path.join(full_path,'key.txt')
+    ckey_file = os.path.join(full_path, NODE_COMPREHENSION_KEY)
     ckeys = []
     if os.path.exists(ckey_file):
         with open(ckey_file) as ckey_entries:
             for line in ckey_entries:
                 line = line.strip()
                 if len(line) > 0:
-                    ckeys.append(line.replace('"',"'"))
+                    ckeys.append(line.replace('"', "'"))
 
     ### process dependencies
-    dependencies_file = os.path.join(full_path, 'dependencies.txt')
+    dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
     dependencies = []
     if os.path.exists(dependencies_file):
         for line_ in open(dependencies_file):
@@ -113,12 +96,12 @@ def read_node(path, tag, assert_exists=False):
             elif parts[0] == 'reason':
                 curr_dep.reason = parts[1].strip()
             else:
-                raise RuntimeError('Error reading line in %s/dependencies.txt: %s' % (tag, line))
+                raise RuntimeError('Error reading line in %s/%s: %s' % (tag, NODE_DEPENDENCIES, line))
     elif assert_exists:
-        raise RuntimeError('%s/dependencies.txt does not exist' % tag)
+        raise RuntimeError('%s/%s does not exist' % (tag, NODE_DEPENDENCIES))
 
     ### process see-also
-    see_also_file = os.path.join(full_path, 'see-also.txt')
+    see_also_file = os.path.join(full_path, NODE_SEE_ALSO)
     pointers = []
     if os.path.exists(see_also_file):
         for line_ in open(see_also_file):
@@ -131,11 +114,11 @@ def read_node(path, tag, assert_exists=False):
                 ptr = graphs.Pointer(tag, to_tag, blurb)
                 pointers.append(ptr)
     elif assert_exists:
-        raise RuntimeError('%s/see-also.txt does not exist' % tag)
+        raise RuntimeError('%s/%s does not exist' % (tag, NODE_SEE_ALSO))
 
     return graphs.Node(
         {'tag': tag, 'resources': resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
-         'pointers': pointers, 'ckeys':ckeys})
+         'pointers': pointers, 'ckeys': ckeys})
 
 
 def read_nodes(path, onlytitle=False):
@@ -149,7 +132,7 @@ def read_nodes(path, onlytitle=False):
 
 
 def _filter_non_nodes(tags):
-    return filter(lambda(x): x[0] != '.' and x != 'README' and x != 'resource_db.sqlite',
+    return filter(lambda(x): x[0] != '.' and x != 'README' and x != RESOURCE_DB_NAME,
         tags) # remove hidden files and readme from list
 
 
@@ -273,8 +256,8 @@ def write_graph_json(nodes, graph, outstr=None):
     resrc_keys = set(
         ['"' + rsrc + '"' for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources] for rsrc in
          rlist])
-    rdb = db(settings.RESOURCE_DB)
-    resrcs = rdb.fetch('SELECT * FROM %s WHERE key IN (%s)' % (settings.RESOURCE_DB_TABLE, ','.join(resrc_keys)))
+    rdb = db(RESOURCE_DB)
+    resrcs = rdb.fetch('SELECT * FROM %s WHERE key IN (%s)' % (RESOURCE_DB_TABLE, ','.join(resrc_keys)))
     res_list = []
     for res in resrcs:
         res_list.append('"%s":%s' % (res["key"], dict_to_json(res)))
@@ -284,7 +267,7 @@ def write_graph_json(nodes, graph, outstr=None):
         res_str = '{}'
 
     json_items.append('"node_resources":%s' % res_str)
-#    json_items.encode('utf-8')
+    #    json_items.encode('utf-8')
     ### write total json object with node and resources data
     json_str = '{' + ','.join(json_items) + '}'
     outstr.write(json_str.encode('utf-8'))

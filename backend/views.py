@@ -1,5 +1,6 @@
 from backend import settings
 from backend.db_handler import db
+import global_resources
 import utils.formats as formats
 import config
 from forms import ResourceForm
@@ -51,9 +52,9 @@ def process_resource_form(request):
         form = ResourceForm(request.POST)
         if form.is_valid():
             rdb = db(settings.RESOURCE_DB)
-            if not rdb.check_table_existence(settings.RESOURCE_DB_TABLE):
-                rdb.add_table('%s (key Text PRIMARY KEY, title Text, location Text, resource_type Text, free Boolean, notes Text)' % settings.RESOURCE_DB_TABLE)
-            rdb.execute("INSERT OR REPLACE INTO %s (key, title, location, resource_type, free, notes) VALUES(?, ?, ?, ?, ?, ?)" % settings.RESOURCE_DB_TABLE,
+            if not rdb.check_table_existence(global_resources.RESOURCE_DB_TABLE):
+                rdb.add_table('%s (key Text PRIMARY KEY, title Text, location Text, resource_type Text, free Boolean, notes Text)' % global_resources.RESOURCE_DB_TABLE)
+            rdb.execute("INSERT OR REPLACE INTO %s (key, title, location, resource_type, free, notes) VALUES(?, ?, ?, ?, ?, ?)" % global_resources.RESOURCE_DB_TABLE,
             [form.cleaned_data['key'], form.cleaned_data['title'], form.cleaned_data['location'],
              form.cleaned_data['resource_type'], form.cleaned_data['cost']=="free", form.cleaned_data['notes']])
             return HttpResponseRedirect('/resource-submission/')

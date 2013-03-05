@@ -1,0 +1,1 @@
+Backpropagation is normally used to propagate first-order derivatives (gradients). However, it can also be used to propagate second-order derivatives, at least approximately.

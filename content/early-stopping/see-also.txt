@@ -1,5 +1,5 @@
 * Other strategies for controlling overfitting in feed-forward neural nets include:
-** Weight decay, a form of $L_2$ regularization [weight-decay]
+** Weight decay, a form of $L_2$ regularization [weight-decay-neural-networks]
 ** Tikhonov regularization, which rewards invariance to noise in the inputs [tikhonov-regularization]
 ** Tangent propagation, which rewards invariance to irrelevant transformations of the inputs such as translation and scalling [tangent-propagation]
 ** Generative pre-training, which improves generalization by encouraging solutions which also reflect the data distribution [generative-pre-training]

@@ -1,0 +1,4 @@
+source: bishop
+edition: 1
+location: Section 5.4, pages 249-256
+mark: star

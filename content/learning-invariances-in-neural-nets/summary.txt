@@ -1,0 +1,2 @@
+The human visual system is capable of recognizing objects despite changes in factors such as location, orientation, and lighting. We'd like the representations learned by neural networks to be invariant to at least some of these things as well. There are several different strategies for achieving this, including enforcing invariance in the network architecture, using an appropriate regularization term, or generating randomly perturbed training data.
+

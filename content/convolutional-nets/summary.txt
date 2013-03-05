@@ -1,0 +1,2 @@
+Convolutional neural networks are a kind of feed-forward neural net architecture geared towards visual processing. In each layer, there are several groups of units whose weights are repeated (or "shared") across all spatial locations. The forward pass and backpropagation updates can both be computed efficiently using convolution.
+ 

@@ -1,0 +1,20 @@
+source: murphy
+edition: 1
+location: Section 16.5.1, pages 564-568
+
+source: bishop
+edition: 1
+location: Section 5.5.6, pages 267-269
+
+source: coursera_hinton
+location: Lectures "Convolutional nets for digit recognition" and "Convolutional nets for object recognition"
+mark: star
+
+source: paper
+authors: Yann LeCun and Leon Bottou and Yoshua Bengio and Patrick Haffner
+title: Gradient-based learning applied to document recognition
+link: http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
+open: true
+mark: star
+
+

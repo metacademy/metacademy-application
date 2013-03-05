@@ -1,4 +1,4 @@
-tag: weight-decay
+tag: weight-decay-neural-networks
 reason: Soft weight sharing is an alternative regularization scheme for neural nets based on weight decay.
 
 tag: mixture-of-gaussians

@@ -1,0 +1,10 @@
+source: khan
+location: https://www.khanacademy.org/math/calculus/partial_derivatives_topic/partial_derivatives/v/partial-derivatives
+mark: star
+
+source: wikipedia
+location: http://en.wikipedia.org/wiki/Partial_derivative
+extra: work through the examples section
+
+source: wolfram
+location: http://mathworld.wolfram.com/PartialDerivative.html

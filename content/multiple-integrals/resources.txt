@@ -1,0 +1,6 @@
+source: khan
+location: https://www.khanacademy.org/math/calculus/double_triple_integrals
+mark: star
+
+source: wolfram
+location: http://mathworld.wolfram.com/MultipleIntegral.html

@@ -1,0 +1,18 @@
+source: bishop
+edition: 1
+location: Section 6.2, pages 294-299
+mark: star
+
+source: gpml
+edition: 1
+location: Sections 4-4.2, pages 79-95
+dependencies: gaussian-processes
+extra: Don't worry about the parts about spectral density if you're not familiar with Fourier techniques. Section 4.2.4, on constructing new kernels from simpler kernels, is especially useful.
+mark: star
+
+source: barber
+edition: 1-online
+location: Section 19.3, pages 388-391
+dependencies: gaussian-processes
+
+

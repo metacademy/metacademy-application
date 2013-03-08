@@ -1,0 +1,1 @@
+Soft weight sharing is a form of regularization for neural networks where groups of weights are encouraged to have similar values.

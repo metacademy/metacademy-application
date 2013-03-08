@@ -1,0 +1,1 @@
+We can use linear models to model complex nonlinear functions by mapping the original data to a basis function representation. Such a representation can get unweildy, however. The kernel trick allows us to implicitly map the data to a very high (possibly infinite) dimensional space by replacing the dot product with a more general inner product, or kernel.

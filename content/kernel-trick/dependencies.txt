@@ -3,3 +3,6 @@ reason: The kernel trick is a way of compactly representing very high-dimensiona
 
 tag: positive-semidefinite-matrices
 reason: The definition of a kernel involves PSD matrices.
+
+tag: ridge-regression
+reason: Kernel ridge regression is the standard example used to introduce kernels.

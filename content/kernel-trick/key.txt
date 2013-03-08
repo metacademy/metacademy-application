@@ -1,0 +1,4 @@
+* What is the computational cost of ridge regression using an explicit basis function representation?  Using the kernel trick?
+* In what situations is it computationally advantageous to use the kernel trick?
+* Think about all the machine learning algorithms you know. Which ones only involve dot products, and are therefore kernelizable?
+

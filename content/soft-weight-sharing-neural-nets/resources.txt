@@ -1,0 +1,3 @@
+source: bishop
+edition: 1
+location: Section 5.5.7, pages 269-272

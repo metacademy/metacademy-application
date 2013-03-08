@@ -1,0 +1,1 @@
+The kernel trick allows us to reformulate linear machine learning models in terms of a kernel function which defines a notion of similarity between data points. A few simple rules allow us to construct kernels which capture a wide variety of similarity functions.

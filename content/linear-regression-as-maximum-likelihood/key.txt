@@ -1,5 +1,2 @@
-* What is the cost function for linear regression?
-* What does it look like when you plot it with respect to one or two parameters?
-* Be aware of two methods for solving the optimization problem: gradient descent, and solving the normal equations.
-* When would you use gradient descent, and when would you solve the normal equations?
+* Derive the maximum likelihood estimator of the weights in linear regression assuming independent zero-mean Gaussian noise.
 

@@ -1,0 +1,16 @@
+source: mathmonk
+location: http://www.youtube.com/watch?v=ulZW99jsMXY&list=PLD0F06AA0D2E8FFBA&index=55
+mark: star
+extra: detailed derivation of maximum likelihood estimator                          
+
+source: cs229
+location: Chapter 1 Section 3 ``Probabilistic interpretation"
+mark: star
+extra: quick summary of maximum likelihood estimator
+
+source: bishop
+edition: 1
+location: Sections 3.1.1-3.1.2, pgs. 140-144    
+
+
+

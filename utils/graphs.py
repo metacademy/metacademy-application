@@ -11,6 +11,7 @@ class Node:
     dependencies -- a list of Dependency objects giving the immediate dependencies
     pointers -- a list of Pointer objects representing the see-also links
     """
+    # TODO: perhaps we should be explicit about the attributes of the node? --CJR
     def __init__(self, *init_data, **kwargs):
             for dictionary in init_data:
                 for key in dictionary:

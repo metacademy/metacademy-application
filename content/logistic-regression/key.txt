@@ -1,2 +1,3 @@
-* Try deriving the gradient descent updates.
-* If the two classes are linearly separable and you don't use any regularization, what happens to the weight vector?
+* How does maximum likelihood justify minimizing sum-of-squares error?
+* Try deriving the maximum likelihood estimator for linear regression assuming iid Gaussian noise
+

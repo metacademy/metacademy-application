@@ -211,12 +211,13 @@ def node_to_json(nodes, tag):
     ### select node and form title, summary, pointer and dependencies strings
     node = nodes[tag]
     ret_lst = []
+    ret_lst.append('"id":"%s"' % tag)
     if node.title:
         ret_lst.append('"title":"%s"' % node.title)
     if node.summary:
         ret_lst.append('"summary":"%s"' % node.summary)
     if node.pointers:
-        pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, p.blurb)
+        pt_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (p.from_tag, p.to_tag, p.reason)
                   for p in node.pointers]
         if pt_arr:
             ret_lst.append('"pointers":[%s]' % ','.join(pt_arr))
@@ -248,8 +249,8 @@ def write_graph_json(nodes, graph, outstr=None):
         outstr = sys.stdout
 
     # get the individual node data
-    json_items = ['"%s":%s' % (tag.replace('-', '_'), node_to_json(nodes, tag))
-                  for tag in nodes.keys()]
+    json_items = ['"nodes":{%s}' % ','.join(['"%s":%s' % (tag.replace('-', '_'), node_to_json(nodes, tag))
+                  for tag in nodes.keys()])]
 
     ### make resources entry in json data
     # TODO perhaps make a "Nodes" object to simplify these statements
@@ -257,6 +258,8 @@ def write_graph_json(nodes, graph, outstr=None):
         ['"' + rsrc + '"' for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources] for rsrc in
          rlist])
     rdb = db(RESOURCE_DB)
+
+    # TODO should this be a separate ajax call?
     resrcs = rdb.fetch('SELECT * FROM %s WHERE key IN (%s)' % (RESOURCE_DB_TABLE, ','.join(resrc_keys)))
     res_list = []
     for res in resrcs:

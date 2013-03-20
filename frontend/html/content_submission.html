@@ -1,0 +1,120 @@
+{% extends "two-panel.html" %}
+
+{% block title %}
+Submit Content
+{% endblock %}
+
+
+<!-- todo move to a separate location -->
+{% block postmain %}
+<script type="text/template" id="cnode-list-item-template">
+    <a href='#cnode/<%- id %>'><%- title ? title :id %></a>
+</script>
+
+<!--TODO externalize this template-->
+<script type="text/template" id="cnode-details-template">
+    <div class="edit-node">
+        <section class="cnode-data-input">
+            <label for="cname">Title</label>
+            <input type="text" id="cname" class="lone-section" name="name" value="<%- title %>" required/>
+        </section>
+
+        <section class="cnode-data-input">
+            <label for="summary">Summary</label>
+            <textarea id="summary" rows="6" class="lone-section"><%- summary %></textarea>
+        </section>
+
+        <!-- TODO fix code repetition with cnode-box  -->
+
+        <section class="cnode-data-input">
+            <header>Learning Resources</header>
+            <% for (var rnum = resources.length-1; rnum >= 0 ; rnum--){ %>
+            <section class="cnode-box resources">
+                <% var id = "res-src" + rnum %>
+                <label for="<%- id %>">Resource</label>
+                <input class="cnode-title-input" type="text" id="<%- id %>" name="<%- id %>"
+                       value="<%- resources[rnum].source %>"/>
+
+                <% var id = "res-loc" + rnum %>
+                <label for="<%- id %>">Location</label>
+                <input class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>" value="<%-
+                    resources[rnum].location %>">
+
+                <% var extra_text = []; %>
+                <% for (rkey in resources[rnum]){ %>
+                <% if (['location','source','mark'].indexOf(rkey) == -1){%>
+                <% extra_text.push(rkey + ':' + resources[rnum][rkey]); %>
+                <% } %>
+                <% } %>
+                <% extra_text = extra_text.join('\n');%>
+
+                <% var id = "res-extra" + rnum %>
+                <label for="<%- id %>">Extra information</label>
+
+                <textarea class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>"><%- extra_text%>
+                </textarea>
+
+            </section>
+            <% } %>
+        </section>
+
+        <section class="cnode-data-input">
+            <header>Dependencies</header>
+            <% for (var rnum = dependencies.length-1; rnum >= 0 ; rnum--){ %>
+            <section class="cnode-box dependencies">
+                <% var id = "dep-title" + rnum %>
+                <label for="<%- id %>">Dependency</label>
+                <input class="cnode-title-input" type="text" id="<%- id %>" name="<%- id %>"
+                       value="<%- dependencies[rnum].from_tag %>"/>
+
+                <% var id = "dep-reason" + rnum %>
+                <label for="<%- id %>">Reason</label>
+                <textarea class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>"><%-
+                    dependencies[rnum].reason %>
+                </textarea>
+            </section>
+            <% } %>
+        </section>
+
+        <section class="cnode-data-input">
+            <header>Related Concepts</header>
+            <% for (var rnum = pointers.length-1; rnum >= 0 ; rnum--){ %>
+            <% console.log(pointers) %>
+            <section class="cnode-box related-concepts">
+                <% var id = "ptr-title" + rnum %>
+                <label for="<%- id %>">Related Concept</label>
+                <input class="cnode-title-input" type="text" id="<%- id %>" name="<%- id %>"
+                       value="<%- pointers[rnum].to_tag %>"/>
+
+                <% var id = "ptr-reason" + rnum %>
+                <label for="<%- id %>">Reason</label>
+                <textarea class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>"><%-
+                    pointers[rnum].reason %>
+                </textarea>
+            </section>
+            <% } %>
+        </section>
+
+
+        <section class="cnode-data-input">
+            <header>Comprehension</header>
+            <section class="lone-section">
+                <% for (var rnum = 0; rnum < ckeys.length; rnum++){ %>
+                <textarea type="text" id=<%-"ckey" + rnum%> name=<%-"ckey" + rnum%>"> <%- ckeys[rnum] %> </textarea>
+                <% } %>
+            </section>
+        </section>
+    </div>
+    </div>
+</script>
+{% endblock %}
+
+
+{% block jscript %}
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/jQuery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/underscore-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/backbone-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk-utils.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/tmp-content-submitmvc.js"></script>
+{% endblock %}
+

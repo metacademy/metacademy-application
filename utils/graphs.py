@@ -50,18 +50,18 @@ class Pointer:
 
     from_tag -- the tag of the node doing the linking
     to_tag -- the tag of the node being linked to
-    blurb -- a verbal annotation of why it's relevant
+    reason -- a verbal annotation of why it's relevant
     """
-    def __init__(self, from_tag, to_tag, blurb=None):
+    def __init__(self, from_tag, to_tag, reason=None):
         self.from_tag = from_tag
         self.to_tag = to_tag
-        if blurb:
-            self.blurb = blurb.replace('"',"'")
+        if reason:
+            self.reason = reason.replace('"',"'")
         else:
-            self.blurb = None
+            self.reason = None
 
     def __repr__(self):
-        return 'Pointer(from_tag=%r, to_tag=%r, blurb=%r)' % (self.from_tag, self.to_tag, self.blurb)
+        return 'Pointer(from_tag=%r, to_tag=%r, reason=%r)' % (self.from_tag, self.to_tag, self.reason)
 
 class Graph:
     """A representation of the dependency graph in a form that's more convenient for graph computations

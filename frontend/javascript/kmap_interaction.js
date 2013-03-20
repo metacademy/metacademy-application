@@ -11,44 +11,6 @@ var rp_rmarg_use = 1;
  HELPER FUNCTIONS
  */
 
-/* IE indexOf function */
-if (!Array.indexOf) {
-    Array.prototype.indexOf = function (obj) {
-        for (var i = 0; i < this.length; i++) {
-            if (this[i] == obj) {
-                return i;
-            }
-        }
-        return -1;
-    }
-}
-
-// object to control window resizing
-var windowSize = {
-    height:0,
-    mainHeight:0,
-    rightPanelHeight:0,
-    headerHeight:0,
-    setDimensions:function () {
-        windowSize.height = $(window).height();
-        windowSize.headerHeight = $('#header').height();
-        windowSize.mainHeight = windowSize.height - windowSize.headerHeight;
-        windowSize.rightPanelHeight = windowSize.height;
-        windowSize.updateSizes();
-    },
-    updateSizes:function () {
-        $('#main').css('height', windowSize.mainHeight + 'px');
-        $('#rightpanel').css('height', (windowSize.rightPanelHeight) + 'px');
-    },
-    init:function () {
-        if ($('#main').length) {
-            windowSize.setDimensions();
-            $(window).resize(function () {
-                windowSize.setDimensions();
-            });
-        }
-    }
-};
 
 function isUrl(s) {
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
@@ -90,22 +52,6 @@ function buildResourceDiv(rsrc_db_ent, rsrc_node) {
     }
 
     return ret_text;
-}
-
-function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
-    /*
-     Changes display size of the right margin
-     See corresponding CSS entries for description of values
-     */
-    rp_lmarg = rp_lmarg || 0;
-    rp_rmarg = rp_rmarg || 0;
-    var rper_width = rp_width + "%";
-
-    $(".colcontainer").css("right", rper_width);
-    $("#leftpanel").css("left", rper_width)
-        .css("width", (100 - rp_width) + "%");
-    $("#rightpanel").css("width", (rp_width - rp_lmarg - rp_rmarg) + "%")
-        .css("left", (rp_width + rp_lmarg) + "%")
 }
 
 function printError(xhr, status) {
@@ -217,9 +163,10 @@ function load_svg(node_name) {
             gelems.selectAll("title").remove(); // remove the title for a cleaner hovering experience
             d3.select('g').selectAll("title").remove(); // also remove title from graph
 
-            // make the svg canvas fill the entire screen TODO: more elegant way to do this?
-            d3.select('svg').attr('width', '10000pt');
-            d3.select('svg').attr('height', '10000pt');
+            // make the svg canvas fill the entire screen
+            d3.select('svg').attr('width', '100%');
+            d3.select('svg').attr('height', '100%');
+            $('#leftpanel').css('overflow','hidden');
 
 
             // *************************************************
@@ -268,7 +215,7 @@ function load_svg(node_name) {
                         .attr("fill", "#F5EEEE");
 
                     // TODO make sure we have jdata & handle errors appropriately
-                    var node_data = jdata[this_node.attr('id')];
+                    var node_data = jdata.nodes[this_node.attr('id')];
                     text_panel.html("");
 
                     // add title
@@ -281,19 +228,19 @@ function load_svg(node_name) {
                     // add summary
                     if ('summary' in node_data) {
                         var spanel = text_panel.append('div')
-                            .attr('class','data-description');
+                            .attr('class', 'data-description');
                         var sum = node_data['summary']
                         // check if summary is from wikipedia
                         if (sum.substring(0, 6) === '*Wiki*') {
                             sum = sum.substring(6);
                             spanel.append('a')
-                                .attr('target','_blank')
+                                .attr('target', '_blank')
                                 .attr('href', 'http://www.en.wikipedia.org/wiki/'
-                                  + encodeURI(node_data['title'] ? node_data['title'] : this_node.attr('id')))
+                                + encodeURI(node_data['title'] ? node_data['title'] : this_node.attr('id')))
                                 .append('img')
-                                .attr('class','hastip wiki-img')
-                                .attr('title','summary from wikipedia -- click to load wikipedia entry')
-                                .attr('src','/static/images/wiki.png');
+                                .attr('class', 'hastip wiki-img')
+                                .attr('title', 'summary from wikipedia -- click to load wikipedia entry')
+                                .attr('src', '/static/images/wiki.png');
                         }
                         spanel.append("span")
                             .attr("class", "shorten")
@@ -430,7 +377,7 @@ function load_svg(node_name) {
                         });
 
                     // tooltip for pretty hover info TODO consider writing this yourself since it is GPL
-                    $('.hastip').tooltipsy({offset: [1, 1]});
+                    $('.hastip').tooltipsy({offset:[1, 1]});
                     beautifyText();
 
                 });
@@ -480,7 +427,8 @@ function load_svg(node_name) {
 
 // load the first dataset in the list (for now) TODO make better initialization
 $(document).ready(function () {
-    windowSize.init();
+    scaleWindowSize("header", "main", "rightpanel", "leftpanel");
     setRightPanelWidth(0);
     load_svg($('#data-select').val());
+
 });

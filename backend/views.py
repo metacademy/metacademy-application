@@ -1,8 +1,9 @@
 from backend import settings
 from backend.db_handler import db
+import config
 import global_resources
 import utils.formats as formats
-import config
+#import config
 from forms import ResourceForm
 from backend.settings import CONTENT_SERVER
 from django.http import HttpResponse, HttpResponseRedirect
@@ -47,6 +48,7 @@ def _get_content_type(fmt):
 def process_resource_form(request):
     """
     Add resources to resource database via a form
+    TODO this should take place with the content API ?
     """
     if request.method == 'POST':
         form = ResourceForm(request.POST)
@@ -61,6 +63,9 @@ def process_resource_form(request):
     else:
         form = ResourceForm()
     return render(request, 'resource_submission.html', {'form': form,})
+
+def process_content_form(request):
+    return render(request, 'content_submission.html')
 
 
 

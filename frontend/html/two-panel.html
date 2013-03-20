@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block meta %}
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {% endblock %}
+
+    {% block css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
+    {% endblock %}
+
+    <title> {% block title %}Knowledge Graph Demo {% endblock %}</title>
+
+</head>
+
+<body>
+<div id="header">
+    {% block header %}
+    AGFK Header (Placeholder)
+    {% endblock %}
+</div>
+
+{% block premain %}
+{% endblock %}
+
+<div id="main">
+    <div class="colcontainer">
+        <div id="leftpanel" class="column colmask rightmenu">
+            {% block leftpanel %}
+            {% endblock %}
+        </div>
+        <div id="rightpanel" class="column">
+            {% block rightpanel %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+{% block postmain %}
+{% endblock %}
+
+{% block jscript %}
+{% endblock %}
+</body>
+</html>          
+
+
+
+
+
+

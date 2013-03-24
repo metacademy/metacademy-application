@@ -45,6 +45,9 @@ def load_graph():
 class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     server_version = 'AGFKDebug'
 
+    def do_POST(self):
+        pass
+
     def do_GET(self):
         load_graph()
         parse = urlparse.urlparse(self.path)
@@ -58,12 +61,14 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             fmt = 'json'
 
+
+
         ctype = {'json': 'application/json',
                  'svg': 'image/svg+xml',
                  'dot': 'text/plain',
                  }[fmt]
         try:
-            if parts[0] == 'full_graph':
+            if parts[0] == 'nodes' and len(parts) == 1:
                 assert len(parts)==1
                 text = self.get_full_graph(fmt=fmt)
                 ctype = 'application/json'

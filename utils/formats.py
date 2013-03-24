@@ -249,7 +249,7 @@ def write_graph_json(nodes, graph, outstr=None):
         outstr = sys.stdout
 
     # get the individual node data
-    json_items = ['"nodes":{%s}' % ','.join(['"%s":%s' % (tag.replace('-', '_'), node_to_json(nodes, tag))
+    json_items = ['"nodes":{%s}' % ','.join(['"%s":%s' % (tag, node_to_json(nodes, tag))
                   for tag in nodes.keys()])]
 
     ### make resources entry in json data

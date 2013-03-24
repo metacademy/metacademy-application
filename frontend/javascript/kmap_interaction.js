@@ -123,8 +123,8 @@ function load_svg(node_name) {
         return
     }
 
-    if (node_name === 'full_graph') {
-        var get_url = '/full_graph'
+    if (node_name === 'nodes') {
+        var get_url = '/nodes'
     } else {
         var get_url = '/nodes/' + node_name.replace(/_/g, '-') + '/map'
     }

@@ -42,7 +42,7 @@ def read_node(path, tag, assert_exists=False):
         usewiki = True
 
     if sfile:
-        summary = unicode(open(sfile).read().strip().replace('\\', '\\\\').replace('"', '\\"'), 'utf-8')
+        summary = unicode(open(sfile).read(), 'utf-8')
 
     if usewiki and len(summary):
         summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
@@ -54,7 +54,7 @@ def read_node(path, tag, assert_exists=False):
         with open(resources_file) as resource_entries:
             src = {}
             for line in resource_entries:
-                line = line.strip().replace('"', '\\"')
+#                line = line.strip().replace('"', '\\"')
                 if line[:6] == "source":
                     if src:
                         resources.append(src)
@@ -76,7 +76,7 @@ def read_node(path, tag, assert_exists=False):
             for line in ckey_entries:
                 line = line.strip()
                 if len(line) > 0:
-                    ckeys.append(line.replace('"', "'"))
+                    ckeys.append(line)#line.replace('"', "'"))
 
     ### process dependencies
     dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
@@ -90,7 +90,7 @@ def read_node(path, tag, assert_exists=False):
 
             parts = line.split(':')
             if parts[0] == 'tag':
-                parent_tag = parts[1].strip()
+                parent_tag = normalize_input_tag(parts[1])
                 curr_dep = graphs.Dependency(parent_tag, tag, None)
                 dependencies.append(curr_dep)
             elif parts[0] == 'reason':
@@ -110,7 +110,7 @@ def read_node(path, tag, assert_exists=False):
             m = re.match(r'(.*)\[(.*)\]', line)
             if m:
                 blurb = m.group(1).strip()
-                to_tag = m.group(2)
+                to_tag = normalize_input_tag(m.group(2))
                 ptr = graphs.Pointer(tag, to_tag, blurb)
                 pointers.append(ptr)
     elif assert_exists:
@@ -123,7 +123,7 @@ def read_node(path, tag, assert_exists=False):
 
 def read_nodes(path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
-    tags = _filter_non_nodes(os.listdir(path))
+    tags = map(normalize_input_tag,_filter_non_nodes(os.listdir(path)))
     if onlytitle:
         return tags
     else:
@@ -137,7 +137,7 @@ def _filter_non_nodes(tags):
 
 
 def check_format(path):
-    tags = _filter_non_nodes(os.listdir(path))
+    tags = map(normalize_input_tag,os.listdir(path))
     # make sure files exist and are formatted correctly
     nodes = []
     for tag in tags:
@@ -168,7 +168,6 @@ def underscorify(s):
     temp = temp.strip()
     return re.sub(r'\W+', '_', temp)
 
-
 def wrap(s, width):
     """Wrap a long string to avoid elongated graph nodes."""
     if s is None:
@@ -196,11 +195,11 @@ def write_graph_dot(nodes, graph, outstr=None):
     print >> outstr, 'digraph G {'
 
     for tag, node in nodes.items():
-        usetag = tag.replace('-', '_')
+        usetag = tag
         print >> outstr, '    %s [label="%s"];' % (usetag, wrap(node.title, WRAP_WIDTH))
 
     for parent, child in graph.edges:
-        print >> outstr, '    %s -> %s;' % (parent.replace('-', '_'), child.replace('-', '_'))
+        print >> outstr, '    %s -> %s;' % (parent, child)
 
     print >> outstr, '}'
 
@@ -213,16 +212,16 @@ def node_to_json(nodes, tag):
     ret_lst = []
     ret_lst.append('"id":"%s"' % tag)
     if node.title:
-        ret_lst.append('"title":"%s"' % node.title)
+        ret_lst.append('"title":"%s"' % normalize_json_text(node.title))
     if node.summary:
-        ret_lst.append('"summary":"%s"' % node.summary)
+        ret_lst.append('"summary":"%s"' % normalize_json_text(node.summary))
     if node.pointers:
-        pt_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (p.from_tag, p.to_tag, p.reason)
+        pt_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (p.from_tag, p.to_tag, normalize_json_text(p.blurb))
                   for p in node.pointers]
         if pt_arr:
             ret_lst.append('"pointers":[%s]' % ','.join(pt_arr))
     if node.dependencies:
-        dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, d.reason)
+        dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, normalize_json_text(d.reason))
                    for d in node.dependencies]
         if dep_arr:
             ret_lst.append('"dependencies":[%s]' % ','.join(dep_arr))
@@ -237,7 +236,7 @@ def node_to_json(nodes, tag):
             ret_lst.append('"resources":%s' % res_str)
 
     if node.ckeys:
-        ret_lst.append('"ckeys":[' + ','.join(['"%s"' % ck for ck in node.ckeys]) + ']')
+        ret_lst.append('"ckeys":[' + ','.join(['"%s"' % normalize_json_text(ck) for ck in node.ckeys]) + ']')
 
 
     ### return final node string
@@ -277,4 +276,14 @@ def write_graph_json(nodes, graph, outstr=None):
 
 
 def dict_to_json(indict):
-    return '{' + ','.join(['"%s":"%s"' % (ikey, indict[ikey]) for ikey in indict.keys()]) + '}'
+    return '{' + ','.join(['"%s":"%s"' % (normalize_json_text(ikey), normalize_json_text(indict[ikey])) for ikey in indict.keys()]) + '}'
+
+def normalize_input_tag(itag):
+    """Make sure node id (tags) only have valid characters and are in a common format"""
+    return re.sub(r'[^a-z0-9]', '_', itag.strip().lower()).replace('-','_')
+
+def normalize_json_text(jdata):
+    if isinstance(jdata,basestring):
+        return jdata.strip().replace('\\', '\\\\').replace('"', '\\"')
+    else:
+        return jdata

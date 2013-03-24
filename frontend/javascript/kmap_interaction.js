@@ -180,7 +180,7 @@ function load_svg(node_name) {
     if (node_name === 'full_graph') {
         var get_url = '/full_graph'
     } else {
-        var get_url = '/nodes/' + node_name.replace(/_/g, '-') + '/map'
+        var get_url = '/nodes/' + node_name + '/map'
     }
 
     // 1st ajax call: load the kmap svg file (output from graphviz)
@@ -386,7 +386,7 @@ function load_svg(node_name) {
                         lent.append('div')
                             .attr('class', 'list-text')
                             .text(function (d) {
-                                return d.from_tag.replace('-', ' ');
+                                return jdata[d.from_tag].title;
                             });
                     }
 
@@ -414,7 +414,7 @@ function load_svg(node_name) {
                         dp_enter.append('div')
                             .attr('class', 'list-text')
                             .text(function (d) {
-                                return d.to_tag.replace('-', ' ');
+                                return jdata[d.to_tag].title;
                             });
                     }
 
@@ -426,7 +426,7 @@ function load_svg(node_name) {
                         .text('Focus on Topic')
                         .attr('class', 'topic-focus')
                         .on('click', function (d) {
-                            load_svg(this_node.attr('id').replace('_', '-'));
+                            load_svg(this_node.attr('id'));
                         });
 
                     // tooltip for pretty hover info TODO consider writing this yourself since it is GPL

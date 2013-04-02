@@ -1,25 +1,6 @@
-source: cs229
-location: Chapter 1, sections 1 and 2, pgs. 1-11
-mark: star
-
-source: esl
-edition: 1
-location: Section 2.3.1, pgs. 11-14
-
-source: bishop
-edition: 1
-location: Sections 3.1-3.1.1, pgs. 137-142
-dependencies: maximum-likelihood
-
-source: coursera_hinton
-location: Lectures "Learning the weight of a linear neuron" and "The error surface of a linear neuron"
-
-source: coursera_ng
-location: Lecture sequences "Linear regression with one variable" and "Linear regression with multiple variables"
-mark: star
-
-source: barber
-edition: 1-online
-location: Sections 17.1-17.2.1, pgs. 343-346
-
+source:barber
+edition:1-online
+dependencies:maximum-likelihood
+location:Sections 17.1-17.2.1, pgs. 343-346
+mark:star
 

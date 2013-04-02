@@ -1,9 +1,3 @@
-/* Utils */
-function textToArray(txt){
-    return txt.split('\n');
-}
-
-/* Backbone MVC */
 window.CNode = Backbone.Model.extend({
     defaults:function () {
         return {
@@ -21,7 +15,15 @@ window.CNode = Backbone.Model.extend({
 //        _.bind(this,this.setArrayEl);
     },
     urlRoot:window.CONTENT_SERVER + "/nodes"
-
+//    get_extra_resource_info: function(rnum){
+//        var extra_text = [];
+//        if (this.resources.length > rnum){
+//            for (rkey in this.resources[rnum]){
+//                extra_text.push(rkey + ':' + this.resources[rnum][rkey]);
+//            }
+//        }
+//        return extra_text.join('\n');
+//    }
 });
 
 window.CNodeCollection = Backbone.Collection.extend({
@@ -39,7 +41,8 @@ window.CNodeCollection = Backbone.Collection.extend({
     comparator:function (node) {
         return node.id.toLowerCase();
     }
-});
+})
+;
 
 window.CNodeListView = Backbone.View.extend({
     tagName:'ul',
@@ -84,32 +87,29 @@ window.CNodeView = Backbone.View.extend({
     },
     change:function (event) {
         // now change the model and have the model post the changes to the server!
-        var newVal = $.trim($(event.currentTarget).val());
+        var newVal = $(event.currentTarget).val();
         var id = this.parseID(event.currentTarget.id)
-
         // handle the extra resource information separately
-	var trgChg = false;
- if (id.length === 1){
-     this.model.set(id[0], newVal);
+        if (id[0]==="resextra"){
+            // each new line gets a separate entry, if a colon is present then use key-value, else assign extra, ect
+//            this.model
+            var lines = newVal.split('\n');
+            for(i=0; i < lines.length; i++){
+
+            }
+        }
+        else if (id.length === 1){
+            this.model.set(id[0], newVal);
         }
         else if (id.length == 2) {
             this.model.get(id[0])[Number(id[1])] = newVal;
 //            directly changing the model so we have to manually trigger the changes
-	    trgChg = true;
-        }
-        else if (id.length === 3) {
-	    if (id[2]=='extras'){
-		this.model.get(id[0])[id[1]][id[2]] = textToArray(newVal);
-	    }
-	    else{
-		this.model.get(id[0])[id[1]][id[2]] = newVal;
-	    }
-	    trgChg = true;
-        }
-	if(trgChg){
             this.model.trigger("change");
             this.model.trigger("change:" + id[0]);
-	}
+        }
+        else if (id.length === 3) {
+
+        }
         this.model.save();
     },
     parseID:function (id) {
@@ -118,7 +118,7 @@ window.CNodeView = Backbone.View.extend({
 })
 ;
 
-// make sure we unbind all listeners/callbacks
+// make sure we always unbind all listeners/callbacks
 Backbone.View.prototype.close = function () {
     if (this.beforeClose) {
         this.beforeClose();
@@ -169,6 +169,8 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
-// main function... TODO move somewhere
+// main function... move somewhere
+scaleWindowSize("header", "main", "rightpanel", "leftpanel");
+//setRightPanelWidth(25, 0.1, 0); //
 var app = new AppRouter();
 Backbone.history.start();

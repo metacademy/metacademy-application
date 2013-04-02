@@ -17,6 +17,7 @@ KMap Explorer
 <div class="dtable">
     <div class="dvcenter">
         <select id="data-select" onchange="load_svg(this.value)">
+            <option value="">full graph</option>
             {% for node_tag in node_list %}
             <option value="{{ node_tag }}">{{ node_tag }}</option>
             {% endfor %}

@@ -1,9 +1,9 @@
-tag: binary-linear-classifiers
-reason: Logistic regression is a binary linear classifier
+from_tag:binary_linear_classifiers
+reason:Logistic regression is a binary linear classifier
 
-tag: linear-regression-as-maximum-likelihood
-reason: Logistic regression is like linear regression, but with a different observation model.
+from_tag:linear_regression_as_maximum_likelihood
+reason:Logistic regression is like linear regression, but with a different observation model.
 
-tag: ridge-regression
-reason: The logistic regression solution is usually regularized to prevent degenerate solutions.
+from_tag:ridge_regression
+reason:The logistic regression solution is usually regularized to prevent degenerate solutions.
 

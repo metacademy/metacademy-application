@@ -2,6 +2,7 @@
 import os
 import re
 import sys
+import json
 import pdb
 from backend import settings
 from backend.db_handler import db
@@ -48,24 +49,39 @@ def read_node(path, tag, assert_exists=False):
         summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
 
     ### process resources
+
     resources_file = os.path.join(full_path, NODE_RESOURCES)
     resources = []
+
     if os.path.exists(resources_file):
         with open(resources_file) as resource_entries:
             src = {}
-            for line in resource_entries:
-#                line = line.strip().replace('"', '\\"')
-                if line[:6] == "source":
+            src_extras = []
+            for line in resource_entries:                
+                if line.strip() == '':
                     if src:
+                        if src_extras:
+                            src['extras'] = src_extras
                         resources.append(src)
                     src = {}
+                    src_extras = []
+                    continue
                 try:
-                    attrs = line.strip().split(':')
+                    inline = line.strip()
+                    attrs = inline.split(':')
+                    add_extra = True
                     if len(attrs) > 1 and len(attrs[0]) > 0:
-                        src[attrs[0].strip()] = ':'.join(attrs[1:]).strip()
+                        kval = attrs[0].strip().lower()
+                        if kval in ['location','source','mark']:
+                            add_extra = False
+                            src[kval] = ':'.join(attrs[1:]).strip()
+                    if add_extra:
+                        src_extras.append(inline)
                 except IndexError:
                     raise RuntimeError('%s/resources has incorrect format: %s' % (tag, line))
             if src:
+                if src_extras:
+                    src['extras'] = src_extras
                 resources.append(src)
 
     ### process comprehension key
@@ -76,7 +92,7 @@ def read_node(path, tag, assert_exists=False):
             for line in ckey_entries:
                 line = line.strip()
                 if len(line) > 0:
-                    ckeys.append(line)#line.replace('"', "'"))
+                    ckeys.append(line)
 
     ### process dependencies
     dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
@@ -89,9 +105,9 @@ def read_node(path, tag, assert_exists=False):
                 continue
 
             parts = line.split(':')
-            if parts[0] == 'tag':
-                parent_tag = normalize_input_tag(parts[1])
-                curr_dep = graphs.Dependency(parent_tag, tag, None)
+            if parts[0] == 'tag' or parts[0] == 'from_tag': # TODO normalize notation
+                from_tag = normalize_input_tag(parts[1])
+                curr_dep = graphs.Dependency(from_tag, tag, None)
                 dependencies.append(curr_dep)
             elif parts[0] == 'reason':
                 curr_dep.reason = parts[1].strip()
@@ -115,7 +131,6 @@ def read_node(path, tag, assert_exists=False):
                 pointers.append(ptr)
     elif assert_exists:
         raise RuntimeError('%s/%s does not exist' % (tag, NODE_SEE_ALSO))
-
     return graphs.Node(
         {'tag': tag, 'resources': resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
          'pointers': pointers, 'ckeys': ckeys})
@@ -151,8 +166,8 @@ def check_format(path):
         if re.search(r'\s', node.tag):
             print 'Node tag "%s" contains whitespace' % node.tag
         for d in node.dependencies:
-            if re.search(r'\s', d.parent_tag):
-                print 'Node "%s" has dependency "%s" which contains whitespace' % (node.tag, d.parent_tag)
+            if re.search(r'\s', d.from_tag):
+                print 'Node "%s" has dependency "%s" which contains whitespace' % (node.tag, d.from_tag)
         for p in node.pointers:
             if re.search(r'\s', p.to_tag):
                 print 'Node "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
@@ -216,12 +231,12 @@ def node_to_json(nodes, tag):
     if node.summary:
         ret_lst.append('"summary":"%s"' % normalize_json_text(node.summary))
     if node.pointers:
-        pt_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (p.from_tag, p.to_tag, normalize_json_text(p.blurb))
+        pt_arr = ['{"to_tag":"%s","reason":"%s"}' % (p.to_tag, normalize_json_text(p.reason))
                   for p in node.pointers]
         if pt_arr:
             ret_lst.append('"pointers":[%s]' % ','.join(pt_arr))
     if node.dependencies:
-        dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, normalize_json_text(d.reason))
+        dep_arr = ['{"from_tag":"%s","reason":"%s"}' % (d.from_tag, normalize_json_text(d.reason))
                    for d in node.dependencies]
         if dep_arr:
             ret_lst.append('"dependencies":[%s]' % ','.join(dep_arr))
@@ -230,7 +245,7 @@ def node_to_json(nodes, tag):
     if node.resources:
         rscrc_lst = []
         for resrc in node.resources:
-            rscrc_lst.append('%s' % dict_to_json(resrc))
+            rscrc_lst.append('%s' % json.dumps(resrc))#dict_to_json(resrc))
         if rscrc_lst:
             res_str = '[' + ','.join(rscrc_lst) + ']'
             ret_lst.append('"resources":%s' % res_str)

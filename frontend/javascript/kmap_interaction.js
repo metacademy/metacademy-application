@@ -119,14 +119,11 @@ function beautifyText() {
 // load the SVG file using AJAX
 var jdata = null;
 function load_svg(node_name) {
-    if (node_name.length === 0) {
-        return
-    }
 
-    if (node_name === 'nodes') {
-        var get_url = '/nodes'
+    if (node_name === 'nodes' || node_name==='') {
+        var get_url = window.CONTENT_SERVER +'/nodes'
     } else {
-        var get_url = '/nodes/' + node_name + '/map'
+        var get_url = window.CONTENT_SERVER + '/nodes/' + node_name + '/map'
     }
 
     // 1st ajax call: load the kmap svg file (output from graphviz)
@@ -333,7 +330,7 @@ function load_svg(node_name) {
                         lent.append('div')
                             .attr('class', 'list-text')
                             .text(function (d) {
-                                return jdata[d.from_tag].title;
+                                return jdata.nodes[d.from_tag].title;
                             });
                     }
 
@@ -361,7 +358,7 @@ function load_svg(node_name) {
                         dp_enter.append('div')
                             .attr('class', 'list-text')
                             .text(function (d) {
-                                return jdata[d.to_tag].title;
+                                return jdata.nodes[d.to_tag].title;
                             });
                     }
 

@@ -1,0 +1,1 @@
+*Wiki*In mathematics, rejection sampling is a basic pseudo-random number sampling technique used to generate observations from a distribution.

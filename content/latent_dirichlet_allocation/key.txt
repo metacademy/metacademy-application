@@ -1,0 +1,1 @@
+Why does LDA tend to place terms that co-occur in documents together?

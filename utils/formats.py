@@ -92,7 +92,7 @@ def read_node(path, tag, assert_exists=False):
             for line in ckey_entries:
                 line = line.strip()
                 if len(line) > 0:
-                    ckeys.append(line)
+                    ckeys.append({"text":line})
 
     ### process dependencies
     dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
@@ -251,7 +251,7 @@ def node_to_json(nodes, tag):
             ret_lst.append('"resources":%s' % res_str)
 
     if node.ckeys:
-        ret_lst.append('"ckeys":[' + ','.join(['"%s"' % normalize_json_text(ck) for ck in node.ckeys]) + ']')
+        ret_lst.append('"ckeys":' + json.dumps(node.ckeys))
 
 
     ### return final node string

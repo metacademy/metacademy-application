@@ -4,96 +4,79 @@
 Submit Content
 {% endblock %}
 
+{% block leftpanel %}
+<div class="edit-node">
+</div>
+{% endblock %}
+
 {% block postmain %}
 <script type="text/template" id="cnode-list-item-template">
     <a href='#cnode/<%- id %>'><%- title ? title :id %></a>
 </script>
 
-<!--TODO externalize this template-->
-<script type="text/template" id="cnode-details-template">
-    <div class="edit-node">
-        <section class="cnode-data-input">
-            <label for="title">Title</label>
-            <input type="text" id="title" class="lone-section" name="name" value="<%- title %>" required/>
-        </section>
 
-        <section class="cnode-data-input">
-            <label for="summary">Summary</label>
-            <textarea id="summary" rows="6" class="lone-section"><%- summary %></textarea>
-        </section>
+<!--TODO externalize these templates-->
+<script type="text/template" id="cnode-resources-template">
+    <% var rid = "resources-" + cid + "-source" %>
+    <label for="<%- rid %>">Resource</label>
+    <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- rid%>" name="<%- rid %>"
+           value="<%- source %>"/>
 
-        <!-- TODO fix code repetition with cnode-box  -->
+    <% rid = "resources-" + cid + "-location" %>
+    <label for="<%- rid %>">Location</label>
+    <input class= "cnode-reason-input  <%-eiclass%>" type="text" id="<%- rid %>" name="<%- rid %>" value="<%-
+            location %>">
 
-        <section class="cnode-data-input">
-            <header>Learning Resources</header>
-            <% for (var rnum = 0; rnum < resources.length; rnum++){ %>
-            <section class="cnode-box resources">
-                <% var id = "resources-" + rnum + "-source" %>
-                <label for="<%- id %>">Resource</label>
-                <input class="cnode-title-input" type="text" id="<%- id %>" name="<%- id %>"
-                       value="<%- resources[rnum].source %>"/>
+    <% rid = "resources-" + cid + "-extras"%>
+    <label for="<%- rid %>">Extra information</label>
 
-                <% var id = "resources-" + rnum + "-location" %>
-                <label for="<%- id %>">Location</label>
-                <input class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>" value="<%-
-                    resources[rnum].location %>">
-                
-                <% var id = "resources-" + rnum  + "-extras"%>
-                <label for="<%- id %>">Extra information</label>
-
-                <textarea class="cnode-reason-input" type="text"
-                id="<%- id %>" name="<%- id
-                %>"><%if(resources[rnum].extras) for(exnum=0;exnum<resources[rnum].extras.length;exnum++){
-                %><%- resources[rnum].extras[exnum] %> <%}%></textarea>
-            </section>
-            <% } %>
-        </section>
-
-        <section class="cnode-data-input">
-            <header>Dependencies</header>
-            <% for (var rnum = 0; rnum < dependencies.length; rnum++){ %>
-            <section class="cnode-box dependencies">
-                <% var id = "dependencies-" + rnum + "-from_tag"%>
-                <label for="<%- id %>">Dependency</label>
-                <input class="cnode-title-input" type="text" id="<%- id %>" name="<%- id %>"
-                       value="<%- dependencies[rnum].from_tag %>"/>
-
-                <% var id = "dependencies-" + rnum + "-reason"%>
-                <label for="<%- id %>">Reason</label>
-                <textarea class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>"><%-
-                    dependencies[rnum].reason %></textarea>
-            </section>
-            <% } %>
-        </section>
-
-        <section class="cnode-data-input">
-            <header>Related Concepts</header>
-            <% for (var rnum = 0; rnum < pointers.length; rnum++){ %>
-            <section class="cnode-box related-concepts">
-                <% var id = "pointers-" + rnum + "-to_tag"%>
-                <label for="<%- id %>">Related Concept</label>
-                <input class="cnode-title-input" type="text" id="<%- id %>" name="<%- id %>"
-                       value="<%- pointers[rnum].to_tag %>"/>
-
-                <% var id = "pointers-" + rnum + "-reason" %>
-                <label for="<%- id %>">Reason</label>
-                <textarea class="cnode-reason-input" type="text" id="<%- id %>" name="<%- id %>"><%-
-                    pointers[rnum].reason %></textarea>
-            </section>
-            <% } %>
-        </section>
-
-        <section class="cnode-data-input">
-            <header>Comprehension</header>
-            <section class="lone-section">
-                <% for (var rnum = 0; rnum < ckeys.length; rnum++){ %>
-                <textarea type="text" id=<%-"ckeys-" + rnum%> name=<%-"ckey" + rnum%>"> <%- ckeys[rnum] %></textarea>
-                <% } %>
-            </section>
-        </section>
-    </div>
-    </div>
+    <textarea  class="cnode-reason-input  <%-eiclass%>" type="text"
+              id="<%- rid %>" name="<%- rid
+        %>"><%if(extras)
+        for(exnum=0;exnum < extras.length; exnum++){
+        %><%- extras[exnum]+"\n"%><%}%></textarea>
 </script>
+
+<script type="text/template" id="cnode-dependency-template">
+    <% var id = cid + "-from_tag"%>
+    <label for="<%- id %>">Dependency</label>
+    <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"
+           value="<%- from_tag %>"/>
+
+    <% var id = cid + "-reason"%>
+    <label for="<%- id %>">Reason</label>
+    <textarea class= "cnode-reason-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"><%-
+        reason %></textarea>
+</script>
+
+<script type="text/template" id="cnode-pointer-template">
+    <% var id = cid + "-from_tag"%>
+    <label for="<%- id %>">Related Concept</label>
+    <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"
+           value="<%- to_tag %>"/>
+    <% var id = cid + "-reason"%>
+    <label for="<%- id %>">Reason</label>
+    <textarea class= "cnode-reason-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"><%-
+        reason %></textarea>
+</script>
+
+<script type="text/template" id="cnode-ckeys-template">
+    <textarea type="text" class =  "cnode-reason-input  <%-eiclass%>" id=<%-"ckeys-" + cid + "-text"%> name=<%-"ckey" + cid%>"> <%- text %></textarea>
+</script>
+
+<script type="text/template" id="cnode-details-template">
+    <section class="cnode-data-input">
+        <label for="title">Title</label>
+        <input type="text" id="title" class="lone-section" name="name" value="<%- title %>" required/>
+    </section>
+
+    <section class="cnode-data-input">
+        <label for="summary">Summary</label>
+        <textarea id="summary" rows="6" class="lone-section"><%- summary %></textarea>
+    </section>
+</script>
+
+
 {% endblock %}
 
 
@@ -103,6 +86,5 @@ Submit Content
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/backbone-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk-utils.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/tmp-content-submitmvc.js"></script>
-
 {% endblock %}
 

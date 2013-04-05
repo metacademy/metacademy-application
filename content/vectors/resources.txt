@@ -1,6 +1,7 @@
-source: wolfram
-location: http://mathworld.wolfram.com/Vector.html      
+source:wolfram
+location:http://mathworld.wolfram.com/Vector.html
 
-source: khan
-location: https://www.khanacademy.org/math/linear-algebra/vectors_and_spaces/vectors/v/linear-algebra--introduction-to-vectors
-mark: star
+source:khan
+location:https://www.khanacademy.org/math/linear-algebra/vectors_and_spaces/vectors/v/linear-algebra--introduction-to-vectors
+mark:star
+

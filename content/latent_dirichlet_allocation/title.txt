@@ -1,1 +1,1 @@
-Latent Dirichlet allocation
+Latent Dirichlet Allocation

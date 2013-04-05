@@ -300,7 +300,7 @@ function load_svg(node_name) {
                             .append('div')
                             .attr('class', 'list-entry resource-entry')
                             .html(function (d) {
-                                return  '<div class="bullet-ptr"> &#8226;</div><div class="list-text">' + d.replace('* ', '') + '</div>';
+                                return  '<div class="bullet-ptr"> &#8226;</div><div class="list-text">' + d.text.replace('* ', '') + '</div>';
                             });
                     }
 
@@ -353,7 +353,7 @@ function load_svg(node_name) {
                             .attr('src', '/static/images/qmark.jpg')
                             .attr('class', 'list-img hastip')
                             .attr('title', function (d) {
-                                return d.blurb === "None" ? "" : d.blurb;
+                                return d.reason === "None" ? "" : d.reason;
                             });
                         dp_enter.append('div')
                             .attr('class', 'list-text')
@@ -411,6 +411,7 @@ function load_svg(node_name) {
     $.ajax({
         type:'GET',
         url:get_url + '?format=json',
+	dataType:'json',
         async:false,
         scriptCharset:"utf-8",
         success:function (data) {

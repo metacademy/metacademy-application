@@ -131,6 +131,7 @@ class Node:
                      'pointers': NODE_SEE_ALSO,
                      'ckeys': NODE_COMPREHENSION_KEY}
 
+        # TODO we need to make sure we don't write arbitrary text to file from server (e.g. extra field for resources)
         for attr in subset:
             # check for a valid attribute
             if not fname_map.has_key(attr):
@@ -158,7 +159,7 @@ class Node:
             elif attr == 'ckeys':
                 with open(fname, 'w') as wfile:
                     for ck in self[attr]:
-                        wfile.write(ck + "\n")
+                        wfile.write(ck["text"] + "\n")
 
             elif attr == 'pointers':
                 # TODO: how to address this different format -- I think we should reformat like deps and resrcs

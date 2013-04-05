@@ -23,6 +23,8 @@ in various formats. It responds to the following requests:
   GET nodes/node-name/related         get the part of the graph that's related to a node
                                          (ancestors/descendants)
 
+TODO add POST/PUT/DELETE/OPTIONS information once API is complete
+
 It can also produce SVG and DOT output for all the graph requests.
 You can specify this with a query field in the URL, e.g.
 

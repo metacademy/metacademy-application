@@ -7,15 +7,15 @@ edition: 1
 location:Sections 8-8.3.2, pages 245-249
 
 source:cs229
-location:Chapter 1, section 5, pages 16-19
 mark:star
+location:Chapter 1, section 5, pages 16-19
 
 source:coursera_ng
-location:Lectures "Hypothesis representation," "Decision boundary", "Cost function," "Simplified cost function and gradient descent," and "Regularized logistic regression"
 mark:star
+location:Lectures "Hypothesis representation," "Decision boundary", "Cost function," "Simplified cost function and gradient descent," and "Regularized logistic regression"
 
 source:barber
 edition: 1-online
-location:Sections 17.4-17.4.3, pages 350-355
 mark:star
+location:Sections 17.4-17.4.3, pages 350-355
 

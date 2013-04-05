@@ -1,0 +1,9 @@
+source: bishop
+edition: 1
+location: Section 6.4.3, pages 311-312
+
+source: gpml
+edition: 1
+location: Section 2.3 (pages 19-21), Section 5.1 (pages 106-108), and Section 5.4.1 (pages 112-116)
+mark: star
+

@@ -1,0 +1,1 @@
+Gaussian process classification is a Bayesian model for nonparametric classification. The data points have associated latent variables which are drawn from a GP prior, and the labels are modeled as stochastic functions of the latent variables.

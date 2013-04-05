@@ -3,3 +3,4 @@ reason: Gaussian process classification builds on Gaussian process regression.
 
 tag: bayesian-logistic-regression
 reason: Gaussian process classification is a kernelized version of Bayesian logistic regression.
+

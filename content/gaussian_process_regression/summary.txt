@@ -1,0 +1,1 @@
+Gaussian process regression is a Bayesian model for nonparametric regression. (That is, nonparametric in the sense that the complexity of the regression function grows with the amount of data.) The model places a prior directly on the output values without reference to an underlying parametric model.

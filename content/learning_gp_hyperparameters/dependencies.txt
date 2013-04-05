@@ -1,0 +1,7 @@
+tag: gaussian-process-regression
+reason: GP regression is the simplest setting in which to discuss hyperparameter learning.
+
+tag: bayesian-model-comparison
+reason: The optimization criterion is based on Bayesian model comparison.
+
+

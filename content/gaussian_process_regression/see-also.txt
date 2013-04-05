@@ -1,3 +1,4 @@
+* In order to use GP regression in practice, it is usually necessary to learn the hyperparameters (such as the length scale) from data. [learning-gp-hyperparameters]
 * Some other uses for Gaussian processes in machine learning:
 ** classification [gaussian-process-classification]
 ** black-box optimization (where we only get to evaluate the function, and doing so is expensive) [bayesian-optimization-with-gaussian-processes]

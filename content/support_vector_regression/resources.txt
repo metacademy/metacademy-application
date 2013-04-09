@@ -1,0 +1,16 @@
+source: esl
+edition: 1
+location: Sections 12.3.5-12.3.6, pages 385-389
+dependencies: kernel-svm
+mark: star
+
+source: bishop
+edition: 1
+location: Section 7.1.4, pages 339-343
+dependencies: kernel-svm
+mark: star
+
+source: murphy
+edition: 1
+location: Section 14.5.1, pages 497-498
+ 

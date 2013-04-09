@@ -1,2 +1,5 @@
-tag: logistic-regression
-reason: The SVM is based on a similar idea to logistic regression.
+tag: binary-linear-classifiers
+reason: The SVM is a kind of binary linear classifier.
+
+tag: convex-optimization
+reason: The SVM is formulated as a convex optimization problem.

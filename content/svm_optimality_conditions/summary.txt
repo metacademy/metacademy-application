@@ -1,0 +1,1 @@
+Using Lagrange duality, we can formulate a set of conditions that characterize the optimal solution to the SVM objective. These conditions show that the weight vector is a linear combination of a (hopefully small) subset of the training points, those for which the margin constraint is tight.

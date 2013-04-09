@@ -1,0 +1,18 @@
+source: bishop
+edition: 1
+location: Section 7.1.1, pages 331-336
+mark: star
+
+source: esl
+edition: 1
+location: Section 12.2, pages 371-373
+mark: star
+
+source: cs229
+location: Lecture notes 3, "Support vector machines," Section 8, pages 19-20
+mark: star
+
+source: murphy
+edition: 1
+location: 14.5-14.5.2, pages 496-502
+

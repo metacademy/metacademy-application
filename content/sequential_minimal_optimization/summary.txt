@@ -1,0 +1,1 @@
+Sequential minimal optimization is an efficient algorithm for optimizing kernel SVMs. It is based on a variant of coordinate descent.

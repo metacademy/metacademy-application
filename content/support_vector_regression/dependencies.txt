@@ -1,3 +1,6 @@
 tag: support-vector-machine
 
 tag: linear-regression
+
+tag: svm-optimality-conditions
+reason: The SVM optimality conditions are a necessary context for understanding the behavior of the solutions.

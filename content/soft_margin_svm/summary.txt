@@ -1,0 +1,1 @@
+The standard SVM objective function, which maximizes the margin, only makes sense when the training set is linearly separable. The soft margin SVM gives more flexibility by allowing some of the training points to be misclassified. In addition to handling non-separable training sets, it also can be more robust to outliers or mislabeled data.

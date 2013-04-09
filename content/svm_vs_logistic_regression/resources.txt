@@ -1,0 +1,13 @@
+source: coursera_ng
+location: Lectures "Optimization objective" and "Using an SVM" under "Support vector machines"
+mark: star
+
+source: bishop
+edition: 1
+location: Section 7.1.2, pages 336-338
+mark: star
+
+source: esl
+edition: 1
+location: Section 12.3.2, pages 380-381
+mark: star

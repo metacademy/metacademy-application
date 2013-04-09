@@ -1,0 +1,1 @@
+Logistic regression and SVMs are closely related algorithms, even though this isn't obvious from the usual presentation. In particular, the loss functions are very similar, and linear SVMs and logistic regression can often be substituted for one another without a big difference in performance.

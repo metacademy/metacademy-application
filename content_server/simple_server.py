@@ -8,7 +8,8 @@ import pdb
 import os; print os.getcwd()
 
 import config
-from utils import formats, graphs
+import formats
+import graphs
 
 """A simple server to serve as a placeholder. Basically spits out graphs
 in various formats. It responds to the following requests:
@@ -26,7 +27,7 @@ You can specify this with a query field in the URL, e.g.
 
 Start the server by typing (from the main knowledge-maps directory):
 
-  python backend/simple_server.py 8000
+  python content_server/simple_server.py 8000
 """
 
 

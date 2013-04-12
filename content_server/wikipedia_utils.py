@@ -3,7 +3,7 @@ import urllib, urllib2
 from xml.dom.minidom import parse as parseXML
 import config
 from global_resources import WIKI_SUMMARY, NODE_SUMMARY
-from utils.formats import read_nodes
+from formats import read_nodes
 
 def write_wiki_summary(node_title, node_dir):
     """

@@ -1,7 +1,7 @@
 from backend import settings
 from backend.db_handler import db
 import global_resources
-import utils.formats as formats
+import content_server.formats as formats
 import config
 from forms import ResourceForm
 from backend.settings import CONTENT_SERVER

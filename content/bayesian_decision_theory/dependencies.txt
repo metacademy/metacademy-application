@@ -1,2 +1,0 @@
-tag: bayesian-parameter-estimation
-reason: We use Bayesian parameter estimation to get the posterior on which we base our decisions.

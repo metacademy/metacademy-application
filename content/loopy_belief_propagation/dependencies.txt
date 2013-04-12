@@ -1,5 +1,0 @@
-tag: belief-propagation-on-trees
-reason: Loopy BP uses the same update rules as the tree-based version.
-
-tag: brouwers-fixed-point-theorem
-reason: Brouwer's fixed point theorem is needed to show that loopy BP has a fixed point.

@@ -1,7 +1,0 @@
-tag: principal-component-analysis
-
-tag: linear-regression
-reason: Linear regression is an instructive example.
-
-tag: generalization
-reason: PCA preprocessing is a way of improving generalization.

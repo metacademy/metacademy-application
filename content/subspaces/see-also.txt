@@ -1,2 +1,0 @@
-* Subspaces are used to define the rank of a matrix, an important concept in solving linear systems. [matrix-rank]
-

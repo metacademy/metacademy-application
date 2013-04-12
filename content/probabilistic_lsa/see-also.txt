@@ -1,1 +1,0 @@
-* Latent Dirichlet allocation is a fully Bayesian version of pLSA. [latent-dirichlet-allocation]

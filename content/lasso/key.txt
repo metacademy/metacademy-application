@@ -1,4 +1,0 @@
-* Convince yourself that L1 regularization should lead to sparse solutions.
-* If the regularization parameter is large enough, all of the weights will be exactly zero. What is the smallest value of the regularization parameter which achieves this?
-* What would go wrong if you tried to apply gradient descent directly to the objective function?
-* If you rotate the feature vectors, do the predictions of linear regression change?  Ridge regression?  Lasso?

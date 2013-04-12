@@ -1,1 +1,0 @@
-* The IBP is often used in probabilistic models with binary latent features. [ibp-linear-gaussian-model]

@@ -1,2 +1,0 @@
-tag: gibbs-sampling
-reason: Slice sampling is a special case of Gibbs sampling

@@ -1,3 +1,0 @@
-tag: bayesian-linear-regression
-
-tag: variational-bayes

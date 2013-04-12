@@ -1,1 +1,0 @@
-Multinomial logistic regression

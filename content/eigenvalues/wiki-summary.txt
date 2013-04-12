@@ -1,1 +1,0 @@
-An eigenvector of a square matrix [A] is a non-zero vector [v] that, when multiplied by [A], yields the original vector multiplied by a single number [\lambda]; that is, [A v = \lambda v]. 

@@ -1,1 +1,0 @@
-* AdaBoost can be interpreted as a greedy algorithm to minimize exponential loss. [boosting-as-optimization]

@@ -1,5 +1,0 @@
-tag: multivariate-gaussian-distribution
-reason: We sample from a univariate Gaussian by sampling from a multivariate Gaussian.
-
-tag: transformation-method
-reason: This trick uses the transformation method.

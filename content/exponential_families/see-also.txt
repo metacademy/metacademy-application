@@ -1,6 +1,0 @@
-* Generalized linear models are a generalization of linear regression where the observation model is an exponential family distribution. [generalized-linear-models]
-* A lot of aspects of statistical modeling wind up having convenient forms for exponential families:
-** conjugate priors [bayes-param-exp-fam]
-** maximum likelihood estimation [maximum-likelihood-in-exponential-families]
-** variational inference, a kind of approximate probabilistic inference algorithm [variational-exponential-family]
-* Markov random fields can be viewed as exponential families. [mrfs-as-exponential-families]

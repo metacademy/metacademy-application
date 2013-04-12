@@ -1,1 +1,0 @@
-* Gaussian process regression is a nonparametric analogue of Bayesian linear regression which uses kernels. [gaussian-process-regression]

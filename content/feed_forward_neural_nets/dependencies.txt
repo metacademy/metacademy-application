@@ -1,2 +1,0 @@
-tag: basis-function-expansions
-reason: Feed-forward neural nets can be seen as an adaptive basis function expansion.

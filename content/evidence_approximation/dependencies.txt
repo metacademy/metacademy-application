@@ -1,5 +1,0 @@
-tag: bayesian-model-comparison
-reason: The evidence approximation is a way of approximating Bayesian model comparison.
-
-tag: unconstrained-optimization-problems
-reason: The evidence approximation is formulated as an optimization problem.

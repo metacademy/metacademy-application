@@ -1,3 +1,0 @@
-* How does maximum likelihood justify minimizing sum-of-squares error?
-* Try deriving the maximum likelihood estimator for linear regression assuming iid Gaussian noise
-

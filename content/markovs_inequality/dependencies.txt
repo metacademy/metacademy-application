@@ -1,2 +1,0 @@
-tag: expected-value
-reason: Markov's inequality involves an expected value.

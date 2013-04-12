@@ -1,3 +1,0 @@
-* It is also possible to condition on random variables, i.e. define a conditional distribution of one random variable given another. [conditional-distributions]
-* Bayes' rule is a method for combining prior beliefs with evidence which follows directly from the definition of conditional probability. [bayes-rule]
-* Two events are independent if the conditional probability of one event doesn't depend on the other event. [independence]

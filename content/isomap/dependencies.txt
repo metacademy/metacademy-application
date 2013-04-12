@@ -1,4 +1,0 @@
-tag: multidimensional-scaling
-reason: MDS is one step of Isomap.
-
-

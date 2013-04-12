@@ -1,1 +1,0 @@
-In probability theory and applications, Bayes' rule relates the odds of event [A_1] to event [A_2], before and after conditioning on event [B]. 

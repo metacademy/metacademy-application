@@ -1,8 +1,0 @@
-* Examples of computing MGFs: 
-** Poisson distribution [mgf-poisson-distribution]
-** Gaussian distribution [mgf-gaussian-distribution]
-* MGFs are an important tool for proving several important results:
-** central limit theorem, which characterizes the limiting distribution of the mean of i.i.d. random variables [central-limit-theorem-proof]
-** Chernoff bounds, which bound the probability of sums of random variables taking extreme values [chernoff-bounds-proof]
-* MGFs are closely related to the Fourier transform. [mgf-and-fourier-transform]
-

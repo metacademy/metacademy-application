@@ -1,3 +1,0 @@
-* Covariance matrices are a way of representing all of the variances and covariances between a set of random variables. [covariance-matrices]
-* Multivariate Gaussians are a widely used "bell-shaped" distribution, parameterized in terms of expectation and covariance. [multivariate-gaussian-distribution]
- 

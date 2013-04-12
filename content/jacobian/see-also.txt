@@ -1,5 +1,0 @@
-* The gradient is an important special case of the Jacobian. [gradient]
-* Some places where the Jacobian is used:
-** evaluating multiple integrals using a change of variables [evaluating-multiple-integrals-change-of-variables]
-** computing the distributions for functions of random variables [function-of-random-variables-tricks]
-

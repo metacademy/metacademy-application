@@ -1,3 +1,0 @@
-* Gaussian process regression is a Bayesian version of kernel ridge regression. [gaussian-process-regression]
-* Kernel support vector machines are a classification algorithm that uses kernels. [kernel-svm]
-* Unfortunately, the running time of ridge regression is cubic in the number of training examples. [computational-complexity-of-kernel-methods]

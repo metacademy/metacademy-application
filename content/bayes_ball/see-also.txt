@@ -1,4 +1,0 @@
-* Bayes ball is an example of
-** dynamic programming [dynamic-programming]
-** message passing [message-passing]
-* Bayes ball can be used as a preprocessing step in inference to determine which variables are relevant to a conditional probability query. [bayes-ball-for-relevance]

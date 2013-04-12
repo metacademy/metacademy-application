@@ -1,5 +1,0 @@
-* What is meant by overfitting and underfitting?  Generalization error?
-* Have an intuitive example in mind (such as polynomial regression).
-* Assuming you have enough data, how would you measure the generalization error of a model?
-* Draw a curve representing the training and test set performances as a function of the number of training examples and explain why the curves have the shapes they do.
-

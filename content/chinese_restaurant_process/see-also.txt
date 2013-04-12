@@ -1,1 +1,0 @@
-* The CRP is often used for Bayesian clustering models. [crp-clustering]

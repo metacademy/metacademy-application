@@ -1,1 +1,0 @@
-Ridge regression as SVD

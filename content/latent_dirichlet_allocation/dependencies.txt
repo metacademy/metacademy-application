@@ -1,6 +1,0 @@
-tag: probabilistic-lsa
-reason: LDA is a Bayesian version of pLSA.
-
-tag: bayesian-parameter-estimation-multinomial
-reason: Bayesian parameter estimation with multinomials is a component of LDA.
-

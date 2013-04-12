@@ -1,2 +1,0 @@
-* does the order of integration matter for definite multiple integration? indefinite multiple integration?
-* why might changing the order of integration be helpful?

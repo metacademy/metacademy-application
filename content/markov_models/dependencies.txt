@@ -1,2 +1,0 @@
-tag: probabilistic-models
-reason: Markov models are a kind of probabilistic model.

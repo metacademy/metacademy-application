@@ -1,2 +1,0 @@
-tag: markov-chain-monte-carlo
-reason: Gibbs sampling is an MCMC algorithm.

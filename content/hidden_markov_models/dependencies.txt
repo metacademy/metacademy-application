@@ -1,2 +1,0 @@
-tag: markov-models
-reason: Markov models are a component of HMMs.

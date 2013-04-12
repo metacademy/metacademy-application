@@ -1,1 +1,0 @@
-In probability theory, a Pitman–Yor process , denoted PY(d, θ, G0), is a stochastic process whose sample path is a probability distribution. 

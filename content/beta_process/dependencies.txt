@@ -1,5 +1,0 @@
-tag: dirichlet-process
-reason: The Dirichlet process is a useful analogy for understanding the beta process.
-
-tag: indian-buffet-process
-reason: The IBP is one of the canonical interpretations of the beta process.

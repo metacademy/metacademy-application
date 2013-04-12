@@ -1,4 +1,0 @@
-* Mathematical tricks for manipulating the beta distribution. [beta-distribution-tricks]
-* The beta distribution is the conjugate prior for the Bernoulli and binomial distributions. [conjugate-priors]
-* The Dirichlet distribution is a multivariate generalization of the beta distribution. [dirichlet-distribution]
-

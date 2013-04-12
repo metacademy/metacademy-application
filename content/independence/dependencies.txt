@@ -1,2 +1,0 @@
-tag: probability
-reason: Independence is a property of events in a probability space.

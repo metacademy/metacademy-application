@@ -1,1 +1,0 @@
-Tricks for manipulating functions of random variables

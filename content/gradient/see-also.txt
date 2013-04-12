@@ -1,1 +1,0 @@
-* Gradient ascent, or "hill climbing" is a simple and widely used optimization algorithm. [gradient-descent]

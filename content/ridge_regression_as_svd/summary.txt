@@ -1,2 +1,0 @@
-It's possible to write the ridge regression solution in terms of the SVD of the dataset. This gives insight into how it makes predictions. It also gives a way of defining the "degrees of freedom" or "effective number of parameters" of the model, which lets us analyze the degree of overfitting.
-

@@ -1,2 +1,0 @@
-* Nonparametric density estimation suffers from the curse of dimensionality, and doesn't work in more than a few dimensions. [curse-of-dimensionality]
-* Mixture of Gaussians models are a more compact parametric representation which has the same form. [mixture-of-gaussians]

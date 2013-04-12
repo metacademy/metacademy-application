@@ -1,2 +1,0 @@
-* The Schur product theorem shows that the product of two kernels is a kernel. [constructing-kernels]
-

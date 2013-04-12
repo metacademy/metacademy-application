@@ -1,2 +1,0 @@
-tag: markov-random-fields
-reason: Factor graphs are a more fine-grained notation for MRFs.

@@ -1,5 +1,0 @@
-* The Brouwer fixed point theorem implies that loopy BP has at least one fixed point. [brouwer-fixed-point-theorem]
-* Loopy BP can be viewed as a variational inference algorithm which tries to minimize the Bethe free energy. [loopy-bp-as-variational]
-* In the case of Gaussian graphical models, loopy BP is guaranteed to converge to the correct mean. [gaussian-loopy-belief-propagation]
-* Loopy BP is guaranteed to converge in graphs with a single loop. [loopy-bp-single-loop]
-

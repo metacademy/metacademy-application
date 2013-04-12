@@ -1,3 +1,0 @@
-tag: moment-generating-functions
-
-tag: gaussian-distribution-tricks

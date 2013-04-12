@@ -1,1 +1,0 @@
-In probability theory and statistics, covariance is a measure of how much two random variables change together. 

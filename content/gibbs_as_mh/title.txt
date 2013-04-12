@@ -1,1 +1,0 @@
-Gibbs sampling as a special case of Metropolis-Hastings

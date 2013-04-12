@@ -1,1 +1,0 @@
-In statistics, Isomap is one of several widely used low-dimensional embedding methods, where geodesic distances on a weighted graph are incorporated with the classical scaling (metric multidimensional scaling). 

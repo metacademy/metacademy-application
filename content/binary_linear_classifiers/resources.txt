@@ -1,7 +1,0 @@
-source: optmodels
-location: https://inst.eecs.berkeley.edu/~ee127a/book/login/l_lqp_apps_class.html
-mark: star
-
-source: bishop
-edition: 1
-location: Section 4-intro - 4.1.1, pages 179-182

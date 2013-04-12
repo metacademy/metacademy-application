@@ -1,7 +1,0 @@
-tag: loopy-belief-propagation
-
-tag: contraction-maps
-reason: The convergence proof involves showing that the update is a contraction map.
-
-tag: computation-trees
-reason: The convergence proof involves computation trees.

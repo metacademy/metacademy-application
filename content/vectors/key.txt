@@ -1,3 +1,0 @@
-* Do vectors depend on a specific coordinate system?
-* Are imaginary numbers vectors?
-* Show the Euclidean space is a vector space

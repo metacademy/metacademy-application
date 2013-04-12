@@ -1,7 +1,0 @@
-tag: expectation-maximization
-
-tag: kl-divergence
-reason: KL divergence is part of the objective function in variational EM.
-
-tag: entropy
-reason: Entropy is part of the objective function in variational EM.

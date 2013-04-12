@@ -1,3 +1,0 @@
-tag: gibbs-sampling
-
-tag: metropolis-hastings

@@ -1,1 +1,0 @@
-In probability theory and statistics, the probit function is the quantile function, i.e., the inverse cumulative distribution function (CDF), associated with the standard normal distribution. 

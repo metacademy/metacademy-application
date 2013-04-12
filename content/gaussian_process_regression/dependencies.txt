@@ -1,5 +1,0 @@
-tag: gaussian-processes
-
-tag: bayesian-linear-regression
-reason: Gaussian process regression is a kernelized version of Bayesian linear regression.
-

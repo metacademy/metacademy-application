@@ -1,1 +1,0 @@
-In statistical learning theory, or sometimes computational learning theory, the VC dimension (for Vapnik–Chervonenkis dimension) is a measure of the capacity of a statistical classification algorithm, defined as the cardinality of the largest set of points that the algorithm can shatter. 

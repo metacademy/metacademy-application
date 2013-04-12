@@ -1,1 +1,0 @@
-In probability theory, a Markov model is a stochastic model that assumes the Markov property. 

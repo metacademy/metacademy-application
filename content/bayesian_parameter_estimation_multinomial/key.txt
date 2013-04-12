@@ -1,1 +1,0 @@
-* Basically, the main takeaway is the formula for the posterior predictive distribution, where we add fake counts and then normalize.

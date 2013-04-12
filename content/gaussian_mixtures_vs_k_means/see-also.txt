@@ -1,4 +1,0 @@
-* Other clustering methods include:
-** naive Bayes, a probabilistic model for discrete data [naive-bayes]
-** spectral clustering, for when the clusters don't have nice convex shapes [spectral-clustering]
-* The application of clustering to finding meaningful regions of images is called image segmentation. [image-segmentation]

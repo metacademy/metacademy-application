@@ -1,6 +1,0 @@
-tag: random-variables
-reason: The CDF is a property of a probability distribution.
-
-tag: partial-derivatives
-reason: The PDF is obtained from the CDF using partial derivatives.
-

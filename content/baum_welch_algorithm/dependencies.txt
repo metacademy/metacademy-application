@@ -1,8 +1,0 @@
-tag: hidden-markov-models
-reason: Baum-Welch is an algorithm for learning HMM parameters.
-
-tag: expectation-maximization
-reason: Baum-Welch is a special case of EM.
-
-tag: forward-backward-algorithm
-reason: The forward-backward algorithm is used to compute the E step.

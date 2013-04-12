@@ -1,1 +1,0 @@
-In vector calculus, the gradient of a scalar field is a vector field that points in the direction of the greatest rate of increase of the scalar field, and whose magnitude is that rate of increase. 

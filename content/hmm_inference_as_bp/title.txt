@@ -1,1 +1,0 @@
-HMM inference as belief propagation

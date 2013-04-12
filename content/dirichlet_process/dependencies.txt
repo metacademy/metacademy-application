@@ -1,7 +1,0 @@
-tag: random-measures
-reason: A Dirichlet process is a kind of random measure.
-
-tag: dirichlet-distribution
-
-tag: chinese-restaurant-process
-reason: The Chinese restaurant process is one canonical interpretation of the Dirichlet process.

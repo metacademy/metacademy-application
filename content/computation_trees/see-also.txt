@@ -1,1 +1,0 @@
-* Loopy BP is guaranteed to converge for a graph with a single loop. [loopy-bp-single-loop]

@@ -1,7 +1,0 @@
-* Other ways to approximate partition functions include:
-** sequential importance sampling (SIS) [sis-partition-function]
-** variational Bayes [variational-bayes]
-** expectation propagation [expectation-propagation]
-** Chib's method [chibs-method]
-** tree-reweighted belief propagation [tree-reweighted-bp]
-

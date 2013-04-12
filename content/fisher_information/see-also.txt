@@ -1,1 +1,0 @@
-* The Fisher information matrix is the multivariate generalization. [fisher-information-matrix]

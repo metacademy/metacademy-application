@@ -1,1 +1,0 @@
-In probability theory, there exist several different notions of convergence of random variables. 

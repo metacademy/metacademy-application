@@ -1,4 +1,0 @@
-source: bishop
-edition: 1
-location: Appendix D (Calculus of Variations)
-note: Good, quick review of functional calculus

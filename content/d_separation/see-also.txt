@@ -1,2 +1,0 @@
-* The Markov blanket is another characterization of Bayes nets in terms of conditional independencies. [markov-blanket]
-* The d-separation criterion presented here is inefficient when implemented as an algorithm. The Bayes Ball algorithm gives an efficient way of testing conditional independence. [bayes-ball]

@@ -1,6 +1,0 @@
-tag: markov-random-fields
-
-tag: exponential-families
-
-tag: inference-in-mrfs
-reason: The sufficient statistics are exactly the marginals obtained from an inference algorithm.

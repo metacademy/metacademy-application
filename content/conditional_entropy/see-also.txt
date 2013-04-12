@@ -1,1 +1,0 @@
-* Conditional entropy is used to define mutual information. [mutual-information]

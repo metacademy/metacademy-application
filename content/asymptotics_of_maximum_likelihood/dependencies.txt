@@ -1,8 +1,0 @@
-tag: maximum-likelihood
-
-tag: multivariate-gaussian-distribution
-reason: The maximum likelihood estimate of the parameters is approximately a multivariate Gaussian in the large data limit.
-
-tag: fisher-information-matrix
-reason: The asymptotic covariance of the maximum likelihood estimate is determined by the Fisher information matrix.
- 

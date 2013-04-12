@@ -1,3 +1,0 @@
-tag: parametric-curves
-
-tag: parameterizing-lines-and-planes

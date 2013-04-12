@@ -1,4 +1,0 @@
-* Change of basis transformations are important for defining equivalence classes on matrices:
-** similar matrices [similar-matrices]
-** congruent matrices [congruent-matrices]
-* The spectral decomposition of a symmetric matrix can be viewed as a change of basis. [spectral-decomposition]

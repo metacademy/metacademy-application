@@ -1,5 +1,0 @@
-tag: linear-regression
-reason: The bias-variance decomposition holds exactly in the case of linear regression.
-
-tag: generalization
-reason: The bias-variance decomposition is a way of analyzing generalization error.

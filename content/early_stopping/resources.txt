@@ -1,8 +1,0 @@
-source: bishop
-edition: 1
-location: Section 5.5.2, pages 259-261
-mark: star
-
-source: coursera_hinton
-location: Lecture "Overview of ways to improve generalization"
-mark: star

@@ -1,4 +1,0 @@
-* The multinomial distribution is the analog of the binomial distribution where each event can take more than two values. [multinomial-distribution]
-* The probability parameter can be estimated from data using maximum likelihood. [maximum-likelihood]
-* The Poisson distribution is the limiting case as the number of trials goes to infinty and the success probability goes to zero. [poisson-distribution]
-* When the number of trials is large, the binomial distribution is well approximated by the Gaussian distribution. This follows from the Central Limit Theorem. [central-limit-theorem]

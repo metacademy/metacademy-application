@@ -1,3 +1,0 @@
-tag: importance-sampling
-reason: The most basic sampling-based estimator of the partition function uses importance sampling.
- 

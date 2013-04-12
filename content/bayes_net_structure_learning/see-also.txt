@@ -1,3 +1,0 @@
-* BDe priors are a kind of prior distribution which results in "fairer" comparisons between models of different complexities. [bde-priors]
-* Many heuristics have been developed for searching over Bayes net structures. [bayes-net-structure-search-strategies]
-* If we restrict ourselves to trees, we can find the globally optimal structure under the maximum likelihood scoring criterion. This is known as Chow-Liu trees. [chow-liu-trees] 

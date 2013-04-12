@@ -1,1 +1,0 @@
-In electrical engineering, computer science, statistical computing and bioinformatics, the Baum–Welch algorithm is used to find the unknown parameters of a hidden Markov model (HMM). 

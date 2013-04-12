@@ -1,7 +1,0 @@
-* Importance sampling is a way of getting weighted samples from a distribution and is useful in many of the same situations. [importance-sampling]
-* Adaptive rejection sampling is a way to improve the sampler based on the rejected samples [adaptive-rejection-sampling]
-* Other commonly used sampling methods include:
-** Gibbs sampling, a generic and widely applicable sampling algorithm [gibbs-sampling]
-** particle filters, which are useful for time series modeling [particle-filter]
-** Metropolis-Hastings algorithm, which is very general [metropolis-hastings]
-

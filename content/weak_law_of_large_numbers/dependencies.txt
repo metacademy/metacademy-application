@@ -1,2 +1,0 @@
-tag: convergence-in-probability
-reason: The statement of the theorem is about convergence in probability.

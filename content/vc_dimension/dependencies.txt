@@ -1,2 +1,0 @@
-tag: pac-learning
-reason: VC dimension is most often used in the context of PAC learning.

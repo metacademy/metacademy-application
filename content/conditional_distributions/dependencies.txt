@@ -1,6 +1,0 @@
-tag: random-variables
-
-tag: conditional-probability
-
-tag: independent-random-variables
-reason: Independent random variables are an important special case.

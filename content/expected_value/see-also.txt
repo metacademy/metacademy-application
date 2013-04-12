@@ -1,6 +1,0 @@
-* Some other statistics which are based on expected value:
-** variance, which reflects how much a random variable typically deviates from its expected value [variance]
-** moment generating functions, a mathematical representation convenient for analyzing sums of random variables [moment-generating-functions]
-* Markov's inequality bounds the probability that a random variable takes on extreme values, based on its expected value. [markovs-inequality]
-* Martingales are a kind of sequence of random variables whose expected value at the next time step is the current value. [martingales]
-* Monte Carlo techniques are a way of estimating expectations by sampling from a distribution. [sampling-methods]

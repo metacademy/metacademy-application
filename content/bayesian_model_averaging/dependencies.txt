@@ -1,2 +1,0 @@
-tag: bayesian-model-comparison
-reason: Bayesian model averaging is based on the same ideas as Bayesian model comparison.

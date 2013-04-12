@@ -1,1 +1,0 @@
-* The single-dimensional Taylor approximations can be generalized to the multivariate case. [taylor-approximations]

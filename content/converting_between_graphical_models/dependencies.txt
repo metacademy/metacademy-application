@@ -1,2 +1,0 @@
-tag: bayes-nets-vs-mrfs-representation
-reason: Converting between Bayes nets and MRFs requires analyzing their representational power.

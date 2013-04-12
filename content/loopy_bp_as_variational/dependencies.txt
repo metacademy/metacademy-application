@@ -1,4 +1,0 @@
-tag: loopy-belief-propagation
-
-tag: belief-propagation-as-variational
-

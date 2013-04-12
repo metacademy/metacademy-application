@@ -1,4 +1,0 @@
-tag: unconstrained-optimization-problems
-
-tag: gradient
-

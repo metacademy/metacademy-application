@@ -1,1 +1,0 @@
-In mathematics, the multinomial theorem says how to expand a power of a sum in terms of powers of the terms in that sum. 

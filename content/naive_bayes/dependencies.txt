@@ -1,8 +1,0 @@
-tag: maximum-likelihood
-reason: Naive Bayes is fit using maximum likelihood.
-
-tag: multiway-classification
-reason: Naive Bayes is often used for multiway classification.
-
-tag: binary-linear-classifiers
-reason: Naive Bayes is a linear classifier.

@@ -1,5 +1,0 @@
-tag: backpropagation
-reason: Weight decay is used as part of the backpropagation algorithm.
-
-tag: ridge-regression
-reason: Weight decay is a way of implementing an L2 regularization term.

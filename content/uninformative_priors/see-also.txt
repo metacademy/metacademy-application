@@ -1,3 +1,0 @@
-* Jeffreys priors are a general way to construct uninformative priors. [jeffreys-priors]
-* Weakly informative priors keep the flexibility of uninformative priors while avoiding the problems caused by improper priors. [weakly-informative-priors]
-* Improper priors can't be used when computing model evidence in Bayesian model comparison. [improper-priors-and-model-evidence]

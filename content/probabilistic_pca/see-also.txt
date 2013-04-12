@@ -1,3 +1,0 @@
-* Probabilistic latent semantic analysis (pLSA) is another probabilistic model similar to PCA, but better geared toward discrete data. [probabilistic-latent-semantic-analysis]
-* Bayesian PCA is a Bayesian version of pPCA. [bayesian-pca]
-

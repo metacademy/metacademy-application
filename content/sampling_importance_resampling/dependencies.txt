@@ -1,4 +1,0 @@
-tag: importance-sampling
-reason: Importance sampling is one step of SIR.
-
-

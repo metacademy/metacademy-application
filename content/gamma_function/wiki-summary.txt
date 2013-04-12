@@ -1,1 +1,0 @@
-In mathematics, the gamma function (represented by the capital Greek letter Γ) is an extension of the factorial function, with its argument shifted down by 1, to real and complex numbers. 

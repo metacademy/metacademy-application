@@ -1,6 +1,0 @@
-* Some uses of Jensen's inequality:
-** showing that KL divergence, a measure of distance between probability distributions, is nonnegative [kl-divergence]
-** showing that the EM algorithm increases the likelihood function [expectation-maximization-variational-interpretation]
-** variational Bayes, a general framework for approximate inference in probabilistic models [variational-bayes]
-** the Rao-Blackwell theorem, which shows that estimators should only consider sufficient statistics is the loss function is convex [rao-blackwell-theorem]
-

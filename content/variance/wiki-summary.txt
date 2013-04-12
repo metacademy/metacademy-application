@@ -1,1 +1,0 @@
-In probability theory and statistics, the variance is a measure of how far a set of numbers is spread out. 

@@ -1,5 +1,0 @@
-tag: backpropagation
-reason: Early stopping is commonly applied to the backpropagation algorithm.
-
-tag: generalization
-reason: Early stopping is meant to improve generalization performance.

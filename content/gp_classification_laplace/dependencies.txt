@@ -1,9 +1,0 @@
-tag: gaussian-process-classification
-
-tag: laplace-approximation
-
-tag: logistic-regression-irls
-reason: We can optimize the objective function using the same IRLS method as in logistic regression.
-
-tag: learning-gp-hyperparameters
-reason: Part of fitting a GP classification model is learning the hyperparameters.

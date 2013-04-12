@@ -1,2 +1,0 @@
-tag: binomial-distribution
-reason: The Poisson distribution is a limiting case of the binomial distribution.

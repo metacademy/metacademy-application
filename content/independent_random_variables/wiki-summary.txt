@@ -1,1 +1,0 @@
-In probability theory, to say that two events are independent (alternatively statistically independent, marginally independent or absolutely independent) means that the occurrence of one does not affect the probability of the other. 

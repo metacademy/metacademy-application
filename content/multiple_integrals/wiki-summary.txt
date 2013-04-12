@@ -1,1 +1,0 @@
-The multiple integral is a type of definite integral extended to functions of more than one real variable, for example, f(x, y) or f(x, y, z). 

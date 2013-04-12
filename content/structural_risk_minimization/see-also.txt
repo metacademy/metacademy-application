@@ -1,5 +1,0 @@
-* Other methods for controlling overfitting include:
-** model selection [model-selection]
-** feature selection [feature-selection]
-** Bayesian model averaging [bayesian-model-averaging]
-

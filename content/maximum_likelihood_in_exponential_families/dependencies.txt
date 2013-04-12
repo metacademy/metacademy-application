@@ -1,3 +1,0 @@
-tag: maximum-likelihood
-
-tag: exponential-families

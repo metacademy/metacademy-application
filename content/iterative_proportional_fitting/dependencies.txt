@@ -1,5 +1,0 @@
-tag: mrf-parameter-learning
-reason: IPF is an algorithm for MRF parameter learning.
-
-tag: coordinate-descent
-reason: IPF is a special case of coordinate descent.

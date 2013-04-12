@@ -1,8 +1,0 @@
-tag: bayesian-networks
-reason: Trees are a case where Bayes nets and MRFs are equivalent.
-
-tag: markov-random-fields
-reason: Trees are a case where Bayes nets and MRFs are equivalent.
-
-tag: conditional-independence
-reason: Trees can be thought of in terms of conditional independencies.

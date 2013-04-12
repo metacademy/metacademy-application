@@ -1,3 +1,0 @@
-tag: sampling-partition-function
-
-tag: annealed-importance-sampling

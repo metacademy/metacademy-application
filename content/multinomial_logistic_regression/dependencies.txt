@@ -1,8 +1,0 @@
-tag: logistic-regression
-
-tag: multiway-classification
-reason: Multinomial logistic regression is a multiway classification algorithm.
-
-tag: multinomial-distribution
-reason: Multinomial logistic regression is defined in terms of the multinomial distribution.
-

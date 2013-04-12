@@ -1,1 +1,0 @@
-Bayesian parameter estimation: multinomial distribution

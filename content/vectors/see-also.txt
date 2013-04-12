@@ -1,6 +1,0 @@
-* Central linear algebra concepts which build directly on vectors include:
-** the dot product [dot-product]
-** matrices [matrices]
-** vector norms [vector-norms]
-* Using a small set of axioms, the basic properties of vectors can be generalized to other vector spaces; examples include functions and polynomials. [vector-spaces]
- 

@@ -1,1 +1,0 @@
-A multiple integral generalizes integration to functions of n variables and produces a general (n-1)-dimensional volume. For instance, n=2 corresponds to an area. Multiple integrals occur frequently in probability theory and machine learning when examining marginal densities.

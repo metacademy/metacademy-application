@@ -1,1 +1,0 @@
-Feed-forward neural nets

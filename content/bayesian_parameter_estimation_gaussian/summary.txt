@@ -1,1 +1,0 @@
-Using the Bayesian framework, we can infer the mean parameter of a Gaussian distribution, the scale parameter, or both. Since Gaussians are widely used in probabilistic modeling, the computations that go into this are common motifs in Bayesian machine learning more generally.

@@ -1,7 +1,0 @@
-* Convolutional nets are one way to get invariances in a neural net representation. Other ways include:
-** augmenting the training set with warped examples [augmenting-training-set-warped]
-** tangent propagation, which penalizes instability with respect to transformations [tangent-propagation]
-** Tikhonov regularization, which penalizes instability with respect to noise [tikhonov-regularization]
-* Learning invariances is a major goal in the field of representation learning. [representation-learning-invariances]
-* Convolutional neural nets learn oriented filters similar to the receptive fields in the human primary visual cortex. [representations-in-v1]
-

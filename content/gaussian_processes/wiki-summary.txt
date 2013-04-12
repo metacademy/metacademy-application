@@ -1,1 +1,0 @@
-In probability theory and statistics, a Gaussian process is a stochastic process whose realizations consist of random values associated with every point in a range of times (or of space) such that each such random variable has a normal distribution. 

@@ -1,4 +1,0 @@
-* Some other ways of reducing dimensionality:
-** Random projections, which can be simpler and faster. [dimensionality-reduction-by-random-projections]
-** Neural nets, which can adapt the representation as learning progresses, rather than fixing it at the start [feed-forward-neural-nets]
-* Often we would rather learn ``overcomplete'' representations, which map the inputs to a higher dimensional space with more structure. [learning-overcomplete-representations]

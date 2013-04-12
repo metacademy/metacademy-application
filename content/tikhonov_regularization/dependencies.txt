@@ -1,2 +1,0 @@
-tag: learning-invariances-in-neural-nets
-reason: Tikhonov regularization is a way of learning invariances in neural nets.

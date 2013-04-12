@@ -1,5 +1,0 @@
-tag: gaussian-distribution
-
-tag: variational-inference-convex-duality
-reason: The Gaussian lower bound is inspired by convex duality.
-

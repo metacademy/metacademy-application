@@ -1,4 +1,0 @@
-tag: logistic-regression
-
-tag: newton-rhapson
-reason: IRLS for logistic regression is a special case of the Newton-Rhapson method.

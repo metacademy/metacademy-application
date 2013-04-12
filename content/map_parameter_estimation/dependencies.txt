@@ -1,5 +1,0 @@
-tag: bayesian-parameter-estimation
-reason: MAP estimation is an approximation to Bayesian parameter estimation.
-
-tag: unconstrained-optimization-problems
-reason: MAP estimation is a kind of optimization problem.

@@ -1,2 +1,0 @@
-* the No-U-Turn Sampler (NUTS) is a parameter-free version of HMC [no-u-turn-sampler]
-* Langevin methods are another sampling algorithm that makes use of gradient information [langevin-methods]

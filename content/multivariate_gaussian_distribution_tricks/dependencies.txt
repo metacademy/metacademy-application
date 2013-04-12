@@ -1,8 +1,0 @@
-tag: multivariate-gaussian-distribution
-
-tag: gaussian-distribution-tricks
-
-tag: spectral-decomposition
-reason: The spectral decomposition gives a useful representation of covariance and precision matrices.
-
-tag: function-of-random-variable-tricks

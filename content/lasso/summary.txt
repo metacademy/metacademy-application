@@ -1,2 +1,0 @@
-The Lasso is a form of regularized linear regression. Unlike ridge regression, it puts an L1 penalty on the weights, which encourages sparsity, i.e. it encourages most of the weights to be exactly zero. The general trick of using L1 norms to encourage sparsity is widely used in machine learning.
-

@@ -1,1 +1,0 @@
-In machine learning, early stopping is a form of regularization used when a machine learning model (such as a neural network) is trained by on-line gradient descent. 

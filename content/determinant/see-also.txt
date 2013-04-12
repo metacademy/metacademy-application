@@ -1,9 +1,0 @@
-* The determinant is used to define:
-** the characteristic polynomial of a matrix, which is important for dealing with eigenvalues [characteristic-polynomial]
-** multivariate Gaussians, a widely used probability distribution for multivariate data [multivariate-gaussian-distribution]
-* The determinant can also be characterized as:
-** the constant term of the characteristic polynomial [characteristic-polynomial]
-** the product of the eigenvalues of a matrix [determinant-product-of-eigenvalues]
-* The determinant can be computed using:
-** the LU factorization [computing-the-determinant]
-** the singular value decomposition [computing-the-determinant-svd]

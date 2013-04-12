@@ -1,5 +1,0 @@
-* We shouldn't expect to learn the parameters exactly in the general case, since inference in MRFs is hard. [complexity-of-inference]
-* In the special case of chordal MRFs, the parameters can be learned efficiently. [mrf-parameter-learning-chordal-case]
-* Some algorithms for learning the parameters:
-** iterative proportional fitting [iterative-proportional-fitting]
-** contrastive divergence [contrastive-divergence]

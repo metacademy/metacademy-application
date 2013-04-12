@@ -1,5 +1,0 @@
-* Weight decay is an example of a regularization method. [regularization]
-* The $L_2$ norm of the weights isn't necessarily a good regularizer for neural nets. Some more principled alternatives include:
-** Tikhonov regularization, which rewards invariance to noise in the inputs [tikhonov-regularization]
-** Tangent propagation, which rewards invariance to irrelevant transformations of the inputs such as translation and scalling [tangent-propagation]
-* Early stopping is another strategy to prevent overfitting in neural nets. [early-stopping]

@@ -1,3 +1,0 @@
-* Some consequences of Markov's inequality:
-** Chebyshev's inequality bounds the probability of extreme values in terms of the variance. [chebyshevs-inequality]
-** Chernoff bounds are a powerful technique for bounding probabilities of extreme values for sums of random variables, and they're based on Markov's inequality and moment generating functions. [chernoff-bounds]

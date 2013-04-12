@@ -1,1 +1,0 @@
-A linear classifier makes a classification decision for a given observation based on the value of a linear combination of the observation's features. In a ``binary'' linear classifier, the observation is classified into one of two possible classes using a linear boundary in the input feature space.

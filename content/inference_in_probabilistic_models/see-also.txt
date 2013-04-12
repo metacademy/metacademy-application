@@ -1,4 +1,0 @@
-* Some techniques for inference in probabilistic models:
-** sampling methods [sampling-methods]
-** variational inference [variational-inference]
-* Inference probably can't be performed efficiently and exactly in the worst case. [complexity-of-inference]

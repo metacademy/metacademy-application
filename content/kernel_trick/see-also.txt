@@ -1,7 +1,0 @@
-* Techniques for constructing kernels [constructing-kernels]
-* The kernel trick is used in many machine learning algorithms, including:
-** kernel ridge regression [kernel-ridge-regression]
-** kernel support vector machines [kernel-svm]
-** Gaussian process regression [gaussian-process-regression]
-* The theory of reproducing kernel Hilbert spaces justifies the use of kernelized representations. [reproducing-kernel-hilber-spaces]
-

@@ -1,2 +1,0 @@
-tag: binary-linear-classifiers
-reason: The perceptron is a binary linear classifier.

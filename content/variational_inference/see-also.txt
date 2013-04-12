@@ -1,9 +1,0 @@
-* Some examples of variational inference algorithms:
-** Mean field approximation [mean-field-approximation]
-** Structured variational approximations in graphical models [structured-variational-approximations]
-** Expectation propagation, which is slower, but often considerably more accurate, than mean field [expectation-propagation]
-* Variational inference works out nicely when the model is built out of exponential family distributions. [variational-exponential-family]
-* Variational Bayes is the application of variational inference to fitting Bayesian models. [variational-bayes]
-* Markov chain Monte Carlo (MCMC) is another versatile set of techniques for performing inference in probabilistic models. [markov-chain-monte-carlo]
-* In the case of graphical models, belief propagation is another inference algorithm with a variational interpretation. [bp-variational-interpretation]
- 

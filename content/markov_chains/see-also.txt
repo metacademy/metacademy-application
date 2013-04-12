@@ -1,2 +1,0 @@
-* Markov models are a probabilistic model which models the data as Markov chains. [markov-models]
-* Markov chain Monte Carlo (MCMC) is a powerful class of techniques for approximate inference in probabilistic models. [markov-chain-monte-carlo]

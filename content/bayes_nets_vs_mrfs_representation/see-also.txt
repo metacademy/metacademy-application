@@ -1,1 +1,0 @@
-* It is possible to convert between Bayes nets and MRFs, although we lose structure when we do so. [converting-between-graphical-models]

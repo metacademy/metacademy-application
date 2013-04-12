@@ -1,3 +1,0 @@
-tag: probabilistic-models
-reason: Bayes nets are a kind of probabilistic model.
-

@@ -1,2 +1,0 @@
-tag: inference-in-mrfs
-reason: Variable elimination is an MRF inference algorithm.

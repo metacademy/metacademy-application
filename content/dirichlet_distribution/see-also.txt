@@ -1,3 +1,0 @@
-* Mathematical tricks for manipulating Dirichlet distributions [dirichlet-tricks]
-* We can define the Dirichlet distribution in terms of the gamma distribution. [dirichlet-from-gamma]
-* The Dirichlet process is a generalization of the Dirichlet distribution to possibly infinite spaces, and is useful in mixture modeling. [dirichlet-process]

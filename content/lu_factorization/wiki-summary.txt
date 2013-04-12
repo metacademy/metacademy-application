@@ -1,1 +1,0 @@
-In linear algebra, LU decomposition (also called LU factorization) factors a matrix as the product of a lower triangular matrix and an upper triangular matrix. 

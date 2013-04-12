@@ -1,1 +1,0 @@
-Slice sampling is a type of Markov chain Monte Carlo algorithm for pseudo-random number sampling, i.e. 

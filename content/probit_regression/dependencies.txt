@@ -1,5 +1,0 @@
-tag: logistic-regression
-reason: Probit regression is a variant on logistic regression.
-
-tag: probit-function
-reason: Probit regression is defined in terms of the probit function.

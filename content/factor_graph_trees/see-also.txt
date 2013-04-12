@@ -1,1 +1,0 @@
-* We can perform efficient exact inference in tree-structured factor graphs using belief propagation. [factor-graph-bp]

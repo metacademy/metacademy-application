@@ -1,7 +1,0 @@
-tag: central-limit-theorem
-
-tag: mgf-gaussian-distribution
-reason: The MGF of a Gaussian distribution is used in the proof.
-
-tag: taylor-approximations
-reason: Taylor approximations are used in the proof.

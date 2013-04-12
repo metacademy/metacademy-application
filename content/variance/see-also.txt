@@ -1,7 +1,0 @@
-* Covariance is a multivariate generalization of variance which captures not only the variances of individual variables, but also the correlations between them. [covariance]
-* Chebyshev's inequality bounds the probability that a random variable takes on extreme values, based on its variance. [chebyshevs-inequality]
-* Averaging large numbers of i.i.d. random variables behaves nicely when the variance is finite:
-** The weak law of large numbers implies that the mean converges to the expected value. [weak-law-of-large-numbers]
-** The Central Limit Theorem implies that the mean is approximately normally distributed. [central-limit-theorem]
-* The Gaussian distribution is a widely used probability distribution, parameterized in terms of the expectation and variance. [gaussian-distribution]
- 

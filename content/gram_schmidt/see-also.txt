@@ -1,3 +1,0 @@
-* The Gram-Schmidt procedure is not numerically stable. In practice, we would compute the QR decomposition using one of:
-** Householder transformations [householder-transformations]
-** Givens rotations [givens-rotations]

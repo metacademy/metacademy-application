@@ -1,2 +1,0 @@
-tag: probabilistic-models
-reason: MRFs are a kind of probabilistic model.

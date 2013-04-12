@@ -1,3 +1,0 @@
-* While Newton's method is very fast for small scale problems, it doesn't scale very well.
-** For large numbers of features, consider quasi-Newton methods. [quasi-newton-methods]
-** For large numbers of data points, consider stochastic gradient descent. [stochastic-gradient-descent]

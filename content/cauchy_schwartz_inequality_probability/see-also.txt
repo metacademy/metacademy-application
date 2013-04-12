@@ -1,4 +1,0 @@
-* Some other versions of the Cauchy-Schwartz inequality:
-** for dot products between vectors [dot-product]
-** for inner products on Hilbert spaces [cauchy-schwartz-hilbert-spaces]
-* The fact that covariance matrices are positive semidefinite is a generalization of this theorem. [covariance-matrices]

@@ -1,8 +1,0 @@
-tag: binary-linear-classifiers
-reason: GDA is a binary linear classifier.
-
-tag: mixture-of-gaussians
-reason: GDA uses a mixture of Gaussians model.
-
-tag: maximum-likelihood
-reason: GDA is fit using maximum likelihood.

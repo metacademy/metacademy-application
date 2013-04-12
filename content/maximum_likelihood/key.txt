@@ -1,3 +1,0 @@
-* What is the likelihood function, and why would we want to maximize it?
-* Why do we typically work with the log-likelihoods rather than the likelihood itself?
-* Go through the derivations for a few simple examples (e.g. binomial, Gaussian).

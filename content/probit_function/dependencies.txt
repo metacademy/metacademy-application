@@ -1,6 +1,0 @@
-tag: gaussian-distribution
-reason: The probit function is the CDF of the Gaussian distribution.
-
-tag: cumulative-distribution-function
-reason: The probit function is the CDF of the Gaussian distribution.
-

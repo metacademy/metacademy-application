@@ -1,8 +1,0 @@
-* Other clustering methods include:
-** mixture of Gaussians, a probabilistic model for continuous data [gaussian-mixtures-vs-k-means]
-** mixture of Bernoullis, a probabilistic model for discrete data [mixture-of-bernoullis]
-** spectral clustering, for when the clusters don't have nice convex shapes [spectral-clustering]
-* The application of clustering to finding meaningful regions of images is called image segmentation. [image-segmentation]
-* K-means is used in information theory for quantizing continuous signals; there it is known as vector quantization. [vector-quantization]
-* K-means is often used as an initialization for more sophisticated models such as mixture of Gaussians. [k-means-initialization]
-* K-means is analogous to the EM algorithm for fitting Gaussian mixtures [em-gaussian-mixtures]

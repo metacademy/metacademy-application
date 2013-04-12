@@ -1,2 +1,0 @@
-tag: gaussian-distribution
-reason: The student-t distribution is a mixture of Gaussians with different variance parameters.

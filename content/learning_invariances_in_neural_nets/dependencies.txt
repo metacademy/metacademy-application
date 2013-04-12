@@ -1,5 +1,0 @@
-tag: backpropagation
-reason: We try to modify the backpropagation procedure to encourage invariances.
-
-tag: generalization
-reason: The point of learning invariances is to improve generalization performance.

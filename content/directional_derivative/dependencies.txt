@@ -1,6 +1,0 @@
-tag: parametric-curves
-reason: The directional derivative is defined in terms of the limit of a function on a parametric curve.
-
-tag: gradient
-reason: The gradient maximizes the directional derivative subject to a norm constraint.
-

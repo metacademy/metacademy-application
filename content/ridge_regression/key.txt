@@ -1,4 +1,0 @@
-* Derive the algorithms for solving ridge regression using both gradient descent and the normal equations.
-* If you rescale all of the features by a constant, does this affect the model's predictions in linear regression?  Ridge regression?
-* If you add multiple copies of the same feature, does this change the predictions in linear regression?  Ridge regression?
-* Suppose you want to penalize some features more heavily than others?  How would you change the cost function and the update rules?

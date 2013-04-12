@@ -1,5 +1,0 @@
-* Some algorithms for inference in Gaussian MRFs:
-** variable elimination [gaussian-variable-elimination]
-** belief propagation [gaussian-bp-on-trees]
-* Another way to perform efficient inference is to apply the naive formulas, but use sparse methods to solve the linear systems. [solving-sparse-linear-systems]
-

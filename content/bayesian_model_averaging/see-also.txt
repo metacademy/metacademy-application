@@ -1,1 +1,0 @@
-* Reversible jump MCMC is a class of sampling algorithms often used for Bayesian model averaging.

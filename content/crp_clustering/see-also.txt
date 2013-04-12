@@ -1,1 +1,0 @@
-* The Indian buffet process linear Gaussian model is another Bayesian nonparametric model, but which uses latent binary representations in place of clusters. [ibp-linear-gaussian-model]

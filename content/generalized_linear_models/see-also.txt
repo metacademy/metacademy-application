@@ -1,5 +1,0 @@
-* Important example of generalized linear models include:
-** linear regression [linear-regression]
-** logistic regression [logistic-regression]
-** multinomial logistic regression [multinomial-logistic-regression]
-* Exponential family PCA is a class of matrix factorization models based on the same ideas as generalized linear models. [exponential-family-pca]

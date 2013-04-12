@@ -1,5 +1,0 @@
-* The eigenvalues of a symmetric PSD matrix are closely related to the singular value decomposition [singular-value-decomposition]
-* Some common examples of PSD matrices:
-** covariance matrices, which represent dependencies between different random variables [covariance-matrices]
-** kernel matrices, a way of representing similarity in machine learning [kernels]
-* Semidefinite programming is a very general category of convex optimization problem. [semidefinite-programming]

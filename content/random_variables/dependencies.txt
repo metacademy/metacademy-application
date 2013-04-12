@@ -1,2 +1,0 @@
-tag: probability
-reason: Random variables are defined in terms of probability distributions.

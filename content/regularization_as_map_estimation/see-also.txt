@@ -1,3 +1,0 @@
-* MAP estimation is not a fully Bayesian method. For the Bayesian treatment, see Bayesian parameter estimation. [bayesian-parameter-estimation]
-* Unlike Bayesian parameter estimation, MAP estimation is not invariant to the parameterization. [map-estimation-not-invariant]
-* MAP estimation is commonly used instead of Bayesian parameter estimation because it is an optimization problem. [unconstrained-optimization]

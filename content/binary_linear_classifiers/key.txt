@@ -1,2 +1,0 @@
-* Is it possible to create a nonlinear decision boundary in the original feature space by mapping the linear combination of original input features through a nonlinear function?
-* Is it possible to create a nonlinear decision boundary in the original feature space by mapping the original input features through a nonlinear function and then using a binary linear classifier on the resulting features?

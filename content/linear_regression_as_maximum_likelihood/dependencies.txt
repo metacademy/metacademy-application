@@ -1,5 +1,0 @@
-tag: linear-regression
-reason: We're interpreting linear regression as maximum likelihood.
-
-tag: maximum-likelihood
-reason: We're interpreting linear regression as maximum likelihood.

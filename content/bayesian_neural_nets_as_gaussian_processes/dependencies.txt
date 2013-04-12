@@ -1,3 +1,0 @@
-tag: bayesian-neural-nets
-
-tag: gaussian-processes

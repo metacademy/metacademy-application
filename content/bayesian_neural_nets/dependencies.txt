@@ -1,8 +1,0 @@
-tag: bayesian-linear-regression
-reason: Bayesian neural nets are based on the same ideas as Bayesian linear regression.
-
-tag: laplace-approximation
-reason: The Laplace approximation is a way of approximating Bayesian neural nets.
-
-tag: evidence-approximation
-reason: The evidence approximation is a way of fitting the hyperparameters of a Bayesian neural net.

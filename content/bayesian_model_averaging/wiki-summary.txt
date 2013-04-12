@@ -1,1 +1,0 @@
-In statistics and machine learning, ensemble methods use multiple models to obtain better predictive performance than could be obtained from any of the constituent models. 

@@ -1,3 +1,0 @@
-tag: conditional-distributions
-
-tag: independent-random-variables

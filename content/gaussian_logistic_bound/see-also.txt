@@ -1,4 +1,0 @@
-* This bound is used in variational inference for:
-** logistic regression [variational-logistic-regression]
-** noisy-or networks [variational-noisy-or]
-

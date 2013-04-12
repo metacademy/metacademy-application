@@ -1,4 +1,0 @@
-* The dot product can be used to define matrix multiplication. [matrix-multiplication]
-* Inner products are generalizations of the dot product to other vector spaces. [inner-product]
-* The dot product is used to define the Euclidean vector norm, but there are other vector norms as well. [vector-norms]
- 

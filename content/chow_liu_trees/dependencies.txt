@@ -1,5 +1,0 @@
-tag: bayes-net-structure-learning
-reason: Chow-Liu trees are a method of Bayes net structure learning.
-
-tag: tree-graphical-models
-reason: Chow-Liu trees give a way of learning the structure of tree graphical models.

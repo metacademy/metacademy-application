@@ -1,1 +1,0 @@
-Annealed importance sampling

@@ -1,2 +1,0 @@
-tag: hidden-markov-models
-reason: The Viterbi algorithm is an algorithm for HMM inference.

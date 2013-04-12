@@ -1,1 +1,0 @@
-* Influence diagrams are a graphical model formalism for decision theoretic problems. [influence-diagrams]

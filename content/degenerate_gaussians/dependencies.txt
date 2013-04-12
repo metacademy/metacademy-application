@@ -1,2 +1,0 @@
-tag: multivariate-gaussians-information-form
-reason: The degenerate cases mean different things in covariance form vs. information form.

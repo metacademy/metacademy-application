@@ -1,4 +1,0 @@
-tag: sampling-methods
-reason: MCMC is a kind of sampling method.
-
-tag: markov-chains

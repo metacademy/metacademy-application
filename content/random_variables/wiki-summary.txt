@@ -1,1 +1,0 @@
-In probability and statistics, a random variable or stochastic variable is a variable whose value is subject to variations due to chance (i.e. 

@@ -1,1 +1,0 @@
-In mathematics, particularly linear algebra and numerical analysis, the Gram–Schmidt process is a method for orthonormalising a set of vectors in an inner product space, most commonly the Euclidean space Rn. 

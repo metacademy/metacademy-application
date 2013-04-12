@@ -1,5 +1,0 @@
-tag: inference-in-probabilistic-models
-reason: Sampling methods are a strategy for inference in probabilistic models.
-
-tag: weak-law-of-large-numbers
-reason: The weak law of large numbers justifies the use of sampling estimators.

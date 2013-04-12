@@ -1,5 +1,0 @@
-* Some particular examples of this trick:
-** polar coordinates [eval-multi-int-polar-coordinates]
-** spherical coordinates [eval-multi-int-spherical-coordinates]
-** cylindrical coordinates [eval-multi-int-cylindrical-coordinates]
-* We use the same change of variables formula to determine the PDF of a function of a continuous random variable. [function-of-random-variables-tricks]

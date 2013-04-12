@@ -1,2 +1,0 @@
-tag: gaussian-elimination
-reason: Gaussian elimination is used to compute the LU factorization.

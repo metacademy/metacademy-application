@@ -1,1 +1,0 @@
-* The directional derivative is used to define the tangent space to a surface. [tangent-space]

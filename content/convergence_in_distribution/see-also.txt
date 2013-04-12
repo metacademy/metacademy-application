@@ -1,4 +1,0 @@
-* Convergence in distribution is used in the statement of the central limit theorem. [central-limit-theorem]
-* Other notions of convergence of sequences of random variables:
-** convergence in probability, where the probability of being far from the limiting value approaches zero [convergence-in-probability]
-** almost sure convergence, where the sequence converges to a value with probability 1 [almost-sure-convergence]

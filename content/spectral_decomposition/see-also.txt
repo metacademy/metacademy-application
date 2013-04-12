@@ -1,6 +1,0 @@
-* The spectral decomposition can also be characterized as:
-** the eigenvalues of a symmetric matrix [eigenvalues]
-** the solution to an optimization problem [variational-characterization-of-eigenvalues]
-* The spectral decomposition can be generalized to complex analogues of symmetric matrices, called Hermitian matrices [spectral-decomposition-hermitian]
-* A symmetric matrix is positive semidefinite if its eigenvalues are nonnegative [positive-semidefinite-matrices]
- 

@@ -1,1 +1,0 @@
-Soft weight sharing in neural nets

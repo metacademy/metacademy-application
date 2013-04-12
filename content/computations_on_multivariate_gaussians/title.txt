@@ -1,1 +1,0 @@
-Computations on multivariate Gaussians

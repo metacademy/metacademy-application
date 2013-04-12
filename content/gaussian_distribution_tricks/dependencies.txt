@@ -1,5 +1,0 @@
-tag: gaussian-distribution
-
-tag: eval-multi-int-polar-coordinates
-reason: Computing the normalizing constant requires using polar coordinates.
-

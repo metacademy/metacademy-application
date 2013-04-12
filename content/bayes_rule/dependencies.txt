@@ -1,2 +1,0 @@
-tag: conditional-probability
-reason: Bayes' rule follows from the definition of conditional probability.

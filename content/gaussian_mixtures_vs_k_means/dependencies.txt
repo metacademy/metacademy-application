@@ -1,3 +1,0 @@
-tag: mixture-of-gaussians
-
-tag: k-means

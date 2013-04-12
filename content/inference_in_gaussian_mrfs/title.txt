@@ -1,1 +1,0 @@
-Inference in Gaussian MRFs

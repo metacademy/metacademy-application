@@ -1,1 +1,0 @@
-In vector calculus, the Jacobian matrix (pron.: /dʒɨˈkoʊbiən/, /jɨˈkoʊbiən/) is the matrix of all first-order partial derivatives of a vector- or scalar-valued function with respect to another vector. 

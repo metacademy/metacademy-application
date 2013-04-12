@@ -1,5 +1,0 @@
-* The Schur product theorem justifies the surprising fact that the product of kernels is a kernel. [schur-product-theorem]
-* Kernels can be defined on a variety of mathematical objects, allowing us to extend linear machine learning models to those cases:
-** strings [kernels-on-strings]
-** graphs [kernels-on-graphs]
-* Fisher kernels are a general recipe for obtaining a kernel from a generative model. [fisher-kernel]

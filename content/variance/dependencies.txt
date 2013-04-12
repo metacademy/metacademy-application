@@ -1,2 +1,0 @@
-tag: expected-value
-reason: Variance is defined in terms of expected value.

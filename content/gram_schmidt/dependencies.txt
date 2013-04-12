@@ -1,2 +1,0 @@
-tag: orthogonal-matrices
-reason: Gram-Schmidt is a way of computing an orthogonal basis for a subspace.

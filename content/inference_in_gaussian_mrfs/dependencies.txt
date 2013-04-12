@@ -1,5 +1,0 @@
-tag: gaussian-mrfs
-
-tag: inference-in-mrfs
-
-tag: computations-on-multivariate-gaussians

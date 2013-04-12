@@ -1,7 +1,0 @@
-* Tikhonov regularization is one strategy for learning invariances in neural nets. Others include:
-** building it explicitly into the architecture, as in convolutional nets [convolutional-nets]
-** augmenting the training set with warped examples [augmenting-training-set-warped]
-** tangent propagation, which penalizes instability with respect to transformations [tangent-propagation]
-* Denoising autoencoders are a neural net architecture based on the idea of invariance to noise in the inputs. [denoising-autoencoders]
-
-

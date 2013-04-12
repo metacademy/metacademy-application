@@ -1,5 +1,0 @@
-tag: markovs-inequality
-reason: Chebyshev's inequality is a consequence of Markov's inequality.
-
-tag: variance
-reason: Chebyshev's inequality involves a variance term.

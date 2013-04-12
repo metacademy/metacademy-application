@@ -1,3 +1,0 @@
-* The variance term depends on the effective number of parameters of a model. [effective-num-parameters]
-* Statistical learning theory gives a way of analyzing bias and variance of estimators more generally. [statistical-learning-theory]
-* Cross-validation is a simple and general technique for managing the bias-variance tradeoff. [cross-validation]

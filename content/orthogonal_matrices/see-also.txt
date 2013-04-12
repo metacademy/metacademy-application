@@ -1,3 +1,0 @@
-* Permutation matrices are an important special case of orthogonal matrices. [permutation-matrices]
-* Orthogonal matrices can be characterized in terms of eigenvalues having unit norm. [eigenvalues-of-orthogonal-matrices]
-* Orthogonal matrices are used in the spectral decomposition of a symmetric matrix. [spectral-decomposition]

@@ -1,1 +1,0 @@
-* Kalman smoothing can be regarded as a speical case of belief propagation. [kalman-as-bp]

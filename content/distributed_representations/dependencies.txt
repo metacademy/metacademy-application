@@ -1,2 +1,0 @@
-tag: feed-forward-neural-nets
-reason: Feed-forward neural nets are an instructive example of a distributed representation.

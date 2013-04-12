@@ -1,1 +1,0 @@
-Expectation propagation (EP) is a technique in Bayesian machine learning, developed by Thomas Minka. 

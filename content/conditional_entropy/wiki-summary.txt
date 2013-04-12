@@ -1,1 +1,0 @@
-In information theory, the conditional entropy (or equivocation) quantifies the amount of information needed to describe the outcome of a random variable [Y] given that the value of another random variable [X] is known. 

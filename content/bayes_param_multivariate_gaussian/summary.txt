@@ -1,1 +1,0 @@
-Using the Bayesian framework, we can infer the posterior over the mean vector of a multivariate Gaussian, the covariance matrix, or both. Since multivariate Gaussians are widely used in probabilistic modeling, the computations that go into this are common motifs in Bayesian machine learning more generally.

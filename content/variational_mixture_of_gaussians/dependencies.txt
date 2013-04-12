@@ -1,6 +1,0 @@
-tag: variational-bayes
-
-tag: mixture-of-gaussians
-
-tag: bayes-param-multivariate-gaussian
-reason: The posterior over parameters for a multivariate Gaussian is part of the mean field update rule for this model.

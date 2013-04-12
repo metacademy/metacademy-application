@@ -1,2 +1,0 @@
-tag: logistic-regression
-reason: The SVM is based on a similar idea to logistic regression.

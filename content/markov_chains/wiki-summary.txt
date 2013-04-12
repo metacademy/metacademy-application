@@ -1,1 +1,0 @@
-A Markov chain (discrete-time Markov chain or DTMC) named after Andrey Markov, is a mathematical system that undergoes transitions from one state to another, between a finite or countable number of possible states. 

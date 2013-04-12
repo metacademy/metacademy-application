@@ -1,5 +1,0 @@
-tag: multivariate-gaussians-information-form
-reason: Gaussian MRFs define constraints on the information form representation.
-
-tag: markov-random-fields
-

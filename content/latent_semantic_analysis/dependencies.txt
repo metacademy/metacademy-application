@@ -1,2 +1,0 @@
-tag: singular-value-decomposition
-reason: The SVD is one step of LSA.

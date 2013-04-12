@@ -1,1 +1,0 @@
-In probability theory and statistics, a covariance matrix (also known as dispersion matrix or variance covariance matrix) is a matrix whose element in the i, j position is the covariance between the i th and j th elements of a random vector (that is, of a vector of random variables). 

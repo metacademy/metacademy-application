@@ -1,2 +1,0 @@
-tag: vc-dimension
-reason: Structural risk minimization is based on a nested sequence of models of increasing VC dimension.

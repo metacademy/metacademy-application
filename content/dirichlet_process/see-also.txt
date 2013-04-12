@@ -1,2 +1,0 @@
-* The beta process is an analogue of the Dirichlet process which is useful for probabilistic models which represent binary attributes.
-* Dirichlet diffusion trees are a hierarchical clustering model based on the same ideas as the Dirichlet process.

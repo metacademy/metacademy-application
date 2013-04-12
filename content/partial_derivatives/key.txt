@@ -1,2 +1,0 @@
-* What is the difference between partial derivatives and implicit differentiation?
-* How are partial derivatives used to define the div, grad, and curl operators?

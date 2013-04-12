@@ -1,1 +1,0 @@
-Unlike with GP regression, there is no closed-form solution to GP classification. The most basic method for approximating it is to use the Laplace approximation, thereby formulating it as an optimization problem.

@@ -1,6 +1,0 @@
-tag: lu-factorization
-reason: The Cholesky decomposition is the LU factorization of a symmetric PSD matrix.
-
-tag: positive-semidefinite-matrices
-reason: The Cholesky decomposition is the LU factorization of a symmetric PSD matrix.
-

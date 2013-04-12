@@ -1,1 +1,0 @@
-Kernel principal component analysis (kernel PCA)  is an extension of principal component analysis (PCA) using techniques of kernel methods. 

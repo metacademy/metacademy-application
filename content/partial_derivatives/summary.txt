@@ -1,1 +1,0 @@
-"A partial derivative of a function of several variables is its derivative with respect to one of those variables, with the others held constant (as opposed to the total derivative, in which all variables are allowed to vary)" [wikipedia entry]. Intuitively, a partial derivative measures the instantaneous rate of change for a single variate in a multivariate function.

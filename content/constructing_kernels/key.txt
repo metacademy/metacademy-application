@@ -1,2 +1,0 @@
-* Given two kernels k_1 and k_2, which you can think of as two similarity functions, how would you construct a kernel which says two data points are similar if either k_1 OR k_2 says they are similar?  What about both k_1 AND k_2?
- 

@@ -1,5 +1,0 @@
-* Computing second derivatives explicitly can be too expensive in high dimensions. However, backpropagation can still be used with quasi-Newton methods which only require gradients. [backpropagation-quasi-newton]
-* Some features of neural nets which make second-order training difficult:
-** the objective function is not convex, so the Hessian might not be PSD [neural-nets-not-convex]
-** some commonly used nonlinearities are not differentiable [neural-net-nonlinearities]
-* Hessian-free optimization is a second-order method which has been successfully applied to training deep neural nets. [neural-nets-hessian-free]

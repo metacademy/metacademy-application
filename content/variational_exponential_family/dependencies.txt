@@ -1,3 +1,0 @@
-tag: variational-inference
-
-tag: exponential-families

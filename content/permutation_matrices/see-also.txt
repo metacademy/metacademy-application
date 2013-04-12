@@ -1,6 +1,0 @@
-* Permutation matrices are a special case of:
-** orthogonal matrices [orthogonal-matrices]
-** doubly stochastic matrices [doubly-stochastic-matrices]
-* Permutation matrices are useful for thinking about algorithms such as:
-** Gaussian elimination [gaussian-elimination]
-** the fast Fourier transform [fast-fourier-transform]

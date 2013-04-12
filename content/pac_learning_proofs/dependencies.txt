@@ -1,7 +1,0 @@
-tag: pac-learning
-
-tag: hoeffding-inequality
-reason: Hoeffding's inequality is used to bound the difference between training and generalization error.
-
-tag: union-bound
-reason: The union bound is used to bound the amount of overfitting across a range of models.

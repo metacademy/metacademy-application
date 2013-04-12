@@ -1,2 +1,0 @@
-* sampling from a Wishart distribution [sampling-wishart]
-* math tricks for Wishart distributions [wishart-tricks]

@@ -1,1 +1,0 @@
-* If we apply the same update rules on a non-tree graph, it often works just fine. This is known as loopy belief propagation. [gaussian-loopy-bp]

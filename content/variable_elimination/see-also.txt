@@ -1,2 +1,0 @@
-* If we want to perform multiple queries, we go through lots of redundant calculations. Belief propagation gives a way of reusing the computations. [belief-propagation-on-trees]
-* In Gaussian graphical models, variable elimination is equivalent to Gaussian elimination. [gaussian-variable-elimination-as-gaussian-elimination]

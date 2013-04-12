@@ -1,5 +1,0 @@
-tag: binary-linear-classifiers
-reason: This is an example of a binary linear classifier.
-
-tag: linear-regression
-

@@ -1,1 +1,0 @@
-Gaussian lower bound on logistic function

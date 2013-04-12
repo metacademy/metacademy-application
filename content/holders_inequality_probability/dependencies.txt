@@ -1,2 +1,0 @@
-tag: cauchy-schwartz-inequality-probability
-reason: Holder's inequality is a generalization of Cauchy-Schwartz.

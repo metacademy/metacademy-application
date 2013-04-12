@@ -1,6 +1,0 @@
-tag: moment-generating-functions
-reason: Chernoff bounds can be specified in terms of moment generating functions.
-
-tag: chebyshevs-inequality-higher-order
-reason: Chernoff bounds are closely related to the higher-order extensions of Chebyshev's inequality.
-

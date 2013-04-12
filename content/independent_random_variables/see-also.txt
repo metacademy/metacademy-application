@@ -1,2 +1,0 @@
-* We may also want to ask whether two variables are independent conditioned on a third. [conditional-independence]
-

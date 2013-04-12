@@ -1,1 +1,0 @@
-In probability and statistics, Student's t-distribution (or simply the t-distribution) is a family of continuous probability distributions that arises when estimating the mean of a normally distributed population in situations where the sample size is small and population standard deviation is unknown. 

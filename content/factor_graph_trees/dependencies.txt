@@ -1,3 +1,0 @@
-tag: factor-graphs
-
-tag: tree-graphical-models

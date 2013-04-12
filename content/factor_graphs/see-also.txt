@@ -1,3 +1,0 @@
-* Sometimes factorization assumptions can be represented as tree-structured factor graphs when their Bayes net or MRF representations aren't tree-structured. Common examples include polytrees and chordal graphs. [factor-graph-trees]
-* In such cases, factor graph belief propagation can be applied to perform exact inference. [factor-graph-bp]
-

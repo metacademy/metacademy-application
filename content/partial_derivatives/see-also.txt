@@ -1,5 +1,0 @@
-* Higher order partial derivatives [higher-order-partial-derivatives]
-* Partial derivatives can be used to compute:
-** the gradient, an operator which "points uphill" [gradient]
-** directional derivatives, which compute the rate of change with respect to movement in a particular direction [directional-derivatives]
-

@@ -1,1 +1,0 @@
-EM for Gaussian mixtures

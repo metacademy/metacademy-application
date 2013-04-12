@@ -1,4 +1,0 @@
-tag: pseudoinverse
-
-tag: singular-value-decomposition
-reason: The SVD is a numerically stable way to compute the pseudoinverse.

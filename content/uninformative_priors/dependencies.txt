@@ -1,9 +1,0 @@
-tag: bayesian-parameter-estimation
-reason: Uninformative priors are normally used for Bayesian parameter estimation.
-
-tag: gaussian-distribution
-reason: The Gaussian distribution is an instructive example.
-
-tag: gamma-distribution
-reason: A degenerate gamma distribution often serves as an uninformative prior.
-

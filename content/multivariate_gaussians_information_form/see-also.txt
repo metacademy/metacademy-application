@@ -1,3 +1,0 @@
-* Many computations on multivariate Gaussians are more efficient in information form. [computations-on-multivariate-gaussians]
-* We saw we can represent multivariate Gaussians in covariance form or information form. These dual representations apply to exponential families more generally. [exponential-family]
-* Gaussian Markov random fields are a kind of graphical model which captures sparsity in the information form representation. [gaussian-mrfs]

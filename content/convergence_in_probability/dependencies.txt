@@ -1,2 +1,0 @@
-tag: sequences-of-random-variables
-reason: Convergence in probability is a property of sequences of random variables.

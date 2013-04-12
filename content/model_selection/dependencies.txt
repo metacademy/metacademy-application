@@ -1,5 +1,0 @@
-tag: generalization
-reason: One of our desiderata for model selection is that the model generalize well to new data.
-
-tag: basis-function-expansions
-reason: Basis function expansions are an instructive case of model selection.

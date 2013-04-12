@@ -1,5 +1,0 @@
-tag: decision-trees
-reason: Decision trees are a major motivating example for bagging.
-
-tag: generalization
-reason: Bagging is a method for improving generalization.

@@ -1,3 +1,0 @@
-tag: poisson-distribution
-
-tag: moment-generating-functions

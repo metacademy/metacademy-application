@@ -1,1 +1,0 @@
-In order to apply Gaussian processes in practice, it is necessary to fit the hyperparameters of the model, such as the lengthscale and variance of a squared-exp kernel. Marginal likelihood is one commonly used criterion for doing so.

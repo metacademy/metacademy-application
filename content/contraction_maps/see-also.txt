@@ -1,2 +1,0 @@
-* Some uses of contraction maps:
-** Loopy belief propagation is guaranteed to converge in graphs with a single loop. [loopy-bp-single-loop]

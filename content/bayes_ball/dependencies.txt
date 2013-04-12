@@ -1,2 +1,0 @@
-tag: d-separation
-reason: Bayes Ball is an efficient way of computing d-separation.

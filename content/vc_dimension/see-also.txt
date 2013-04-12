@@ -1,3 +1,0 @@
-* Structural risk minimization is an idea based on VC dimension which justifies algorithms such as SVMs. [structural-risk-minimization]
-* Rademacher complexity is an alternative measure of model complexity. [rademacher-complexity]
-

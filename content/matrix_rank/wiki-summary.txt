@@ -1,1 +1,0 @@
-The column rank of a matrix A is the maximum number of linearly independent column vectors of A. 

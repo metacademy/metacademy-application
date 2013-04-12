@@ -1,1 +1,0 @@
-* The fact that MRFs are exponential families lets us characterize the maximum likelihood solution for learning the parameters. [mrf-parameter-learning]

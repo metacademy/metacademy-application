@@ -1,2 +1,0 @@
-tag: fixed-point-iterations
-reason: The Robbins-Monro procedure is an example of a fixed-point iteration.

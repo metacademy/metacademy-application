@@ -1,2 +1,0 @@
-tag: determinant
-reason: The determinant explains the relationship between cross products, dot products, and volume.

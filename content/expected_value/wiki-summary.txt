@@ -1,1 +1,0 @@
-In probability theory, the expected value (or expectation, mathematical expectation, EV, mean, or the first moment) of a random variable is the weighted average of all possible values that this random variable can take on. 

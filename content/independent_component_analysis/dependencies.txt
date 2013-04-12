@@ -1,8 +1,0 @@
-tag: probabilistic-models
-reason: ICA is a probabilisitic model.
-
-tag: covariance-matrices
-reason: ICA requires rescaling the covariance matrix as a preprocessing step.
-
-tag: heavy-tailed-distributions
-reason: ICA typically involves fitting heavy-tailed distributions.

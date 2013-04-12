@@ -1,4 +1,0 @@
-* The problem with this algorithm is that the cost function isn't well-suited to classification. Some alternatives which make more sense are:
-** logistic regression [logistic-regression]
-** support vector machines (SVMs) [support-vector-machines]
-* The least squares solution, surprisingly, turns out to be equivalent to Gaussian discriminant analysis. [gda-is-least-squares]

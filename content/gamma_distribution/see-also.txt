@@ -1,8 +1,0 @@
-* The gamma distribution is used to construct a prior for the scale parameters in Bayesian parameter estimation. [bayesian-parameter-estimation-gaussian]
-* The gamma distribution is a member of the exponential family. [exponential-family]
-* The Wishart distribution is a generalization of the gamma distribution to positive semidefinite matrices. [wishart-distribution]
-* Some special cases of the gamma distribution:
-** exponential distribution [exponential-distribution]
-** chi-squared distribution [chi-squared-distribution]
-* The student-t distribution is a heavy-tailed distribution constructed from the Gaussian distribution and gamma distribution. [stuent-t-distribution]
-* Gamma distributions are used to model the intervals between neuronal firings. [neuronal-firings-gamma]

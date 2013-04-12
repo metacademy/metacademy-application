@@ -1,1 +1,0 @@
-Bayesian neural nets converge to Gaussian processes

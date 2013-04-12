@@ -1,4 +1,0 @@
-tag: markov-random-fields
-
-tag: variable-elimination
-reason: Efficiency of variable elimination is a major reason for looking at chordal MRFs.

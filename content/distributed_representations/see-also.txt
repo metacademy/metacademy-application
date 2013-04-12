@@ -1,4 +1,0 @@
-* Connectionist psychology tries to model human cognition using neural nets. Distributed representations are a key element of this approach. [connectionist-psychology]
-* Deep learning is a subfield of machine learning which attempts to learn complex distributed representations automatically. [deep-learning]
-* Distributed representations of words have been used a lot recently in language modeling (modeling the distribution over text) [distributed-representations-of-language]
- 

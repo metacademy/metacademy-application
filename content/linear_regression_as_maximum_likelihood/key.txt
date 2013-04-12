@@ -1,2 +1,0 @@
-* Derive the maximum likelihood estimator of the weights in linear regression assuming independent zero-mean Gaussian noise.
-

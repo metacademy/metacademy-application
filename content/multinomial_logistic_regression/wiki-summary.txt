@@ -1,1 +1,0 @@
-In statistics, a multinomial logistic regression model, also known as softmax regression or multinomial logit, is a regression model which generalizes logistic regression by allowing more than two discrete outcomes. 

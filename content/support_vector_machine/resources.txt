@@ -1,0 +1,33 @@
+source: coursera_ng
+location: Lectures "Optimization objective," "Large margin intuition," and "Mathematics behind large margin classification," under heading "Support vector machines."
+dependencies: logistic_regression
+
+source: bishop
+edition: 1
+location: Section 7.1, up to 7.1.1 (pages 326-331)
+dependencies: lagrange_duality
+mark: star
+
+source: aima
+edition: 2
+location: Section 20.6, pages 749-752
+
+source: boyd
+edition: 1
+location: Section 8.6-8.6.1, up to "Approximate linear discrimination," pages 422-427
+
+source: murphy
+edition: 1
+location: Section 14.5-14.5.2.2, pages 496-502
+mark: star
+
+source: esl
+edition: 1
+location: Section 4.5.2, pages 108-111
+dependencies: lagrange_duality
+
+source: cs229
+location: Lectures notes 3, "Support vector machines," sections 1-4, pages 1-7
+mark: star
+
+

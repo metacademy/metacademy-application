@@ -1,0 +1,13 @@
+source: cs229
+location: Lecture notes 3, "Support vector machines," Section 6, pages 10-13
+mark: star
+
+source: esl
+location: Section 4.5.2, pages 108-111
+
+source: bishop
+edition: 1
+location: Section 7.1, up to 7.1.1, pages 326-331
+dependencies: kernel-trick
+
+

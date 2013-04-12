@@ -1,0 +1,11 @@
+source: cs229
+location: Lecture notes 3, "Support vector machines," Section 9, pages 20-25
+mark: star
+
+source: paper
+authors: John C. Platt
+title: Fast training of support vector machines using sequential minimal optimization
+link: http://www.cs.utsa.edu/~bylander/cs6243/smo-book.pdf
+mark: star
+
+

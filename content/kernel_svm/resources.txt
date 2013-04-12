@@ -1,0 +1,16 @@
+source: bishop
+edition: 1
+location: Section 7.1, up to 7.1.1, pages 326-331
+
+source: murphy
+edition: 1
+location: Section 14.5-14.5.2.2, pages 496-502
+
+source: esl
+edition: 1
+location: Section 12.3-12.3.1, pages 377-379
+mark: star
+
+source: coursera_ng
+location: Lecture "Kernels II"
+

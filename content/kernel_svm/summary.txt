@@ -1,0 +1,2 @@
+The main advantage of the SVM as a linear classifier is that it can be kernelized in order to represent complex nonlinear decision boundaries. Conveniently, since only a (hopefully) sparse subset of the training examples are used, kernels only need to be computed with a small fraction of the training examples. Kernel SVMs are one of the most widely used classifiers in machine learning, because off-the-shelf tools often perform very well.
+ 

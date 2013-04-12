@@ -1,4 +1,5 @@
+* If the training set is not linearly separable, the soft-margin SVM allows for some of the constraints to be violated. [soft-margin-svm]
 * The SVM can be optimized with the sequential minimal optimization (SMO) algorithm. [sequential-minimal-optimization]
 * The main advantage of SVMs is that they can be kernelized in order to capture nonlinear dependencies. [kernel-svm]
-* Comparison of loss functions for classification [comparing-classification-losses]
+* The SVM is closely related to logistic regression, and it is instructive to compare the loss functions. [svm-vs-logistic-regression]
 * The SVM can be justified as optimizing a tradeoff between bias and variance. [statistical-learning-theory-for-svm]

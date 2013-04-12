@@ -1,0 +1,2 @@
+Support vector regression is an analogue of the support vector machine (SVM) which is used for regression rather than classification. The loss function is hinge loss, which ignores small errors and penalizes errors linearly beyond some margin. Like with SVMs, the main selling point is the ability to represent complex nonlinear decision boundaries in terms of kernels with a small number of training examples.
+ 

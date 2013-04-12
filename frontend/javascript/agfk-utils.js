@@ -1,4 +1,4 @@
-/* IE indexOf function */
+/* IE compatability functions */
 if (!Array.indexOf) {
     Array.prototype.indexOf = function (obj) {
         for (var i = 0; i < this.length; i++) {
@@ -9,6 +9,16 @@ if (!Array.indexOf) {
         return -1;
     }
 }
+
+if (typeof Object.getPrototypeOf !== "function")
+    Object.getPrototypeOf = "".__proto__ === String.prototype
+        ? function (object) {
+            return object.__proto__;
+        }
+        : function (object) {
+            // May break if the constructor has been tampered with
+            return object.constructor.prototype;
+        };
 
 function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
     /*

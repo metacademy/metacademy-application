@@ -76,11 +76,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pass
 
     def do_PUT(self):
-	""" TODO: make unique from POST"""
-        self.do_POST() # TODO return 204...
-
-    def do_POST(self):
-	""" POST node data """
+	""" Update Data """
         parse = urlparse.urlparse(self.path)
         parts = parse.path.lower().split('/')
         parts = filter(bool, parts)
@@ -98,6 +94,12 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
         except:
             self.send_error(500, traceback.format_exc())
+
+
+    def do_POST(self):
+        """ TODO: make unique from PUT"""
+        self.do_PUT() # TODO return 204...
+
 
     def do_GET(self):
 	"""GET node data"""

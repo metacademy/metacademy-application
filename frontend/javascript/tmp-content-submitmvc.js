@@ -194,7 +194,7 @@ window.CNodeDIView = Backbone.View.extend({
     className:'cnode-data-input',
     appendNewEl:function (modelInstance, inclassName, templateID) {
         // add new empty element to view collection but not model collection
-        var newcon = Object.getPrototypeOf(modelInstance).constructor;
+        var newcon = Object.getPrototypeOf(modelInstance).constructor; // NOTE: this is ES5 so only IE 9+ support (TODO add at least IE 8 support)
         var newel = new newcon();
         newel.addCollection = this.model;
         newel.isnew = true;

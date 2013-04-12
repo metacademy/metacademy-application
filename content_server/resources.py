@@ -1,19 +1,20 @@
 import os
 
 import config
+import formats
 import global_resources
 
 def resource_db_path():
     return os.path.join(config.CONTENT_PATH, global_resources.RESOURCE_DB_NAME)
 
 class Resource:
-    def __init__(self, key):
+    def __init__(self, key, title, location, resource_type, free, notes):
         self.key = key
-        self.title = None
-        self.location = None
-        self.resource_type = None
-        self.free = 0
-        self.notes = []
+        self.title = title
+        self.location = location
+        self.resource_type = resource_type
+        self.free = free
+        self.notes = notes
 
     def as_dict(self):
         return {'key': self.key,
@@ -21,36 +22,20 @@ class Resource:
                 'location': self.location,
                 'resource_type': self.resource_type,
                 'free': self.free,
+                'notes': self.notes,
                 }
 
 def read_resources_file(fname):
-    resource_list = []
-    for line_ in open(fname):
-        line = line_.strip()
-
-        if line == '':
-            continue
-
-        pos = line.find(':')
-        assert pos != -1
-        field = line[:pos]
-        value = line[pos+1:].strip()
-
-        if field == 'key':
-            curr = Resource(value)
-            resource_list.append(curr)
-        elif field == 'title':
-            curr.title = value
-        elif field == 'location':
-            curr.location = value
-        elif field == 'resource_type':
-            curr.resource_type = value
-        elif field == 'free':
-            curr.free = int(value)
-        elif field == 'note':
-            curr.notes.append(value)
-        else:
-            raise RuntimeError('Unknown field: %s' % field)
-
+    keys = {'key': str,
+            'title': str,
+            'location': (str, None),
+            'resource_type': str,
+            'free': (int, 0),
+            }
+    list_keys = {'note': str,
+                 }
+    dicts = formats.read_text_db(open(fname), keys, list_keys)
+    resource_list = [Resource(d['key'], d['title'], d['location'], d['resource_type'], d['free'], d['note'])
+                     for d in dicts]
     return {r.key: r for r in resource_list}
 

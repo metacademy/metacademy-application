@@ -9,7 +9,73 @@ import graphs
 
 WRAP_WIDTH = 12
 
+class RequiredField:
+    pass
+
+def read_text_db(instr, fields, list_fields={}):
+    items = []
+    new_item = True
+    curr = {}
+
+    # Fields without default values indicate required fields
+    fields = dict(fields)
+    for k, v in fields.items():
+        if not isinstance(v, tuple):
+            fields[k] = (v, RequiredField)
+    
+    for line_ in instr:
+        line = line_.strip()
+
+        if line == '':
+            new_item = True
+            continue
+
+        pos = line.find(':')
+        if pos == -1:
+            raise RuntimeError('Error reading line: %s' % line)
+        field = line[:pos]
+        value = line[pos+1:].strip()
+
+        if new_item:
+            curr = {}
+            items.append(curr)
+            for field_name, (tp, default) in fields.items():
+                curr[field_name] = default
+            for field_name, tp in list_fields.items():
+                curr[field_name] = []
+
+        if field in fields:
+            tp, _ = fields[field]
+            curr[field] = tp(value)
+        elif field in list_fields:
+            tp = list_fields[field]
+            curr[field].append(tp(value))
+        else:
+            raise RuntimeError('Unknown field: %s' % field)
+
+        new_item = False
+
+    # Check that all required fields were filled
+    for item in items:
+        for field, value in item.items():
+            if value is RequiredField:
+                raise RuntimeError('Missing field %s for item %r' % (field, item))
+
+    return items
+
+
+def normalize_input_tag(itag):
+    """Make sure node id (tags) only have valid characters and are in a common format"""
+    return re.sub(r'[^a-z0-9]', '_', itag.strip().lower()).replace('-','_')
+
+
+
 ############################ read nodes as directories #########################
+
+def parse_list(s, sep):
+    parts = s.split(sep)
+    parts = [p.strip() for p in parts]
+    return parts
 
 def read_node(content_path, tag, assert_exists=False):
     """Read a Node object from a directory which optionally contains title.txt,
@@ -44,26 +110,33 @@ def read_node(content_path, tag, assert_exists=False):
     if usewiki and len(summary):
         summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
 
-    ### process resources
+    # process resources
     resources_file = os.path.join(full_path, NODE_RESOURCES)
-    resources = []
     if os.path.exists(resources_file):
-        with open(resources_file) as resource_entries:
-            src = {}
-            for line in resource_entries:
-#                line = line.strip().replace('"', '\\"')
-                if line[:6] == "source":
-                    if src:
-                        resources.append(src)
-                    src = {}
-                try:
-                    attrs = line.strip().split(':')
-                    if len(attrs) > 1 and len(attrs[0]) > 0:
-                        src[attrs[0].strip()] = ':'.join(attrs[1:]).strip()
-                except IndexError:
-                    raise RuntimeError('%s/resources has incorrect format: %s' % (tag, line))
-            if src:
-                resources.append(src)
+        fields = {'source': str,
+                  'edition': (str, None),
+                  'location': (str, None),
+                  'title': (str, None),
+                  'authors': (lambda s: parse_list(s, 'and'), None),
+                  'link': (str, None),
+                  'open': (str, None),
+                  'dependencies': (lambda s: parse_list(s, ','), []),
+                }
+        list_fields = {'mark': str,
+                       'extra': str,
+                       'note': str,
+                   }
+        resources = read_text_db(open(resources_file), fields, list_fields)
+
+        # temporary fix: remove 'mark' field if empty, since the frontent checks if it exists
+        # to determine if it's starred
+        for r in resources:
+            if not r['mark']:
+                del r['mark']
+    else:
+        resources = []
+    
+    
 
     ### process comprehension key
     ckey_file = os.path.join(full_path, NODE_COMPREHENSION_KEY)
@@ -77,26 +150,18 @@ def read_node(content_path, tag, assert_exists=False):
 
     ### process dependencies
     dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
-    dependencies = []
     if os.path.exists(dependencies_file):
-        for line_ in open(dependencies_file):
-            line = line_.strip()
-
-            if line == '':
-                continue
-
-            parts = line.split(':')
-            if parts[0] == 'tag':
-                parent_tag = normalize_input_tag(parts[1])
-                curr_dep = graphs.Dependency(parent_tag, tag, None)
-                dependencies.append(curr_dep)
-            elif parts[0] == 'reason':
-                curr_dep.reason = parts[1].strip()
-            else:
-                raise RuntimeError('Error reading line in %s/%s: %s' % (tag, NODE_DEPENDENCIES, line))
-    elif assert_exists:
-        raise RuntimeError('%s/%s does not exist' % (tag, NODE_DEPENDENCIES))
-
+        fields = {'tag': normalize_input_tag,
+                  'reason': (str, None),
+                  }
+        dependencies_dicts = read_text_db(open(dependencies_file), fields)
+        dependencies = [graphs.Dependency(d['tag'], tag, d['reason'])
+                        for d in dependencies_dicts]
+    else:
+        if assert_exists:
+            raise RuntimeError('%s/%s does not exist' % (tag, NODE_DEPENDENCIES))
+        dependencies = []
+    
     ### process see-also
     see_also_file = os.path.join(full_path, NODE_SEE_ALSO)
     pointers = []
@@ -225,7 +290,4 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
 
     json.dump(items, outstr)
     
-def normalize_input_tag(itag):
-    """Make sure node id (tags) only have valid characters and are in a common format"""
-    return re.sub(r'[^a-z0-9]', '_', itag.strip().lower()).replace('-','_')
 

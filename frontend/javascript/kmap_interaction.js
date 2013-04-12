@@ -335,32 +335,46 @@ function load_svg(node_name) {
                     }
 
                     // add pointer (see-also) info
-                    if ('pointers' in node_data) {
-                        text_panel.append('div')
-                            .attr('class', 'data-subtitle')
-                            .text('See Also');
-                        var dp_enter = text_panel.append("div")
-                            .attr("class", "data-pointers")
-                            .selectAll('div')
-                            .data(node_data['pointers'])
-                            .enter()
-                            .append('div')
-                            .attr('class', 'list-entry');
+                    // if ('pointers' in node_data) {
+                    //     var ptrs = $.trim(node_data['pointers']).split(/([^\*]|^)\*[^\*]/) 
+                    //     text_panel.append('div')
+                    //         .attr('class', 'data-subtitle')
+                    //         .text('See Also')
+                    //     var dp_enter = text_panel.append("div")
+                    //         .attr("class", "data-pointers")
+                    //         .selectAll('div')
+                    //         .data(ptrs)
+                    //         .enter()
+                    //         .append('div')
+                    //         .attr('class', 'list-entry')
+                    //         .html(function(d){
+                    //             var rethtml = "";
+                    //             var subdiv = d.split(/\*\*/);
+                    //             rethtml = "<li>" + subdiv[0] + "</li>";
+                    //             if (subdiv.length > 1){
+                    //                 rethtml += "<li>\n<ul>";
+                    //                 for (var jj=1; jj < subdiv.length; jj++ ){
+                    //                     rethtml += "<li>" + subdiv[jj] + "</li>";
+                    //                 }
+                    //                 rethtml += "</ul></li>"
+                    //             }
+                    //             return rethtml
+                    //         });
 
-                        dp_enter.append('div')
-                            .attr('class', 'bullet-ptr')
-                            .append('img')
-                            .attr('src', '/static/images/qmark.jpg')
-                            .attr('class', 'list-img hastip')
-                            .attr('title', function (d) {
-                                return d.reason === "None" ? "" : d.reason;
-                            });
-                        dp_enter.append('div')
-                            .attr('class', 'list-text')
-                            .text(function (d) {
-                                return jdata.nodes[d.to_tag].title;
-                            });
-                    }
+                    //     // dp_enter.append('div')
+                    //     //     .attr('class', 'bullet-ptr')
+                    //     //     .append('img')
+                    //     //     .attr('src', '/static/images/qmark.jpg')
+                    //     //     .attr('class', 'list-img hastip')
+                    //     //     .attr('title', function (d) {
+                    //     //         return d.reason === "None" ? "" : d.reason;
+                    //     //     });
+                    //     // dp_enter.append('div')
+                    //     //     .attr('class', 'list-text')
+                    //     //     .text(function (d) {
+                    //     //         return jdata.nodes[d.to_tag].title;
+                    //     //     });
+                    // }
 
 
                     // add "focus" button

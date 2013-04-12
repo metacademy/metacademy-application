@@ -49,16 +49,6 @@ Submit Content
         reason %></textarea>
 </script>
 
-<script type="text/template" id="cnode-pointer-template">
-    <% var id = cid + "-from_tag"%>
-    <label for="<%- id %>">Related Concept</label>
-    <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"
-           value="<%- to_tag %>"/>
-    <% var id = cid + "-reason"%>
-    <label for="<%- id %>">Reason</label>
-    <textarea class= "cnode-reason-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"><%-
-        reason %></textarea>
-</script>
 
 <script type="text/template" id="cnode-ckeys-template">
     <textarea type="text" class =  "cnode-reason-input  <%-eiclass%>" id=<%-"ckeys-" + cid + "-text"%> name=<%-"ckey" + cid%>"> <%- text %></textarea>
@@ -74,6 +64,21 @@ Submit Content
         <label for="summary">Summary</label>
         <textarea id="summary" rows="6" class="lone-section"><%- summary %></textarea>
     </section>
+
+    <div id="resources-loc">
+    </div>
+
+    <div id="dependencies-loc">
+    </div>
+
+    <div id="comprehension-loc">
+    </div>
+
+    <section class="cnode-data-input">
+        <label for="pointers">Related Concepts</label>
+        <textarea id="pointers" rows="6" class="lone-section"><%- pointers %></textarea>
+    </section>
+
 </script>
 
 

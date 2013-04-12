@@ -118,17 +118,18 @@ def read_node(path, tag, assert_exists=False):
 
     ### process see-also
     see_also_file = os.path.join(full_path, NODE_SEE_ALSO)
-    pointers = []
+    pointers = ""
     if os.path.exists(see_also_file):
-        for line_ in open(see_also_file):
-            line = line_.strip()
+        pointers = open(see_also_file).read()
+        # for line_ in open(see_also_file):
+        #     line = line_.strip()
 
-            m = re.match(r'(.*)\[(.*)\]', line)
-            if m:
-                blurb = m.group(1).strip()
-                to_tag = normalize_input_tag(m.group(2))
-                ptr = graphs.Pointer(tag, to_tag, blurb)
-                pointers.append(ptr)
+        #     m = re.match(r'(.*)\[(.*)\]', line)
+        #     if m:
+        #         blurb = m.group(1).strip()
+        #         to_tag = normalize_input_tag(m.group(2))
+        #         ptr = graphs.Pointer(tag, to_tag, blurb)
+        #         pointers.append(ptr)
     elif assert_exists:
         raise RuntimeError('%s/%s does not exist' % (tag, NODE_SEE_ALSO))
     return graphs.Node(
@@ -227,14 +228,11 @@ def node_to_json(nodes, tag):
     ret_lst = []
     ret_lst.append('"id":"%s"' % tag)
     if node.title:
-        ret_lst.append('"title":"%s"' % normalize_json_text(node.title))
+        ret_lst.append('"title":%s' % json.dumps(node.title))
     if node.summary:
-        ret_lst.append('"summary":"%s"' % normalize_json_text(node.summary))
+        ret_lst.append('"summary":%s' % json.dumps(node.summary))
     if node.pointers:
-        pt_arr = ['{"to_tag":"%s","reason":"%s"}' % (p.to_tag, normalize_json_text(p.reason))
-                  for p in node.pointers]
-        if pt_arr:
-            ret_lst.append('"pointers":[%s]' % ','.join(pt_arr))
+        ret_lst.append('"pointers":%s' % json.dumps(node.pointers))
     if node.dependencies:
         dep_arr = ['{"from_tag":"%s","reason":"%s"}' % (d.from_tag, normalize_json_text(d.reason))
                    for d in node.dependencies]

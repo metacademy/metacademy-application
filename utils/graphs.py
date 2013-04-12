@@ -45,16 +45,6 @@ class Dependency(DirectedEdge):
     def __repr__(self):
         return 'Dependency(from_tag=%r, to_tag=%r, reason=%r)' % (self.from_tag, self.to_tag, self.reason)
 
-class Pointer(DirectedEdge):
-    """A struct representing a see-also link in the graph.
-
-    from_tag -- the tag of the node doing the linking
-    to_tag -- the tag of the node being linked to
-    reason -- a verbal annotation of why it's relevant
-    """
-    def __repr__(self):
-        return 'Pointer(from_tag=%r, to_tag=%r, reason=%r)' % (self.from_tag, self.to_tag, self.reason)
-
 
 class Node:
     """A struct containing the information relevant to one node in the graph.
@@ -93,15 +83,12 @@ class Node:
         jdata: json data representation of node
         """
         for attr in jdata:
-            if attr == 'title' or attr == 'summary':
+            if attr == 'title' or attr == 'summary' or attr == 'pointers':
                 self[attr] = jdata[attr]
-            elif attr == 'dependencies' or attr == 'pointers':
+            elif attr == 'dependencies':
                 self[attr] = []
                 for jdep in jdata[attr]:
-                    if attr == 'dependencies':
-                        dep =  Dependency()
-                    else:
-                        dep = Pointer()
+                    dep =  Dependency()
                     dep.add_json_content(jdep)
                     self[attr].append(dep)
             elif attr == 'ckeys':
@@ -140,7 +127,7 @@ class Node:
             # write the data to the appropriate file
             fname = os.path.join(npath, fname_map[attr])
 
-            if attr == 'title' or attr=='summary':
+            if attr == 'title' or attr == 'summary' or attr == 'pointers':
                 with open(fname, 'w') as wfile:
                     wfile.write(self[attr])
 
@@ -160,10 +147,6 @@ class Node:
                 with open(fname, 'w') as wfile:
                     for ck in self[attr]:
                         wfile.write(ck["text"] + "\n")
-
-            elif attr == 'pointers':
-                # TODO: how to address this different format -- I think we should reformat like deps and resrcs
-                pass
 
 
 class Graph:
@@ -200,20 +183,21 @@ class Graph:
 
         return Graph(incoming, outgoing, edges)
 
-    @staticmethod
-    def from_node_pointers(nodes):
-        """Construct the see-also graph from a dict of nodes. Expects all the links to be present in the
-        graph (so call remove_missing_links on nodes first)."""
-        outgoing = {tag: [] for tag in nodes}
-        incoming = {tag: [] for tag in nodes}
-        edges = set()
-        for tag, node in nodes.items():
-            for ptr in node.pointers:
-                outgoing[ptr.from_tag].append(ptr.to_tag)
-                incoming[ptr.to_tag].append(ptr.from_tag)
-                edges.add((ptr.from_tag, ptr.to_tag))
+    # April 12 2013: broken due to new pointer handling
+    # @staticmethod
+    # def from_node_pointers(nodes):
+    #     """Construct the see-also graph from a dict of nodes. Expects all the links to be present in the
+    #     graph (so call remove_missing_links on nodes first)."""
+    #     outgoing = {tag: [] for tag in nodes}
+    #     incoming = {tag: [] for tag in nodes}
+    #     edges = set()
+    #     for tag, node in nodes.items():
+    #         for ptr in node.pointers:
+    #             outgoing[ptr.from_tag].append(ptr.to_tag)
+    #             incoming[ptr.to_tag].append(ptr.from_tag)
+    #             edges.add((ptr.from_tag, ptr.to_tag))
 
-        return Graph(incoming, outgoing, edges)
+    #     return Graph(incoming, outgoing, edges)
 
 
 
@@ -227,7 +211,7 @@ def remove_missing_links(nodes):
     for tag, node in nodes.items():
         nprops = vars(node)
         nprops['dependencies'] = [d for d in node.dependencies if d.from_tag in nodes]
-        nprops['pointers'] = [p for p in node.pointers if p.to_tag in nodes]
+        # nprops['pointers'] = [p for p in node.pointers if p.to_tag in nodes]
         new_nodes[tag] = Node(nprops)
     return new_nodes
 

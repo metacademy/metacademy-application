@@ -49,15 +49,15 @@ window.CDirectedEdge = Backbone.Model.extend({
 
 // Model: entire node
 window.CNode = Backbone.Model.extend({
-    collVals:["ckeys", "dependencies", "pointers", "resources"], // collection values\
-    txtVals:["id", "title", "summary"],
+    collVals:["ckeys", "dependencies", "resources"], // collection values\
+    txtVals:["id", "title", "summary", "pointers"],
     defaults:function () {
         return {
             title:"",
             summary:"",
             ckeys:new CCKeyCollection(),
             dependencies:new CDirectedEdgeCollection(),
-            pointers:new CDirectedEdgeCollection(),
+            pointers:"",
             resources:new CResourceCollection()
         };
     },
@@ -256,24 +256,23 @@ window.CNodeView = Backbone.View.extend({
     tagName:"div",
     template:_.template($("#cnode-details-template").html()),
     render:function () {
-        //resources
         this.$el.html(this.template(this.model.toJSON()));
-        this.$el.append(new CNodeDIView({model:this.model
+        this.$el.find("#resources-loc").replaceWith(new CNodeDIView({model:this.model
             .get("resources")}).render("Learning Resources", "cnode-resources-template", "cnode-box resources").el);
         //dependencies
-        this.$el.append(new CNodeDIView({model:this.model
+        this.$el.find("#dependencies-loc").replaceWith(new CNodeDIView({model:this.model
             .get("dependencies")}).render("Dependencies", "cnode-dependency-template", "cnode-box dependencies").el);
-        // pointers
-        this.$el.append(new CNodeDIView({model:this.model
-            .get("pointers")}).render("Related Concepts", "cnode-pointer-template", "cnode-box related-concepts").el);
         //ckeys
-        this.$el.append(new CNodeDIView({model:this.model
+        this.$el.find("#comprehension-loc").replaceWith(new CNodeDIView({model:this.model
             .get("ckeys")}).render("Comprehension", "cnode-ckeys-template", "lone-section").el);
+        // place all html into main view
+        
         return this;
     },
     events:{
         "change #title":"changeText",
-        "change #summary":"changeText"
+        "change #summary":"changeText",
+        "change #pointers":"changeText"
     },
     changeText:function (event) {
         var newVal = $.trim($(event.currentTarget).val());

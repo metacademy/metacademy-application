@@ -25,6 +25,24 @@ class Node:
             keys = [rdic['source'] for rdic in self.resources]
         return keys
 
+    def as_dict(self):
+        d = {}
+        
+        if hasattr(self, 'title'):
+            d['title'] = self.title
+        if hasattr(self, 'summary'):
+            d['summary'] = self.summary
+        if hasattr(self, 'pointers'):
+            d['pointers'] = [p.as_dict() for p in self.pointers]
+        if hasattr(self, 'dependencies'):
+            d['dependencies'] = [dep.as_dict() for dep in self.dependencies]
+        if hasattr(self, 'resources'):
+            d['resources'] = self.resources
+        if hasattr(self, 'ckeys'):
+            d['ckeys'] = self.ckeys
+        
+        return d
+
 # TODO add __repr__ method
 
 class Dependency:
@@ -45,6 +63,13 @@ class Dependency:
     def __repr__(self):
         return 'Dependency(parent_tag=%r, child_tag=%r, reason=%r)' % (self.parent_tag, self.child_tag, self.reason)
 
+    def as_dict(self):
+        return {'from_tag': self.parent_tag,
+                'to_tag': self.child_tag,
+                'reason': self.reason,
+                }
+
+
 class Pointer:
     """A struct representing a see-also link in the graph.
 
@@ -62,6 +87,12 @@ class Pointer:
 
     def __repr__(self):
         return 'Pointer(from_tag=%r, to_tag=%r, blurb=%r)' % (self.from_tag, self.to_tag, self.blurb)
+
+    def as_dict(self):
+        return {'from_tag': self.from_tag,
+                'to_tag': self.to_tag,
+                'blurb': self.blurb,
+                }
 
 class Graph:
     """A representation of the dependency graph in a form that's more convenient for graph computations

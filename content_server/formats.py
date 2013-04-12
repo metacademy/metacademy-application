@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 import re
 import sys
@@ -204,80 +205,27 @@ def write_graph_dot(nodes, graph, outstr=None):
 #################################### JSON ######################################
 
 def node_to_json(nodes, tag):
-    ### select node and form title, summary, pointer and dependencies strings
     node = nodes[tag]
-    ret_lst = []
-    if node.title:
-        ret_lst.append('"title":"%s"' % normalize_json_text(node.title))
-    if node.summary:
-        ret_lst.append('"summary":"%s"' % normalize_json_text(node.summary))
-    if node.pointers:
-        pt_arr = ['{"from_tag":"%s","to_tag":"%s","blurb":"%s"}' % (p.from_tag, p.to_tag, normalize_json_text(p.blurb))
-                  for p in node.pointers]
-        if pt_arr:
-            ret_lst.append('"pointers":[%s]' % ','.join(pt_arr))
-    if node.dependencies:
-        dep_arr = ['{"from_tag":"%s","to_tag":"%s","reason":"%s"}' % (d.parent_tag, d.child_tag, normalize_json_text(d.reason))
-                   for d in node.dependencies]
-        if dep_arr:
-            ret_lst.append('"dependencies":[%s]' % ','.join(dep_arr))
-
-    ### add the relevant resources info
-    if node.resources:
-        rscrc_lst = []
-        for resrc in node.resources:
-            rscrc_lst.append('%s' % dict_to_json(resrc))
-        if rscrc_lst:
-            res_str = '[' + ','.join(rscrc_lst) + ']'
-            ret_lst.append('"resources":%s' % res_str)
-
-    if node.ckeys:
-        ret_lst.append('"ckeys":[' + ','.join(['"%s"' % normalize_json_text(ck) for ck in node.ckeys]) + ']')
-
-
-    ### return final node string
-    return '{%s}' % ','.join(ret_lst)
-
+    return json.dumps(node.as_dict())
 
 def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
-    # get the individual node data
-    json_items = ['"%s":%s' % (tag, node_to_json(nodes, tag))
-                  for tag in nodes.keys()]
+    items = {node.tag: node.as_dict() for node in nodes.values()}
 
-    ### make resources entry in json data
     if resource_dict is not None:
         resrc_keys = set(
             [rsrc
              for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources]
              for rsrc in rlist
              if rsrc in resource_dict])
-        res_list = ['"%s":%s' % (key, dict_to_json(resource_dict[key].as_dict()))
-                    for key in resrc_keys]
-        
-        if res_list:
-            res_str = '{' + ','.join(res_list) + '}'
-        else:
-            res_str = '{}'
-        json_items.append('"node_resources":%s' % res_str)
+        res_dict = {key: resource_dict[key].as_dict() for key in resrc_keys}
+        items['node_resources'] = res_dict
+
+    json.dump(items, outstr)
     
-    #    json_items.encode('utf-8')
-    ### write total json object with node and resources data
-    json_str = '{' + ','.join(json_items) + '}'
-    outstr.write(json_str.encode('utf-8'))
-
-
-def dict_to_json(indict):
-    return '{' + ','.join(['"%s":"%s"' % (normalize_json_text(ikey), normalize_json_text(indict[ikey])) for ikey in indict.keys()]) + '}'
-
 def normalize_input_tag(itag):
     """Make sure node id (tags) only have valid characters and are in a common format"""
     return re.sub(r'[^a-z0-9]', '_', itag.strip().lower()).replace('-','_')
 
-def normalize_json_text(jdata):
-    if isinstance(jdata,basestring):
-        return jdata.strip().replace('\\', '\\\\').replace('"', '\\"')
-    else:
-        return jdata

@@ -7,7 +7,7 @@ from global_resources import RESOURCE_DB_NAME
 CONTENT_SERVER = 'http://localhost:' + str(config.CONTENT_SERVER_PORT)
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
 AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../'))
-RESOURCE_DB = os.path.join(AGFK_PATH,'content',RESOURCE_DB_NAME)
+RESOURCE_DB = os.path.join(config.CONTENT_PATH,RESOURCE_DB_NAME)
 
 
 DEBUG = True

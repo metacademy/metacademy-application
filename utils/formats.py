@@ -14,11 +14,11 @@ WRAP_WIDTH = 12
 
 ############################ read nodes as directories #########################
 
-def read_node(path, tag, assert_exists=False):
+def read_node(content_path, tag, assert_exists=False):
     """Read a Node object from a directory which optionally contains title.txt,
     dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
     # TODO: normalize string cleaning (get rid of double quotes that mess up json)
-    full_path = os.path.join(path, tag)
+    full_path = os.path.join(content_path, 'nodes', tag)
 
     ### process title
     title_file = os.path.join(full_path, NODE_TITLE)
@@ -121,13 +121,14 @@ def read_node(path, tag, assert_exists=False):
          'pointers': pointers, 'ckeys': ckeys})
 
 
-def read_nodes(path, onlytitle=False):
+def read_nodes(content_path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
-    tags = map(normalize_input_tag,_filter_non_nodes(os.listdir(path)))
+    nodes_path = os.path.join(content_path, 'nodes')
+    tags = map(normalize_input_tag,_filter_non_nodes(os.listdir(nodes_path)))
     if onlytitle:
         return tags
     else:
-        nodes = [read_node(path, tag) for tag in tags]
+        nodes = [read_node(content_path, tag) for tag in tags]
         return {node.tag: node for node in nodes}
 
 
@@ -136,13 +137,14 @@ def _filter_non_nodes(tags):
         tags) # remove hidden files and readme from list
 
 
-def check_format(path):
-    tags = map(normalize_input_tag,os.listdir(path))
+def check_format(content_path):
+    nodes_path = os.path.join(content_path, 'nodes')
+    tags = map(normalize_input_tag,os.listdir(nodes_path))
     # make sure files exist and are formatted correctly
     nodes = []
     for tag in tags:
         try:
-            nodes.append(read_node(path, tag, assert_exists=True))
+            nodes.append(read_node(content_path, tag, assert_exists=True))
         except RuntimeError as e:
             print e
 

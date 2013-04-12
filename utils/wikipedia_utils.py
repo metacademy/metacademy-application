@@ -32,7 +32,7 @@ if __name__=="__main__":
     nodes = read_nodes(config.CONTENT_PATH)
     for node_tag in nodes:
         node = nodes[node_tag]
-        node_dir = os.path.join(config.CONTENT_PATH, node.tag)
+        node_dir = os.path.join(config.CONTENT_PATH, 'nodes', node.tag)
         if not os.path.exists(os.path.join(node_dir, NODE_SUMMARY)) and not os.path.exists(
             os.path.join(node_dir, WIKI_SUMMARY)):
             if node.title:

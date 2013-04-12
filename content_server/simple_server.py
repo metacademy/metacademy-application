@@ -10,6 +10,7 @@ import os; print os.getcwd()
 import config
 import formats
 import graphs
+import resources
 
 """A simple server to serve as a placeholder. Basically spits out graphs
 in various formats. It responds to the following requests:
@@ -33,13 +34,15 @@ Start the server by typing (from the main knowledge-maps directory):
 
 nodes = None
 graph = None
+resource_dict = None
 
 def load_graph():
-    global nodes, graph
+    global nodes, graph, resource_dict
     if nodes is None:
         nodes = formats.read_nodes(config.CONTENT_PATH)
         nodes = graphs.remove_missing_links(nodes)
         graph = graphs.Graph.from_node_dependencies(nodes)
+        resource_dict = resources.read_resources_file(resources.resource_db_path())
 
 
 
@@ -100,7 +103,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def format_graph(self, nodes, graph, fmt):
         if fmt == 'json':
             f = cStringIO.StringIO()
-            formats.write_graph_json(nodes, graph, f)
+            formats.write_graph_json(nodes, graph, resource_dict, f)
             return f.getvalue()
         elif fmt == 'dot':
             f = cStringIO.StringIO()

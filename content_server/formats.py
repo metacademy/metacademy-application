@@ -2,11 +2,7 @@
 import os
 import re
 import sys
-import pdb
-from backend import settings
-from backend.db_handler import db
-from backend.settings import RESOURCE_DB
-from global_resources import NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, WIKI_SUMMARY_PREFIX, WIKI_SUMMARY, NODE_SUMMARY, NODE_TITLE, NODE_SEE_ALSO, RESOURCE_DB_NAME, RESOURCE_DB_TABLE
+from global_resources import NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, WIKI_SUMMARY_PREFIX, WIKI_SUMMARY, NODE_SUMMARY, NODE_TITLE, NODE_SEE_ALSO
 
 import graphs
 
@@ -133,8 +129,7 @@ def read_nodes(content_path, onlytitle=False):
 
 
 def _filter_non_nodes(tags):
-    return filter(lambda(x): x[0] != '.' and x != 'README' and x != RESOURCE_DB_NAME,
-        tags) # remove hidden files and readme from list
+    return filter(lambda(x): x[0] != '.', tags) # remove hidden files from list
 
 
 def check_format(content_path):
@@ -244,7 +239,7 @@ def node_to_json(nodes, tag):
     return '{%s}' % ','.join(ret_lst)
 
 
-def write_graph_json(nodes, graph, outstr=None):
+def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
@@ -253,21 +248,21 @@ def write_graph_json(nodes, graph, outstr=None):
                   for tag in nodes.keys()]
 
     ### make resources entry in json data
-    # TODO perhaps make a "Nodes" object to simplify these statements
-    resrc_keys = set(
-        ['"' + rsrc + '"' for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources] for rsrc in
-         rlist])
-    rdb = db(RESOURCE_DB)
-    resrcs = rdb.fetch('SELECT * FROM %s WHERE key IN (%s)' % (RESOURCE_DB_TABLE, ','.join(resrc_keys)))
-    res_list = []
-    for res in resrcs:
-        res_list.append('"%s":%s' % (res["key"], dict_to_json(res)))
-    if res_list:
-        res_str = '{' + ','.join(res_list) + '}'
-    else:
-        res_str = '{}'
-
-    json_items.append('"node_resources":%s' % res_str)
+    if resource_dict is not None:
+        resrc_keys = set(
+            [rsrc
+             for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources]
+             for rsrc in rlist
+             if rsrc in resource_dict])
+        res_list = ['"%s":%s' % (key, dict_to_json(resource_dict[key].as_dict()))
+                    for key in resrc_keys]
+        
+        if res_list:
+            res_str = '{' + ','.join(res_list) + '}'
+        else:
+            res_str = '{}'
+        json_items.append('"node_resources":%s' % res_str)
+    
     #    json_items.encode('utf-8')
     ### write total json object with node and resources data
     json_str = '{' + ','.join(json_items) + '}'

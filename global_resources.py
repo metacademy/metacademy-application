@@ -1,5 +1,5 @@
 """
-This file stores an alphabetical list of all resources use in agfk and was implemented to avoid hardcoding filenames,
+This file stores an alphabetical list of all resources used in agfk and was implemented to avoid hardcoding filenames,
 parameters, etc across several differnt files
 local paths should be declared in config.py and relative paths should be established in settings.py
 """

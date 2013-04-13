@@ -1,0 +1,95 @@
+{% extends "two-panel.html" %}
+
+{% block title %}
+Submit Content
+{% endblock %}
+
+{% block leftpanel %}
+<div class="edit-node">
+</div>
+{% endblock %}
+
+{% block postmain %}
+<script type="text/template" id="cnode-list-item-template">
+    <a href='#cnode/<%- id %>'><%- title ? title :id %></a>
+</script>
+
+
+<!--TODO externalize these templates-->
+<script type="text/template" id="cnode-resources-template">
+    <% var rid = "resources-" + cid + "-source" %>
+    <label for="<%- rid %>">Resource</label>
+    <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- rid%>" name="<%- rid %>"
+           value="<%- source %>"/>
+
+    <% rid = "resources-" + cid + "-location" %>
+    <label for="<%- rid %>">Location</label>
+    <input class= "cnode-reason-input  <%-eiclass%>" type="text" id="<%- rid %>" name="<%- rid %>" value="<%-
+            location %>">
+
+    <% rid = "resources-" + cid + "-extras"%>
+    <label for="<%- rid %>">Extra information</label>
+
+    <textarea  class="cnode-reason-input  <%-eiclass%>" type="text"
+              id="<%- rid %>" name="<%- rid
+        %>"><%if(extras)
+        for(exnum=0;exnum < extras.length; exnum++){
+        %><%- extras[exnum]+"\n"%><%}%></textarea>
+</script>
+
+<script type="text/template" id="cnode-dependency-template">
+    <% var id = cid + "-from_tag"%>
+    <label for="<%- id %>">Dependency</label>
+    <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"
+           value="<%- from_tag %>"/>
+
+    <% var id = cid + "-reason"%>
+    <label for="<%- id %>">Reason</label>
+    <textarea class= "cnode-reason-input  <%-eiclass%>" type="text" id="<%- id %>" name="<%- id %>"><%-
+        reason %></textarea>
+</script>
+
+
+<script type="text/template" id="cnode-ckeys-template">
+    <textarea type="text" class =  "cnode-reason-input  <%-eiclass%>" id=<%-"ckeys-" + cid + "-text"%> name=<%-"ckey" + cid%>"> <%- text %></textarea>
+</script>
+
+<script type="text/template" id="cnode-details-template">
+    <section class="cnode-data-input">
+        <label for="title">Title</label>
+        <input type="text" id="title" class="lone-section" name="name" value="<%- title %>" required/>
+    </section>
+
+    <section class="cnode-data-input">
+        <label for="summary">Summary</label>
+        <textarea id="summary" rows="6" class="lone-section"><%- summary %></textarea>
+    </section>
+
+    <div id="resources-loc">
+    </div>
+
+    <div id="dependencies-loc">
+    </div>
+
+    <div id="comprehension-loc">
+    </div>
+
+    <section class="cnode-data-input">
+        <label for="pointers">Related Concepts</label>
+        <textarea id="pointers" rows="6" class="lone-section"><%- pointers %></textarea>
+    </section>
+
+</script>
+
+
+{% endblock %}
+
+
+{% block jscript %}
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/jQuery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/underscore-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/backbone-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk-utils.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/content-submit-mvc.js"></script>
+{% endblock %}
+

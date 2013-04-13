@@ -1,44 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html"/>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/d3.v2.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/jQuery-latest.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/kmap_interaction.js"></script>
-    <!--<script type="text/javascript" src="{{ STATIC_URL }}javascript/viz.js"></script>-->
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
-    <title>Knowledge Graph Demo</title>
+{% extends "two-panel.html" %}
 
-</head>
+{% block title %}
+KMap Explorer
+{% endblock %}
 
-<body>
-<div id="header">
-    <div class="dtable">
-        <div class="dvcenter">
-            <select id="data-select" onchange="load_svg(this.value)">
-                {% for node_tag in node_list %}
-                <option value="{{ node_tag }}">{{ node_tag }}</option>
-                {% endfor %}
-            </select>
-        </div>
+{% block jscript %}
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/d3.v2.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/jQuery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk-utils.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/kmap-interaction.js"></script>
+{% endblock %}
+
+
+{% block header %}
+<div class="dtable">
+    <div class="dvcenter">
+        <select id="data-select" onchange="load_svg(this.value)">
+            <option value="">full graph</option>
+            {% for node_tag in node_list %}
+            <option value="{{ node_tag }}">{{ node_tag }}</option>
+            {% endfor %}
+        </select>
     </div>
 </div>
+{% endblock %}
 
-<div id="main">
-    <div class="colcontainer">
-        <div id="leftpanel" class="column colmask rightmenu">
-        </div>
-        <div id="rightpanel" class="column">
-            <div id="righttext">
-
-            </div>
-        </div>
-    </div>
+{% block rightpanel %}
+<div id="righttext">
 </div>
-</body>
-</html>          
+{% endblock %}
+
+
 
 
 

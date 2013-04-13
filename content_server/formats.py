@@ -3,6 +3,8 @@ import json
 import os
 import re
 import sys
+import pdb
+
 from global_resources import NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, WIKI_SUMMARY_PREFIX, WIKI_SUMMARY, NODE_SUMMARY, NODE_TITLE, NODE_SEE_ALSO
 
 import graphs
@@ -146,7 +148,7 @@ def read_node(content_path, tag, assert_exists=False):
             for line in ckey_entries:
                 line = line.strip()
                 if len(line) > 0:
-                    ckeys.append(line)#line.replace('"', "'"))
+                    ckeys.append({"text":line})
 
     ### process dependencies
     dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
@@ -164,20 +166,20 @@ def read_node(content_path, tag, assert_exists=False):
     
     ### process see-also
     see_also_file = os.path.join(full_path, NODE_SEE_ALSO)
-    pointers = []
+    pointers = ""
     if os.path.exists(see_also_file):
-        for line_ in open(see_also_file):
-            line = line_.strip()
+        pointers = open(see_also_file).read()
+        # for line_ in open(see_also_file):
+        #     line = line_.strip()
 
-            m = re.match(r'(.*)\[(.*)\]', line)
-            if m:
-                blurb = m.group(1).strip()
-                to_tag = normalize_input_tag(m.group(2))
-                ptr = graphs.Pointer(tag, to_tag, blurb)
-                pointers.append(ptr)
+        #     m = re.match(r'(.*)\[(.*)\]', line)
+        #     if m:
+        #         blurb = m.group(1).strip()
+        #         to_tag = normalize_input_tag(m.group(2))
+        #         ptr = graphs.Pointer(tag, to_tag, blurb)
+        #         pointers.append(ptr)
     elif assert_exists:
         raise RuntimeError('%s/%s does not exist' % (tag, NODE_SEE_ALSO))
-
     return graphs.Node(
         {'tag': tag, 'resources': resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
          'pointers': pointers, 'ckeys': ckeys})
@@ -214,8 +216,8 @@ def check_format(content_path):
         if re.search(r'\s', node.tag):
             print 'Node tag "%s" contains whitespace' % node.tag
         for d in node.dependencies:
-            if re.search(r'\s', d.parent_tag):
-                print 'Node "%s" has dependency "%s" which contains whitespace' % (node.tag, d.parent_tag)
+            if re.search(r'\s', d.from_tag):
+                print 'Node "%s" has dependency "%s" which contains whitespace' % (node.tag, d.from_tag)
         for p in node.pointers:
             if re.search(r'\s', p.to_tag):
                 print 'Node "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
@@ -276,8 +278,7 @@ def node_to_json(nodes, tag):
 def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     if outstr is None:
         outstr = sys.stdout
-
-    items = {node.tag: node.as_dict() for node in nodes.values()}
+    items = {'nodes' : {node.tag: node.as_dict() for node in nodes.values()}}
 
     if resource_dict is not None:
         resrc_keys = set(

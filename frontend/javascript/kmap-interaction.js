@@ -11,44 +11,6 @@ var rp_rmarg_use = 1;
  HELPER FUNCTIONS
  */
 
-/* IE indexOf function */
-if (!Array.indexOf) {
-    Array.prototype.indexOf = function (obj) {
-        for (var i = 0; i < this.length; i++) {
-            if (this[i] == obj) {
-                return i;
-            }
-        }
-        return -1;
-    }
-}
-
-// object to control window resizing
-var windowSize = {
-    height:0,
-    mainHeight:0,
-    rightPanelHeight:0,
-    headerHeight:0,
-    setDimensions:function () {
-        windowSize.height = $(window).height();
-        windowSize.headerHeight = $('#header').height();
-        windowSize.mainHeight = windowSize.height - windowSize.headerHeight;
-        windowSize.rightPanelHeight = windowSize.height;
-        windowSize.updateSizes();
-    },
-    updateSizes:function () {
-        $('#main').css('height', windowSize.mainHeight + 'px');
-        $('#rightpanel').css('height', (windowSize.rightPanelHeight) + 'px');
-    },
-    init:function () {
-        if ($('#main').length) {
-            windowSize.setDimensions();
-            $(window).resize(function () {
-                windowSize.setDimensions();
-            });
-        }
-    }
-};
 
 function isUrl(s) {
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
@@ -90,22 +52,6 @@ function buildResourceDiv(rsrc_db_ent, rsrc_node) {
     }
 
     return ret_text;
-}
-
-function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
-    /*
-     Changes display size of the right margin
-     See corresponding CSS entries for description of values
-     */
-    rp_lmarg = rp_lmarg || 0;
-    rp_rmarg = rp_rmarg || 0;
-    var rper_width = rp_width + "%";
-
-    $(".colcontainer").css("right", rper_width);
-    $("#leftpanel").css("left", rper_width)
-        .css("width", (100 - rp_width) + "%");
-    $("#rightpanel").css("width", (rp_width - rp_lmarg - rp_rmarg) + "%")
-        .css("left", (rp_width + rp_lmarg) + "%")
 }
 
 function printError(xhr, status) {
@@ -173,14 +119,11 @@ function beautifyText() {
 // load the SVG file using AJAX
 var jdata = null;
 function load_svg(node_name) {
-    if (node_name.length === 0) {
-        return
-    }
 
-    if (node_name === 'full_graph') {
-        var get_url = '/full_graph'
+    if (node_name === 'nodes' || node_name==='') {
+        var get_url = window.CONTENT_SERVER +'/nodes'
     } else {
-        var get_url = '/nodes/' + node_name + '/map'
+        var get_url = window.CONTENT_SERVER + '/nodes/' + node_name + '/map'
     }
 
     // 1st ajax call: load the kmap svg file (output from graphviz)
@@ -217,9 +160,10 @@ function load_svg(node_name) {
             gelems.selectAll("title").remove(); // remove the title for a cleaner hovering experience
             d3.select('g').selectAll("title").remove(); // also remove title from graph
 
-            // make the svg canvas fill the entire screen TODO: more elegant way to do this?
-            d3.select('svg').attr('width', '10000pt');
-            d3.select('svg').attr('height', '10000pt');
+            // make the svg canvas fill the entire screen
+            d3.select('svg').attr('width', '100%');
+            d3.select('svg').attr('height', '100%');
+            $('#leftpanel').css('overflow','hidden');
 
 
             // *************************************************
@@ -268,7 +212,7 @@ function load_svg(node_name) {
                         .attr("fill", "#F5EEEE");
 
                     // TODO make sure we have jdata & handle errors appropriately
-                    var node_data = jdata[this_node.attr('id')];
+                    var node_data = jdata.nodes[this_node.attr('id')];
                     text_panel.html("");
 
                     // add title
@@ -281,26 +225,26 @@ function load_svg(node_name) {
                     // add summary
                     if ('summary' in node_data) {
                         var spanel = text_panel.append('div')
-                            .attr('class','data-description');
+                            .attr('class', 'data-description');
                         var sum = node_data['summary']
                         // check if summary is from wikipedia
                         if (sum.substring(0, 6) === '*Wiki*') {
                             sum = sum.substring(6);
                             spanel.append('a')
-                                .attr('target','_blank')
+                                .attr('target', '_blank')
                                 .attr('href', 'http://www.en.wikipedia.org/wiki/'
-                                  + encodeURI(node_data['title'] ? node_data['title'] : this_node.attr('id')))
+                                + encodeURI(node_data['title'] ? node_data['title'] : this_node.attr('id')))
                                 .append('img')
-                                .attr('class','hastip wiki-img')
-                                .attr('title','summary from wikipedia -- click to load wikipedia entry')
-                                .attr('src','/static/images/wiki.png');
+                                .attr('class', 'hastip wiki-img')
+                                .attr('title', 'summary from wikipedia -- click to load wikipedia entry')
+                                .attr('src', '/static/images/wiki.png');
                         }
                         spanel.append("span")
                             .attr("class", "shorten")
                             .text(sum);
                     }
                     // add resources
-                    if ('resources' in node_data) {
+                    if ('resources' in node_data && node_data.resources.length > 0) {
                         // sort the elements so starred entries come first
                         node_data['resources'].sort(function (a, b) {
                             var ma = Number("mark" in a);
@@ -343,7 +287,7 @@ function load_svg(node_name) {
                     }
 
                     // add comprehension questions
-                    if ('ckeys' in node_data) {
+                    if ('ckeys' in node_data && node_data.ckeys.length > 0) {
                         text_panel.append('div')
                             .attr('class', 'data-subtitle')
                             .text('Comprehension');
@@ -356,12 +300,12 @@ function load_svg(node_name) {
                             .append('div')
                             .attr('class', 'list-entry resource-entry')
                             .html(function (d) {
-                                return  '<div class="bullet-ptr"> &#8226;</div><div class="list-text">' + d.replace('* ', '') + '</div>';
+                                return  '<div class="bullet-ptr"> &#8226;</div><div class="list-text">' + d.text.replace('* ', '') + '</div>';
                             });
                     }
 
                     // add dependencies info
-                    if ('dependencies' in node_data) {
+                    if ('dependencies' in node_data && node_data.dependencies.length > 0) {
                         text_panel.append('div')
                             .attr('class', 'data-subtitle')
                             .text('Dependencies');
@@ -386,37 +330,51 @@ function load_svg(node_name) {
                         lent.append('div')
                             .attr('class', 'list-text')
                             .text(function (d) {
-                                return jdata[d.from_tag].title;
+                                return jdata.nodes[d.from_tag].title;
                             });
                     }
 
                     // add pointer (see-also) info
-                    if ('pointers' in node_data) {
-                        text_panel.append('div')
-                            .attr('class', 'data-subtitle')
-                            .text('See Also');
-                        var dp_enter = text_panel.append("div")
-                            .attr("class", "data-pointers")
-                            .selectAll('div')
-                            .data(node_data['pointers'])
-                            .enter()
-                            .append('div')
-                            .attr('class', 'list-entry');
+                    // if ('pointers' in node_data) {
+                    //     var ptrs = $.trim(node_data['pointers']).split(/([^\*]|^)\*[^\*]/) 
+                    //     text_panel.append('div')
+                    //         .attr('class', 'data-subtitle')
+                    //         .text('See Also')
+                    //     var dp_enter = text_panel.append("div")
+                    //         .attr("class", "data-pointers")
+                    //         .selectAll('div')
+                    //         .data(ptrs)
+                    //         .enter()
+                    //         .append('div')
+                    //         .attr('class', 'list-entry')
+                    //         .html(function(d){
+                    //             var rethtml = "";
+                    //             var subdiv = d.split(/\*\*/);
+                    //             rethtml = "<li>" + subdiv[0] + "</li>";
+                    //             if (subdiv.length > 1){
+                    //                 rethtml += "<li>\n<ul>";
+                    //                 for (var jj=1; jj < subdiv.length; jj++ ){
+                    //                     rethtml += "<li>" + subdiv[jj] + "</li>";
+                    //                 }
+                    //                 rethtml += "</ul></li>"
+                    //             }
+                    //             return rethtml
+                    //         });
 
-                        dp_enter.append('div')
-                            .attr('class', 'bullet-ptr')
-                            .append('img')
-                            .attr('src', '/static/images/qmark.jpg')
-                            .attr('class', 'list-img hastip')
-                            .attr('title', function (d) {
-                                return d.blurb === "None" ? "" : d.blurb;
-                            });
-                        dp_enter.append('div')
-                            .attr('class', 'list-text')
-                            .text(function (d) {
-                                return jdata[d.to_tag].title;
-                            });
-                    }
+                    //     // dp_enter.append('div')
+                    //     //     .attr('class', 'bullet-ptr')
+                    //     //     .append('img')
+                    //     //     .attr('src', '/static/images/qmark.jpg')
+                    //     //     .attr('class', 'list-img hastip')
+                    //     //     .attr('title', function (d) {
+                    //     //         return d.reason === "None" ? "" : d.reason;
+                    //     //     });
+                    //     // dp_enter.append('div')
+                    //     //     .attr('class', 'list-text')
+                    //     //     .text(function (d) {
+                    //     //         return jdata.nodes[d.to_tag].title;
+                    //     //     });
+                    // }
 
 
                     // add "focus" button
@@ -430,7 +388,7 @@ function load_svg(node_name) {
                         });
 
                     // tooltip for pretty hover info TODO consider writing this yourself since it is GPL
-                    $('.hastip').tooltipsy({offset: [1, 1]});
+                    $('.hastip').tooltipsy({offset:[1, 1]});
                     beautifyText();
 
                 });
@@ -467,6 +425,7 @@ function load_svg(node_name) {
     $.ajax({
         type:'GET',
         url:get_url + '?format=json',
+	dataType:'json',
         async:false,
         scriptCharset:"utf-8",
         success:function (data) {
@@ -480,7 +439,8 @@ function load_svg(node_name) {
 
 // load the first dataset in the list (for now) TODO make better initialization
 $(document).ready(function () {
-    windowSize.init();
+    scaleWindowSize("header", "main", "rightpanel", "leftpanel");
     setRightPanelWidth(0);
     load_svg($('#data-select').val());
+
 });

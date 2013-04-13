@@ -3,7 +3,7 @@
 // define global attributes
 var NEWELCLASS = "newel"; // must also change events entry in model view
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Utils ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Local Utils ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 function textToArray(txt) {
     return _.filter(txt.split('\n'), function (str) {
         return str.length;
@@ -18,6 +18,7 @@ function parseID(id) {
 
 // ------------ MODELS ---------------- //
 
+// comprehension key model -- allows for model expansion later on (e.g. adding quality metrics)
 window.CCKey = Backbone.Model.extend({
     defaults:function () {
         return {
@@ -25,7 +26,7 @@ window.CCKey = Backbone.Model.extend({
         };
     }
 });
-
+// resource model
 window.CResource = Backbone.Model.extend({
     defaults:function () {
         return {
@@ -36,7 +37,7 @@ window.CResource = Backbone.Model.extend({
         };
     }
 });
-
+// general directed edge model
 window.CDirectedEdge = Backbone.Model.extend({
     defaults:function () {
         return {
@@ -47,7 +48,7 @@ window.CDirectedEdge = Backbone.Model.extend({
     }
 });
 
-// Model: entire node
+// Model: entire node, encompasses several collections and sub-models
 window.CNode = Backbone.Model.extend({
     collVals:["ckeys", "dependencies", "resources"], // collection values\
     txtVals:["id", "title", "summary", "pointers"],
@@ -62,6 +63,7 @@ window.CNode = Backbone.Model.extend({
         };
     },
     parse:function (resp, xhr) {
+        // check if we have a null response from the server
         if (resp === null) {
             return {};
         }
@@ -140,10 +142,10 @@ window.CNodeCollection = Backbone.Collection.extend({
 window.BoxItemView = Backbone.View.extend({
     tagName : 'section',
     className : 'cnode-box',
-    templateID : 'notemplate',
+    templateId : 'notemplate',
     render:function (extra_input_class) {
         extra_input_class = extra_input_class || "";
-        var template = _.template($("#" + this.templateID).html());
+        var template = _.template($("#" + this.templateId).html());
         this.$el.html(template(_.extend(this.model.toJSON(), {cid:this.model.cid, eiclass:extra_input_class })));
         return this;
     },
@@ -160,13 +162,11 @@ window.BoxItemView = Backbone.View.extend({
         this.model.set(elid, newVal);
     },
     newelChange:function (event) {
-        // verify we have need content and remove newval class
+        // remove newval class once value is changed TODO how to handle deleted new values
         var $el = $(event.currentTarget);
         $el.removeClass(NEWELCLASS);
 
         if (this.model.isnew) {
-            // check if conditions are satisfied to add to collection TODO what conditions?
-
             // assign default value to source/id/etc if not specified
             var $cnodetitle = $el.parent().find(".cnode-title-input");
             if ($cnodetitle.length) { // TODO perhaps do this check before saving to server for all relevant entries
@@ -176,14 +176,12 @@ window.BoxItemView = Backbone.View.extend({
                     this.model.set(idval, "--undefined--")
                 }
             }
-
             // add to collection
             this.model.addCollection.add(this.model);
             this.model.isnew = false;
 
             // display new element
-            this.containingView.appendNewEl(this.model, this.className, this.templateID);
-
+            this.containingView.appendNewEl(this.model, this.className, this.templateId);
         }
     }
 });
@@ -192,32 +190,41 @@ window.BoxItemView = Backbone.View.extend({
 window.CNodeDIView = Backbone.View.extend({
     tagName:'section',
     className:'cnode-data-input',
-    appendNewEl:function (modelInstance, inclassName, templateID) {
+    appendNewEl:function (modelInstance, inclassName, templateId) {
         // add new empty element to view collection but not model collection
         var newcon = Object.getPrototypeOf(modelInstance).constructor; // NOTE: this is ES5 so only IE 9+ support (TODO add at least IE 8 support)
         var newel = new newcon();
         newel.addCollection = this.model;
         newel.isnew = true;
         var biv = new BoxItemView({model:newel, className : inclassName});
-        biv.templateID = templateID;
+        biv.templateId = templateId;
         biv.containingView = this;
         this.$el.append( biv.render(NEWELCLASS).el);
     },
-    render:function (header, templateID, inclassName) {
+    render:function (header, templateId, inclassName) {
+        /*
+        render the DIView
+        header: the header to diplay within the enclosing section
+        templatete
+        */
         this.$el.append("<header>" + header + "</header>");
         _.each(this.model.models, function (rsrc) {
             var biv = new BoxItemView({model:rsrc, className:inclassName});
-            biv.templateID = templateID;
+            biv.templateId = templateId;
             biv.containingView = this;
             this.$el.append(biv.render().el);
         }, this)
-        // less-than elegant technique to add new models to view but not collection
+        /* less-than elegant technique to add new models to view but not collection:
+           if model is not in collection, this adds an empty model to the collection
+           then uses the model type to instantiate a new model that corresponds to the new element
+           then removes the initial empty model from the collection
+        */
         if (this.model.models.length){
-            this.appendNewEl(this.model.models[0], inclassName, templateID);
+            this.appendNewEl(this.model.models[0], inclassName, templateId);
         }
         else{
             this.model.add({});
-            this.appendNewEl(this.model.pop(), inclassName, templateID);
+            this.appendNewEl(this.model.pop(), inclassName, templateId);
         }
         return this;
     }
@@ -290,7 +297,7 @@ Backbone.View.prototype.close = function () {
     this.unbind();
 };
 
-// ----------- ROUTERS ------------- //
+// ----------- ROUTER ------------- //
 
 var AppRouter = Backbone.Router.extend({
     routes:{
@@ -337,6 +344,5 @@ var AppRouter = Backbone.Router.extend({
 // ------------ MAIN ---------------- //
 // main function... TODO move somewhere else
 scaleWindowSize("header", "main", "rightpanel", "leftpanel");
-//setRightPanelWidth(25, 0.1, 0); //
 var app = new AppRouter();
 Backbone.history.start();

@@ -6,12 +6,13 @@ An apt-get for knowledge.
 Current testing instructions (April 11, 2013):
 
 1. Install [django](https://www.djangoproject.com/download/).
-2. Copy config-template.py to config.py, edit.
-3. From `agfk` project directory:
+2. Clone/checkout/download the [agfk content](https://github.com/agfk/agfk-content) to an appropriate external directory 
+3. Copy config-template.py to config.py, edit.
+4. From `agfk` project directory:
 
         run_test_servers.sh
 
-4. Open [localhost:8080/kmap](http://localhost:8080/kmap) with a modern javascript-enabled browser
+5. Open [localhost:8080/kmap](http://localhost:8080/kmap) with a modern javascript-enabled browser
 
 Basic use:
 

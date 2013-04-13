@@ -1,4 +1,3 @@
-MAPS_OUTPUT_PATH = '/path/to/kmaps/output'
 CONTENT_PATH = '/path/to/agfk-content'
 TEMP_PATH = '/path/to/tmp-area'
 HASH = 'randomLettersAndNumbers'

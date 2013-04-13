@@ -129,12 +129,6 @@ def read_node(content_path, tag, assert_exists=False):
                        'note': str,
                    }
         resources = read_text_db(open(resources_file), fields, list_fields)
-
-        # temporary fix: remove 'mark' field if empty, since the frontent checks if it exists
-        # to determine if it's starred
-        for r in resources:
-            if not r['mark']:
-                del r['mark']
     else:
         resources = []
     

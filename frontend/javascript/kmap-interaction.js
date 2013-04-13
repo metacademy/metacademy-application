@@ -247,8 +247,8 @@ function load_svg(node_name) {
                     if ('resources' in node_data && node_data.resources.length > 0) {
                         // sort the elements so starred entries come first
                         node_data['resources'].sort(function (a, b) {
-                            var ma = Number("mark" in a);
-                            var mb = Number("mark" in b);
+                            var ma = Number("mark" in a && a.mark[0] == "star" );
+                            var mb = Number("mark" in b && b.mark[0] == "star");
                             return (mb > ma) ? 1 : ((ma > mb) ? -1 : 0);
                         });
                         text_panel.append('div')
@@ -265,7 +265,7 @@ function load_svg(node_name) {
                             .attr('class', 'list-entry')
                             .html(function (d) {
                                 // Add an appropriate styled bullet with appropriate title
-                                var bullet = "mark" in d ? '<span class="gold-text">&#9733;</span>' : '&#8226;';
+                                var bullet = "mark" in d && d.mark[0] === "star" ? '<span class="gold-text">&#9733;</span>' : '&#8226;';
                                 bullet = '<div class="bullet-ptr">' + bullet + '</div>'
 
                                 // obtain resource info
@@ -333,49 +333,6 @@ function load_svg(node_name) {
                                 return jdata.nodes[d.from_tag].title;
                             });
                     }
-
-                    // add pointer (see-also) info
-                    // if ('pointers' in node_data) {
-                    //     var ptrs = $.trim(node_data['pointers']).split(/([^\*]|^)\*[^\*]/) 
-                    //     text_panel.append('div')
-                    //         .attr('class', 'data-subtitle')
-                    //         .text('See Also')
-                    //     var dp_enter = text_panel.append("div")
-                    //         .attr("class", "data-pointers")
-                    //         .selectAll('div')
-                    //         .data(ptrs)
-                    //         .enter()
-                    //         .append('div')
-                    //         .attr('class', 'list-entry')
-                    //         .html(function(d){
-                    //             var rethtml = "";
-                    //             var subdiv = d.split(/\*\*/);
-                    //             rethtml = "<li>" + subdiv[0] + "</li>";
-                    //             if (subdiv.length > 1){
-                    //                 rethtml += "<li>\n<ul>";
-                    //                 for (var jj=1; jj < subdiv.length; jj++ ){
-                    //                     rethtml += "<li>" + subdiv[jj] + "</li>";
-                    //                 }
-                    //                 rethtml += "</ul></li>"
-                    //             }
-                    //             return rethtml
-                    //         });
-
-                    //     // dp_enter.append('div')
-                    //     //     .attr('class', 'bullet-ptr')
-                    //     //     .append('img')
-                    //     //     .attr('src', '/static/images/qmark.jpg')
-                    //     //     .attr('class', 'list-img hastip')
-                    //     //     .attr('title', function (d) {
-                    //     //         return d.reason === "None" ? "" : d.reason;
-                    //     //     });
-                    //     // dp_enter.append('div')
-                    //     //     .attr('class', 'list-text')
-                    //     //     .text(function (d) {
-                    //     //         return jdata.nodes[d.to_tag].title;
-                    //     //     });
-                    // }
-
 
                     // add "focus" button
                     text_panel.append("div")

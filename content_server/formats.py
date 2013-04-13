@@ -70,6 +70,13 @@ def normalize_input_tag(itag):
     """Make sure node id (tags) only have valid characters and are in a common format"""
     return re.sub(r'[^a-z0-9]', '_', itag.strip().lower()).replace('-','_')
 
+def remove_empty_keys(d):
+    d = dict(d)
+    for k, v in d.items():
+        if v is None or v == []:
+            del d[k]
+    return d
+
 
 
 ############################ read nodes as directories #########################
@@ -129,6 +136,7 @@ def read_node(content_path, tag, assert_exists=False):
                        'note': str,
                    }
         resources = read_text_db(open(resources_file), fields, list_fields)
+        resources = map(remove_empty_keys, resources)
     else:
         resources = []
     
@@ -280,7 +288,7 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
              for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources]
              for rsrc in rlist
              if rsrc in resource_dict])
-        res_dict = {key: resource_dict[key].as_dict() for key in resrc_keys}
+        res_dict = {key: remove_empty_keys(resource_dict[key].as_dict()) for key in resrc_keys}
         items['node_resources'] = res_dict
 
     json.dump(items, outstr)

@@ -273,14 +273,15 @@ def write_graph_dot(nodes, graph, outstr=None):
 
 #################################### JSON ######################################
 
-def node_to_json(nodes, tag):
+def node_to_json(nodes, tag, user_nodes=None):
     node = nodes[tag]
-    return json.dumps(node.as_dict())
+    return json.dumps(node.as_dict(user_nodes=user_nodes))
 
-def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
+def write_graph_json(nodes, graph, resource_dict=None, outstr=None, user_nodes=None):
     if outstr is None:
         outstr = sys.stdout
-    items = {'nodes' : {node.tag: node.as_dict() for node in nodes.values()}}
+
+    items = {'nodes' : {node.tag: node.as_dict(user_nodes=user_nodes) for node in nodes.values()}}
 
     if resource_dict is not None:
         resrc_keys = set(

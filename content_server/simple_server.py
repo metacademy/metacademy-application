@@ -139,6 +139,14 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 elif parts[2] == 'map':
                     assert len(parts) == 3
                     text = self.get_map(parts[1], fmt=fmt)
+                elif parts[2] == 'user_data':
+                    assert len(parts) == 3
+                    assert fmt == 'json'
+                    if parts[1] in user_nodes:
+                        text = json.dumps(user_nodes[parts[1]])   # JSON representation of user-supplied data
+                    else:
+                        text = json.dumps({})
+                    print 'text', text
                 else:
                     raise RuntimeError('Invalid resource: %s' % self.path)
             else:
@@ -168,7 +176,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	"""Return graph in desired format"""
         if fmt == 'json':
             f = cStringIO.StringIO()
-            formats.write_graph_json(nodes, graph, resource_dict, f)
+            formats.write_graph_json(nodes, graph, resource_dict, f, user_nodes=user_nodes)
             return f.getvalue()
         elif fmt == 'dot':
             f = cStringIO.StringIO()
@@ -201,7 +209,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_node_json(self, tag):
         load_graph()
-        return formats.node_to_json(nodes, tag)
+        return formats.node_to_json(nodes, tag, user_nodes=user_nodes)
 
     def get_map(self, tag, fmt):
         load_graph()

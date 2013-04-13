@@ -61,10 +61,10 @@ def process_resource_form(request):
             return HttpResponseRedirect('/resource-submission/')
     else:
         form = ResourceForm()
-    return render(request, 'resource_submission.html', {'form': form,})
+    return render(request, 'resource-submission.html', {'form': form,})
 
 def process_content_form(request):
-    return render_to_response('content_submission.html',{'content_server':CONTENT_SERVER},context_instance=RequestContext(request))
+    return render_to_response('content-submission.html',{'content_server':CONTENT_SERVER},context_instance=RequestContext(request))
 
 
 

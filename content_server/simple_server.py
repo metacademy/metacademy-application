@@ -22,6 +22,8 @@ in various formats. It responds to the following requests:
   GET nodes/node-name/map             get the part of the graph that a node depends on
   GET nodes/node-name/related         get the part of the graph that's related to a node
                                          (ancestors/descendants)
+  GET nodes/node-name/user_data       get the JSON representation of the user-supplied data for a node
+  PUT nodes/node-name/user_data       update the user-supplied data for a node
 
 TODO add POST/PUT/DELETE/OPTIONS information once API is complete
 
@@ -39,27 +41,25 @@ Start the server by typing (from the main knowledge-maps directory):
 nodes = None
 graph = None
 resource_dict = None
+user_nodes = None
 
 def load_graph():
-    global nodes, graph, resource_dict
+    global nodes, graph, resource_dict, user_nodes
     if nodes is None:
         nodes = formats.read_nodes(config.CONTENT_PATH)
         nodes = graphs.remove_missing_links(nodes)
         graph = graphs.Graph.from_node_dependencies(nodes)
         resource_dict = resources.read_resources_file(resources.resource_db_path())
 
-# TODO where should we place this function?
-def update_node(node_id, jdata):
-    """
-    Write the node data provided in jdata to the appropriate node_id
-    """
-    global nodes
-    if nodes is None or not nodes.has_key(node_id):
-        nodes = {node_id: Node()}
-        nodes[node_id].tag = node_id
-    nodes[node_id].add_json_data(jdata)
+        # read user-supplied data
+        user_nodes = formats.read_user_nodes(config.USER_CONTENT_PATH)
 
-    nodes[node_id].write_node_to_file(jdata.keys())
+def update_node_user_data(node_tag, jdata):
+    formats.check_node_user_data_format(jdata)
+    user_nodes[node_tag] = jdata
+    formats.write_node_user_data(config.USER_CONTENT_PATH, node_tag, jdata)
+    
+
 
 
 
@@ -78,24 +78,27 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pass
 
     def do_PUT(self):
-	""" Update Data """
+        """ Update user-supplied data """
+        load_graph()
         parse = urlparse.urlparse(self.path)
         parts = parse.path.lower().split('/')
         parts = filter(bool, parts)
+        if len(parts) != 3 or parts[0] != 'nodes' or parts[2] != 'user_data' or parts[1] not in nodes:
+            self.send_error(404, 'Invalid resource: %s' % self.path)
+        node_name = parts[1]
+
         try:
             clen = int(self.headers.getheader('content-length'))
             if clen:
                 post_body = self.rfile.read(clen)
                 jdata = json.loads(post_body)
-
-                # write the appropriate data TODO handle multiple nodes / related etc (will this be an issue?)
-                if parts[0] == 'nodes' and len(parts)==2:
-                    update_node(parts[1],jdata)
+                update_node_user_data(node_name, jdata)
             self.send_response(201)
             self.add_cors_header()
             self.end_headers()
         except:
             self.send_error(500, traceback.format_exc())
+        
 
 
     def do_POST(self):

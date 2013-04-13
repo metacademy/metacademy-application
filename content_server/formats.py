@@ -294,3 +294,34 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     json.dump(items, outstr)
     
 
+############################### User data ######################################
+
+def node_user_data_file(user_content_path, tag):
+    return os.path.join(user_content_path, 'nodes', '%s.json' % tag)
+
+def read_user_nodes(user_content_path):
+    user_nodes_path = os.path.join(user_content_path, 'nodes')
+    if not os.path.exists(user_nodes_path):
+        return {}
+
+    nodes = {}
+    fnames = os.listdir(user_nodes_path)
+    for fname in fnames:
+        full_path = os.path.join(user_nodes_path, fname)
+        tag, ext = fname.split('.')
+        assert ext == 'json'
+        nodes[tag] = json.load(open(full_path))
+
+    return nodes
+
+def check_node_user_data_format(jdata):
+    pass   # TODO
+
+def write_node_user_data(user_content_path, tag, jdata):
+    user_nodes_path = os.path.join(user_content_path, 'nodes')
+    if not os.path.exists(user_nodes_path):
+        os.mkdir(user_nodes_path)
+    fname = node_user_data_file(user_content_path, tag)
+    json.dump(jdata, open(fname, 'w'))
+
+

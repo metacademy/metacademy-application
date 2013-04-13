@@ -130,7 +130,7 @@ class Node:
             subset = self.__dict__.keys()
 
         # create directory for new nodes if necessary
-        npath = os.path.join(config.CONTENT_PATH, self.tag)
+        npath = os.path.join(config.CONTENT_PATH,"nodes", self.tag)
         if not os.path.exists(npath):
             os.makedirs(npath)
 

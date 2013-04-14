@@ -247,7 +247,7 @@ div.res-extras {
 
 div.res-extra-ent {
     font-family: Helvetica;
-    font-size: 0.9em;
+    font-size: small;
     font-style: italic;
     margin-bottom: 0.1em;
 }
@@ -315,7 +315,7 @@ a:active {
 
 a.morelink {
     font-family: Helvetica;
-    font-size: 0.9em;
+    font-size: small;
     text-decoration: none;
     color: rgb(0, 0, 122);
 }

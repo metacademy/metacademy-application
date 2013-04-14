@@ -158,11 +158,23 @@ class Node:
                 with open(fname, 'w') as wfile:
                     for ndep in self[attr]:
                         for depattr in ndep:
+                            if depattr == "to_tag":
+                                continue
                             if ndep[depattr]:
-                                if depattr=="extras":
-                                    wrtext = '\n'.join(ndep[depattr])
+                                if depattr == "extras":
+                                    joinvals = []
+                                    for val in ndep[depattr]:
+                                        # handles list and text extra elements
+                                        if not isinstance(val,basestring):
+                                            joinvals.append(",".join(val).strip())
+                                        else:
+                                            joinvals.append(val.strip())
+                                        wrtext  = "\n".join(joinvals)
                                 else:
-                                    wrtext=depattr + ':' + ndep[depattr]
+                                    wrattr = depattr;
+                                    if depattr == "from_tag":
+                                        wrattr = "tag" # conforms to legacy naming scheme
+                                    wrtext = wrattr + ':' + ndep[depattr]
                                 wfile.write(wrtext + '\n')
                         wfile.write('\n')
 

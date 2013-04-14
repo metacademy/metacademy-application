@@ -5,9 +5,14 @@ var NEWELCLASS = "newel"; // must also change events entry in model view
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Local Utils ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 function textToArray(txt) {
-    return _.filter(txt.split('\n'), function (str) {
+    var arr = _.filter(txt.split('\n'), function (str) {
         return str.length;
     });
+    var i = arr.length;
+    while (i--){
+        arr[i] = arr[i].split(','); // adheres to list elements for resources TODO figure what these are
+    }
+    return arr;
 }
 
 function parseID(id) {
@@ -28,6 +33,7 @@ window.CCKey = Backbone.Model.extend({
 });
 // resource model
 window.CResource = Backbone.Model.extend({
+    reqvars: ["source", "location"],
     defaults:function () {
         return {
             id:"",

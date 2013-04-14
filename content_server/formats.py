@@ -131,6 +131,7 @@ def read_node(content_path, tag, assert_exists=False):
                   'open': (str, None),
                   'dependencies': (lambda s: parse_list(s, ','), []),
                 }
+                # COLO: why are these lists? We should document/explain this
         list_fields = {'mark': str,
                        'extra': str,
                        'note': str,

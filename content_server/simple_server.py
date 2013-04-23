@@ -22,6 +22,7 @@ in various formats. It responds to the following requests:
   GET nodes/node-name/map             get the part of the graph that a node depends on
   GET nodes/node-name/related         get the part of the graph that's related to a node
                                          (ancestors/descendants)
+  GET nodes/node-name/resources       get a JSON representation of the resource list for a given node
 
 TODO add POST/PUT/DELETE/OPTIONS information once API is complete
 
@@ -136,6 +137,9 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 elif parts[2] == 'map':
                     assert len(parts) == 3
                     text = self.get_map(parts[1], fmt=fmt)
+                elif parts[2] == 'resources':
+                    assert len(parts) == 3
+                    text = formats.node_resources_json(nodes[node], resource_dict)
                 else:
                     raise RuntimeError('Invalid resource: %s' % self.path)
             else:

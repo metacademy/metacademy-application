@@ -295,3 +295,23 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     json.dump(items, outstr)
     
 
+def node_resources(node, resource_dict):
+    result = []
+    for r in node.resources:
+        curr = dict(r)
+        if 'source' in curr:
+            key = curr['source']
+            if key in resource_dict:
+                for field, value in resource_dict[key].as_dict().items():
+                    curr[field] = value
+            del curr['source']
+        result.append(curr)
+    return result
+
+def node_resources_json(node, resource_dict):
+    return json.dumps(node_resources(node, resource_dict))
+
+
+
+
+    

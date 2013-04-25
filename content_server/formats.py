@@ -131,6 +131,7 @@ def read_node(content_path, tag, assert_exists=False):
                   'open': (str, None),
                   'dependencies': (lambda s: parse_list(s, ','), []),
                 }
+                # COLO: why are these lists? We should document/explain this
         list_fields = {'mark': str,
                        'extra': str,
                        'note': str,
@@ -295,6 +296,23 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None, user_nodes=N
     json.dump(items, outstr)
     
 
+def node_resources(node, resource_dict):
+    result = []
+    for r in node.resources:
+        curr = dict(r)
+        if 'source' in curr:
+            key = curr['source']
+            if key in resource_dict:
+                for field, value in resource_dict[key].as_dict().items():
+                    curr[field] = value
+            del curr['source']
+        result.append(curr)
+    return result
+
+def node_resources_json(node, resource_dict):
+    return json.dumps(node_resources(node, resource_dict))
+
+
 ############################### User data ######################################
 
 def node_user_data_file(user_content_path, tag):
@@ -326,3 +344,7 @@ def write_node_user_data(user_content_path, tag, jdata):
     json.dump(jdata, open(fname, 'w'))
 
 
+
+
+
+    

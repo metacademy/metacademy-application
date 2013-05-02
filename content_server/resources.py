@@ -4,38 +4,68 @@ import config
 import formats
 import global_resources
 
+RESOURCE_FIELDS = {'title': str,
+                   'location': str,
+                   'resource_type': str,
+                   'free': int,
+                   'edition': str,
+                   'url': str,
+                   'authors': lambda s: formats.parse_list(s, 'and'),
+                   'dependencies': lambda s: formats.parse_list(s, ','),
+                   }
+
+RESOURCE_LIST_FIELDS = {'mark': str,
+                        'extra': str,
+                        'note': str
+                        }
+
+RESOURCE_DEFAULTS = {'free': 0,
+                     }
+
 def resource_db_path():
     return os.path.join(config.CONTENT_PATH, global_resources.RESOURCE_DB_NAME)
 
-class Resource:
-    def __init__(self, key, title, location, resource_type, free, notes):
-        self.key = key
-        self.title = title
-        self.location = location
-        self.resource_type = resource_type
-        self.free = free
-        self.notes = notes
 
-    def as_dict(self):
-        return {'key': self.key,
-                'title': self.title,
-                'location': self.location,
-                'resource_type': self.resource_type,
-                'free': self.free,
-                'notes': self.notes,
-                }
+def read_resources_file(fname, check=False):
+    fields = dict(RESOURCE_FIELDS)
+    fields['key'] = str
+    list_fields = dict(RESOURCE_LIST_FIELDS)
+    dicts = formats.read_text_db(open(fname), fields, list_fields, require_all=False)
 
-def read_resources_file(fname):
-    keys = {'key': str,
-            'title': str,
-            'location': (str, None),
-            'resource_type': str,
-            'free': (int, 0),
-            }
-    list_keys = {'note': str,
-                 }
-    dicts = formats.read_text_db(open(fname), keys, list_keys)
-    resource_list = [Resource(d['key'], d['title'], d['location'], d['resource_type'], d['free'], d['note'])
-                     for d in dicts]
-    return {r.key: r for r in resource_list}
+    result = {}
+    for d in dicts:
+        if 'key' not in d:
+            if check:
+                raise RuntimeError('Resource missing key: %r' % d)
+            else:
+                continue
+
+        for k, v in RESOURCE_DEFAULTS.items():
+            if k not in d:
+                d[k] = v
+
+        key = d['key']
+        del d['key']
+        result[key] = d
+
+    return result
+
+def add_defaults(node_resource, defaults, check=False):
+    node_resource = dict(node_resource)
+    if 'source' in node_resource:
+        key = node_resource['source']
+        if key in defaults:
+            for field, value in defaults[key].items():
+                if field in RESOURCE_FIELDS:
+                    if field not in node_resource:
+                        node_resource[field] = value
+                elif field in RESOURCE_LIST_FIELDS:
+                    if field not in node_resource:
+                        node_resource[field] = []
+                    node_resource[field] += value
+                else:
+                    if check:
+                        raise RuntimeError('Unknown field: %s' % field)
+        del node_resource['source']
+    return node_resource
 

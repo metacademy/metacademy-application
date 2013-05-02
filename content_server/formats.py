@@ -8,13 +8,14 @@ import pdb
 from global_resources import NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, WIKI_SUMMARY_PREFIX, WIKI_SUMMARY, NODE_SUMMARY, NODE_TITLE, NODE_SEE_ALSO
 
 import graphs
+import resources
 
 WRAP_WIDTH = 12
 
-class RequiredField:
+class Missing:
     pass
 
-def read_text_db(instr, fields, list_fields={}):
+def read_text_db(instr, fields, list_fields={}, require_all=True):
     items = []
     new_item = True
     curr = {}
@@ -23,7 +24,7 @@ def read_text_db(instr, fields, list_fields={}):
     fields = dict(fields)
     for k, v in fields.items():
         if not isinstance(v, tuple):
-            fields[k] = (v, RequiredField)
+            fields[k] = (v, Missing)
     
     for line_ in instr:
         line = line_.strip()
@@ -43,14 +44,14 @@ def read_text_db(instr, fields, list_fields={}):
             items.append(curr)
             for field_name, (tp, default) in fields.items():
                 curr[field_name] = default
-            for field_name, tp in list_fields.items():
-                curr[field_name] = []
 
         if field in fields:
             tp, _ = fields[field]
             curr[field] = tp(value)
         elif field in list_fields:
             tp = list_fields[field]
+            if field not in curr:
+                curr[field] = []
             curr[field].append(tp(value))
         else:
             raise RuntimeError('Unknown field: %s' % field)
@@ -60,8 +61,11 @@ def read_text_db(instr, fields, list_fields={}):
     # Check that all required fields were filled
     for item in items:
         for field, value in item.items():
-            if value is RequiredField:
-                raise RuntimeError('Missing field %s for item %r' % (field, item))
+            if value is Missing:
+                if require_all:
+                    raise RuntimeError('Missing field %s for item %r' % (field, item))
+                else:
+                    del item[field]
 
     return items
 
@@ -77,14 +81,14 @@ def remove_empty_keys(d):
             del d[k]
     return d
 
-
-
-############################ read nodes as directories #########################
-
 def parse_list(s, sep):
     parts = s.split(sep)
     parts = [p.strip() for p in parts]
     return parts
+
+
+
+############################ read nodes as directories #########################
 
 def read_node(content_path, tag, assert_exists=False):
     """Read a Node object from a directory which optionally contains title.txt,
@@ -122,24 +126,13 @@ def read_node(content_path, tag, assert_exists=False):
     # process resources
     resources_file = os.path.join(full_path, NODE_RESOURCES)
     if os.path.exists(resources_file):
-        fields = {'source': str,
-                  'edition': (str, None),
-                  'location': (str, None),
-                  'title': (str, None),
-                  'authors': (lambda s: parse_list(s, 'and'), None),
-                  'link': (str, None),
-                  'open': (str, None),
-                  'dependencies': (lambda s: parse_list(s, ','), []),
-                }
-                # COLO: why are these lists? We should document/explain this
-        list_fields = {'mark': str,
-                       'extra': str,
-                       'note': str,
-                   }
-        resources = read_text_db(open(resources_file), fields, list_fields)
-        resources = map(remove_empty_keys, resources)
+        fields = dict(resources.RESOURCE_FIELDS)
+        fields['source'] = str
+        list_fields = dict(resources.RESOURCE_LIST_FIELDS)
+        node_resources = read_text_db(open(resources_file), fields, list_fields, require_all=False)
+        node_resources = map(remove_empty_keys, node_resources)
     else:
-        resources = []
+        node_resources = []
     
     
 
@@ -184,7 +177,7 @@ def read_node(content_path, tag, assert_exists=False):
     elif assert_exists:
         raise RuntimeError('%s/%s does not exist' % (tag, NODE_SEE_ALSO))
     return graphs.Node(
-        {'tag': tag, 'resources': resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
+        {'tag': tag, 'resources': node_resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
          'pointers': pointers, 'ckeys': ckeys})
 
 
@@ -289,24 +282,13 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
              for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources]
              for rsrc in rlist
              if rsrc in resource_dict])
-        res_dict = {key: remove_empty_keys(resource_dict[key].as_dict()) for key in resrc_keys}
+        res_dict = {key: remove_empty_keys(resource_dict[key]) for key in resrc_keys}
         items['node_resources'] = res_dict
 
     json.dump(items, outstr)
-    
 
-def node_resources(node, resource_dict):
-    result = []
-    for r in node.resources:
-        curr = dict(r)
-        if 'source' in curr:
-            key = curr['source']
-            if key in resource_dict:
-                for field, value in resource_dict[key].as_dict().items():
-                    curr[field] = value
-            del curr['source']
-        result.append(curr)
-    return result
+def node_resources(node, resource_defaults):
+    return [resources.add_defaults(r, resource_defaults) for r in node.resources]
 
 def node_resources_json(node, resource_dict):
     return json.dumps(node_resources(node, resource_dict))

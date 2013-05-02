@@ -108,7 +108,10 @@ window.CNode = Backbone.Model.extend({
             this.save();
         });
     },
-    urlRoot:window.CONTENT_SERVER + "/nodes"
+    urlRoot:window.CONTENT_SERVER + "/nodes",
+    url:function(){
+        return this.urlRoot + "/" + this.id + "/user_data" ;
+    }
 
 });
 

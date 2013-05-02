@@ -54,7 +54,7 @@ def read_text_db(instr, fields, list_fields={}, require_all=True):
                 curr[field] = []
             curr[field].append(tp(value))
         else:
-            raise RuntimeError('Unknown field: %s' % field)
+            raise RuntimeError('Unknown field: %s in item %s' % (field,)
 
         new_item = False
 
@@ -126,11 +126,22 @@ def read_node(content_path, tag, assert_exists=False):
     # process resources
     resources_file = os.path.join(full_path, NODE_RESOURCES)
     if os.path.exists(resources_file):
-        fields = dict(resources.RESOURCE_FIELDS)
-        fields['source'] = str
-        list_fields = dict(resources.RESOURCE_LIST_FIELDS)
-        node_resources = read_text_db(open(resources_file), fields, list_fields, require_all=False)
-        node_resources = map(remove_empty_keys, node_resources)
+        fields = {'source': str,
+                  'edition': (str, None),
+                  'location': (str, None),
+                  'title': (str, None),
+                  'authors': (lambda s: parse_list(s, 'and'), None),
+                  'link': (str, None),
+                  'open': (str, None),
+                  'dependencies': (lambda s: parse_list(s, ','), []),
+                }
+        # COLO: why are these lists? We should document/explain this
+        list_fields = {'mark': str,
+                       'extra': str,
+                       'note': str,
+                   }
+        resources = read_text_db(open(resources_file), fields, list_fields)
+        resources = map(remove_empty_keys, resources)
     else:
         node_resources = []
     
@@ -267,14 +278,15 @@ def write_graph_dot(nodes, graph, outstr=None):
 
 #################################### JSON ######################################
 
-def node_to_json(nodes, tag):
+def node_to_json(nodes, tag, user_nodes=None):
     node = nodes[tag]
-    return json.dumps(node.as_dict())
+    return json.dumps(node.as_dict(user_nodes=user_nodes))
 
-def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
+def write_graph_json(nodes, graph, resource_dict=None, outstr=None, user_nodes=None):
     if outstr is None:
         outstr = sys.stdout
-    items = {'nodes' : {node.tag: node.as_dict() for node in nodes.values()}}
+
+    items = {'nodes' : {node.tag: node.as_dict(user_nodes=user_nodes) for node in nodes.values()}}
 
     if resource_dict is not None:
         resrc_keys = set(
@@ -292,6 +304,59 @@ def node_resources(node, resource_defaults):
 
 def node_resources_json(node, resource_dict):
     return json.dumps(node_resources(node, resource_dict))
+
+
+
+
+    
+
+def node_resources(node, resource_dict):
+    result = []
+    for r in node.resources:
+        curr = dict(r)
+        if 'source' in curr:
+            key = curr['source']
+            if key in resource_dict:
+                for field, value in resource_dict[key].as_dict().items():
+                    curr[field] = value
+            del curr['source']
+        result.append(curr)
+    return result
+
+def node_resources_json(node, resource_dict):
+    return json.dumps(node_resources(node, resource_dict))
+
+
+############################### User data ######################################
+
+def node_user_data_file(user_content_path, tag):
+    return os.path.join(user_content_path, 'nodes', '%s.json' % tag)
+
+def read_user_nodes(user_content_path):
+    user_nodes_path = os.path.join(user_content_path, 'nodes')
+    if not os.path.exists(user_nodes_path):
+        return {}
+
+    nodes = {}
+    fnames = os.listdir(user_nodes_path)
+    for fname in fnames:
+        full_path = os.path.join(user_nodes_path, fname)
+        tag, ext = fname.split('.')
+        assert ext == 'json'
+        nodes[tag] = json.load(open(full_path))
+
+    return nodes
+
+def check_node_user_data_format(jdata):
+    pass   # TODO
+
+def write_node_user_data(user_content_path, tag, jdata):
+    user_nodes_path = os.path.join(user_content_path, 'nodes')
+    if not os.path.exists(user_nodes_path):
+        os.mkdir(user_nodes_path)
+    fname = node_user_data_file(user_content_path, tag)
+    json.dump(jdata, open(fname, 'w'))
+
 
 
 

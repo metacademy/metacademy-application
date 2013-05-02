@@ -74,7 +74,7 @@ class Node:
     def __getitem__(self, key):
         return getattr(self, key)
 
-    def as_dict(self):
+    def as_dict(self, user_nodes=None):
         d = {}
 
         if hasattr(self, 'title'):
@@ -90,6 +90,10 @@ class Node:
         if hasattr(self, 'ckeys'):
             d['ckeys'] = self.ckeys
 
+        # add user-supplied data
+        if user_nodes is not None and self.tag in user_nodes:
+            d['user_data'] = user_nodes[self.tag]
+
         return d
 
     def get_resource_keys(self):
@@ -98,27 +102,8 @@ class Node:
             keys = [rdic['source'] for rdic in self.resources]
         return keys
 
-    def add_json_data(self, jdata):
-        """
-        replace node attributes with json data from server
-        TODO: consider replacing the deps and ptrs with dicts and we can simply pass json data to constructor
 
-        jdata: json data representation of node
-        """
-        for attr in jdata:
-            if attr == 'title' or attr == 'summary' or attr == 'pointers':
-                self[attr] = jdata[attr]
-            elif attr == 'dependencies':
-                self[attr] = []
-                for jdep in jdata[attr]:
-                    dep =  Dependency()
-                    dep.add_json_content(jdep)
-                    self[attr].append(dep)
-            elif attr == 'ckeys':
-                self[attr] = jdata[attr]
 
-            elif attr == 'resources':
-                self[attr] = jdata[attr]
 
     def write_node_to_file(self, subset=-1):
         """

@@ -15,6 +15,14 @@ WRAP_WIDTH = 12
 class Missing:
     pass
 
+def is_comment(line):
+    return len(line) >= 1 and line[0] == '#'
+
+def remove_comments(text):
+    lines = text.split('\n')
+    lines = filter(lambda l: not is_comment(l), lines)
+    return '\n'.join(lines)
+
 def read_text_db(instr, fields, list_fields={}, require_all=True):
     items = []
     new_item = True
@@ -27,6 +35,8 @@ def read_text_db(instr, fields, list_fields={}, require_all=True):
             fields[k] = (v, Missing)
     
     for line_ in instr:
+        if is_comment(line_):
+            continue
         line = line_.strip()
 
         if line == '':
@@ -123,6 +133,8 @@ def read_node(content_path, tag, assert_exists=False):
     if usewiki and len(summary):
         summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
 
+    summary = remove_comments(summary)
+
     # process resources
     resources_file = os.path.join(full_path, NODE_RESOURCES)
     if os.path.exists(resources_file):
@@ -142,6 +154,8 @@ def read_node(content_path, tag, assert_exists=False):
     if os.path.exists(ckey_file):
         with open(ckey_file) as ckey_entries:
             for line in ckey_entries:
+                if is_comment(line):
+                    continue
                 line = line.strip()
                 if len(line) > 0:
                     ckeys.append({"text":line})
@@ -164,7 +178,7 @@ def read_node(content_path, tag, assert_exists=False):
     see_also_file = os.path.join(full_path, NODE_SEE_ALSO)
     pointers = ""
     if os.path.exists(see_also_file):
-        pointers = open(see_also_file).read()
+        pointers = remove_comments(open(see_also_file).read())
         # for line_ in open(see_also_file):
         #     line = line_.strip()
 

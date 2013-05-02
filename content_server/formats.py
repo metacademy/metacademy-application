@@ -23,8 +23,8 @@ def summary_file(content_path, tag):
 def wiki_summary_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'wiki-summary.txt')
 
-def ckey_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'key.txt')
+def questions_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'questions.txt')
 
 def node_resources_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'resources.txt')
@@ -140,15 +140,15 @@ def read_node_resources(f):
     node_resources = read_text_db(f, fields, list_fields, require_all=False)
     return map(remove_empty_keys, node_resources)
 
-def read_ckey(f):
-    ckeys = []
+def read_questions(f):
+    questions = []
     for line in f:
         if is_comment(line):
             continue
         line = line.strip()
         if len(line) > 0:
-            ckeys.append({"text":line})
-    return ckeys
+            questions.append({"text":line})
+    return questions
 
 def read_dependencies(f, tag):
     fields = {'tag': normalize_input_tag,
@@ -198,11 +198,11 @@ def read_node(content_path, tag):
     else:
         node_resources = []
 
-    ### process comprehension key
-    if os.path.exists(ckey_file(content_path, tag)):
-        ckeys = read_ckey(open(ckey_file(content_path, tag)))
+    ### process questions
+    if os.path.exists(questions_file(content_path, tag)):
+        questions = read_questions(open(questions_file(content_path, tag)))
     else:
-        ckeys = []
+        questions = []
             
 
     ### process dependencies
@@ -218,7 +218,7 @@ def read_node(content_path, tag):
     
     return graphs.Node(
         {'tag': tag, 'resources': node_resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
-         'pointers': pointers, 'ckeys': ckeys})
+         'pointers': pointers, 'questions': questions})
 
 def check_required_files(content_path, node_tag):
     if not os.path.exists(title_file(content_path, node_tag)):

@@ -23,8 +23,8 @@ function parseID(id) {
 
 // ------------ MODELS ---------------- //
 
-// comprehension key model -- allows for model expansion later on (e.g. adding quality metrics)
-window.CCKey = Backbone.Model.extend({
+// comprehension questions model -- allows for model expansion later on (e.g. adding quality metrics)
+window.CQuestion = Backbone.Model.extend({
     defaults:function () {
         return {
             text:""
@@ -56,13 +56,13 @@ window.CDirectedEdge = Backbone.Model.extend({
 
 // Model: entire node, encompasses several collections and sub-models
 window.CNode = Backbone.Model.extend({
-    collVals:["ckeys", "dependencies", "resources"], // collection values\
+    collVals:["questions", "dependencies", "resources"], // collection values\
     txtVals:["id", "title", "summary", "pointers"],
     defaults:function () {
         return {
             title:"",
             summary:"",
-            ckeys:new CCKeyCollection(),
+            questions:new CQuestionCollection(),
             dependencies:new CDirectedEdgeCollection(),
             pointers:"",
             resources:new CResourceCollection()
@@ -125,8 +125,8 @@ window.CDirectedEdgeCollection = Backbone.Collection.extend({
     model:CDirectedEdge
 });
 
-window.CCKeyCollection = Backbone.Collection.extend({
-    model:CCKey
+window.CQuestionCollection = Backbone.Collection.extend({
+    model:CQuestion
 });
 
 window.CNodeCollection = Backbone.Collection.extend({
@@ -278,9 +278,9 @@ window.CNodeView = Backbone.View.extend({
         //dependencies
         this.$el.find("#dependencies-loc").replaceWith(new CNodeDIView({model:this.model
             .get("dependencies")}).render("Dependencies", "cnode-dependency-template", "cnode-box dependencies").el);
-        //ckeys
-        this.$el.find("#comprehension-loc").replaceWith(new CNodeDIView({model:this.model
-            .get("ckeys")}).render("Comprehension", "cnode-ckeys-template", "lone-section").el);
+        //questions
+        this.$el.find("#questions-loc").replaceWith(new CNodeDIView({model:this.model
+            .get("questions")}).render("Comprehension", "cnode-questions-template", "lone-section").el);
         // place all html into main view
         
         return this;

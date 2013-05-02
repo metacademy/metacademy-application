@@ -287,15 +287,15 @@ function load_svg(node_name) {
                     }
 
                     // add comprehension questions
-                    if ('ckeys' in node_data && node_data.ckeys.length > 0) {
+                    if ('questions' in node_data && node_data.questions.length > 0) {
                         text_panel.append('div')
                             .attr('class', 'data-subtitle')
-                            .text('Comprehension');
+                            .text('Check your understanding');
 
                         var ckents = text_panel.append("div")
-                            .attr('class', 'ckeys')
+                            .attr('class', 'questions')
                             .selectAll('div')
-                            .data(node_data['ckeys'])
+                            .data(node_data['questions'])
                             .enter()
                             .append('div')
                             .attr('class', 'list-entry resource-entry')

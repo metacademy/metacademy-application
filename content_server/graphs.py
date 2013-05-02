@@ -86,8 +86,8 @@ class Node:
             d['dependencies'] = [dep.as_dict() for dep in self.dependencies]
         if hasattr(self, 'resources'):
             d['resources'] = self.resources
-        if hasattr(self, 'ckeys'):
-            d['ckeys'] = self.ckeys
+        if hasattr(self, 'questions'):
+            d['questions'] = self.questions
 
         # add user-supplied data
         if user_nodes is not None and self.tag in user_nodes:

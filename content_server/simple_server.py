@@ -12,7 +12,6 @@ import formats
 import graphs
 from graphs import Node
 import resources
-from global_resources import NODE_TITLE, NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, NODE_SEE_ALSO, NODE_SUMMARY
 
 """A simple server to serve as a placeholder. Basically spits out graphs
 in various formats. It responds to the following requests:

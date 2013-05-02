@@ -3,7 +3,6 @@ import pdb
 import numpy as np
 import scipy.linalg
 import config
-from global_resources import NODE_COMPREHENSION_KEY, NODE_SUMMARY, NODE_TITLE, NODE_DEPENDENCIES, NODE_RESOURCES, NODE_SEE_ALSO
 
 class DirectedEdge:
     """A struct representing an abstract directed edge in the graph.

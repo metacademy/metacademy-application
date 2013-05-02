@@ -5,12 +5,39 @@ import re
 import sys
 import pdb
 
-from global_resources import NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, WIKI_SUMMARY_PREFIX, WIKI_SUMMARY, NODE_SUMMARY, NODE_TITLE, NODE_SEE_ALSO
-
 import graphs
 import resources
 
 WRAP_WIDTH = 12
+
+
+def node_dir(content_path, tag):
+    return os.path.join(content_path, 'nodes', tag)
+
+def title_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'title.txt')
+
+def summary_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'summary.txt')
+
+def wiki_summary_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'wiki-summary.txt')
+
+def ckey_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'key.txt')
+
+def node_resources_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'resources.txt')
+
+def dependencies_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'dependencies.txt')
+
+def see_also_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'see-also.txt')
+
+
+
+############################## utility functions ###############################
 
 class Missing:
     pass
@@ -100,99 +127,106 @@ def parse_list(s, sep):
 
 ############################ read nodes as directories #########################
 
-def read_node(content_path, tag, assert_exists=False):
+def read_title(f):
+    return f.readlines()[0].strip()
+
+def read_summary(f):
+    return remove_comments(unicode(f.read(), 'utf-8'))
+
+def read_node_resources(f):
+    fields = dict(resources.RESOURCE_FIELDS)
+    fields['source'] = str
+    list_fields = dict(resources.RESOURCE_LIST_FIELDS)
+    node_resources = read_text_db(f, fields, list_fields, require_all=False)
+    return map(remove_empty_keys, node_resources)
+
+def read_ckey(f):
+    ckeys = []
+    for line in f:
+        if is_comment(line):
+            continue
+        line = line.strip()
+        if len(line) > 0:
+            ckeys.append({"text":line})
+    return ckeys
+
+def read_dependencies(f, tag):
+    fields = {'tag': normalize_input_tag,
+              'reason': (str, None),
+              }
+    dependencies_dicts = read_text_db(f, fields)
+    return [graphs.Dependency(d['tag'], tag, d['reason'])
+            for d in dependencies_dicts]
+
+def read_see_also(f):
+    return remove_comments(f.read())
+
+def mark_wiki(summary):
+    return '%s%s' % ('*Wiki*', summary)
+
+def read_node(content_path, tag):
     """Read a Node object from a directory which optionally contains title.txt,
     dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
     # TODO: normalize string cleaning (get rid of double quotes that mess up json)
-    full_path = os.path.join(content_path, 'nodes', tag)
-
+    
     ### process title
-    title_file = os.path.join(full_path, NODE_TITLE)
-    if os.path.exists(title_file):
-        title = open(title_file).readlines()[0].strip()
+    if os.path.exists(title_file(content_path, tag)):
+        title = read_title(open(title_file(content_path, tag)))
     else:
-        if assert_exists:
-            raise RuntimeError('%s/%s does not exist' % (tag, NODE_TITLE))
         title = None
 
     ### process summary
-    summary_file = os.path.join(full_path, NODE_SUMMARY)
-    wiki_summary_file = os.path.join(full_path, WIKI_SUMMARY)
     summary = ""
     usewiki = False
     sfile = None
-    if os.path.exists(summary_file):
-        sfile = summary_file
-    elif os.path.exists(wiki_summary_file):
-        sfile = wiki_summary_file
+    if os.path.exists(summary_file(content_path, tag)):
+        sfile = summary_file(content_path, tag)
+    elif os.path.exists(wiki_summary_file(content_path, tag)):
+        sfile = wiki_summary_file(content_path, tag)
         usewiki = True
 
     if sfile:
-        summary = unicode(open(sfile).read(), 'utf-8')
+        summary = read_summary(open(sfile))
 
     if usewiki and len(summary):
-        summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
+        summary = mark_wiki(summary)
 
-    summary = remove_comments(summary)
 
     # process resources
-    resources_file = os.path.join(full_path, NODE_RESOURCES)
-    if os.path.exists(resources_file):
-        fields = dict(resources.RESOURCE_FIELDS)
-        fields['source'] = str
-        list_fields = dict(resources.RESOURCE_LIST_FIELDS)
-        node_resources = read_text_db(open(resources_file), fields, list_fields, require_all=False)
-        node_resources = map(remove_empty_keys, node_resources)
+    if os.path.exists(node_resources_file(content_path, tag)):
+        node_resources = read_node_resources(open(node_resources_file(content_path, tag)))
     else:
         node_resources = []
-    
-    
 
     ### process comprehension key
-    ckey_file = os.path.join(full_path, NODE_COMPREHENSION_KEY)
-    ckeys = []
-    if os.path.exists(ckey_file):
-        with open(ckey_file) as ckey_entries:
-            for line in ckey_entries:
-                if is_comment(line):
-                    continue
-                line = line.strip()
-                if len(line) > 0:
-                    ckeys.append({"text":line})
+    if os.path.exists(ckey_file(content_path, tag)):
+        ckeys = read_ckey(open(ckey_file(content_path, tag)))
+    else:
+        ckeys = []
+            
 
     ### process dependencies
-    dependencies_file = os.path.join(full_path, NODE_DEPENDENCIES)
-    if os.path.exists(dependencies_file):
-        fields = {'tag': normalize_input_tag,
-                  'reason': (str, None),
-                  }
-        dependencies_dicts = read_text_db(open(dependencies_file), fields)
-        dependencies = [graphs.Dependency(d['tag'], tag, d['reason'])
-                        for d in dependencies_dicts]
+    if os.path.exists(dependencies_file(content_path, tag)):
+        dependencies = read_dependencies(open(dependencies_file(content_path, tag)), tag)
     else:
-        if assert_exists:
-            raise RuntimeError('%s/%s does not exist' % (tag, NODE_DEPENDENCIES))
         dependencies = []
     
     ### process see-also
-    see_also_file = os.path.join(full_path, NODE_SEE_ALSO)
     pointers = ""
-    if os.path.exists(see_also_file):
-        pointers = remove_comments(open(see_also_file).read())
-        # for line_ in open(see_also_file):
-        #     line = line_.strip()
-
-        #     m = re.match(r'(.*)\[(.*)\]', line)
-        #     if m:
-        #         blurb = m.group(1).strip()
-        #         to_tag = normalize_input_tag(m.group(2))
-        #         ptr = graphs.Pointer(tag, to_tag, blurb)
-        #         pointers.append(ptr)
-    elif assert_exists:
-        raise RuntimeError('%s/%s does not exist' % (tag, NODE_SEE_ALSO))
+    if os.path.exists(see_also_file(content_path, tag)):
+        pointers = read_see_also(open(see_also_file(content_path, tag)))
+    
     return graphs.Node(
         {'tag': tag, 'resources': node_resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
          'pointers': pointers, 'ckeys': ckeys})
+
+def check_required_files(content_path, node_tag):
+    if not os.path.exists(title_file(content_path, node_tag)):
+        raise RuntimeError('No title for %s' % node_tag)
+    if not os.path.exists(dependencies_file(content_path, node_tag)):
+        raise RuntimeError('No dependencies for %s' % node_tag)
+    if not os.path.exists(see_also_file(content_path, node_tag)):
+        raise RuntimeError('No see-also for %s' % node_tag)
 
 
 def read_nodes(content_path, onlytitle=False):

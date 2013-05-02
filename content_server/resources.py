@@ -2,7 +2,6 @@ import os
 
 import config
 import formats
-import global_resources
 
 RESOURCE_FIELDS = {'title': str,
                    'location': str,
@@ -22,8 +21,8 @@ RESOURCE_LIST_FIELDS = {'mark': str,
 RESOURCE_DEFAULTS = {'free': 0,
                      }
 
-def resource_db_path():
-    return os.path.join(config.CONTENT_PATH, global_resources.RESOURCE_DB_NAME)
+def resource_db_path(content_path=config.CONTENT_PATH):
+    return os.path.join(content_path, 'resources.txt')
 
 
 def read_resources_file(fname, check=False):

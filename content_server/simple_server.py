@@ -83,7 +83,6 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         parse = urlparse.urlparse(self.path)
         parts = parse.path.lower().split('/')
         parts = filter(bool, parts)
-        pdb.set_trace()
         if len(parts) != 3 or parts[0] != 'nodes' or parts[2] != 'user_data' or parts[1] not in nodes:
             self.send_error(404, 'Invalid resource: %s' % self.path)
         node_name = parts[1]

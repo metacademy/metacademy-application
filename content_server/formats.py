@@ -54,7 +54,7 @@ def read_text_db(instr, fields, list_fields={}, require_all=True):
                 curr[field] = []
             curr[field].append(tp(value))
         else:
-            raise RuntimeError('Unknown field: %s in item %s' % (field,)
+            raise RuntimeError('Unknown field: %s ' % field)
 
         new_item = False
 
@@ -122,30 +122,17 @@ def read_node(content_path, tag, assert_exists=False):
 
     if usewiki and len(summary):
         summary = "%s%s" % (WIKI_SUMMARY_PREFIX, summary) # TODO should we use a wiki flag instead?
-
+    
     # process resources
     resources_file = os.path.join(full_path, NODE_RESOURCES)
     if os.path.exists(resources_file):
-        fields = {'source': str,
-                  'edition': (str, None),
-                  'location': (str, None),
-                  'title': (str, None),
-                  'authors': (lambda s: parse_list(s, 'and'), None),
-                  'link': (str, None),
-                  'open': (str, None),
-                  'dependencies': (lambda s: parse_list(s, ','), []),
-                }
-        # COLO: why are these lists? We should document/explain this
-        list_fields = {'mark': str,
-                       'extra': str,
-                       'note': str,
-                   }
-        resources = read_text_db(open(resources_file), fields, list_fields)
-        resources = map(remove_empty_keys, resources)
+        fields = dict(resources.RESOURCE_FIELDS)
+        fields['source'] = str
+        list_fields = dict(resources.RESOURCE_LIST_FIELDS)
+        node_resources = read_text_db(open(resources_file), fields, list_fields, require_all=False)
+        node_resources = map(remove_empty_keys, node_resources)
     else:
         node_resources = []
-    
-    
 
     ### process comprehension key
     ckey_file = os.path.join(full_path, NODE_COMPREHENSION_KEY)

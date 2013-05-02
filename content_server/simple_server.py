@@ -213,7 +213,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_node_json(self, tag):
         load_graph()
-        return formats.node_to_json(nodes, tag, user_nodes=user_nodes)
+        return formats.node_to_json(nodes, tag, user_nodes=user_nodes, resource_dict=resource_dict)
 
     def get_map(self, tag, fmt):
         load_graph()

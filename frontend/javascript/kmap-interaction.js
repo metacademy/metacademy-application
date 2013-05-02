@@ -26,7 +26,7 @@ function wrapDiv(content, props) {
     return '<div' + (props ? ' ' + props : '') + '>' + content + '</div>';
 }
 
-function buildResourceDiv(rsrc_db_ent, rsrc_node) {
+function buildResourceDiv(rsrc_node) {
     /*
      Builds the additonal info resources div
      */
@@ -38,9 +38,9 @@ function buildResourceDiv(rsrc_db_ent, rsrc_node) {
         }
     }
 
-    if ('notes' in rsrc_db_ent) {
-        if (rsrc_db_ent.notes) {
-            extra_info.push(wrapDiv('note: ' + rsrc_db_ent.notes, 'class="res-extra-ent"'));
+    if ('notes' in rsrc_node) {
+        if (rsrc_node.notes) {
+            extra_info.push(wrapDiv('note: ' + rsrc_node.notes, 'class="res-extra-ent"'));
         }
     }
 
@@ -260,28 +260,33 @@ function load_svg(node_name) {
                             .data(node_data['resources'])
                             .enter()
                             .append('div')
-                            .attr('class', 'resource-entry');
+                           .attr('class', 'resource-entry');
                         rents.append('div')
                             .attr('class', 'list-entry')
                             .html(function (d) {
                                 // Add an appropriate styled bullet with appropriate title
                                 var bullet = "mark" in d && d.mark[0] === "star" ? '<span class="gold-text">&#9733;</span>' : '&#8226;';
-                                bullet = '<div class="bullet-ptr">' + bullet + '</div>'
+                                bullet = '<div class="bullet-ptr">' + bullet + '</div>';
 
-                                // obtain resource info
-                                var rsrc = jdata.node_resources[d.source];
-                                var title = "title" in rsrc ? rsrc.title : d.source;
-                                title = "location" in rsrc ? wrapLink(title, rsrc.location) : title;
-                                var info_loc = "location" in d ? d.location : "";
-                                if (isUrl(info_loc)) {
-                                    info_loc = wrapLink("direct link", info_loc, "direct-link");
-                                }
-                                // is it free?
-                                var cost_mark = Number(rsrc.free) ? "" : '<span class="cost-dollar"> $</span>';
+                                //// obtain resource info
+                                //var rsrc = jdata.node_resources[d.source];
+                                //var title = "title" in rsrc ? rsrc.title : d.source;
+                                //title = "location" in rsrc ? wrapLink(title, rsrc.location) : title;
+                                //var info_loc = "location" in d ? d.location : "";
+                                //if (isUrl(info_loc)) {
+                                //    info_loc = wrapLink("direct link", info_loc, "direct-link");
+                                //}
+                                //// is it free?
+                                //var cost_mark = Number(rsrc.free) ? "" : '<span class="cost-dollar"> $</span>';
+
+                                var title = "title" in d ? d.title : "no title";
+                                title = "url" in d ? wrapLink(title, d.url) : title;
+                                var info_loc = "location" in d ? d.location: "";
+                                var cost_mark = Number(d.free) ? "" : '<span class="cost-dollar"> $</span>';
 
                                 // create display
                                 var disp = '<div class="list-text">' + title + cost_mark
-                                    + '<div class="info-loc">[' + info_loc + "]</div>" + buildResourceDiv(rsrc, d) + "</div>";
+                                    + '<div class="info-loc">[' + info_loc + "]</div>" + buildResourceDiv(d) + "</div>";
                                 return bullet + disp;
                             })
                     }

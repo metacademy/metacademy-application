@@ -315,25 +315,25 @@ def write_graph_dot(nodes, graph, outstr=None):
 
 #################################### JSON ######################################
 
-def node_to_json(nodes, tag, user_nodes=None):
+def node_dict(nodes, tag, resource_dict=None, user_nodes=None):
     node = nodes[tag]
-    return json.dumps(node.as_dict(user_nodes=user_nodes))
+    d = node.as_dict(user_nodes=user_nodes)
+    if resource_dict is not None:
+        d = dict(d)
+        d['resources'] = [resources.add_defaults(r, resource_dict) for r in d['resources']]
+    return d
+
+def node_to_json(nodes, tag, resource_dict=None, user_nodes=None):
+    return json.dumps(node_dict(nodes, tag, resource_dict=resource_dict, user_nodes=user_nodes))
 
 def write_graph_json(nodes, graph, resource_dict=None, outstr=None, user_nodes=None):
     if outstr is None:
         outstr = sys.stdout
 
-    items = {'nodes' : {node.tag: node.as_dict(user_nodes=user_nodes) for node in nodes.values()}}
+    node_items = {tag: node_dict(nodes, tag, resource_dict=resource_dict, user_nodes=user_nodes)
+                  for tag in nodes}
 
-    if resource_dict is not None:
-        resrc_keys = set(
-            [rsrc
-             for rlist in [nde.get_resource_keys() for nde in nodes.values() if nde.resources]
-             for rsrc in rlist
-             if rsrc in resource_dict])
-        res_dict = {key: remove_empty_keys(resource_dict[key]) for key in resrc_keys}
-        items['node_resources'] = res_dict
-
+    items = {'nodes': node_items}
     json.dump(items, outstr)
 
 def node_resources(node, resource_defaults):

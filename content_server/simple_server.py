@@ -58,9 +58,6 @@ def update_node_user_data(node_tag, jdata):
     formats.check_node_user_data_format(jdata)
     user_nodes[node_tag] = jdata
     formats.write_node_user_data(config.USER_CONTENT_PATH, node_tag, jdata)
-    
-
-
 
 
 class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -97,8 +94,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.add_cors_header()
             self.end_headers()
         except:
-            self.send_error(500, traceback.format_exc())
-        
+            self.send_error(500, traceback.format_exc()) 
 
 
     def do_POST(self):

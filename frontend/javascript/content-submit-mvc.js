@@ -21,7 +21,7 @@ function parseID(id) {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Backbone MVC ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-// ------------ MODELS ---------------- //
+/* MODELS */
 
 // comprehension questions model -- allows for model expansion later on (e.g. adding quality metrics)
 window.CQuestion = Backbone.Model.extend({
@@ -37,7 +37,7 @@ window.CResource = Backbone.Model.extend({
     defaults:function () {
         return {
             id:"",
-            source:"",
+            title:"",
             location:"",
             extras:[]
         };
@@ -56,16 +56,16 @@ window.CDirectedEdge = Backbone.Model.extend({
 
 // Model: entire node, encompasses several collections and sub-models
 window.CNode = Backbone.Model.extend({
-    collVals:["questions", "dependencies", "resources"], // collection values\
+    collVals:["questions", "dependencies", "resources"], // collection values
     txtVals:["id", "title", "summary", "pointers"],
     defaults:function () {
         return {
-            title:"",
-            summary:"",
-            questions:new CQuestionCollection(),
-            dependencies:new CDirectedEdgeCollection(),
-            pointers:"",
-            resources:new CResourceCollection()
+            title: "",
+            summary: "",
+            pointers: "",
+            questions: new CQuestionCollection(),
+            dependencies: new CDirectedEdgeCollection(),
+            resources: new CResourceCollection()
         };
     },
     parse:function (resp, xhr) {
@@ -182,7 +182,7 @@ window.BoxItemView = Backbone.View.extend({
                 var idval = parseID($cnodetitle.attr("id")).pop();
                 // check if we're editing the id val
                 if (idval !== parseID($el.attr("id")).pop()) {
-                    this.model.set(idval, "--undefined--")
+                    this.model.set(idval, "--undefined--");
                 }
             }
             // add to collection
@@ -201,8 +201,8 @@ window.CNodeDIView = Backbone.View.extend({
     className:'cnode-data-input',
     appendNewEl:function (modelInstance, inclassName, templateId) {
         // add new empty element to view collection but not model collection
-        var newcon = Object.getPrototypeOf(modelInstance).constructor; // NOTE: this is ES5 so only IE 9+ support (TODO add at least IE 8 support)
-        var newel = new newcon();
+        var NewCon = Object.getPrototypeOf(modelInstance).constructor; // NOTE: this is ES5 so only IE 9+ support (TODO add at least IE 8 support)
+        var newel = new NewCon();
         newel.addCollection = this.model;
         newel.isnew = true;
         var biv = new BoxItemView({model:newel, className : inclassName});
@@ -213,8 +213,7 @@ window.CNodeDIView = Backbone.View.extend({
     render:function (header, templateId, inclassName) {
         /*
         render the DIView
-        header: the header to diplay within the enclosing section
-        templatete
+        header: the header to diplay within the enclosing section template
         */
         this.$el.append("<header>" + header + "</header>");
         _.each(this.model.models, function (rsrc) {

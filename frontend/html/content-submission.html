@@ -17,10 +17,10 @@ Submit Content
 
 <!--TODO externalize these templates-->
 <script type="text/template" id="cnode-resources-template">
-    <% var rid = "resources-" + cid + "-source" %>
+    <% var rid = "resources-" + cid + "-title" %>
     <label for="<%- rid %>">Resource</label>
     <input class= "cnode-title-input  <%-eiclass%>" type="text" id="<%- rid%>" name="<%- rid %>"
-           value="<%- source %>"/>
+           value="<%- title %>"/>
 
     <% rid = "resources-" + cid + "-location" %>
     <label for="<%- rid %>">Location</label>

@@ -11,9 +11,8 @@ var rp_rmarg_use = 1;
  HELPER FUNCTIONS
  */
 
-
 function isUrl(s) {
-    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
     return regexp.test(s);
 }
 
@@ -32,7 +31,7 @@ function buildResourceDiv(rsrc_node) {
      */
     var extra_info = [];
     var ignore_fields = ["source", "location", "mark"];
-    for (attr in rsrc_node) {
+    for (var attr in rsrc_node) {
         if (rsrc_node.hasOwnProperty(attr) && ignore_fields.indexOf(attr) === -1) {
             extra_info.push(wrapDiv(attr + ': ' + rsrc_node[attr], 'class="res-extra-ent"'));
         }
@@ -43,12 +42,12 @@ function buildResourceDiv(rsrc_node) {
             extra_info.push(wrapDiv('note: ' + rsrc_node.notes, 'class="res-extra-ent"'));
         }
     }
-
+    var ret_text;
     if (extra_info.length > 0) {
-        var ret_text = wrapDiv(extra_info.join("\n"), 'class=res-extras') + wrapDiv('<a href="" class="moreres">' + '[additional info]' + '</a>');
+        ret_text = wrapDiv(extra_info.join("\n"), 'class=res-extras') + wrapDiv('<a href="" class="moreres">' + '[additional info]' + '</a>');
     }
     else {
-        var ret_text = "";
+        ret_text = "";
     }
 
     return ret_text;
@@ -119,11 +118,11 @@ function beautifyText() {
 // load the SVG file using AJAX
 var jdata = null;
 function load_svg(node_name) {
-
+    var get_url;
     if (node_name === 'nodes' || node_name==='') {
-        var get_url = window.CONTENT_SERVER +'/nodes'
+        get_url = window.CONTENT_SERVER +'/nodes';
     } else {
-        var get_url = window.CONTENT_SERVER + '/nodes/' + node_name + '/map'
+        get_url = window.CONTENT_SERVER + '/nodes/' + node_name + '/map';
     }
 
     // 1st ajax call: load the kmap svg file (output from graphviz)
@@ -147,16 +146,16 @@ function load_svg(node_name) {
             var gelems = d3.selectAll('.node,.edge');
             var gdata = gelems[0].map(function (itm) {
                 if (d3.select(itm).attr('class') === 'node') {
-                    return 1
+                    return 1;
                 }
-                return 0
+                return 0;
             });
             gelems.data(gdata).sort();
 
             // change title to id and remove title
             gelems.attr('id', function () {
-                return d3.select(this).select('title').text()
-            })
+                return d3.select(this).select('title').text();
+            });
             gelems.selectAll("title").remove(); // remove the title for a cleaner hovering experience
             d3.select('g').selectAll("title").remove(); // also remove title from graph
 
@@ -174,14 +173,14 @@ function load_svg(node_name) {
             d3.selectAll(".node")
                 .on("mouseover", function () {
                     var node = d3.select(this);
-                    if (node.attr('clicked') == null) {
-                        node.select('ellipse').attr('fill', '#E6EEEE')
+                    if (node.attr('clicked') === null) {
+                        node.select('ellipse').attr('fill', '#E6EEEE');
                     }
                 })
                 .on("mouseout", function () {
                     var node = d3.select(this);
-                    if (node.attr('clicked') == null) {
-                        node.select('ellipse').attr('fill', 'white')
+                    if (node.attr('clicked') === null) {
+                        node.select('ellipse').attr('fill', 'white');
                     }
                 })
                 .on("click", function (d) {
@@ -219,21 +218,21 @@ function load_svg(node_name) {
                     if ('title' in node_data) {
                         text_panel.append("div")
                             .attr("class", "data-title")
-                            .text(node_data['title']);
+                            .text(node_data.title);
                     }
 
                     // add summary
                     if ('summary' in node_data) {
                         var spanel = text_panel.append('div')
                             .attr('class', 'data-description');
-                        var sum = node_data['summary']
+                        var sum = node_data.summary;
                         // check if summary is from wikipedia
                         if (sum.substring(0, 6) === '*Wiki*') {
                             sum = sum.substring(6);
                             spanel.append('a')
                                 .attr('target', '_blank')
-                                .attr('href', 'http://www.en.wikipedia.org/wiki/'
-                                + encodeURI(node_data['title'] ? node_data['title'] : this_node.attr('id')))
+                                .attr('href', 
+                                    'http://www.en.wikipedia.org/wiki/'+ encodeURI(node_data.title ? node_data.title : this_node.attr('id')))
                                 .append('img')
                                 .attr('class', 'hastip wiki-img')
                                 .attr('title', 'summary from wikipedia -- click to load wikipedia entry')
@@ -246,9 +245,9 @@ function load_svg(node_name) {
                     // add resources
                     if ('resources' in node_data && node_data.resources.length > 0) {
                         // sort the elements so starred entries come first
-                        node_data['resources'].sort(function (a, b) {
-                            var ma = Number("mark" in a && a.mark[0] == "star" );
-                            var mb = Number("mark" in b && b.mark[0] == "star");
+                        node_data.resources.sort(function (a, b) {
+                            var ma = Number("mark" in a && a.mark[0] === "star" );
+                            var mb = Number("mark" in b && b.mark[0] === "star");
                             return (mb > ma) ? 1 : ((ma > mb) ? -1 : 0);
                         });
                         text_panel.append('div')
@@ -257,7 +256,7 @@ function load_svg(node_name) {
                         var rents = text_panel.append('div')
                             .attr("class", "resources")
                             .selectAll('div')
-                            .data(node_data['resources'])
+                            .data(node_data.resources)
                             .enter()
                             .append('div')
                            .attr('class', 'resource-entry');
@@ -281,14 +280,14 @@ function load_svg(node_name) {
 
                                 var title = "title" in d ? d.title : "no title";
                                 title = "url" in d ? wrapLink(title, d.url) : title;
-                                var info_loc = "location" in d ? d.location: "";
+                                var info_loc = "location" in d ? d.location : "";
                                 var cost_mark = Number(d.free) ? "" : '<span class="cost-dollar"> $</span>';
 
                                 // create display
                                 var disp = '<div class="list-text">' + title + cost_mark
                                     + '<div class="info-loc">[' + info_loc + "]</div>" + buildResourceDiv(d) + "</div>";
                                 return bullet + disp;
-                            })
+                            });
                     }
 
                     // add comprehension questions
@@ -300,7 +299,7 @@ function load_svg(node_name) {
                         var ckents = text_panel.append("div")
                             .attr('class', 'questions')
                             .selectAll('div')
-                            .data(node_data['questions'])
+                            .data(node_data.questions)
                             .enter()
                             .append('div')
                             .attr('class', 'list-entry resource-entry')
@@ -318,7 +317,7 @@ function load_svg(node_name) {
                         var lent = text_panel.append("div")
                             .attr("class", "data-dependencies")
                             .selectAll('div')
-                            .data(node_data['dependencies'])
+                            .data(node_data.dependencies)
                             .enter()
                             .append('div')
                             .attr('class', 'list-entry');
@@ -386,7 +385,7 @@ function load_svg(node_name) {
 // 2nd AJAX call: get json graph data (dependencies, see-also, etc)
     $.ajax({
         type:'GET',
-        url:get_url + '?format=json',
+        url: get_url + '?format=json',
 	dataType:'json',
         async:false,
         scriptCharset:"utf-8",

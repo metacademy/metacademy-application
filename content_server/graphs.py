@@ -3,7 +3,6 @@ import pdb
 import numpy as np
 import scipy.linalg
 import config
-from global_resources import NODE_COMPREHENSION_KEY, NODE_SUMMARY, NODE_TITLE, NODE_DEPENDENCIES, NODE_RESOURCES, NODE_SEE_ALSO
 
 class DirectedEdge:
     """A struct representing an abstract directed edge in the graph.
@@ -87,8 +86,8 @@ class Node:
             d['dependencies'] = [dep.as_dict() for dep in self.dependencies]
         if hasattr(self, 'resources'):
             d['resources'] = self.resources
-        if hasattr(self, 'ckeys'):
-            d['ckeys'] = self.ckeys
+        if hasattr(self, 'questions'):
+            d['questions'] = self.questions
 
         # add user-supplied data
         if user_nodes is not None and self.tag in user_nodes:
@@ -102,71 +101,6 @@ class Node:
             keys = [rdic['source'] for rdic in self.resources]
         return keys
 
-
-
-
-    def write_node_to_file(self, subset=-1):
-        """
-        write the given node to file specificed by config.CONTENT_PATH/self.tag
-
-        subset: the subset of attributes to write to file
-        """
-        if subset==-1:
-            subset = self.__dict__.keys()
-
-        # create directory for new nodes if necessary
-        npath = os.path.join(config.CONTENT_PATH,"nodes", self.tag)
-        if not os.path.exists(npath):
-            os.makedirs(npath)
-
-        fname_map = {'title':NODE_TITLE,
-                     'summary':NODE_SUMMARY,
-                     'dependencies':NODE_DEPENDENCIES,
-                     'resources': NODE_RESOURCES,
-                     'pointers': NODE_SEE_ALSO,
-                     'ckeys': NODE_COMPREHENSION_KEY}
-
-        # TODO we need to make sure we don't write arbitrary text to file from server (e.g. extra field for resources)
-        for attr in subset:
-            # check for a valid attribute
-            if not fname_map.has_key(attr):
-                continue
-
-            # write the data to the appropriate file
-            fname = os.path.join(npath, fname_map[attr])
-
-            if attr == 'title' or attr == 'summary' or attr == 'pointers':
-                with open(fname, 'w') as wfile:
-                    wfile.write(self[attr])
-
-            elif attr == 'dependencies' or attr == 'resources':
-                with open(fname, 'w') as wfile:
-                    for ndep in self[attr]:
-                        for depattr in ndep:
-                            if depattr == "to_tag":
-                                continue
-                            if ndep[depattr]:
-                                if depattr == "extras":
-                                    joinvals = []
-                                    for val in ndep[depattr]:
-                                        # handles list and text extra elements
-                                        if not isinstance(val,basestring):
-                                            joinvals.append(",".join(val).strip())
-                                        else:
-                                            joinvals.append(val.strip())
-                                        wrtext  = "\n".join(joinvals)
-                                else:
-                                    wrattr = depattr;
-                                    if depattr == "from_tag":
-                                        wrattr = "tag" # conforms to legacy naming scheme
-                                    wrtext = wrattr + ':' + ndep[depattr]
-                                wfile.write(wrtext + '\n')
-                        wfile.write('\n')
-
-            elif attr == 'ckeys':
-                with open(fname, 'w') as wfile:
-                    for ck in self[attr]:
-                        wfile.write(ck["text"] + "\n")
 
 
 

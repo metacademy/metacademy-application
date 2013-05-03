@@ -2,8 +2,7 @@ import os
 import urllib, urllib2
 from xml.dom.minidom import parse as parseXML
 import config
-from global_resources import WIKI_SUMMARY, NODE_SUMMARY
-from formats import read_nodes
+import formats
 
 def write_wiki_summary(node_title, node_dir):
     """
@@ -24,17 +23,21 @@ def write_wiki_summary(node_title, node_dir):
     else:
         summary = ''
     # cache the wiki summary
-    wiki_summary_file = os.path.join(node_dir, WIKI_SUMMARY)
+    temp, tag = os.path.split(node_dir)
+    content_path, _ = os.path.split(temp)
+    wiki_summary_file = formats.wiki_summary_file(content_path, tag)
     with open(wiki_summary_file, 'w') as wikif:
         wikif.write(summary.encode('utf-8'))
 
 if __name__=="__main__":
-    nodes = read_nodes(config.CONTENT_PATH)
+    nodes = formats.read_nodes(config.CONTENT_PATH)
     for node_tag in nodes:
         node = nodes[node_tag]
         node_dir = os.path.join(config.CONTENT_PATH, 'nodes', node.tag)
-        if not os.path.exists(os.path.join(node_dir, NODE_SUMMARY)) and not os.path.exists(
-            os.path.join(node_dir, WIKI_SUMMARY)):
+        summary_file = formats.summary_file(config.CONTENT_PATH, node.tag)
+        wiki_summary_file = formats.wiki_summary_file(config.CONTENT_PATH, node.tag)
+        
+        if not os.path.exists(summary_file) and not os.path.exists(wiki_summary_file):
             if node.title:
                 ttl = node.title
             else:

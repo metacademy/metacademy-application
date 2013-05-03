@@ -12,7 +12,6 @@ import formats
 import graphs
 from graphs import Node
 import resources
-from global_resources import NODE_TITLE, NODE_COMPREHENSION_KEY, NODE_DEPENDENCIES, NODE_RESOURCES, NODE_SEE_ALSO, NODE_SUMMARY
 
 """A simple server to serve as a placeholder. Basically spits out graphs
 in various formats. It responds to the following requests:
@@ -24,6 +23,7 @@ in various formats. It responds to the following requests:
                                          (ancestors/descendants)
   GET nodes/node-name/user_data       get the JSON representation of the user-supplied data for a node
   PUT nodes/node-name/user_data       update the user-supplied data for a node
+  GET nodes/node-name/resources       get a JSON representation of the resource list for a given node
 
 TODO add POST/PUT/DELETE/OPTIONS information once API is complete
 
@@ -147,6 +147,9 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     else:
                         text = json.dumps({})
                     print 'text', text
+                elif parts[2] == 'resources':
+                    assert len(parts) == 3
+                    text = formats.node_resources_json(nodes[node], resource_dict)
                 else:
                     raise RuntimeError('Invalid resource: %s' % self.path)
             else:
@@ -209,7 +212,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_node_json(self, tag):
         load_graph()
-        return formats.node_to_json(nodes, tag, user_nodes=user_nodes)
+        return formats.node_to_json(nodes, tag, user_nodes=user_nodes, resource_dict=resource_dict)
 
     def get_map(self, tag, fmt):
         load_graph()

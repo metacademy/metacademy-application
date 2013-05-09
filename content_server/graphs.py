@@ -118,10 +118,24 @@ class Graph:
         self.outgoing = outgoing
         self.edges = edges
 
+    def copy(self):
+        incoming = {tag: list(parents) for tag, parents in self.incoming.items()}
+        outgoing = {tag: list(children) for tag, children in self.outgoing.items()}
+        edges = set(self.edges)
+        return Graph(incoming, outgoing, edges)
+
     def remove_edge(self, parent, child):
         self.outgoing[parent].remove(child)
         self.incoming[child].remove(parent)
         self.edges.remove((parent, child))
+
+    def subset(self, tags):
+        incoming = {tag: filter(lambda t: t in tags, self.incoming[tag])
+                    for tag in tags}
+        outgoing = {tag: filter(lambda t: t in tags, self.outgoing[tag])
+                    for tag in tags}
+        edges = set(filter(lambda (p, c): p in tags and c in tags, self.edges))
+        return Graph(incoming, outgoing, edges)
 
     @staticmethod
     def from_node_dependencies(nodes):
@@ -171,17 +185,14 @@ def remove_missing_links(nodes):
     return new_nodes
 
 
-def topo_sort(nodes):
+def topo_sort(graph):
     """Return a list of all tags topologically ordered such that if B depends on A, then
     A precedes B in the list."""
-
-    # so that we only consider edges between existing nodes
-    nodes = remove_missing_links(nodes)
-
-    graph = Graph.from_node_dependencies(nodes)
-
+    graph = graph.copy()   # since we destructively modify it
+    tags = graph.incoming.keys()
+    
     # nodes with no dependencies
-    start_tags = [tag for tag, node in nodes.items() if not graph.incoming[tag]]
+    start_tags = filter(lambda t: graph.incoming[t] == [], tags)
 
     sorted_deps = []
     while start_tags:
@@ -198,25 +209,23 @@ def topo_sort(nodes):
     return sorted_deps
 
     
-def gather_dependencies(nodes):
+def gather_dependencies(graph):
     """Construct a dict mapping a tag to the set of all tags which it depends on."""
-    tags = topo_sort(nodes)
+    tags = topo_sort(graph)
 
     dependencies = {}
     for tag in tags:
-        node = nodes[tag]
-        parent_tags = [dep.from_tag for dep in node.dependencies]
-        curr_deps = set(parent_tags)
-        for parent_tag in parent_tags:
-            if parent_tag in nodes:
-                curr_deps.update(dependencies[parent_tag])
+        curr_deps = set(graph.incoming[tag])
+        for parent_tag in graph.incoming[tag]:
+            curr_deps.update(dependencies[parent_tag])
         dependencies[tag] = curr_deps
 
     return dependencies
+
     
-def count_dependencies(nodes):
+def count_dependencies(graph):
     """Return a dict counting the total number of (long-range) dependencies for each node."""
-    return sum([len(deps) for tag, deps in gather_dependencies(nodes).items()])
+    return sum([len(deps) for tag, deps in gather_dependencies(graph).items()])
 
 def bottleneck_score(nodes, tag):
     """Compute the bottleneck score for a tag, which is the total number of long-range dependencies which are
@@ -329,3 +338,17 @@ def missing_dependencies(nodes):
             dependencies.add(d.from_tag)
 
     return dependencies.difference(set(nodes.keys()))
+
+def remove_redundant_edges(graph):
+    graph = graph.copy()
+    ancestors = gather_dependencies(graph)
+    tags = graph.incoming.keys()
+
+    for tag in tags:
+        parents = list(graph.incoming[tag])
+        for p in parents:
+            for p2 in parents:
+                if p in ancestors[p2] and (p, tag) in graph.edges:
+                    graph.remove_edge(p, tag)
+
+    return graph

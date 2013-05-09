@@ -40,15 +40,17 @@ Start the server by typing (from the main knowledge-maps directory):
 
 nodes = None
 graph = None
+graph_minus_redundant = None
 resource_dict = None
 user_nodes = None
 
 def load_graph():
-    global nodes, graph, resource_dict, user_nodes
+    global nodes, graph, graph_minus_redundant, resource_dict, user_nodes
     if nodes is None:
         nodes = formats.read_nodes(config.CONTENT_PATH)
         nodes = graphs.remove_missing_links(nodes)
         graph = graphs.Graph.from_node_dependencies(nodes)
+        graph_minus_redundant = graphs.remove_redundant_edges(graph)
         resource_dict = resources.read_resources_file(resources.resource_db_path())
 
         # read user-supplied data
@@ -192,7 +194,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_full_graph(self, fmt):
         load_graph()
-        return self.format_graph(nodes, graph, fmt)
+        return self.format_graph(nodes, graph_minus_redundant, fmt)
 
     def get_related_nodes(self, tag, fmt):
         load_graph()
@@ -201,8 +203,8 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         descendants = graphs.descendants_set(nodes, graph, tag)
         relevant = set([tag]).union(ancestors).union(descendants)
         rel_nodes = {tag: node for tag, node in nodes.items() if tag in relevant}
-        rel_nodes = graphs.remove_missing_links(rel_nodes)
-        rel_graph = graphs.Graph.from_node_dependencies(rel_nodes)
+        rel_graph = graph.subset(relevant)
+        rel_graph = graphs.remove_redundant_edges(rel_graph)
 
         return self.format_graph(rel_nodes, rel_graph, fmt)
 
@@ -216,8 +218,8 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         ancestors = graphs.ancestors_set(nodes, graph, tag)
         relevant = set([tag]).union(ancestors)
         rel_nodes = {tag: node for tag, node in nodes.items() if tag in relevant}
-        rel_nodes = graphs.remove_missing_links(rel_nodes)
-        rel_graph = graphs.Graph.from_node_dependencies(rel_nodes)
+        rel_graph = graph.subset(relevant)
+        rel_graph = graphs.remove_redundant_edges(rel_graph)
 
         return self.format_graph(rel_nodes, rel_graph, fmt)
 

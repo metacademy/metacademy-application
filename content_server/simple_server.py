@@ -181,12 +181,12 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return f.getvalue()
         elif fmt == 'dot':
             f = cStringIO.StringIO()
-            formats.write_graph_dot(nodes, graph, f)
+            formats.write_graph_dot(nodes, graph, f, bottom_up=True)
             return f.getvalue()
         elif fmt == 'svg':
             dotfile = os.path.join(config.TEMP_PATH, 'graph.dot')
             svgfile = os.path.join(config.TEMP_PATH, 'graph.svg')
-            formats.write_graph_dot(nodes, graph, open(dotfile, 'w'))
+            formats.write_graph_dot(nodes, graph, open(dotfile, 'w'), bottom_up=True)
             os.system('dot -Tsvg %s -o %s' % (dotfile, svgfile))
             return open(svgfile, 'rb').read()
         else:

@@ -297,11 +297,14 @@ def wrap(s, width):
     return result
 
 
-def write_graph_dot(nodes, graph, outstr=None):
+def write_graph_dot(nodes, graph, outstr=None, bottom_up=False):
     if outstr is None:
         outstr = sys.stdout
 
     print >> outstr, 'digraph G {'
+
+    if bottom_up:
+        print >> outstr, '    rankdir=BT;'
 
     for tag, node in nodes.items():
         usetag = tag

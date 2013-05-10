@@ -12,11 +12,12 @@ import formats
 import graphs
 from graphs import Node
 import resources
+import search
 
 """A simple server to serve as a placeholder. Basically spits out graphs
 in various formats. It responds to the following requests:
 
-  GET nodes                          get a JSON object representing the full graph
+  GET nodes                           get a JSON object representing the full graph
   GET nodes/node-name                 get the JSON representation of a single node
   GET nodes/node-name/map             get the part of the graph that a node depends on
   GET nodes/node-name/related         get the part of the graph that's related to a node
@@ -25,12 +26,18 @@ in various formats. It responds to the following requests:
   PUT nodes/node-name/user_data       update the user-supplied data for a node
   GET nodes/node-name/resources       get a JSON representation of the resource list for a given node
 
+  GET search                          process a search query, return a list of JSON objects for the results
+
 TODO add POST/PUT/DELETE/OPTIONS information once API is complete
 
 It can also produce SVG and DOT output for all the graph requests.
 You can specify this with a query field in the URL, e.g.
 
   GET full_graph?format=svg
+
+Example search query:
+
+  GET search?q=gibbs+sampling
 
 Start the server by typing (from the main knowledge-maps directory):
 
@@ -55,6 +62,9 @@ def load_graph():
 
         # read user-supplied data
         user_nodes = formats.read_user_nodes(config.USER_CONTENT_PATH)
+
+        # load search index
+        search.load_main_index()
 
 def update_node_user_data(node_tag, jdata):
     formats.check_node_user_data_format(jdata)
@@ -150,6 +160,17 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     text = formats.node_resources_json(nodes[node], resource_dict)
                 else:
                     raise RuntimeError('Invalid resource: %s' % self.path)
+            elif parts[0] == 'search':
+                if 'q' not in query:
+                    raise RuntimeError('No query specified')
+                q = query['q']
+                print 'Search query:', q
+                tags = search.answer_query(q)
+                tags = filter(lambda t: t in nodes, tags)
+                result_nodes = [nodes[t] for t in tags]
+                results = [{'tag': node.tag, 'title': node.title, 'summary': node.summary}
+                           for node in result_nodes]
+                text = json.dumps(results)
             else:
                 raise RuntimeError('Invalid resource: %s' % self.path)
             self.send_text(text, ctype)

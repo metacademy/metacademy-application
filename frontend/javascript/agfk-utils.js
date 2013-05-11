@@ -7,7 +7,7 @@ if (!Array.indexOf) {
             }
         }
         return -1;
-    }
+    };
 }
 
 if (typeof Object.getPrototypeOf !== "function")
@@ -20,6 +20,13 @@ if (typeof Object.getPrototypeOf !== "function")
             return object.constructor.prototype;
         };
 
+/* General helper functions */
+function isUrl(s) {
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    return regexp.test(s);
+}
+
+/* agfk specific helper functions */
 function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
     /*
      Changes display size of the right margin
@@ -35,7 +42,7 @@ function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
     $("#leftpanel").css("left", rper_width)
         .css("width", (100 - rp_width) + "%");
     $("#rightpanel").css("width", (rp_width - rp_lmarg - rp_rmarg) + "%")
-        .css("left", (rp_width + rp_lmarg) + "%")
+        .css("left", (rp_width + rp_lmarg) + "%");
 }
 
 

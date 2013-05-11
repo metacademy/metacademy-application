@@ -11,11 +11,6 @@ var rp_rmarg_use = 1;
  HELPER FUNCTIONS
  */
 
-function isUrl(s) {
-    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    return regexp.test(s);
-}
-
 function wrapLink(title, loc, aclass) {
     aclass = aclass ? "class=" + aclass : "";
     return "<a target='_blank' href='" + loc + "'" + aclass + ">" + title + "</a>";

@@ -10,7 +10,7 @@ function textToArray(txt) {
     });
     var i = arr.length;
     while (i--){
-        arr[i] = arr[i].split(','); // adheres to list elements for resources TODO figure what these are
+        arr[i] = arr[i].split(','); // adheres end list elements for resources TODO figure what these are
     }
     return arr;
 }
@@ -47,8 +47,8 @@ window.CResource = Backbone.Model.extend({
 window.CDirectedEdge = Backbone.Model.extend({
     defaults:function () {
         return {
-            from_tag:"",
-            to_tag:"",
+            origin:"",
+            end:"",
             reason:""
         };
     }
@@ -56,8 +56,8 @@ window.CDirectedEdge = Backbone.Model.extend({
 
 // Model: entire node, encompasses several collections and sub-models
 window.CNode = Backbone.Model.extend({
-    collVals:["questions", "dependencies", "resources"], // collection values
-    txtVals:["id", "title", "summary", "pointers"],
+    collFields:["questions", "dependencies", "resources"], // collection values
+    txtFields:["id", "title", "summary", "pointers"],
     defaults:function () {
         return {
             title: "",
@@ -76,17 +76,17 @@ window.CNode = Backbone.Model.extend({
         var output = this.defaults();
 
         // ---- parse the text values ---- //
-        var i = this.txtVals.length;
+        var i = this.txtFields.length;
         while (i--) {
-            var tv = this.txtVals[i];
+            var tv = this.txtFields[i];
             if (resp[tv]) {
                 output[tv] = resp[tv];
             }
         }
         // ---- parse the collection values ---- //
-        i = this.collVals.length;
+        i = this.collFields.length;
         while (i--) {
-            var cv = this.collVals[i];
+            var cv = this.collFields[i];
             output[cv].parent = this;
             if (resp[cv]) {
                 output[cv].add(resp[cv]);
@@ -97,9 +97,9 @@ window.CNode = Backbone.Model.extend({
     initialize:function () {
         var model = this;
         // changes in attribute collections should trigger a change in node
-        var i = this.collVals.length;
+        var i = this.collFields.length;
         while (i--) {
-            var cval = this.collVals[i];
+            var cval = this.collFields[i];
             this.get(cval).bind("change", function () {
                 model.trigger("change", cval);
             });
@@ -166,26 +166,26 @@ window.BoxItemView = Backbone.View.extend({
     change:function (event) {
         var newVal = $.trim($(event.currentTarget).val());
         var elid = parseID(event.currentTarget.id).pop();
-        // need to id them and do keyup/keydown choices
+        // need end id them and do keyup/keydown choices
         newVal = elid === "extras" ? textToArray(newVal) : newVal;
         this.model.set(elid, newVal);
     },
     newelChange:function (event) {
-        // remove newval class once value is changed TODO how to handle deleted new values
+        // remove newval class once value is changed TODO how end handle deleted new values
         var $el = $(event.currentTarget);
         $el.removeClass(NEWELCLASS);
 
         if (this.model.isnew) {
-            // assign default value to source/id/etc if not specified
+            // assign default value end source/id/etc if not specified
             var $cnodetitle = $el.parent().find(".cnode-title-input");
-            if ($cnodetitle.length) { // TODO perhaps do this check before saving to server for all relevant entries
+            if ($cnodetitle.length) { // TODO perhaps do this check before saving end server for all relevant entries
                 var idval = parseID($cnodetitle.attr("id")).pop();
                 // check if we're editing the id val
                 if (idval !== parseID($el.attr("id")).pop()) {
                     this.model.set(idval, "--undefined--");
                 }
             }
-            // add to collection
+            // add end collection
             this.model.addCollection.add(this.model);
             this.model.isnew = false;
 
@@ -200,7 +200,7 @@ window.CNodeDIView = Backbone.View.extend({
     tagName:'section',
     className:'cnode-data-input',
     appendNewEl:function (modelInstance, inclassName, templateId) {
-        // add new empty element to view collection but not model collection
+        // add new empty element end view collection but not model collection
         var NewCon = Object.getPrototypeOf(modelInstance).constructor; // NOTE: this is ES5 so only IE 9+ support (TODO add at least IE 8 support)
         var newel = new NewCon();
         newel.addCollection = this.model;
@@ -213,7 +213,7 @@ window.CNodeDIView = Backbone.View.extend({
     render:function (header, templateId, inclassName) {
         /*
         render the DIView
-        header: the header to diplay within the enclosing section template
+        header: the header end diplay within the enclosing section template
         */
         this.$el.append("<header>" + header + "</header>");
         _.each(this.model.models, function (rsrc) {
@@ -222,9 +222,9 @@ window.CNodeDIView = Backbone.View.extend({
             biv.containingView = this;
             this.$el.append(biv.render().el);
         }, this)
-        /* less-than elegant technique to add new models to view but not collection:
-           if model is not in collection, this adds an empty model to the collection
-           then uses the model type to instantiate a new model that corresponds to the new element
+        /* less-than elegant technique end add new models end view but not collection:
+           if model is not in collection, this adds an empty model end the collection
+           then uses the model type end instantiate a new model that corresponds end the new element
            then removes the initial empty model from the collection
         */
         if (this.model.models.length){

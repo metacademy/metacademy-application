@@ -118,17 +118,20 @@ function beautifyText() {
 // load the SVG file using AJAX
 var jdata = null;
 function load_svg(node_name) {
-    var get_url;
+    var getUrl;
+    var addChar;
     if (node_name === 'nodes' || node_name==='') {
-        get_url = window.CONTENT_SERVER +'/nodes';
+        getUrl = window.CONTENT_SERVER +'/nodes';
+        addChar = '?';
     } else {
-        get_url = window.CONTENT_SERVER + '/nodes/' + node_name + '/map';
+        getUrl = window.CONTENT_SERVER + '/nodes/' + node_name + '?set=map';
+        addChar = '&';
     }
 
     // 1st ajax call: load the kmap svg file (output from graphviz)
     $.ajax({
         type:'GET',
-        url:get_url + '?format=svg',
+        url:getUrl + addChar + 'format=svg',
         async:false,
         success:function (svgFileData) {
             // remove previous data
@@ -385,7 +388,7 @@ function load_svg(node_name) {
 // 2nd AJAX call: get json graph data (dependencies, see-also, etc)
     $.ajax({
         type:'GET',
-        url: get_url + '?format=json',
+        url: getUrl + addChar + "format=json",
 	dataType:'json',
         async:false,
         scriptCharset:"utf-8",

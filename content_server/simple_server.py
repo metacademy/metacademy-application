@@ -19,8 +19,8 @@ in various formats. It responds to the following requests:
 
   GET nodes                           get a JSON object representing the full graph
   GET nodes/node-name                 get the JSON representation of a single node
-  GET nodes/node-name/map             get the part of the graph that a node depends on
-  GET nodes/node-name/related         get the part of the graph that's related to a node
+  GET nodes/node-name?set=map             get the part of the graph that a node depends on
+  GET nodes/node-name?set=related         get the part of the graph that's related to a node
                                          (ancestors/descendants)
   GET nodes/node-name/user_data       get the JSON representation of the user-supplied data for a node
   PUT nodes/node-name/user_data       update the user-supplied data for a node
@@ -31,7 +31,7 @@ in various formats. It responds to the following requests:
 TODO add POST/PUT/DELETE/OPTIONS information once API is complete
 
 It can also produce SVG and DOT output for all the graph requests.
-You can specify this with a query field in the URL, e.g.
+You can specify this with a query field in the URL, e.g. (Will be deprecated in frontend V2)
 
   GET full_graph?format=svg
 
@@ -51,6 +51,7 @@ graph_minus_redundant = None
 resource_dict = None
 user_nodes = None
 
+
 def load_graph():
     global nodes, graph, graph_minus_redundant, resource_dict, user_nodes
     if nodes is None:
@@ -66,6 +67,7 @@ def load_graph():
         # load search index
         search.load_main_index()
 
+
 def update_node_user_data(node_tag, jdata):
     formats.check_node_user_data_format(jdata)
     user_nodes[node_tag] = jdata
@@ -76,14 +78,14 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     server_version = 'AGFKDebug'
 
     def do_OPTIONS(self):
-	""" Return HTTP Options"""
+        """ Return HTTP Options"""
         self.send_response(200)
         self.add_cors_header()
-        self.send_header('Allow','GET, PUT, POST, DELETE')
+        self.send_header('Allow', 'GET, PUT, POST, DELETE')
         self.end_headers()
 
     def do_DELETE(self):
-	"""TODO"""
+        """TODO"""
         pass
 
     def do_PUT(self):
@@ -106,16 +108,14 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.add_cors_header()
             self.end_headers()
         except:
-            self.send_error(500, traceback.format_exc()) 
-
+            self.send_error(500, traceback.format_exc())
 
     def do_POST(self):
         """ TODO: make unique from PUT"""
-        self.do_PUT() # TODO return 204...
-
+        self.do_PUT()  # TODO return 204...
 
     def do_GET(self):
-	"""GET node data"""
+        """GET node data"""
         load_graph()
         parse = urlparse.urlparse(self.path)
         parts = parse.path.lower().split('/')
@@ -127,26 +127,30 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             fmt = 'json'
 
+        if 'set' in query:
+            dset = query['set'][0]
+        else:
+            dset = 'single'
+
         ctype = {'json': 'application/json',
                  'svg': 'image/svg+xml',
                  'dot': 'text/plain',
                  }[fmt]
         try:
             if parts[0] == 'nodes' and len(parts) == 1:
-                assert len(parts)==1
+                assert len(parts) == 1
                 text = self.get_full_graph(fmt=fmt)
             elif parts[0] == 'nodes':
                 node = parts[1]
                 assert node in nodes
                 if len(parts) == 2:
-                    assert fmt == 'json'
-                    text = self.get_node_json(parts[1])
-                elif parts[2] == 'related':
-                    assert len(parts) == 3
-                    text = self.get_related_nodes(parts[1], fmt=fmt)
-                elif parts[2] == 'map':
-                    assert len(parts) == 3
-                    text = self.get_map(parts[1], fmt=fmt)
+                    if dset == 'single':
+                        assert fmt == 'json'
+                        text = self.get_node_json(parts[1])
+                    elif dset == 'related':
+                        text = self.get_related_nodes(parts[1], fmt=fmt)
+                    elif dset == 'map':
+                        text = self.get_map(parts[1], fmt=fmt)
                 elif parts[2] == 'user_data':
                     assert len(parts) == 3
                     assert fmt == 'json'
@@ -178,24 +182,24 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_error(404, traceback.format_exc())
 
     def add_cors_header(self):
-	"""Add headers to all Cross Origin Resource Sharing"""
-        self.send_header('Access-Control-Allow-Origin','*') # TODO do we want full CORS?
-        self.send_header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE,OPTIONS')
+        """Add headers to all Cross Origin Resource Sharing"""
+        self.send_header('Access-Control-Allow-Origin', '*')  # TODO do we want full CORS?
+        self.send_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         self.send_header('Access-Control-Allow-Credentials', 'true')
         self.send_header('Access-Control-Allow-Headers', 'x-requested-with,Content-Type')
-        self.send_header('Access-Control-Max-Age','86400') # cache preflight for 24 hours
+        self.send_header('Access-Control-Max-Age', '86400')  # cache preflight for 24 hours
 
     def send_text(self, text, ctype):
-	"""Send text data via HTTP response"""
+        """Send text data via HTTP response"""
         self.send_response(200)
         self.add_cors_header()
-        self.send_header('Content-type', ctype + ';charset=utf-8') # TODO make encoding an option?
+        self.send_header('Content-type', ctype + ';charset=utf-8')  # TODO make encoding an option?
         self.send_header('Content-length', len(text))
         self.end_headers()
         self.wfile.write(text)
 
     def format_graph(self, nodes, graph, fmt):
-	"""Return graph in desired format"""
+        """Return graph in desired format"""
         if fmt == 'json':
             f = cStringIO.StringIO()
             formats.write_graph_json(nodes, graph, resource_dict, f, user_nodes=user_nodes)

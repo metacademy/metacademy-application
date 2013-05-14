@@ -47,9 +47,9 @@ window.CResource = Backbone.Model.extend({
 window.CDirectedEdge = Backbone.Model.extend({
     defaults:function () {
         return {
-            origin:"",
-            end:"",
-            reason:""
+            from_tag: "",
+            to_tag: "",
+            reason: ""
         };
     }
 });

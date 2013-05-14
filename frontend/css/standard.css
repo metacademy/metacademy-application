@@ -49,6 +49,7 @@ body {
     width: 80%; /* left column content width (left column width minus left and right padding) */
     left: 20%; /* (right column width) plus (left column left padding) */
     border-right: 0.2ex black solid;
+    overflow: hidden;
     box-sizing: border-box;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */

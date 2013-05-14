@@ -5,25 +5,14 @@ KMap Explorer
 {% endblock %}
 
 {% block jscript %}
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/d3.v2.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/jQuery-latest.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/tooltipsy.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/d3.v2.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jQuery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/viz.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/underscore-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/backbone.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/tooltipsy.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk-utils.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/kmap-interaction.js"></script>
-{% endblock %}
-
-
-{% block header %}
-<div class="dtable">
-    <div class="dvcenter">
-        <select id="data-select" onchange="load_svg(this.value)">
-            <option value="">full graph</option>
-            {% for node_tag in node_list %}
-            <option value="{{ node_tag }}">{{ node_tag }}</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk-mv-main.js"></script>
 {% endblock %}
 
 {% block rightpanel %}

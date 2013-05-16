@@ -6,7 +6,7 @@ Constructors are prefixed with a 'C' to avoid naming collisions ('C' for 'Constr
 */
 
 /* set some constants */
-window.DEFAULT_DEPTH = 2; // default dependency depth for keynode
+window.DEFAULT_DEPTH = 1; // default dependency depth for keynode
 window.DEFAULT_IS_BT = true; // display graph bottom to top by default?
 
 (function(Backbone, Viz){
@@ -369,8 +369,8 @@ window.CKmapView = Backbone.View.extend({
     */
     initialize: function(){
         // build initial graph based on input collection
-        var getDotStr = this.collToDot(this.model);
-        this.svgGraph = this.createSvgGV(getDotStr);
+        var dotStr = this.collToDot();
+        this.svgGraph = this.createSvgGV(dotStr);
         this.initialSvg = true;
     },
 
@@ -429,6 +429,7 @@ window.CKmapView = Backbone.View.extend({
         // var vmodel = this.model;
         d3this.selectAll(".node")
         .on("mouseover", function () {
+            // display down arrow if not expanded down
             var node = d3.select(this);
             if (node.attr('clicked') === null) {
                 node.select('ellipse').attr('fill', '#E6EEEE');
@@ -483,19 +484,69 @@ window.CKmapView = Backbone.View.extend({
    },
 
     /**
-    * Return full string representation of a node for graphviz
+    * Create dot string from the model
+    * depth: depth from keyNode (if present)
+    * bottomUp: have dependencies below the given nodes
     */
-    _fullGraphVizStr: function(node){
-        return node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"];';
-    },
+    collToDot: function(depth, bottomUp){
 
-    /**
-    * Create node collection to dot string
-    */
-    collToDot: function(getDotStr, depth, bottomUp){
         depth = depth || window.DEFAULT_DEPTH;
         bottomUp = bottomUp || window.DEFAULT_IS_BT;
 
+        var dgArr;
+        if (this.model.get("keyNode")){
+            dgArr = this._getDSFromKeyArr(depth);
+        }
+        else{
+            dgArr = this._getFullDSArr();
+        }
+
+        // include digraph options
+        if (bottomUp) {dgArr.unshift("rankdir=BT");}
+        // dgArr.unshift("node [shape=note]");
+
+        return "digraph G{\n" + dgArr.join("\n") + "}";
+    },
+
+    /**
+    * Create SVG representation of graph given a dot string
+    */
+    createSvgGV: function(dotStr){
+        return Viz(dotStr, 'svg');
+    },
+
+    /**
+    * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
+    */
+    close: function(){
+      this.remove();
+      this.unbind();
+  },
+
+      /**
+    * Return a dot string array from the entire model
+    */
+    _getFullDSArr: function(){
+        var dgArr = [];
+        // add all node properties & edges
+        this.model.get("nodes").each(
+            function(node){
+                dgArr.unshift(node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"];');
+                node.get("dependencies").each(
+                    function(inlink){
+                        if (node.isUniqueDependency(inlink.get("from_tag"))){
+                            dgArr.push(inlink.getDotStr());
+                        }
+                });
+            }
+        );
+        return dgArr;
+    },
+
+    /**
+    * Return a dot string array from keyNode and specified depth
+    */
+    _getDSFromKeyArr: function(depth){
         var dgArr = [];
         var thisView = this;
         // build graph of appropriate depth from given keyNode
@@ -504,6 +555,7 @@ window.CKmapView = Backbone.View.extend({
             dgArr.unshift(thisView._fullGraphVizStr(node));
         });
 
+        // This is essentially adding nodes via a bredth-first search to the desired dependency depth
         // for each dependency depth level...
         var addedNodes = {};
         for(var curDep = 0; curDep < depth; curDep++){
@@ -519,9 +571,8 @@ window.CKmapView = Backbone.View.extend({
                         var depNode = thisView.model.get("nodes").get(depNodeId);
                         // add node strings to the front of the dgArr
                         dgArr.unshift(thisView._fullGraphVizStr(depNode));
-                        var depId = depNodeId + node.get("id");
                         // add edge string to the end
-                        dgArr.push(node.get("dependencies").get(depId).getDotStr());
+                        dgArr.push(node.get("dependencies").get(depNodeId + node.get("id")).getDotStr());
                         // then add dependency to the end of curEndNodes if it has not been previously added
                         if (!addedNodes.hasOwnProperty(depNodeId)){
                             curEndNodes.push(depNode);
@@ -531,27 +582,16 @@ window.CKmapView = Backbone.View.extend({
                 );
             }
         }
+        return dgArr;
 
-        // include digraph options
-        if (bottomUp) {dgArr.unshift("rankdir=BT");}
-
-        return "digraph G{\n" + dgArr.join("\n") + "}";
     },
 
     /**
-    * Create SVG representation of graph given a dot string
+    * Return full string representation of a node for graphviz
     */
-    createSvgGV: function(getDotStr){
-        return Viz(getDotStr, 'svg');
-    },
-
-    /**
-    * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
-    */
-    close: function(){
-      this.remove();
-      this.unbind();
-  }
+    _fullGraphVizStr: function(node){
+        return node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"];';
+    }
 });
 
 

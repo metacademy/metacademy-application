@@ -1,3 +1,32 @@
+/**
+* This file contains general purpose utility functions
+*/
+
+/**
+* Wrap a long string to avoid elongated graph nodes. Translated from server techniqu
+*/
+function wrapNodeText(s, width){
+    if (!s) {return '';}
+
+    var parts = s.split(" ");
+    var result = '';
+    var total = 0;
+    for (var i = 0; i < parts.length; i++){
+        result += parts[i];
+        total += parts[i].length;
+        if (total > width){
+            result += '\\n';
+            total = 0;
+        }
+        else{
+            result += " ";
+            total += 1;
+        }
+    }
+    return result;
+}
+
+
 /* IE compatability functions */
 if (!Array.indexOf) {
     Array.prototype.indexOf = function (obj) {
@@ -26,7 +55,9 @@ function isUrl(s) {
     return regexp.test(s);
 }
 
-/* agfk specific helper functions */
+/**
+* agfk specific helper functions 
+*/
 function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
     /*
      Changes display size of the right margin

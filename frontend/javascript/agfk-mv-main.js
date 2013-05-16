@@ -2,18 +2,24 @@
 This file will contain the central mv* framework for the AGFK learning, exploration, and content-submission.
 After initial development, the contents of this file may be placed into an standard MV* file heirarchy, 
 e.g. models/node.js, views/comprehension-view.js, etc
+Constructors are prefixed with a 'C' to avoid naming collisions ('C' for 'Constructor')
 */
+
+/* set some constants */
+window.DEFAULT_DEPTH = 2; // default dependency depth for keynode
+window.DEFAULT_IS_BT = true; // display graph bottom to top by default?
 
 (function(Backbone, Viz){
 "use strict"; // TODO use functional form of strict mode after initial development
 
 
-
-
-/* UTILS - TODO move to utils file */
+/*****************************/
+/* -------- UTILS ---------- */
+/*****************************/
+/* TODO move to utils file */
 
 /**
-* Wrap a long string to avoid elongated graph nodes.
+* Wrap a long string to avoid elongated graph nodes. Translated from server techniqu
 */
 function wrapNodeText(s, width){
     if (!s) {return '';}
@@ -98,6 +104,10 @@ window.CDirectedEdge = Backbone.Model.extend({
             reason: "",
             visible: false
         };
+    },
+
+    initialize: function(inp){
+        this.id = inp.id || inp.from_tag + inp.to_tag;
     },
 
     /**
@@ -213,20 +223,20 @@ window.CNode = Backbone.Model.extend({
     * Obtain (and optionally return) a list of the ancestors of this node 
     * side effect: creates a list of unique dependencies (dependencies not present as an 
     * ancestor of another dependency) which is stored in this.uniqueDeps
-    */
-    getAncestors: function(noReturn){
-        if (!this.ancestors){
-            var ancests = {};
-            var coll = this.collection;
-            this.get("dependencies").each(function(dep){
-                var depNode = coll.get(dep.get("from_tag"));
-                var dAncests = depNode.getAncestors();
-                for (var dAn in dAncests){
-                    if(dAncests.hasOwnProperty(dAn)){
-                        ancests[dAn] = 1;
-                    }
+*/
+getAncestors: function(noReturn){
+    if (!this.ancestors){
+        var ancests = {};
+        var coll = this.collection;
+        this.get("dependencies").each(function(dep){
+            var depNode = coll.get(dep.get("from_tag"));
+            var dAncests = depNode.getAncestors();
+            for (var dAn in dAncests){
+                if(dAncests.hasOwnProperty(dAn)){
+                    ancests[dAn] = 1;
                 }
-            });
+            }
+        });
 
             // create list of unique dependencies
             var uniqueDeps = {};
@@ -237,36 +247,65 @@ window.CNode = Backbone.Model.extend({
                 }
                 ancests[dtag] = 1;
             });
-                this.uniqueDeps = uniqueDeps;
-                this.ancestors = ancests;
-            }
+            this.uniqueDeps = uniqueDeps;
+            this.ancestors = ancests;
+        }
 
-            if (!noReturn){
-                return this.ancestors;
-            }
+        if (!noReturn){
+            return this.ancestors;
+        }
     },
 
     /**
     * Get a list of unqiue dependencies (dependencies not present as an 
     * ancestor of another dependency)
-    */
-    getUniqueDependencies: function(noReturn){
-        if (!this.uniqueDeps){ this.getAncestors(true); }
+*/
+getUniqueDependencies: function(noReturn){
+        if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
         if (!noReturn){
-            return this.uniqueDeps;
+            return Object.keys(this.uniqueDeps);
         }
     },
 
     /**
     * Check if depID is a unique dependency (dependencies not present as an 
     * ancestor of another dependency)
-    */
-    isUniqueDependency: function(depID){
-        if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
-        return this.uniqueDeps.hasOwnProperty(depID);
-    }
+*/
+isUniqueDependency: function(depID){
+    if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
+    return this.uniqueDeps.hasOwnProperty(depID);
+}
 });
 
+
+/**
+* Container for CNodeCollection in order to save/parse meta information for the collection
+*/
+window.CNodeCollectionContainer = Backbone.Model.extend({
+    defaults: function(){
+        return {
+            nodes: new CNodeCollection(),
+            keyNode: null
+        };
+    },
+
+    /**
+    * parse incoming json data
+    */
+    parse: function(response){
+        // TODO check for extending the nodes vs resetting
+        this.get("nodes").add(response.nodes, {parse: true});
+        delete response.nodes;
+        return response;
+    },
+
+    /**
+    * Specify URL for HTTP verbs (GET/POST/etc)
+    */
+    url: function(){
+        return window.CONTENT_SERVER + "/nodes" + (this.get("keyNode") ? "/" + this.get("keyNode") + '?set=map' : "");
+    }
+});
 
 /*****************************/
 /* ------ COLLECTIONS ------ */
@@ -301,17 +340,14 @@ window.CQuestionCollection = Backbone.Collection.extend({
 */
 window.CNodeCollection = Backbone.Collection.extend({
     model: CNode,
-    url: function(){
-        return window.CONTENT_SERVER + "/nodes" + (this.ncoll ? "/" + this.ncoll + '?set=map' : "");
-    },
 
     /**
-    * parse the incoming json data
+    * parse incoming json data
     */
-    parse:function (response) {
+    parse: function(response){
         var ents = [];
-        for (var key in response.nodes) {
-            ents.push(_.extend(response.nodes[key],{id: key})); // TODO change once id is generated server-side
+        for (var key in response) {
+            ents.push(_.extend(response[key],{id: key})); // TODO change once id is generated server-side
         }
         return ents;
     }
@@ -325,7 +361,7 @@ window.CNodeCollection = Backbone.Collection.extend({
 /**
 * View for knowledge map in exploration mode
 */
-window.KmapView = Backbone.View.extend({
+window.CKmapView = Backbone.View.extend({
     id: "kmview",
 
     /**
@@ -430,9 +466,9 @@ window.KmapView = Backbone.View.extend({
     },
 
     /**
-     * Renders the kmap using the supplied features collection
-     */
-     render: function() {
+    * Renders the kmap using the supplied features collection
+    */
+    render: function() {
         if (this.initialSvg){
             //initial render
             this.$el.html(this.svgGraph);
@@ -441,59 +477,81 @@ window.KmapView = Backbone.View.extend({
         }
         else{
            // TODO
-        }
+       }
 
-        return this;
+       return this;
+   },
+
+    /**
+    * Return full string representation of a node for graphviz
+    */
+    _fullGraphVizStr: function(node){
+        return node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"];';
     },
 
     /**
     * Create node collection to dot string
     */
-    collToDot: function(getDotStr, bottomUp){
-        bottomUp = bottomUp || true;
+    collToDot: function(getDotStr, depth, bottomUp){
+        depth = depth || window.DEFAULT_DEPTH;
+        bottomUp = bottomUp || window.DEFAULT_IS_BT;
 
         var dgArr = [];
+        var thisView = this;
+        // build graph of appropriate depth from given keyNode
+        var curEndNodes = [this.model.get("nodes").get(this.model.get("keyNode"))]; // this should generalize easily to multiple end nodes, if desired
+        _.each(curEndNodes, function(node){
+            dgArr.unshift(thisView._fullGraphVizStr(node));
+        });
+
+        // for each dependency depth level...
+        var addedNodes = {};
+        for(var curDep = 0; curDep < depth; curDep++){
+            // obtain number of nodes at given depth
+            var cenLen = curEndNodes.length;
+            // iterate over the nodes
+            while(cenLen--){
+                // grab a specific node at that depth
+                var node = curEndNodes.shift();
+                // for each unqiue dependency for the specific node...
+                _.each(node.getUniqueDependencies(), function(depNodeId){
+                        // grab the dependency node
+                        var depNode = thisView.model.get("nodes").get(depNodeId);
+                        // add node strings to the front of the dgArr
+                        dgArr.unshift(thisView._fullGraphVizStr(depNode));
+                        var depId = depNodeId + node.get("id");
+                        // add edge string to the end
+                        dgArr.push(node.get("dependencies").get(depId).getDotStr());
+                        // then add dependency to the end of curEndNodes if it has not been previously added
+                        if (!addedNodes.hasOwnProperty(depNodeId)){
+                            curEndNodes.push(depNode);
+                            addedNodes[depNodeId] = true;
+                        }
+                    }
+                );
+            }
+        }
 
         // include digraph options
-        if (bottomUp) {dgArr.push("rankdir=BT");}
-
-        // add node properties
-        this.model.each(
-            function(cnode){
-                dgArr.push(cnode.get("id") + ' [label="' + cnode.getNodeDisplayTitle() + '"];');
-            }
-        );
-
-        // add the edges TODO make an option to display redundant edges
-        this.model.each(
-            function(cnode){
-
-                cnode.get("dependencies").each(
-                    function(inlink){
-                        if (cnode.isUniqueDependency(inlink.get("from_tag"))){
-                            dgArr.push(inlink.getDotStr());
-                        }
-                    });
-            }
-        );
+        if (bottomUp) {dgArr.unshift("rankdir=BT");}
 
         return "digraph G{\n" + dgArr.join("\n") + "}";
     },
 
     /**
-    * Create SVG representation
+    * Create SVG representation of graph given a dot string
     */
     createSvgGV: function(getDotStr){
         return Viz(getDotStr, 'svg');
     },
 
     /**
-    * Close and unbind views to avoid memory leaks
+    * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
     */
     close: function(){
       this.remove();
       this.unbind();
-    }
+  }
 });
 
 
@@ -504,7 +562,7 @@ window.KmapView = Backbone.View.extend({
 /**
 * Central router to control URL state
 */
-window.AppRouter = Backbone.Router.extend({
+window.CAppRouter = Backbone.Router.extend({
     routes: {
         "":"fullGraphRoute",
         ":id":"cnodeRoute"
@@ -527,12 +585,11 @@ window.AppRouter = Backbone.Router.extend({
         // need to load just the given node and deps...
         console.log('in list');
         console.log(id);
-        this.cnodes = new CNodeCollection();
-        this.cnodes.ncoll = id; // TODO this is a hack
+        this.cnodesContn = new CNodeCollectionContainer({keyNode: id});
         var that = this; // TODO better way to do this?
-        this.cnodes.fetch({success:function () {
-            console.log('successful fetch'); //  (collection was populated)
-            that.kmView = new KmapView({model: that.cnodes});
+        this.cnodesContn.fetch({success:function () {
+            console.log('successful fetch: collection was populated'); //  (collection was populated)
+            that.kmView = new CKmapView({model: that.cnodesContn});
             that.showView("#leftpanel", that.kmView);
         }});
 
@@ -542,7 +599,7 @@ window.AppRouter = Backbone.Router.extend({
 /*****************************/
 /* --------- MAIN ---------- */
 /*****************************/
-var app = new AppRouter();
+window.app = new CAppRouter();
 Backbone.history.start();
 scaleWindowSize("header", "main", "rightpanel", "leftpanel");
 setRightPanelWidth(0);

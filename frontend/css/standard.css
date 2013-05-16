@@ -50,10 +50,10 @@ body {
     left: 20%; /* (right column width) plus (left column left padding) */
     border-right: 0.2ex black solid;
     overflow: hidden;
-    box-sizing: border-box;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 
 }
 
@@ -67,6 +67,12 @@ body {
 }
 
 /* special styles */
+
+#kmview{
+    width: 100%;
+    height: 100%;
+}
+
 div.edit-node {
     margin: 0.2em;
     margin-bottom: 0.1em;
@@ -92,10 +98,10 @@ section.cnode-dep{
     padding: 1% 1.5%;
     border: 0.15em solid;
     border-radius: 1.2em;
-    box-sizing: border-box;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 }
 .cnode-box label{
     display: inline;
@@ -116,6 +122,7 @@ section.cnode-dep{
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 }
 
 
@@ -137,10 +144,10 @@ section.resources{
 /*hack to match style with cnode-box*/
 .lone-section{
     margin: 0.75%;
-    box-sizing: border-box;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 }
 
 textarea.cnode-reason-input{
@@ -150,9 +157,6 @@ ul.nodelist {
     list-style: none;
     margin: 0;
     padding: 0;
-}
-
-ul.nodelist li {
 }
 
 ul.nodelist li a {

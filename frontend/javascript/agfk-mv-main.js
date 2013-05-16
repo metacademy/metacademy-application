@@ -2,9 +2,13 @@
 This file will contain the central mv* framework for the AGFK learning, exploration, and content-submission.
 After initial development, the contents of this file may be placed into an standard MV* file heirarchy, 
 e.g. models/node.js, views/comprehension-view.js, etc
-/*
+*/
 
-"use strict" // TODO use functional form of strict mode after initial development
+(function(Backbone, Viz){
+"use strict"; // TODO use functional form of strict mode after initial development
+
+
+
 
 /* UTILS - TODO move to utils file */
 
@@ -217,7 +221,7 @@ window.CNode = Backbone.Model.extend({
             this.get("dependencies").each(function(dep){
                 var depNode = coll.get(dep.get("from_tag"));
                 var dAncests = depNode.getAncestors();
-                for (dAn in dAncests){
+                for (var dAn in dAncests){
                     if(dAncests.hasOwnProperty(dAn)){
                         ancests[dAn] = 1;
                     }
@@ -225,7 +229,7 @@ window.CNode = Backbone.Model.extend({
             });
 
             // create list of unique dependencies
-            uniqueDeps = {};
+            var uniqueDeps = {};
             this.get("dependencies").each(function(dep){
                 var dtag = dep.get("from_tag");
                 if (!ancests.hasOwnProperty(dtag)){
@@ -322,8 +326,7 @@ window.CNodeCollection = Backbone.Collection.extend({
 * View for knowledge map in exploration mode
 */
 window.KmapView = Backbone.View.extend({
-    // tagName: "svg",
-    tagName: "div",
+    id: "kmview",
 
     /**
     * Obtain initial kmap coordinates and render results
@@ -334,7 +337,7 @@ window.KmapView = Backbone.View.extend({
         this.svgGraph = this.createSvgGV(getDotStr);
         this.initialSvg = true;
     },
-    
+
     /**
     * Initial rendering for view (necessary because of particular d3 use case)
     */
@@ -449,7 +452,7 @@ window.KmapView = Backbone.View.extend({
     collToDot: function(getDotStr, bottomUp){
         bottomUp = bottomUp || true;
 
-        dgArr = [];
+        var dgArr = [];
 
         // include digraph options
         if (bottomUp) {dgArr.push("rankdir=BT");}
@@ -461,7 +464,7 @@ window.KmapView = Backbone.View.extend({
             }
         );
 
-        // add the edges TODO make an option for display redundant edges
+        // add the edges TODO make an option to display redundant edges
         this.model.each(
             function(cnode){
 
@@ -539,12 +542,11 @@ window.AppRouter = Backbone.Router.extend({
 /*****************************/
 /* --------- MAIN ---------- */
 /*****************************/
-scaleWindowSize("header", "main", "rightpanel", "leftpanel");
-setRightPanelWidth(0);
 var app = new AppRouter();
 Backbone.history.start();
-
-
+scaleWindowSize("header", "main", "rightpanel", "leftpanel");
+setRightPanelWidth(0);
+})(Backbone, Viz);
 
 
 

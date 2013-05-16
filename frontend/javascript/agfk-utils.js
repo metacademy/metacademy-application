@@ -45,9 +45,11 @@ function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
         .css("left", (rp_width + rp_lmarg) + "%");
 }
 
-
+/**
+* Controls window/svg/div sizes in two panel display when resizing the window
+* NB: has jQuery dependency
+*/
 function scaleWindowSize(header_id, main_id, rightpanel_id, leftpanel_id) {
-// object to control window resizing in two panel display
     var windowSize = {
         height:0,
         mainHeight:0,

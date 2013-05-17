@@ -3,27 +3,27 @@
 */
 
 /**
-* Wrap a long string to avoid elongated graph nodes. Translated from server techniqu
+* Wrap a long string to avoid elongated graph nodes. Translated/modified from server techniqu
 */
 function wrapNodeText(s, width){
     if (!s) {return '';}
 
     var parts = s.split(" ");
-    var result = '';
+    var result = [];
+    var resArr = [];
     var total = 0;
     for (var i = 0; i < parts.length; i++){
-        result += parts[i];
-        total += parts[i].length;
-        if (total > width){
-            result += '\\n';
+        if (total + parts[i].length + 1 > width && total !== 0){
+            resArr.push(result.join(" "));
+            result = [];
             total = 0;
         }
-        else{
-            result += " ";
-            total += 1;
-        }
+        result.push(parts[i]);
+        total += parts[i].length + 1; 
+        
     }
-    return result;
+    resArr.push(result.join(" "));  
+    return resArr.join("\\n");
 }
 
 

@@ -66,48 +66,82 @@ window.CKmapView = Backbone.View.extend({
     },
 
     /**
-    * Use D3 to add dynamic properties to graph nodes
+    * Use D3 to add dynamic properties to the nodes
     */
     addNodeProps: function(d3this){
-        var last_node = -1;
+        var lastNode = -1;
         // var vmodel = this.model;
         d3this.selectAll(".node")
         .on("mouseover", function () {
-            // display down arrow if not expanded down
+            
+            // add hover color if not clicked
             var node = d3.select(this);
-            if (node.attr('clicked') === null) {
-                node.select('ellipse').attr('fill', '#E6EEEE');
+            node.select("ellipse").classed("hovered", function(){
+                return !this.classList.contains("clicked");
+            });
+
+
+
+            if (!node.select(".expand-node")[0][0]){ // TODO check if the node is already expanded
+                // TODO cache the svg generation
+            // display down arrow if not expanded down
+            var circEl = this.getElementsByTagName("ellipse")[0];
+            var lxval = Number(circEl.getAttribute("cx"));
+            var lyval = Number(circEl.getAttribute("cy"));
+            var yr = Number(circEl.getAttribute("ry"));
+            var xr = Number(circEl.getAttribute("rx"));
+            var plusW = 5;
+            var xorig = lxval - plusW/2;
+            var yorig = lyval + yr - 24; // - the distance from circle edge
+            var plusPts = (xorig) + "," + (yorig) + " " +
+                          (xorig + plusW) + "," + (yorig) + " " +
+                          (xorig + plusW) + "," + (yorig + plusW) + " " +
+                          (xorig + 2*plusW) + "," + (yorig + plusW) + " " +
+                          (xorig + 2*plusW) + "," + (yorig + 2*plusW) + " " +
+                          (xorig + plusW) + "," + (yorig + 2*plusW) + " " +
+                          (xorig + plusW) + "," + (yorig + 3*plusW) + " " +
+                          (xorig) + "," + (yorig + 3*plusW) + " " +
+                          (xorig) + "," + (yorig + 2*plusW) + " " +
+                          (xorig -  plusW) + "," + (yorig + 2*plusW) + " " +
+                          (xorig -  plusW) + "," + (yorig + plusW) + " " +
+                          (xorig) + "," + (yorig + plusW) + " " +
+                          (xorig) + "," + (yorig);
+            node.append("polygon")
+            .attr("points", plusPts)
+            .classed("expand-node node", true)
+            .on("click", function(){alert("happy!");});
+            //     var imgWH = 14;
+            //      node.append("image")
+            //      .attr("xlink:href", window.STATIC_URL + "images/expand.png")
+            //      .attr("x", String(lxval - imgWH/2))
+            //      .attr("y", String(lyval + yr*3/5))
+            //      .attr("height", String(imgWH))
+            //      .attr("width", String(imgWH))
+            //      .attr("class", "expand-node")
+            //      .on("click", function(){alert("happy!");});
             }
+            
         })
         .on("mouseout", function () {
             var node = d3.select(this);
-            if (node.attr('clicked') === null) {
-                node.select('ellipse').attr('fill', 'white');
-            }
+            node.select("ellipse").classed("hovered", false);
+            if (!node.select('.clicked')[0][0]){
+            node.select(".expand-node").remove();
+        }
         })
         .on("click", function (d) {
-            var this_node = d3.select(this).attr('clicked', 'true');
-
-                // First check to see if the node was already clicked and change previous node properties
-                if (last_node === -1) {
-                    last_node = this_node;
-                }
-                else {
-                    last_node.attr("clicked", null)
-                    .select('ellipse')
-                    .attr("fill", "white");
-
-                    if (this_node.attr('id') === last_node.attr('id')) {
-                        last_node = -1;
-                        return;
-                    }
-
-                    last_node = this_node;
-                }
-
-                this_node.select('ellipse')
-                .attr("fill", "#F5EEEE");
+            var thisNode = d3.select(this);
+            thisNode.select("ellipse")
+            .classed('clicked',function(){
+                return !this.classList.contains("clicked");
             });
+            if (lastNode == -1){
+                lastNode = thisNode;
+            }
+            else{
+                lastNode = lastNode.attr('id') === thisNode.attr('id') ? -1 : thisNode;
+            }
+        });
     },
 
     /**
@@ -132,10 +166,11 @@ window.CKmapView = Backbone.View.extend({
     * depth: depth from keyNode (if present)
     * bottomUp: have dependencies below the given nodes
     */
-    collToDot: function(depth, bottomUp){
+    collToDot: function(depth, bottomUp, nodeSep){
 
         depth = depth || window.DEFAULT_DEPTH;
         bottomUp = bottomUp || window.DEFAULT_IS_BT;
+        nodeSep = nodeSep || window.DEFAULT_NODE_SEP;
 
         var dgArr;
         if (this.model.get("keyNode")){
@@ -147,6 +182,8 @@ window.CKmapView = Backbone.View.extend({
 
         // include digraph options
         if (bottomUp) {dgArr.unshift("rankdir=BT");}
+        dgArr.unshift("nodesep=" + nodeSep); // encourage node separation TODO add as option
+        if (bottomUp) {dgArr.unshift('node [shape=circle, fixedsize=true, width=2];');}
         // dgArr.unshift("node [shape=note]");
 
         return "digraph G{\n" + dgArr.join("\n") + "}";

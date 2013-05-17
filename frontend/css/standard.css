@@ -305,6 +305,18 @@ img.list-img {
 
 /* general styles */
 
+ellipse{
+    fill: rgba(157, 200, 255, 0.09);
+}
+
+ellipse.clicked{
+    fill: rgb(250, 247, 247);
+}
+
+ellipse.hovered{
+    fill: rgb(250, 247, 247);
+}
+
 p {
     margin: 0.1em 0;
 }
@@ -346,7 +358,7 @@ h1 {
 }
 
 h2 {
-    line-height: 0em;
+    line-height: 0;
     font-size: 1.3em;
     font-style: italic;
     margin-bottom: 2ex;
@@ -354,15 +366,15 @@ h2 {
 
 /*Graph Properties*/
 path {
-    stroke: #15317E;
-    stroke-width: 2;
-    stroke-opacity: 0.6;
+    stroke-width: 3;
+    stroke-opacity: 0.8;
     fill: none;
 }
 
-circle {
-    fill: #15317E;
+ellipse {
     fill-opacity: 1.0;
+    stroke-opacity: 0.8;
+    stroke-width: 2;
 }
 
 line {
@@ -375,9 +387,15 @@ line {
 
 .node text{
     font-family: Arial, sans-serif;
+    font-weight: bold;
 }
 
-line.link {
-    stroke: #999999;
-    stroke-opacity: 0.6;
+.expand-node{
+    fill: rgb(222, 236, 217);
+    stroke: #333;
+    stroke-width: 3;
+    
 }
+
+
+

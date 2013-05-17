@@ -148,7 +148,7 @@ window.CNode = Backbone.Model.extend({
             this.get(cval).bind("change", function () {
                 model.trigger("change", cval);
             });
-        }
+        } 
         this.bind("change", function () {
             this.save();
         });
@@ -160,7 +160,7 @@ window.CNode = Backbone.Model.extend({
     getNodeDisplayTitle: function(){
         if (!this.nodeDisplayTitle){
             var title = this.title || this.id.replace(/_/g, " ");
-            this.nodeDisplayTitle = wrapNodeText(title, 12);
+            this.nodeDisplayTitle = wrapNodeText(title, window.NUM_CHARS_NODE_LINE || 10);
         }
         return this.nodeDisplayTitle;
     },

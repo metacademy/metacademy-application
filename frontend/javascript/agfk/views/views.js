@@ -2,7 +2,21 @@
 * This file contains the views and must be loaded after the models and collections
 */
 
+
 /**
+* View utilities
+*/
+
+/**
+* Checks if the mouse pointer is within a given circle element
+*/
+function mouseWithinCircle(mcoords, circleEl){
+    var dist = Math.sqrt(Math.pow(mcoords[0] - circleEl.getAttribute('cx'), 2) + Math.pow(mcoords[1] - circleEl.getAttribute('cy'), 2));
+    var rad = circleEl.getAttribute('rx') || circleEl.getAttribute('r');
+    return dist <= rad - 0.001;
+}
+
+/*
 * View for knowledge map in exploration mode
 */
 window.CKmapView = Backbone.View.extend({
@@ -69,77 +83,85 @@ window.CKmapView = Backbone.View.extend({
     * Use D3 to add dynamic properties to the nodes
     */
     addNodeProps: function(d3this){
-        var lastNode = -1;
+        var lastNodeClicked = -1;
+        var lastNodeHovered = -1;
+        var outerElemClick = false;
         // var vmodel = this.model;
         d3this.selectAll(".node")
         .on("mouseover", function () {
-            
-            // add hover color if not clicked
+            // add hover class if not clicked
             var node = d3.select(this);
-            node.select("ellipse").classed("hovered", function(){
-                return !this.classList.contains("clicked");
-            });
-
-
+            lastNodeHovered = node;
+            node.select("ellipse").classed("hovered", true);
 
             if (!node.select(".expand-node")[0][0]){ // TODO check if the node is already expanded
-                // TODO cache the svg generation
-            // display down arrow if not expanded down
-            var circEl = this.getElementsByTagName("ellipse")[0];
-            var lxval = Number(circEl.getAttribute("cx"));
-            var lyval = Number(circEl.getAttribute("cy"));
-            var yr = Number(circEl.getAttribute("ry"));
-            var xr = Number(circEl.getAttribute("rx"));
-            var plusW = 5;
-            var xorig = lxval - plusW/2;
-            var yorig = lyval + yr - 24; // - the distance from circle edge
-            var plusPts = (xorig) + "," + (yorig) + " " +
-                          (xorig + plusW) + "," + (yorig) + " " +
-                          (xorig + plusW) + "," + (yorig + plusW) + " " +
-                          (xorig + 2*plusW) + "," + (yorig + plusW) + " " +
-                          (xorig + 2*plusW) + "," + (yorig + 2*plusW) + " " +
-                          (xorig + plusW) + "," + (yorig + 2*plusW) + " " +
-                          (xorig + plusW) + "," + (yorig + 3*plusW) + " " +
-                          (xorig) + "," + (yorig + 3*plusW) + " " +
-                          (xorig) + "," + (yorig + 2*plusW) + " " +
-                          (xorig -  plusW) + "," + (yorig + 2*plusW) + " " +
-                          (xorig -  plusW) + "," + (yorig + plusW) + " " +
-                          (xorig) + "," + (yorig + plusW) + " " +
-                          (xorig) + "," + (yorig);
-            node.append("polygon")
-            .attr("points", plusPts)
-            .classed("expand-node node", true)
-            .on("click", function(){alert("happy!");});
-            //     var imgWH = 14;
-            //      node.append("image")
-            //      .attr("xlink:href", window.STATIC_URL + "images/expand.png")
-            //      .attr("x", String(lxval - imgWH/2))
-            //      .attr("y", String(lyval + yr*3/5))
-            //      .attr("height", String(imgWH))
-            //      .attr("width", String(imgWH))
-            //      .attr("class", "expand-node")
-            //      .on("click", function(){alert("happy!");});
+                // display expand shape if not expanded
+                var circEl = this.getElementsByTagName("ellipse")[0];
+                var lxval = Number(circEl.getAttribute("cx"));
+                var lyval = Number(circEl.getAttribute("cy"));
+                var yr = Number(circEl.getAttribute("ry"));
+                var xr = Number(circEl.getAttribute("rx"));
+                var plusW = 5;
+                var xorig = lxval - plusW/2;
+                var yorig = lyval + yr - 24; // - the distance from circle edge
+                // points to make a cross of width plusW
+                var plusPts = (xorig) + "," + (yorig) + " " +
+                              (xorig + plusW) + "," + (yorig) + " " +
+                              (xorig + plusW) + "," + (yorig + plusW) + " " +
+                              (xorig + 2*plusW) + "," + (yorig + plusW) + " " +
+                              (xorig + 2*plusW) + "," + (yorig + 2*plusW) + " " +
+                              (xorig + plusW) + "," + (yorig + 2*plusW) + " " +
+                              (xorig + plusW) + "," + (yorig + 3*plusW) + " " +
+                              (xorig) + "," + (yorig + 3*plusW) + " " +
+                              (xorig) + "," + (yorig + 2*plusW) + " " +
+                              (xorig -  plusW) + "," + (yorig + 2*plusW) + " " +
+                              (xorig -  plusW) + "," + (yorig + plusW) + " " +
+                              (xorig) + "," + (yorig + plusW) + " " +
+                              (xorig) + "," + (yorig);
+                node.append("polygon")
+                .attr("points", plusPts)
+                .classed("expand-node node", true)
+                .on("click", function(){
+                    outerElemClick = true;
+                })
+                .on("hover", function(){
+                    var x = 5;
+                });
             }
-            
+            else{
+                node.select(".expand-node").attr("visibility", "visible");
+            }
         })
         .on("mouseout", function () {
             var node = d3.select(this);
-            node.select("ellipse").classed("hovered", false);
-            if (!node.select('.clicked')[0][0]){
-            node.select(".expand-node").remove();
-        }
+            // check if we're outside of the node
+            var mcoords = d3.mouse(lastNodeHovered.node());
+            if (!mouseWithinCircle(d3.mouse(lastNodeHovered.node()), lastNodeHovered.select("ellipse").node())){
+                node.select("ellipse").classed("hovered", false);
+                if (!node.select('.clicked')[0][0]){
+                    node.select(".expand-node").attr("visibility", "hidden");
+                }
+            }
         })
         .on("click", function (d) {
+            // make sure it's not a propagated click event
+            if(outerElemClick){
+                outerElemClick = false;
+                return;
+            }
+
+            // TODO move this to a separate function that is used for both hover and click
             var thisNode = d3.select(this);
             thisNode.select("ellipse")
             .classed('clicked',function(){
                 return !this.classList.contains("clicked");
             });
-            if (lastNode == -1){
-                lastNode = thisNode;
+
+            if (lastNodeClicked == -1){
+                lastNodeClicked = thisNode;
             }
             else{
-                lastNode = lastNode.attr('id') === thisNode.attr('id') ? -1 : thisNode;
+                lastNodeClicked = lastNodeClicked.attr('id') === thisNode.attr('id') ? -1 : thisNode;
             }
         });
     },
@@ -233,7 +255,7 @@ window.CKmapView = Backbone.View.extend({
         // build graph of appropriate depth from given keyNode
         var curEndNodes = [this.model.get("nodes").get(this.model.get("keyNode"))]; // this should generalize easily to multiple end nodes, if desired
         _.each(curEndNodes, function(node){
-            dgArr.unshift(thisView._fullGraphVizStr(node));
+            dgArr.unshift(thisView._fullGraphVizStr(node, {pos: '"10,100!"'}));
         });
 
         // This is essentially adding nodes via a bredth-first search to the desired dependency depth
@@ -251,7 +273,7 @@ window.CKmapView = Backbone.View.extend({
                         // grab the dependency node
                         var depNode = thisView.model.get("nodes").get(depNodeId);
                         // add node strings to the front of the dgArr
-                        dgArr.unshift(thisView._fullGraphVizStr(depNode));
+                        dgArr.unshift(thisView._fullGraphVizStr(depNode, {pos: '"10,100!"'}));
                         // add edge string to the end
                         dgArr.push(node.get("dependencies").get(depNodeId + node.get("id")).getDotStr());
                         // then add dependency to the end of curEndNodes if it has not been previously added
@@ -270,7 +292,17 @@ window.CKmapView = Backbone.View.extend({
     /**
     * Return full string representation of a node for graphviz
     */
-    _fullGraphVizStr: function(node){
-        return node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"];';
+    _fullGraphVizStr: function(node, options){
+        var optionStr = "";
+        if(options){
+            for (opt in options){
+                if (options.hasOwnProperty(opt)){
+                    optionStr += "," + opt + "=" + options[opt];
+                }
+            }
+        }
+
+        return node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"' +  optionStr + '];';
     }
 });
+

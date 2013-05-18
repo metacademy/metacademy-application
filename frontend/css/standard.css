@@ -305,17 +305,6 @@ img.list-img {
 
 /* general styles */
 
-ellipse{
-    fill: rgba(157, 200, 255, 0.09);
-}
-
-ellipse.clicked{
-    fill: rgb(250, 247, 247);
-}
-
-ellipse.hovered{
-    fill: rgb(250, 247, 247);
-}
 
 p {
     margin: 0.1em 0;
@@ -371,10 +360,19 @@ path {
     fill: none;
 }
 
-ellipse {
-    fill-opacity: 1.0;
+ellipse{
+    fill: rgba(157, 200, 255, 0.09);
     stroke-opacity: 0.8;
     stroke-width: 2;
+    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
+}
+
+ellipse.hovered{
+    fill: #f1f3f9;
+}
+
+ellipse.clicked{
+    fill: #f1f3f9;
 }
 
 line {
@@ -391,9 +389,10 @@ line {
 }
 
 .expand-node{
-    fill: rgb(222, 236, 217);
+    fill: #eaf3ec;
     stroke: #333;
     stroke-width: 3;
+    /*pointer-events: none;  TODO does this cause IE problems since it's define on SVG elements? */
     
 }
 

@@ -43,3 +43,6 @@ tmp
 
 # local configuration
 config.py
+
+# local copies
+media

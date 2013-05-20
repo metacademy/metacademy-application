@@ -10,6 +10,8 @@ Current testing instructions (April 11, 2013):
 3. Copy config-template.py to config.py, edit.
 4. From `agfk` project directory:
 
+        python manage.py collectstatic
+
         run_test_servers.sh
 
 5. Open [localhost:8080/kmap](http://localhost:8080/kmap) with a modern javascript-enabled browser

@@ -54,6 +54,31 @@ window.CKmapView = Backbone.View.extend({
         d3this.select('svg').attr('width', '100%');
         d3this.select('svg').attr('height', '100%');
 
+        // add reusable svg elements //
+        var plusW = 5;
+        var xorig = 0;
+        var yorig = 0; // - the distance from circle edge
+        // points to make a cross of width plusW
+        var plusPts = (xorig) + "," + (yorig) + " " +
+        (xorig + plusW) + "," + (yorig) + " " +
+        (xorig + plusW) + "," + (yorig + plusW) + " " +
+        (xorig + 2*plusW) + "," + (yorig + plusW) + " " +
+        (xorig + 2*plusW) + "," + (yorig + 2*plusW) + " " +
+        (xorig + plusW) + "," + (yorig + 2*plusW) + " " +
+        (xorig + plusW) + "," + (yorig + 3*plusW) + " " +
+        (xorig) + "," + (yorig + 3*plusW) + " " +
+        (xorig) + "," + (yorig + 2*plusW) + " " +
+        (xorig -  plusW) + "," + (yorig + 2*plusW) + " " +
+        (xorig -  plusW) + "," + (yorig + plusW) + " " +
+        (xorig) + "," + (yorig + plusW) + " " +
+        (xorig) + "," + (yorig);
+
+        d3this.insert("svg:defs", ":first-child")
+        .append("polygon")
+        .attr("points", plusPts)
+        .attr("id", "expand-cross")
+        .classed("expand-node", true);
+
         // add node properties
         this.addNodeProps(d3this);
 
@@ -94,33 +119,23 @@ window.CKmapView = Backbone.View.extend({
             lastNodeHovered = node;
             node.select("ellipse").classed("hovered", true);
 
-            if (!node.select(".expand-node")[0][0]){ // TODO check if the node is already expanded
+            if (!node.select(".use-expand")[0][0]){ // TODO check if the node is already expanded
                 // display expand shape if not expanded
                 var circEl = this.getElementsByTagName("ellipse")[0];
                 var lxval = Number(circEl.getAttribute("cx"));
                 var lyval = Number(circEl.getAttribute("cy"));
                 var yr = Number(circEl.getAttribute("ry"));
-                var xr = Number(circEl.getAttribute("rx"));
-                var plusW = 5;
-                var xorig = lxval - plusW/2;
+                var plusW = 5; // TODO this shouldn't need to be specified here
+                var xorig = lxval - plusW/2; // TODO remove hard coding
                 var yorig = lyval + yr - 24; // - the distance from circle edge
                 // points to make a cross of width plusW
-                var plusPts = (xorig) + "," + (yorig) + " " +
-                              (xorig + plusW) + "," + (yorig) + " " +
-                              (xorig + plusW) + "," + (yorig + plusW) + " " +
-                              (xorig + 2*plusW) + "," + (yorig + plusW) + " " +
-                              (xorig + 2*plusW) + "," + (yorig + 2*plusW) + " " +
-                              (xorig + plusW) + "," + (yorig + 2*plusW) + " " +
-                              (xorig + plusW) + "," + (yorig + 3*plusW) + " " +
-                              (xorig) + "," + (yorig + 3*plusW) + " " +
-                              (xorig) + "," + (yorig + 2*plusW) + " " +
-                              (xorig -  plusW) + "," + (yorig + 2*plusW) + " " +
-                              (xorig -  plusW) + "," + (yorig + plusW) + " " +
-                              (xorig) + "," + (yorig + plusW) + " " +
-                              (xorig) + "," + (yorig);
-                node.append("polygon")
-                .attr("points", plusPts)
-                .classed("expand-node node", true)
+
+                // TODO add to defs section
+                node.append("use")
+                .attr("xlink:href", "#expand-cross")
+                .attr("x", xorig)
+                .attr("y", yorig)
+                .attr("class", "use-expand")
                 .on("click", function(){
                     outerElemClick = true;
                 })
@@ -129,21 +144,21 @@ window.CKmapView = Backbone.View.extend({
                 });
             }
             else{
-                node.select(".expand-node").attr("visibility", "visible");
+                node.select(".use-expand").attr("visibility", "visible");
             }
         })
-        .on("mouseout", function () {
-            var node = d3.select(this);
+.on("mouseout", function () {
+    var node = d3.select(this);
             // check if we're outside of the node
             var mcoords = d3.mouse(lastNodeHovered.node());
             if (!mouseWithinCircle(d3.mouse(lastNodeHovered.node()), lastNodeHovered.select("ellipse").node())){
                 node.select("ellipse").classed("hovered", false);
                 if (!node.select('.clicked')[0][0]){
-                    node.select(".expand-node").attr("visibility", "hidden");
+                    node.select(".use-expand").attr("visibility", "hidden");
                 }
             }
         })
-        .on("click", function (d) {
+.on("click", function (d) {
             // make sure it's not a propagated click event
             if(outerElemClick){
                 outerElemClick = false;
@@ -164,7 +179,7 @@ window.CKmapView = Backbone.View.extend({
                 lastNodeClicked = lastNodeClicked.attr('id') === thisNode.attr('id') ? -1 : thisNode;
             }
         });
-    },
+},
 
     /**
     * Renders the kmap using the supplied features collection
@@ -240,9 +255,9 @@ window.CKmapView = Backbone.View.extend({
                         if (node.isUniqueDependency(inlink.get("from_tag"))){
                             dgArr.push(inlink.getDotStr());
                         }
-                });
+                    });
             }
-        );
+            );
         return dgArr;
     },
 
@@ -282,7 +297,7 @@ window.CKmapView = Backbone.View.extend({
                             addedNodes[depNodeId] = true;
                         }
                     }
-                );
+                    );
             }
         }
         return dgArr;

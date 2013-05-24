@@ -167,16 +167,14 @@ window.CKmapView = Backbone.View.extend({
 
             // TODO move this to a separate function that is used for both hover and click
             var thisNode = d3.select(this);
-            thisNode.select("ellipse")
-            .classed('clicked',function(){
-                return !this.classList.contains("clicked");
-            });
-
+            thisNode.select('ellipse').node().classList.add("clicked");
             if (lastNodeClicked == -1){
                 lastNodeClicked = thisNode;
             }
             else{
-                lastNodeClicked = lastNodeClicked.attr('id') === thisNode.attr('id') ? -1 : thisNode;
+                lastNodeClicked.select("ellipse").node().classList.remove("clicked");
+                lastNodeClicked.select(".use-expand").attr("visibility", "hidden");
+                lastNodeClicked = thisNode.attr("id") === lastNodeClicked.attr("id") ? -1 : thisNode;
             }
         });
 },

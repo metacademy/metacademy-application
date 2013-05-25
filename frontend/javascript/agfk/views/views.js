@@ -4,9 +4,11 @@
 
 
 /**
-* View utilities
+* View constants
 */
-
+window.EXPLUSW = 5; // pixel width of expand cross
+window.EDGEPLUSW = 22; // pixel distance of expand cross from circle edge
+window.SUMMARYWIDTH = 250; // px width of summary node
 /**
 * Checks if the mouse pointer is within a given circle element
 */
@@ -51,29 +53,31 @@ window.CKmapView = Backbone.View.extend({
         d3this.select('g').selectAll("title").remove(); // also remove title from graph
 
         // make the svg canvas fill the entire enclosing element
-        d3this.select('svg').attr('width', '100%');
-        d3this.select('svg').attr('height', '100%');
+        d3this.select('svg')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('id', 'explore-svg');
 
         // add reusable svg elements //
-        var plusW = 5;
         var xorig = 0;
         var yorig = 0; // - the distance from circle edge
-        // points to make a cross of width plusW
+        // points to make a cross of width  window.EXPLUSW 
         var plusPts = (xorig) + "," + (yorig) + " " +
-        (xorig + plusW) + "," + (yorig) + " " +
-        (xorig + plusW) + "," + (yorig + plusW) + " " +
-        (xorig + 2*plusW) + "," + (yorig + plusW) + " " +
-        (xorig + 2*plusW) + "," + (yorig + 2*plusW) + " " +
-        (xorig + plusW) + "," + (yorig + 2*plusW) + " " +
-        (xorig + plusW) + "," + (yorig + 3*plusW) + " " +
-        (xorig) + "," + (yorig + 3*plusW) + " " +
-        (xorig) + "," + (yorig + 2*plusW) + " " +
-        (xorig -  plusW) + "," + (yorig + 2*plusW) + " " +
-        (xorig -  plusW) + "," + (yorig + plusW) + " " +
-        (xorig) + "," + (yorig + plusW) + " " +
+        (xorig +  window.EXPLUSW ) + "," + (yorig) + " " +
+        (xorig +  window.EXPLUSW ) + "," + (yorig +  window.EXPLUSW ) + " " +
+        (xorig + 2* window.EXPLUSW ) + "," + (yorig +  window.EXPLUSW ) + " " +
+        (xorig + 2* window.EXPLUSW ) + "," + (yorig + 2* window.EXPLUSW ) + " " +
+        (xorig +  window.EXPLUSW ) + "," + (yorig + 2* window.EXPLUSW ) + " " +
+        (xorig +  window.EXPLUSW ) + "," + (yorig + 3* window.EXPLUSW ) + " " +
+        (xorig) + "," + (yorig + 3* window.EXPLUSW ) + " " +
+        (xorig) + "," + (yorig + 2* window.EXPLUSW ) + " " +
+        (xorig -   window.EXPLUSW ) + "," + (yorig + 2* window.EXPLUSW ) + " " +
+        (xorig -   window.EXPLUSW ) + "," + (yorig +  window.EXPLUSW ) + " " +
+        (xorig) + "," + (yorig +  window.EXPLUSW ) + " " +
         (xorig) + "," + (yorig);
 
-        d3this.insert("svg:defs", ":first-child")
+        d3this.select("#explore-svg")
+        .insert("svg:defs", ":first-child")
         .append("polygon")
         .attr("points", plusPts)
         .attr("id", "expand-cross")
@@ -112,25 +116,37 @@ window.CKmapView = Backbone.View.extend({
         var lastNodeHovered = -1;
         var outerElemClick = false;
         // var vmodel = this.model;
+        var thisView = this;
         d3this.selectAll(".node")
         .on("mouseover", function () {
-            // add hover class if not clicked
+            // Node mouseover: display node info and expand/contract options
+
+            // make sure we're not already hovered
+            var classL = this.classList;
+            if (classL.contains("hovered") || classL.contains("clicked")){
+                classL.add("hovered");
+                return;
+            }
+
+            // add the appropriate class
             var node = d3.select(this);
+            classL.add("hovered");
+            // node.select("ellipse").classed("hovered", true);
+
+            // update last hovered node
             lastNodeHovered = node;
-            node.select("ellipse").classed("hovered", true);
 
-            if (!node.select(".use-expand")[0][0]){ // TODO check if the node is already expanded
+            // display the node summary
+            var nodeRect = window.event.target.getBoundingClientRect();
+            thisView.showNodeSummary(thisView.model.get("nodes").get(this.id), nodeRect);
+
+            // add expand svg cross if not present
+            if (!node.select(".use-expand").node()){ // TODO check if the node is already expanded
+                var svgSpatialInfo =  window.getSpatialNodeInfo(this);
+
                 // display expand shape if not expanded
-                var circEl = this.getElementsByTagName("ellipse")[0];
-                var lxval = Number(circEl.getAttribute("cx"));
-                var lyval = Number(circEl.getAttribute("cy"));
-                var yr = Number(circEl.getAttribute("ry"));
-                var plusW = 5; // TODO this shouldn't need to be specified here
-                var xorig = lxval - plusW/2; // TODO remove hard coding
-                var yorig = lyval + yr - 24; // - the distance from circle edge
-                // points to make a cross of width plusW
-
-                // TODO add to defs section
+                var xorig = svgSpatialInfo.cx - window.EXPLUSW / 2;
+                var yorig = svgSpatialInfo.cy + svgSpatialInfo.ry - window.EDGEPLUSW;
                 node.append("use")
                 .attr("xlink:href", "#expand-cross")
                 .attr("x", xorig)
@@ -140,21 +156,25 @@ window.CKmapView = Backbone.View.extend({
                     outerElemClick = true;
                 })
                 .on("hover", function(){
-                    var x = 5;
+                    // TODO anything here?
                 });
             }
+            // else make the expand svg cross visible
             else{
                 node.select(".use-expand").attr("visibility", "visible");
             }
         })
-.on("mouseout", function () {
-    var node = d3.select(this);
+        .on("mouseout", function () {
+            // remove visual properties unless node is clicked
             // check if we're outside of the node
             var mcoords = d3.mouse(lastNodeHovered.node());
+            // TODO probably a more elegant solution here: https://groups.google.com/forum/#!msg/d3-js/8nApzax9p5E/KjbNz3FChUAJ
             if (!mouseWithinCircle(d3.mouse(lastNodeHovered.node()), lastNodeHovered.select("ellipse").node())){
-                node.select("ellipse").classed("hovered", false);
-                if (!node.select('.clicked')[0][0]){
+                var node = d3.select(this);
+                node.classed("hovered", false);
+                if (!this.classList.contains('clicked')){
                     node.select(".use-expand").attr("visibility", "hidden");
+                    document.getElementById(node.attr("id") + "-summary").remove(); // TODO should we do visible/invisible rather than remove?
                 }
             }
         })
@@ -165,16 +185,22 @@ window.CKmapView = Backbone.View.extend({
                 return;
             }
 
-            // TODO move this to a separate function that is used for both hover and click
+            // TODO consider moving this to a separate function that is used for both hover and click
             var thisNode = d3.select(this);
-            thisNode.select('ellipse').node().classList.add("clicked");
+            thisNode.classed("clicked", true);
             if (lastNodeClicked == -1){
                 lastNodeClicked = thisNode;
             }
             else{
-                lastNodeClicked.select("ellipse").node().classList.remove("clicked");
-                lastNodeClicked.select(".use-expand").attr("visibility", "hidden");
-                lastNodeClicked = thisNode.attr("id") === lastNodeClicked.attr("id") ? -1 : thisNode;
+                lastNodeClicked.classed("clicked", false);
+                if (thisNode.attr("id") === lastNodeClicked.attr("id")){
+                    lastNodeClicked = -1;
+                }
+                else{
+                    // trigger mouseout event on last node
+                    window.simulate(lastNodeClicked.node(), "mouseout");
+                    lastNodeClicked =  thisNode;
+                }
             }
         });
 },
@@ -222,6 +248,22 @@ window.CKmapView = Backbone.View.extend({
         // dgArr.unshift("node [shape=note]");
 
         return "digraph G{\n" + dgArr.join("\n") + "}";
+    },
+
+    /**
+    * Show the node summary in "hover box" next to the node
+    */
+    showNodeSummary: function(node, clientBoundBox){
+        var div = document.createElement("div");
+        div.style.position = "absolute";
+        var shiftDiff =  clientBoundBox.left + clientBoundBox.width/2 > window.innerWidth/2 ?  -window.SUMMARYWIDTH : clientBoundBox.width;
+        div.style.left = (clientBoundBox.left + shiftDiff) + "px";
+        div.style.top = clientBoundBox.top + "px";
+        div.style.width = window.SUMMARYWIDTH + "px";
+        div.id = node.get("id") + "-summary";
+        div.classList.add("summary-box");
+        div.textContent = node.get("summary");
+        document.body.appendChild(div);
     },
 
     /**

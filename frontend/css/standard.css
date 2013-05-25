@@ -222,12 +222,19 @@ span.morecontent {
     height: 100%;
 }
 
-.tooltipsy {
+.summary-box {
     padding: 1em;
     max-width: 15em;
     color: #303030;
-    background-color: #f6fefe;
-    border: 0.15ex solid #000000;
+    background-color: ghostwhite;
+    border: 2px solid #000000;
+    max-height: 12em;
+    overflow: scroll;
+    border-radius: 1.2em;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 }
 
 button.topic-focus {
@@ -367,11 +374,11 @@ ellipse{
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
 }
 
-ellipse.hovered{
+.hovered ellipse{
     fill: #f1f3f9;
 }
 
-ellipse.clicked{
+.clicked ellipse{
     fill: #f1f3f9;
 }
 

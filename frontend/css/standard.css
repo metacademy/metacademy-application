@@ -5,7 +5,7 @@
     width: 100%;
     background: #333;
     overflow: hidden;
-    border-bottom: 0.1em black solid;
+    border-bottom: 0.1em #333 solid;
     font-size: 1.1em;
 }
 
@@ -48,7 +48,7 @@ body {
     position: relative;
     width: 80%; /* left column content width (left column width minus left and right padding) */
     left: 20%; /* (right column width) plus (left column left padding) */
-    border-right: 0.2ex black solid;
+    border-right: 0.2ex #333 solid;
     overflow: hidden;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
@@ -105,7 +105,7 @@ section.cnode-dep{
 }
 .cnode-box label{
     display: inline;
-    color: black;
+    color: #333;
     font-weight: bold;
     font-size: 1.0em
 }
@@ -223,13 +223,16 @@ span.morecontent {
 }
 
 .summary-box {
-    padding: 1em;
+    padding: 0.5em 1em;
     max-width: 15em;
-    color: #303030;
-    background-color: ghostwhite;
-    border: 2px solid #000000;
-    max-height: 12em;
+    background-color: #f1f3f9;
+    border: 3px solid;
+    border-color: #493A5C;
+    max-height: 15em;
     overflow: scroll;
+    font-size: 1em;
+    /*font-weight: bold;*/
+    line-height: 1.4em;
     border-radius: 1.2em;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
@@ -346,7 +349,7 @@ a.moreres {
 }
 
 a.direct-link {
-    color: black;
+    color: #333;
 }
 
 h1 {
@@ -368,7 +371,6 @@ path {
 }
 
 ellipse{
-    fill: rgba(157, 200, 255, 0.09);
     stroke-opacity: 0.8;
     stroke-width: 2;
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
@@ -383,7 +385,7 @@ ellipse{
 }
 
 line {
-    stroke: black;
+    stroke: #333;
 }
 
 .node {

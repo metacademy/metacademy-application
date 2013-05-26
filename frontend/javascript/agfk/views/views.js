@@ -9,6 +9,7 @@
 window.EXPLUSW = 5; // pixel width of expand cross
 window.EDGEPLUSW = 22; // pixel distance of expand cross from circle edge
 window.SUMMARYWIDTH = 250; // px width of summary node
+window.EXPLORESVG = "explore-svg"; // id of explore svg
 /**
 * Checks if the mouse pointer is within a given circle element
 */
@@ -56,7 +57,7 @@ window.CKmapView = Backbone.View.extend({
         d3this.select('svg')
         .attr('width', '100%')
         .attr('height', '100%')
-        .attr('id', 'explore-svg');
+        .attr('id', window.EXPLORESVG);
 
         // add reusable svg elements //
         var xorig = 0;
@@ -76,7 +77,8 @@ window.CKmapView = Backbone.View.extend({
         (xorig) + "," + (yorig +  window.EXPLUSW ) + " " +
         (xorig) + "," + (yorig);
 
-        d3this.select("#explore-svg")
+        // add reusable svg elements to defs
+        d3this.select(window.EXPLORESVG)
         .insert("svg:defs", ":first-child")
         .append("polygon")
         .attr("points", plusPts)
@@ -86,13 +88,30 @@ window.CKmapView = Backbone.View.extend({
         // add node properties
         this.addNodeProps(d3this);
 
-        // -- post processing on initial SVG -- //
+        // -- post processing of initial SVG -- //
 
         // obtain orginal transformation since graphviz produces unnormalized coordinates
         var transprops = d3this.select(".graph").attr("transform").match(/[0-9]+( [0-9]+)?/g);
         var otrans = transprops[2].split(" ").map(Number);
+        // front-and-center the key node if present
+        var keyNode = this.model.get("keyNode");
+        if (keyNode){
+            var keyNodeLoc = getSpatialNodeInfo(d3this.select("#" + keyNode).node());
+            var swx = window.innerWidth;
+            var swy = window.innerHeight;
+            // set x coordinate so key node is centered on screen
+            otrans[0] = swx/2 - keyNodeLoc.cx;
+            otrans[1] = keyNodeLoc.ry + 5 - keyNodeLoc.cy;
+            d3this.select(".graph")
+            .attr("transform", "translate(" + otrans[0] + "," + otrans[1] + ")")
+        }
+
+
+        // add original transformation to the zoom behavior
         var dzoom = d3.behavior.zoom();
         dzoom.translate(otrans);
+
+        // now translate to center graph
 
         // make graph zoomable/translatable
         var vis = d3this.select("svg")
@@ -256,7 +275,8 @@ window.CKmapView = Backbone.View.extend({
     showNodeSummary: function(node, clientBoundBox){
         var div = document.createElement("div");
         div.style.position = "absolute";
-        var shiftDiff =  clientBoundBox.left + clientBoundBox.width/2 > window.innerWidth/2 ?  -window.SUMMARYWIDTH : clientBoundBox.width;
+        // TODO why is summarywidth 10px to0 large?
+        var shiftDiff =  clientBoundBox.left + clientBoundBox.width/2 > window.innerWidth/2 ?  -window.SUMMARYWIDTH + 10 : clientBoundBox.width;
         div.style.left = (clientBoundBox.left + shiftDiff) + "px";
         div.style.top = clientBoundBox.top + "px";
         div.style.width = window.SUMMARYWIDTH + "px";

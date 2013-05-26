@@ -4,7 +4,7 @@
 
 
 /**
-* Get spatial information about input dom element
+* Get spatial information about input dom element that contains an svg ellipse
 */
 function getSpatialNodeInfo(inNode){
     var ellp = inNode.getElementsByTagName("ellipse")[0];

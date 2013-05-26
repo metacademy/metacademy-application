@@ -6,9 +6,9 @@
 /**
 * View constants
 */
-window.EXPLUSW = 5; // pixel width of expand cross
-window.EDGEPLUSW = 22; // pixel distance of expand cross from circle edge
-window.SUMMARYWIDTH = 250; // px width of summary node
+window.EXPLUSW = 5.5; // pixel width of expand cross
+window.EDGEPLUSW = 28; // pixel distance of expand cross from circle edge
+window.SUMMARYWIDTH = 350; // px width of summary node
 window.EXPLORESVG = "explore-svg"; // id of explore svg
 /**
 * Checks if the mouse pointer is within a given circle element
@@ -59,6 +59,9 @@ window.CKmapView = Backbone.View.extend({
         .attr('height', '100%')
         .attr('id', window.EXPLORESVG);
 
+        // remove unneeded background polygon
+        d3this.select("polygon").remove();
+
         // add reusable svg elements //
         var xorig = 0;
         var yorig = 0; // - the distance from circle edge
@@ -78,7 +81,7 @@ window.CKmapView = Backbone.View.extend({
         (xorig) + "," + (yorig);
 
         // add reusable svg elements to defs
-        d3this.select(window.EXPLORESVG)
+        d3this.select("#" + window.EXPLORESVG)
         .insert("svg:defs", ":first-child")
         .append("polygon")
         .attr("points", plusPts)
@@ -103,15 +106,12 @@ window.CKmapView = Backbone.View.extend({
             otrans[0] = swx/2 - keyNodeLoc.cx;
             otrans[1] = keyNodeLoc.ry + 5 - keyNodeLoc.cy;
             d3this.select(".graph")
-            .attr("transform", "translate(" + otrans[0] + "," + otrans[1] + ")")
+            .attr("transform", "translate(" + otrans[0] + "," + otrans[1] + ")");
         }
-
 
         // add original transformation to the zoom behavior
         var dzoom = d3.behavior.zoom();
         dzoom.translate(otrans);
-
-        // now translate to center graph
 
         // make graph zoomable/translatable
         var vis = d3this.select("svg")
@@ -156,8 +156,14 @@ window.CKmapView = Backbone.View.extend({
             lastNodeHovered = node;
 
             // display the node summary
-            var nodeRect = window.event.target.getBoundingClientRect();
-            thisView.showNodeSummary(thisView.model.get("nodes").get(this.id), nodeRect);
+            var nodeRect = d3.event.target.getBoundingClientRect();
+            var wrapDiv = thisView.showNodeSummary(thisView.model.get("nodes").get(this.id), nodeRect);
+
+            // add listener to node summary so mouseouts trigger mouseout on node
+            $(wrapDiv).on("mouseleave", function(){
+                window.simulate(lastNodeHovered.node(), "mouseout");
+            });
+
 
             // add expand svg cross if not present
             if (!node.select(".use-expand").node()){ // TODO check if the node is already expanded
@@ -193,7 +199,7 @@ window.CKmapView = Backbone.View.extend({
                 node.classed("hovered", false);
                 if (!this.classList.contains('clicked')){
                     node.select(".use-expand").attr("visibility", "hidden");
-                    document.getElementById(node.attr("id") + "-summary").remove(); // TODO should we do visible/invisible rather than remove?
+                    d3.select(document.getElementById(node.attr("id") + "-summary")).remove(); // TODO should we do visible/invisible rather than remove?
                 }
             }
         })
@@ -263,7 +269,7 @@ window.CKmapView = Backbone.View.extend({
         // include digraph options
         if (bottomUp) {dgArr.unshift("rankdir=BT");}
         dgArr.unshift("nodesep=" + nodeSep); // encourage node separation TODO add as option
-        if (bottomUp) {dgArr.unshift('node [shape=circle, fixedsize=true, width=2];');}
+        if (bottomUp) {dgArr.unshift('node [shape=circle, fixedsize=true, width=2.8];');}
         // dgArr.unshift("node [shape=note]");
 
         return "digraph G{\n" + dgArr.join("\n") + "}";
@@ -273,17 +279,29 @@ window.CKmapView = Backbone.View.extend({
     * Show the node summary in "hover box" next to the node
     */
     showNodeSummary: function(node, clientBoundBox){
+        // add content div
         var div = document.createElement("div");
-        div.style.position = "absolute";
-        // TODO why is summarywidth 10px to0 large?
-        var shiftDiff =  clientBoundBox.left + clientBoundBox.width/2 > window.innerWidth/2 ?  -window.SUMMARYWIDTH + 10 : clientBoundBox.width;
-        div.style.left = (clientBoundBox.left + shiftDiff) + "px";
-        div.style.top = clientBoundBox.top + "px";
-        div.style.width = window.SUMMARYWIDTH + "px";
-        div.id = node.get("id") + "-summary";
         div.classList.add("summary-box");
         div.textContent = node.get("summary");
-        document.body.appendChild(div);
+        var placeLeft = clientBoundBox.left + clientBoundBox.width/2 > window.innerWidth/2;
+
+        // add wrapper div so we can use "overflow" pseudo elements
+        var wrapDiv = document.createElement("div");
+        wrapDiv.id = node.get("id") + "-summary";
+        wrapDiv.classList.add("wrap-summary");
+        wrapDiv.classList.add(placeLeft? "tright" : "tleft"); // place the arrow on the opposite side
+        wrapDiv.appendChild(div);
+
+        // calculate location of box
+        var shiftDiff =  placeLeft ?  -window.SUMMARYWIDTH + 10 : clientBoundBox.width -10;
+        wrapDiv.style.left = (clientBoundBox.left + shiftDiff) + "px";
+        wrapDiv.style.top = clientBoundBox.top + "px";
+        wrapDiv.style.width = window.SUMMARYWIDTH + "px";
+
+        // add box to document
+        document.body.appendChild(wrapDiv);
+
+        return wrapDiv;
     },
 
     /**

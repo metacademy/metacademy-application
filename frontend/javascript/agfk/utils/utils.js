@@ -20,6 +20,21 @@ function getSpatialNodeInfo(inNode){
 * Simulate html/mouse events programatically
 * taken from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
 */
+var eventMatchers = {
+    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
+    'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
+};
+var defaultOptions = {
+    pointerX: 0,
+    pointerY: 0,
+    button: 0,
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    metaKey: false,
+    bubbles: true,
+    cancelable: true
+};
 function simulate(element, eventName)
 {
     var options = extend(defaultOptions, arguments[2] || {});
@@ -57,29 +72,17 @@ function simulate(element, eventName)
         element.fireEvent('on' + eventName, oEvent);
     }
     return element;
-}
 
-function extend(destination, source) {
+    function extend(destination, source) {
     for (var property in source)
       destination[property] = source[property];
     return destination;
+    }
 }
 
-var eventMatchers = {
-    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
-    'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
-}
-var defaultOptions = {
-    pointerX: 0,
-    pointerY: 0,
-    button: 0,
-    ctrlKey: false,
-    altKey: false,
-    shiftKey: false,
-    metaKey: false,
-    bubbles: true,
-    cancelable: true
-}
+
+
+
 
 /**
 * Wrap a long string to avoid elongated graph nodes. Translated/modified from server techniqu
@@ -98,10 +101,9 @@ function wrapNodeText(s, width){
             total = 0;
         }
         result.push(parts[i]);
-        total += parts[i].length + 1; 
-        
+        total += parts[i].length + 1;
     }
-    resArr.push(result.join(" "));  
+    resArr.push(result.join(" "));
     return resArr.join("\\n");
 }
 

@@ -222,24 +222,6 @@ span.morecontent {
     height: 100%;
 }
 
-.summary-box {
-    padding: 0.5em 1em;
-    max-width: 15em;
-    background-color: #f1f3f9;
-    border: 3px solid;
-    border-color: #493A5C;
-    max-height: 15em;
-    overflow: scroll;
-    font-size: 1em;
-    /*font-weight: bold;*/
-    line-height: 1.4em;
-    border-radius: 1.2em;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
 button.topic-focus {
     margin-top: 1.5ex;
     line-height: 1.3em;
@@ -363,16 +345,93 @@ h2 {
     margin-bottom: 2ex;
 }
 
-/*Graph Properties*/
+/* Explore-view interactive properties **************************************************/
+.summary-box {
+    padding: 0.4em 0.7em;
+    color: #3E4018;
+    background-color: white;
+    border: 4px solid;
+    border-color: #493A5C;
+    overflow: auto;
+    font-size: 1em;
+    line-height: 1.4em;
+    max-height: 12em;
+    min-height: 4em;
+    border-radius: 0.7em;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+
+.wrap-summary{
+    position: absolute;
+}
+/* creates the larger triangle */
+.wrap-summary.tright:before {
+    content: "";
+    border: solid;
+    border-width: 1em 0 1em 2.1em;
+    border-color: transparent #493A5C;
+    position: absolute;
+    top: 1em;
+    right: -1.9em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.wrap-summary.tright:after {
+    content: "";
+    border: solid;
+    border-width: 0.8em 0 0.8em 1.7em;
+    border-color: transparent white;
+    position: absolute;
+    top: 1.17em;
+    right: -1.4em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width: 0;
+}
+
+/* creates the larger triangle */
+.wrap-summary.tleft:before {
+    content: "";
+    border: solid;
+    border-width: 1em 2.1em 1em 0;
+    border-color: transparent #493A5C;
+    position: absolute;
+    top: 1em;
+    left: -1.9em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.wrap-summary.tleft:after {
+    content: "";
+    border: solid;
+    border-width: 0.8em 1.7em 0.8em 0;
+    border-color: transparent white;
+    position: absolute;
+    top: 1.17em;
+    left: -1.4em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width: 0;
+}
+
+
+
+
+/* Graph properties **************************************************/
 path {
-    stroke-width: 3;
-    stroke-opacity: 0.8;
+    stroke-width: 4;
+    stroke: #333;
     fill: none;
 }
 
 ellipse{
-    stroke-opacity: 0.8;
-    stroke-width: 2;
+    stroke: #333;
+    stroke-width: 3;
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
 }
 
@@ -395,6 +454,8 @@ line {
 .node text{
     font-family: Arial, sans-serif;
     font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
 }
 
 .expand-node{

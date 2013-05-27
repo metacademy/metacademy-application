@@ -2,6 +2,9 @@
 * This file contains the views and must be loaded after the models and collections
 */
 
+// Global TODOS
+// -fix hardcoded 10px summary display offset; produces strange results when zooming on graphs
+// -move summaries with node on translations
 
 /**
 * View constants
@@ -140,16 +143,15 @@ window.CKmapView = Backbone.View.extend({
         .on("mouseover", function () {
             // Node mouseover: display node info and expand/contract options
 
-            // make sure we're not already hovered
-            var classL = this.classList;
-            if (classL.contains("hovered") || classL.contains("clicked")){
-                classL.add("hovered");
+            // make sure we're not already hovered (jquery for cross-browser support: Safari doesn't support classList with inline SVG)
+            var node = d3.select(this);
+            if (node.classed("hovered") || node.classed("clicked")){
+                node.classed("hovered", true);
                 return;
             }
 
             // add the appropriate class
-            var node = d3.select(this);
-            classL.add("hovered");
+            node.classed("hovered", true);
             // node.select("ellipse").classed("hovered", true);
 
             // update last hovered node
@@ -161,7 +163,7 @@ window.CKmapView = Backbone.View.extend({
 
             // add listener to node summary so mouseouts trigger mouseout on node
             $(wrapDiv).on("mouseleave", function(){
-                window.simulate(lastNodeHovered.node(), "mouseout");
+                window.simulate(node.node(), "mouseout");
             });
 
 
@@ -197,7 +199,7 @@ window.CKmapView = Backbone.View.extend({
             if (!mouseWithinCircle(d3.mouse(lastNodeHovered.node()), lastNodeHovered.select("ellipse").node())){
                 var node = d3.select(this);
                 node.classed("hovered", false);
-                if (!this.classList.contains('clicked')){
+                if (!node.classed('clicked')){
                     node.select(".use-expand").attr("visibility", "hidden");
                     d3.select(document.getElementById(node.attr("id") + "-summary")).remove(); // TODO should we do visible/invisible rather than remove?
                 }
@@ -281,15 +283,17 @@ window.CKmapView = Backbone.View.extend({
     showNodeSummary: function(node, clientBoundBox){
         // add content div
         var div = document.createElement("div");
-        div.classList.add("summary-box");
+        d3div = d3.select(div);
+        d3div.classed("summary-box", true);
         div.textContent = node.get("summary");
         var placeLeft = clientBoundBox.left + clientBoundBox.width/2 > window.innerWidth/2;
 
         // add wrapper div so we can use "overflow" pseudo elements
         var wrapDiv = document.createElement("div");
+        d3wrapDiv = d3.select(wrapDiv);
         wrapDiv.id = node.get("id") + "-summary";
-        wrapDiv.classList.add("wrap-summary");
-        wrapDiv.classList.add(placeLeft? "tright" : "tleft"); // place the arrow on the opposite side
+        d3wrapDiv.classed("wrap-summary", true);
+        d3wrapDiv.classed(placeLeft? "tright" : "tleft", true); // place the arrow on the opposite side
         wrapDiv.appendChild(div);
 
         // calculate location of box

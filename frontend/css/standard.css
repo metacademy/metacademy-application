@@ -383,11 +383,11 @@ h2 {
 /* creates the smaller  triangle */
 .wrap-summary.tright:after {
     content: "";
-    border: solid;
+    border-style: solid;
     border-width: 0.8em 0 0.8em 1.7em;
     border-color: transparent white;
     position: absolute;
-    top: 1.17em;
+    top: 1.19em;
     right: -1.4em; /* value = - border-left-width - border-right-width */
     display: block;
     width: 0;
@@ -396,7 +396,7 @@ h2 {
 /* creates the larger triangle */
 .wrap-summary.tleft:before {
     content: "";
-    border: solid;
+    border-style: solid;
     border-width: 1em 2.1em 1em 0;
     border-color: transparent #493A5C;
     position: absolute;
@@ -413,7 +413,7 @@ h2 {
     border-width: 0.8em 1.7em 0.8em 0;
     border-color: transparent white;
     position: absolute;
-    top: 1.17em;
+    top: 1.19em;
     left: -1.4em; /* value = - border-left-width - border-right-width */
     display: block;
     width: 0;

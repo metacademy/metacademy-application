@@ -126,10 +126,16 @@ window.CKmapView = Backbone.View.extend({
             .select(".graph");
 
         // helper function to redraw svg graph with correct coordinates
-
+        
         function redraw() {
+            var scale, trans;
+            // restrict scaling to reasonable values to prevent losing the graph
+            scale = d3.event.scale < 0.1 ? 0.1 : d3.event.scale;
+            scale = scale > 5 ? 5 : scale;
+            dzoom.scale(scale);
+            trans = d3.event.translate;
             vis.attr("transform",
-                "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+                "translate(" + trans + ")" + " scale(" + scale + ")");
         }
     },
 
@@ -337,7 +343,7 @@ window.CKmapView = Backbone.View.extend({
         wrapDiv.style.display = "none";
 
         // add box to document
-        $(wrapDiv).appendTo(document.body).fadeIn(250);
+        $(wrapDiv).appendTo(document.body).fadeIn(200);
         // document.body.appendChild(wrapDiv);
 
         return wrapDiv;

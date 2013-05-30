@@ -126,16 +126,34 @@ window.CKmapView = Backbone.View.extend({
             .select(".graph");
 
         // helper function to redraw svg graph with correct coordinates
-        
+        var prevTrans = otrans;
+        var maxScale = 5;
+        var minScale = 0.03;
+        var exceedCt = 0; // exceed a scale threshold greater than once, lock the translate to avoid jiggly display
         function redraw() {
-            var scale, trans;
+            var scale = d3.event.scale;
+            var trans = d3.event.translate;
+            var chScale = scale < minScale || scale > maxScale;
+
             // restrict scaling to reasonable values to prevent losing the graph
-            scale = d3.event.scale < 0.1 ? 0.1 : d3.event.scale;
-            scale = scale > 5 ? 5 : scale;
-            dzoom.scale(scale);
-            trans = d3.event.translate;
-            vis.attr("transform",
-                "translate(" + trans + ")" + " scale(" + scale + ")");
+            if (chScale) {
+                exceedCt++;
+                trans = exceedCt > 10 ? prevTrans : trans;
+                if (scale < minScale) {
+                    scale = minScale;
+                } else if (scale > maxScale) {
+                    scale = maxScale;
+                }
+                // change d3 internals for consistency
+                dzoom.scale(scale);
+                dzoom.translate(trans);
+            }
+            else{
+                exceedCt++;
+            }
+            // translate the graph
+            vis.attr("transform", "translate(" + trans + ")" + " scale(" + scale + ")");
+            prevTrans = trans;
         }
     },
 
@@ -145,7 +163,6 @@ window.CKmapView = Backbone.View.extend({
     addNodeProps: function(d3this) {
         var lastNodeClicked = -1;
         var lastNodeHovered = -1;
-        var outerElemClick = false;
         // var vmodel = this.model;
         var thisView = this;
         // TODO write functions for each of these events
@@ -190,7 +207,8 @@ window.CKmapView = Backbone.View.extend({
                     .attr("y", expY)
                     .attr("class", "use-expand")
                     .on("click", function() {
-                    outerElemClick = true;
+                    // don't propagate click to lower level objects
+                    d3.event.stopPropagation();
                 });
 
                 var chkX = svgSpatialInfo.cx - svgSpatialInfo.rx + 15;
@@ -200,8 +218,8 @@ window.CKmapView = Backbone.View.extend({
                 var chkG = node.append("g")
                     .attr("id", thisView._getCheckId(node))
                     .on("click", function() {
-                    outerElemClick = true;
                     node.classed("node-learned", !node.classed("node-learned")); // TODO write a toggle helper function in utils
+                    d3.event.stopPropagation();
                 })
                     .on("mouseover", function() {
                     d3.select(this).classed("checkmark-hovered", true);
@@ -209,12 +227,12 @@ window.CKmapView = Backbone.View.extend({
                     .on("mouseout", function() {
                     d3.select(this).classed("checkmark-hovered", false);
                 });
-                    chkG.append("circle")
-                    .attr("cx", chkX + 10 )
+                chkG.append("circle")
+                    .attr("cx", chkX + 10)
                     .attr("cy", chkY)
                     .attr("r", "14")
                     .classed("checkmark-circle", true);
-                    chkG.append("path")
+                chkG.append("path")
                     .attr("d", "M 0,0 L 10,10 L 30,-10")
                     .attr("transform", "translate(" + chkX + "," + chkY + ") scale(0.65)")
                     .attr("class", "checkmark");
@@ -236,7 +254,7 @@ window.CKmapView = Backbone.View.extend({
                 var node = d3.select(this);
                 node.classed("hovered", false);
                 if (!node.classed('clicked')) {
-                    if (!node.classed("node-learned")){
+                    if (!node.classed("node-learned")) {
                         node.select("#" + thisView._getCheckId(node)).attr("visibility", "hidden");
                     }
                     node.select(".use-expand").attr("visibility", "hidden");
@@ -245,12 +263,6 @@ window.CKmapView = Backbone.View.extend({
             }
         })
             .on("click", function(d) {
-            // make sure it's not a bubbled click event
-            if (outerElemClick) {
-                outerElemClick = false;
-                return;
-            }
-
             // TODO consider moving this to a separate function that is used for both hover and click
             var thisNode = d3.select(this);
             thisNode.classed("clicked", true);
@@ -444,12 +456,10 @@ window.CKmapView = Backbone.View.extend({
     },
 
     /**
-    * Helper function to obtain checkmark element for the given node
-    */
-    _getCheckId: function(node){
+     * Helper function to obtain checkmark element for the given node
+     */
+    _getCheckId: function(node) {
         return node.attr("id") + "-checkG"
     }
 
 });
-
-

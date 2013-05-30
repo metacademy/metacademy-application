@@ -466,5 +466,28 @@ line {
     
 }
 
+.checkmark{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 5;
+}
 
+.checkmark-circle{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 2;
+}
+.checkmark-hovered .checkmark-circle, .checkmark-clicked .checkmark-circle, .node-learned .checkmark-circle{
+    fill: transparent;
+    stroke: #759466;
+    stroke-width: 3;
+}
 
+.checkmark-hovered .checkmark, .checkmark-clicked .checkmark, .node-learned .checkmark{
+    stroke-width: 6;
+    stroke: #759466;
+}
+
+.node-learned{
+    opacity: 0.5;
+}

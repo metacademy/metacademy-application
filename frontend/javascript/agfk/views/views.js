@@ -13,15 +13,6 @@ window.EXPLUSW = 5.5; // pixel width of expand cross
 window.EDGEPLUSW = 28; // pixel distance of expand cross from circle edge
 window.SUMMARYWIDTH = 350; // px width of summary node
 window.EXPLORESVG = "explore-svg"; // id of explore svg
-/**
- * Checks if the mouse pointer is within a given circle element
- */
-
-function mouseWithinCircle(mcoords, circleEl) {
-    var dist = Math.sqrt(Math.pow(mcoords[0] - circleEl.getAttribute('cx'), 2) + Math.pow(mcoords[1] - circleEl.getAttribute('cy'), 2));
-    var rad = circleEl.getAttribute('rx') || circleEl.getAttribute('r');
-    return dist <= rad - 0.001;
-}
 
 /*
  * View for knowledge map in exploration mode
@@ -248,9 +239,7 @@ window.CKmapView = Backbone.View.extend({
             .on("mouseout", function() {
             // remove visual properties unless node is clicked
             // check if we're outside of the node
-            var mcoords = d3.mouse(lastNodeHovered.node());
-            // TODO probably a more elegant solution here: https://groups.google.com/forum/#!msg/d3-js/8nApzax9p5E/KjbNz3FChUAJ
-            if (!mouseWithinCircle(d3.mouse(lastNodeHovered.node()), lastNodeHovered.select("ellipse").node())) {
+            if (d3.event.relatedTarget.contains(this)) {
                 var node = d3.select(this);
                 node.classed("hovered", false);
                 if (!node.classed('clicked')) {

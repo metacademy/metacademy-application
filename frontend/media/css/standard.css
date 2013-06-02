@@ -1,11 +1,10 @@
 /* header */
 #header {
-    position: relative;
     height: 1.5em;
     width: 100%;
     background: #333;
     overflow: hidden;
-    border-bottom: 0.1em black solid;
+    border-bottom: 0.1em #333 solid;
     font-size: 1.1em;
 }
 
@@ -23,12 +22,11 @@ body {
 
 #main {
     clear: both;
-    float: left;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    position: relative; /* This fixes the IE7 overflow hidden bug */
-    background: rgba(255, 238, 238, 0.54);
+    position: absolute; 
+    background: rgb(255, 238, 238);
 }
 
 .colcontainer {
@@ -48,7 +46,7 @@ body {
     position: relative;
     width: 80%; /* left column content width (left column width minus left and right padding) */
     left: 20%; /* (right column width) plus (left column left padding) */
-    border-right: 0.2ex black solid;
+    border-right: 0.2ex #333 solid;
     overflow: hidden;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
@@ -68,9 +66,57 @@ body {
 
 /* special styles */
 
+#explore-learn-div{
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    z-index: 1;
+    margin-top: 0.5em;
+    margin-right: 0.8em;
+}
+
 #kmview{
     width: 100%;
     height: 100%;
+}
+
+.el-nav-button{
+    display: inline;
+    float: left;
+    border: solid;
+    border-color: transparent;
+    background-color: #416685;
+    color: white;
+    padding: 2px;
+    margin: 0;
+    font-size: 0.8em;
+    cursor: default;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+
+.el-nav-button.active{
+    background-color: #333;
+}
+
+.el-nav-button:hover{
+    background-color: steelblue;
+}
+.el-nav-button.button-left{
+    border-width: 3px 1px 3px 3px;
+    border-radius: 0.3em 0 0 0.3em;
+    padding-right: 3px;
+    margin-right: 0;
+}
+
+.el-nav-button.button-right{
+    border-width: 3px 3px 3px 1px;
+    border-radius: 0 0.3em 0.3em 0;
+    padding-left: 3px;
+    margin-left: 0;
 }
 
 div.edit-node {
@@ -105,7 +151,7 @@ section.cnode-dep{
 }
 .cnode-box label{
     display: inline;
-    color: black;
+    color: #333;
     font-weight: bold;
     font-size: 1.0em
 }
@@ -222,14 +268,6 @@ span.morecontent {
     height: 100%;
 }
 
-.tooltipsy {
-    padding: 1em;
-    max-width: 15em;
-    color: #303030;
-    background-color: #f6fefe;
-    border: 0.15ex solid #000000;
-}
-
 button.topic-focus {
     margin-top: 1.5ex;
     line-height: 1.3em;
@@ -339,7 +377,7 @@ a.moreres {
 }
 
 a.direct-link {
-    color: black;
+    color: #333;
 }
 
 h1 {
@@ -353,30 +391,106 @@ h2 {
     margin-bottom: 2ex;
 }
 
-/*Graph Properties*/
+/* Explore-view interactive properties **************************************************/
+.summary-text {
+    padding: 0.4em 0.7em;
+    color: #3E4018;
+    background-color: white;
+    border: 4px solid;
+    border-color: #493A5C;
+    overflow: auto;
+    font-size: 1em;
+    line-height: 1.4em;
+    max-height: 12em;
+    min-height: 4em;
+    border-radius: 0.7em;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+
+.summary-wrap{
+    position: absolute;
+}
+/* creates the larger triangle */
+.summary-wrap.tright:before {
+    content: "";
+    border: solid;
+    border-width: 1em 0 1em 2.1em;
+    border-color: transparent #493A5C;
+    position: absolute;
+    top: 1em;
+    right: -1.9em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.summary-wrap.tright:after {
+    content: "";
+    border-style: solid;
+    border-width: 0.8em 0 0.8em 1.7em;
+    border-color: transparent white;
+    position: absolute;
+    top: 1.19em;
+    right: -1.4em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width: 0;
+}
+
+/* creates the larger triangle */
+.summary-wrap.tleft:before {
+    content: "";
+    border-style: solid;
+    border-width: 1em 2.1em 1em 0;
+    border-color: transparent #493A5C;
+    position: absolute;
+    top: 1em;
+    left: -1.9em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.summary-wrap.tleft:after {
+    content: "";
+    border: solid;
+    border-width: 0.8em 1.7em 0.8em 0;
+    border-color: transparent white;
+    position: absolute;
+    top: 1.19em;
+    left: -1.4em; /* value = - border-left-width - border-right-width */
+    display: block;
+    width: 0;
+}
+
+
+
+
+/* Graph properties **************************************************/
 path {
-    stroke-width: 3;
-    stroke-opacity: 0.8;
+    stroke-width: 4;
+    stroke: #333;
     fill: none;
 }
 
 ellipse{
-    fill: rgba(157, 200, 255, 0.09);
-    stroke-opacity: 0.8;
-    stroke-width: 2;
+    stroke: #333;
+    stroke-width: 3;
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
 }
 
-ellipse.hovered{
+.hovered ellipse{
     fill: #f1f3f9;
 }
 
-ellipse.clicked{
+.clicked ellipse{
     fill: #f1f3f9;
 }
 
 line {
-    stroke: black;
+    stroke: #333;
 }
 
 .node {
@@ -386,6 +500,8 @@ line {
 .node text{
     font-family: Arial, sans-serif;
     font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
 }
 
 .expand-node{
@@ -396,5 +512,28 @@ line {
     
 }
 
+.checkmark{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 4;
+}
 
+.checkmark-circle{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 3;
+}
+.checkmark-hovered .checkmark-circle, .checkmark-clicked .checkmark-circle, .node-learned .checkmark-circle{
+    fill: transparent;
+    stroke: #759466;
+    stroke-width: 4;
+}
 
+.checkmark-hovered .checkmark, .checkmark-clicked .checkmark, .node-learned .checkmark{
+    stroke-width: 5;
+    stroke: #759466;
+}
+
+.node-learned{
+    opacity: 0.5;
+}

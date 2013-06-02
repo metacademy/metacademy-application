@@ -1,6 +1,5 @@
 /* header */
 #header {
-    position: relative;
     height: 1.5em;
     width: 100%;
     background: #333;
@@ -23,12 +22,11 @@ body {
 
 #main {
     clear: both;
-    float: left;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    position: relative; /* This fixes the IE7 overflow hidden bug */
-    background: rgba(255, 238, 238, 0.54);
+    position: absolute; 
+    background: rgb(255, 238, 238);
 }
 
 .colcontainer {
@@ -68,9 +66,57 @@ body {
 
 /* special styles */
 
+#explore-learn-div{
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    z-index: 1;
+    margin-top: 0.5em;
+    margin-right: 0.8em;
+}
+
 #kmview{
     width: 100%;
     height: 100%;
+}
+
+.el-nav-button{
+    display: inline;
+    float: left;
+    border: solid;
+    border-color: transparent;
+    background-color: #333;
+    color: white;
+    padding: 2px;
+    margin: 0;
+    font-size: 0.8em;
+    cursor: default;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+
+.el-nav-button.active{
+    background-color: #416685;
+}
+
+.el-nav-button:hover{
+    background-color: steelblue;
+}
+.el-nav-button.button-left{
+    border-width: 3px 1px 3px 3px;
+    border-radius: 0.3em 0 0 0.3em;
+    padding-right: 3px;
+    margin-right: 0;
+}
+
+.el-nav-button.button-right{
+    border-width: 3px 3px 3px 1px;
+    border-radius: 0 0.3em 0.3em 0;
+    padding-left: 3px;
+    margin-left: 0;
 }
 
 div.edit-node {

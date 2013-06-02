@@ -16,39 +16,42 @@
 </head>
 
 <body>
-<div id="header">
-    {% block header %}
+    <div id="header">
+        {% block header %}
+        {% endblock %}
+    </div>
+
+    {% block premain %}
     {% endblock %}
-</div>
 
-{% block premain %}
-{% endblock %}
+    <div id="main">
+        {% block mainstart %}
+        {% endblock %}
 
-<div id="main">
-    <div class="colcontainer">
-        <div id="leftpanel" class="column colmask rightmenu">
-            {% block leftpanel %}
-            {% endblock %}
-        </div>
-        <div id="rightpanel" class="column">
-            {% block rightpanel %}
-            {% endblock %}
+        <div class="colcontainer">
+            <div id="leftpanel" class="column colmask rightmenu">
+                {% block leftpanel %}
+                {% endblock %}
+            </div>
+            <div id="rightpanel" class="column">
+                {% block rightpanel %}
+                {% endblock %}
+            </div>
         </div>
     </div>
-</div>
 
-{% block postmain %}
-{% endblock %}
+    {% block postmain %}
+    {% endblock %}
 
-{% block jsconsts %}
-<script type="text/javascript">
+    {% block jsconsts %}
+    <script type="text/javascript">
     // current hack for multiple development environments
     window.CONTENT_SERVER = "{{ content_server }}";
     window.STATIC_URL = "{{ STATIC_URL }}";
-</script>
-{% endblock %}
-{% block jscript %}
-{% endblock %}
+    </script>
+    {% endblock %}
+    {% block jscript %}
+    {% endblock %}
 </body>
 </html>          
 

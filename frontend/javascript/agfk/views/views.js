@@ -398,11 +398,11 @@ window.CKmapView = Backbone.View.extend({
      * Remove mouse over properties from the explore nodes unless the node is clicked
      */
     _nodeMouseOut: function(nodeEl) {
-        // check if we're outside of the node but not in a semantically related element
         var relTarget = d3.event.relatedTarget;
         if (!relTarget) { 
             return;
         }
+        // check if we're outside of the node but not in a semantically related element
         if (!nodeEl.contains(relTarget) && !relTarget.id.match(nodeEl.id)) {
             var thisView = this;
             var node = d3.select(nodeEl);

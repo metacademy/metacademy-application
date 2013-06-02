@@ -157,10 +157,10 @@ window.CNode = Backbone.Model.extend({
     /**
     * returns and caches the node display title
     */
-    getNodeDisplayTitle: function(){
+    getNodeDisplayTitle: function(numCharNodeLine){
         if (!this.nodeDisplayTitle){
             var title = this.title || this.id.replace(/_/g, " ");
-            this.nodeDisplayTitle = wrapNodeText(title, window.NUM_CHARS_NODE_LINE || 10);
+            this.nodeDisplayTitle = wrapNodeText(title, numCharNodeLine || 10);
         }
         return this.nodeDisplayTitle;
     },

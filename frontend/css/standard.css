@@ -346,7 +346,7 @@ h2 {
 }
 
 /* Explore-view interactive properties **************************************************/
-.summary-box {
+.summary-text {
     padding: 0.4em 0.7em;
     color: #3E4018;
     background-color: white;
@@ -364,11 +364,11 @@ h2 {
     box-sizing: border-box;
 }
 
-.wrap-summary{
+.summary-wrap{
     position: absolute;
 }
 /* creates the larger triangle */
-.wrap-summary.tright:before {
+.summary-wrap.tright:before {
     content: "";
     border: solid;
     border-width: 1em 0 1em 2.1em;
@@ -381,7 +381,7 @@ h2 {
 }
 
 /* creates the smaller  triangle */
-.wrap-summary.tright:after {
+.summary-wrap.tright:after {
     content: "";
     border-style: solid;
     border-width: 0.8em 0 0.8em 1.7em;
@@ -394,7 +394,7 @@ h2 {
 }
 
 /* creates the larger triangle */
-.wrap-summary.tleft:before {
+.summary-wrap.tleft:before {
     content: "";
     border-style: solid;
     border-width: 1em 2.1em 1em 0;
@@ -407,7 +407,7 @@ h2 {
 }
 
 /* creates the smaller  triangle */
-.wrap-summary.tleft:after {
+.summary-wrap.tleft:after {
     content: "";
     border: solid;
     border-width: 0.8em 1.7em 0.8em 0;
@@ -469,22 +469,22 @@ line {
 .checkmark{
     fill: transparent;
     stroke: #868686;
-    stroke-width: 5;
+    stroke-width: 4;
 }
 
 .checkmark-circle{
     fill: transparent;
     stroke: #868686;
-    stroke-width: 2;
+    stroke-width: 3;
 }
 .checkmark-hovered .checkmark-circle, .checkmark-clicked .checkmark-circle, .node-learned .checkmark-circle{
     fill: transparent;
     stroke: #759466;
-    stroke-width: 3;
+    stroke-width: 4;
 }
 
 .checkmark-hovered .checkmark, .checkmark-clicked .checkmark, .node-learned .checkmark{
-    stroke-width: 6;
+    stroke-width: 5;
     stroke: #759466;
 }
 

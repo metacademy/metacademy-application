@@ -1,12 +1,13 @@
 /**
-* This file contains general purpose utility functions
-*/
+ * This file contains general purpose utility functions
+ */
 
 
 /**
-* Get spatial information about input dom element that contains an svg ellipse
-*/
-function getSpatialNodeInfo(inNode){
+ * Get spatial information about input dom element that contains an svg ellipse
+ */
+
+function getSpatialNodeInfo(inNode) {
     var ellp = inNode.getElementsByTagName("ellipse")[0];
     return {
         cx: Number(ellp.getAttribute("cx")),
@@ -17,9 +18,9 @@ function getSpatialNodeInfo(inNode){
 }
 
 /**
-* Simulate html/mouse events programatically
-* taken from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
-*/
+ * Simulate html/mouse events
+ * modified code from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
+ */
 var eventMatchers = {
     'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
     'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
@@ -33,38 +34,35 @@ var defaultOptions = {
     shiftKey: false,
     metaKey: false,
     bubbles: true,
-    cancelable: true
+    cancelable: true,
+    relatedTarget: null
 };
-function simulate(element, eventName)
-{
+
+function simulate(element, eventName) {
     var options = extend(defaultOptions, arguments[2] || {});
     var oEvent, eventType = null;
 
-    for (var name in eventMatchers)
-    {
-        if (eventMatchers[name].test(eventName)) { eventType = name; break; }
+    for (var name in eventMatchers) {
+        if (eventMatchers[name].test(eventName)) {
+            eventType = name;
+            break;
+        }
     }
 
     if (!eventType)
         throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
 
-    if (document.createEvent)
-    {
+    if (document.createEvent) {
         oEvent = document.createEvent(eventType);
-        if (eventType == 'HTMLEvents')
-        {
+        if (eventType == 'HTMLEvents') {
             oEvent.initEvent(eventName, options.bubbles, options.cancelable);
-        }
-        else
-        {
+        } else {
             oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
-            options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
-            options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
+                options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
+                options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, options.relatedTarget);
         }
         element.dispatchEvent(oEvent);
-    }
-    else
-    {
+    } else {
         options.clientX = options.pointerX;
         options.clientY = options.pointerY;
         var evt = document.createEventObject();
@@ -74,28 +72,29 @@ function simulate(element, eventName)
     return element;
 
     function extend(destination, source) {
-    for (var property in source)
-      destination[property] = source[property];
-    return destination;
+        for (var property in source)
+            destination[property] = source[property];
+        return destination;
     }
 }
 
 
 
-
-
 /**
-* Wrap a long string to avoid elongated graph nodes. Translated/modified from server techniqu
-*/
-function wrapNodeText(s, width){
-    if (!s) {return '';}
+ * Wrap a long string to avoid elongated graph nodes. Translated/modified from server techniqu
+ */
+
+function wrapNodeText(s, width) {
+    if (!s) {
+        return '';
+    }
 
     var parts = s.split(" ");
     var result = [];
     var resArr = [];
     var total = 0;
-    for (var i = 0; i < parts.length; i++){
-        if (total + parts[i].length + 1 > width && total !== 0){
+    for (var i = 0; i < parts.length; i++) {
+        if (total + parts[i].length + 1 > width && total !== 0) {
             resArr.push(result.join(" "));
             result = [];
             total = 0;
@@ -110,7 +109,7 @@ function wrapNodeText(s, width){
 
 /* IE compatability functions */
 if (!Array.indexOf) {
-    Array.prototype.indexOf = function (obj) {
+    Array.prototype.indexOf = function(obj) {
         for (var i = 0; i < this.length; i++) {
             if (this[i] == obj) {
                 return i;
@@ -121,24 +120,24 @@ if (!Array.indexOf) {
 }
 
 if (typeof Object.getPrototypeOf !== "function")
-    Object.getPrototypeOf = "".__proto__ === String.prototype
-        ? function (object) {
-            return object.__proto__;
-        }
-        : function (object) {
-            // May break if the constructor has been tampered with
-            return object.constructor.prototype;
-        };
+    Object.getPrototypeOf = "".__proto__ === String.prototype ? function(object) {
+        return object.__proto__;
+}: function(object) {
+    // May break if the constructor has been tampered with
+    return object.constructor.prototype;
+};
 
 /* General helper functions */
+
 function isUrl(s) {
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
     return regexp.test(s);
 }
 
 /**
-* agfk specific helper functions 
-*/
+ * agfk specific helper functions
+ */
+
 function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
     /*
      Changes display size of the right margin
@@ -158,16 +157,17 @@ function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
 }
 
 /**
-* Controls window/svg/div sizes in two panel display when resizing the window
-* NB: has jQuery dependency for x-browser suppoert
-*/
+ * Controls window/svg/div sizes in two panel display when resizing the window
+ * NB: has jQuery dependency for x-browser suppoert
+ */
+
 function scaleWindowSize(header_id, main_id, rightpanel_id, leftpanel_id) {
     var windowSize = {
-        height:0,
-        mainHeight:0,
-        rightPanelHeight:0,
-        headerHeight:0,
-        setDimensions:function () {
+        height: 0,
+        mainHeight: 0,
+        rightPanelHeight: 0,
+        headerHeight: 0,
+        setDimensions: function() {
             windowSize.height = $(window).height();
             windowSize.headerHeight = $('#' + header_id).height();
             windowSize.mainHeight = windowSize.height - windowSize.headerHeight;
@@ -175,15 +175,15 @@ function scaleWindowSize(header_id, main_id, rightpanel_id, leftpanel_id) {
             windowSize.leftPanelHeight = windowSize.mainHeight;
             windowSize.updateSizes();
         },
-        updateSizes:function () {
+        updateSizes: function() {
             $('#' + main_id).css('height', windowSize.mainHeight + 'px');
             $('#' + rightpanel_id).css('height', (windowSize.rightPanelHeight) + 'px');
             $('#' + leftpanel_id).css('height', (windowSize.leftPanelHeight) + 'px');
         },
-        init:function () {
+        init: function() {
             if ($('#' + main_id).length) {
                 windowSize.setDimensions();
-                $(window).resize(function () {
+                $(window).resize(function() {
                     windowSize.setDimensions();
                 });
             }

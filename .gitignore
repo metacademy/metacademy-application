@@ -34,8 +34,10 @@ nosetests.xml
 .project
 .pydevproject        
 
-# tmp folders
+# tmp folders/files
 tmp
+*~
+\#*\#
 
 # Mac
 .DS_Store

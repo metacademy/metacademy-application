@@ -63,7 +63,7 @@ window.CKmapView = Backbone.View.extend({
     },
 
     /**
-     * Maintain references to the user interactions with the view
+     * Maintain references to the user interactions with the view TODO move to the userState of the node wrapper collection
      */
     interactState: {
         lastNodeClicked: -1,
@@ -186,14 +186,14 @@ window.CKmapView = Backbone.View.extend({
 
         d3this.selectAll("." + thisView.viewConsts.nodeClass)
             .on("mouseover", function() {
-            thisView._nodeMouseOver(this);
-        })
+                thisView._nodeMouseOver(this);
+            })
             .on("mouseout", function() {
-            thisView._nodeMouseOut(this);
-        })
+                thisView._nodeMouseOut(this);
+            })
             .on("click", function() {
-            thisView._nodeClick(this);
-        });
+                thisView._nodeClick(this);
+            });
     },
 
     /**
@@ -275,8 +275,8 @@ window.CKmapView = Backbone.View.extend({
         $wrapDiv = $(wrapDiv);
         $wrapDiv .delay(200).queue(function(){
             if(node.classed(thisView.viewConsts.hoveredClass) || node.classed(thisView.viewConsts.clickedClass)){
-               $wrapDiv.appendTo(document.body).fadeIn(thisView.viewConsts.summaryFadeInTime);
-        }
+                $wrapDiv.appendTo(document.body).fadeIn(thisView.viewConsts.summaryFadeInTime);
+            }
             $(this).dequeue();
         });
 
@@ -338,7 +338,6 @@ window.CKmapView = Backbone.View.extend({
             }); 
         });
 
-
         // add node-hoverables if not already present
         if (!node.attr(thisView.viewConsts.dataHoveredProp)) { // TODO check if the node is already expanded
             var svgSpatialInfo = window.getSpatialNodeInfo(nodeEl);
@@ -352,24 +351,28 @@ window.CKmapView = Backbone.View.extend({
                 .attr("y", expY)
                 .attr("class", thisView.viewConsts.useExpandClass)
                 .on("click", function() {
-                // don't propagate click to lower level objects
-                d3.event.stopPropagation();
-            });
-
+                    // don't propagate click to lower level objects
+                    d3.event.stopPropagation();
+                });
 
             // display checkmark
             var chkG = node.append("g")
                 .attr("id", thisView._getCheckIdForNode(node))
                 .on("click", function() {
-                node.classed(thisView.viewConsts.nodeLearnedClass, !node.classed(thisView.viewConsts.nodeLearnedClass)); // TODO write a toggle helper function in utils
-                d3.event.stopPropagation();
-            })
+                    // add/remove appropriate classses and entry from userData
+                    var addClick = !node.classed(thisView.viewConsts.nodeLearnedClass);
+                    node.classed(thisView.viewConsts.nodeLearnedClass, addClick);
+                    thisView.model.get("userData")
+                        .updateLearnedNodes(node.attr("id"), addClick);
+                    // stop the event from firing on the ellipse
+                    d3.event.stopPropagation();
+                })
                 .on("mouseover", function() {
-                d3.select(this).classed(thisView.viewConsts.checkHoveredClass, true);
-            })
+                    d3.select(this).classed(thisView.viewConsts.checkHoveredClass, true);
+                })
                 .on("mouseout", function() {
-                d3.select(this).classed(thisView.viewConsts.checkHoveredClass, false);
-            });
+                    d3.select(this).classed(thisView.viewConsts.checkHoveredClass, false);
+                });
             chkG.append("circle")
                 .attr("r", thisView.viewConsts.checkCircleR)
                 .classed(thisView.viewConsts.checkCircleClass, true);
@@ -382,8 +385,8 @@ window.CKmapView = Backbone.View.extend({
             var chkX = svgSpatialInfo.cx - maxTextLen/2 - thisView.viewConsts.checkXOffset;
             var chkY = svgSpatialInfo.cy;
             chkG.attr("transform", 
-                "translate(" + chkX + "," + chkY + ") "
-                + "scale(" + thisView.viewConsts.checkGScale + ")");
+                      "translate(" + chkX + "," + chkY + ") "
+                      + "scale(" + thisView.viewConsts.checkGScale + ")");
 
             node.attr(thisView.viewConsts.dataHoveredProp, true);
         }
@@ -403,7 +406,7 @@ window.CKmapView = Backbone.View.extend({
             return;
         }
         // check if we're outside of the node but not in a semantically related element
-        if (!nodeEl.contains(relTarget) && !relTarget.id.match(nodeEl.id)) {
+        if (!nodeEl.contains(relTarget) && !relTarget.id.match(nodeEl.id)){
             var thisView = this;
             var node = d3.select(nodeEl);
 
@@ -450,9 +453,10 @@ window.CKmapView = Backbone.View.extend({
      */
     _getFullDSArr: function() {
         var dgArr = [];
+        var thisView = this;
         // add all node properties & edges
         this.model.get("nodes").each(function(node) {
-            dgArr.unshift(node.get("id") + ' [label="' + node.getNodeDisplayTitle(this.viewconsts.numCharLineDisplayNode) + '"];');
+            dgArr.unshift(thisView._fullGraphVizStr(node));
             node.get("dependencies").each(function(inlink) {
                 if (node.isUniqueDependency(inlink.get("from_tag"))) {
                     dgArr.push(inlink.getDotStr());
@@ -469,7 +473,7 @@ window.CKmapView = Backbone.View.extend({
         var dgArr = [];
         var thisView = this;
         // build graph of appropriate depth from given keyNode
-        var curEndNodes = [this.model.get("nodes").get(this.model.get("keyNode"))]; // this should generalize easily to multiple end nodes, if desired
+        var curEndNodes = [thisView.model.get("nodes").get(thisView.model.get("keyNode"))]; // this should generalize easily to multiple end nodes, if desired
         _.each(curEndNodes, function(node) {
             dgArr.unshift(thisView._fullGraphVizStr(node));
         });
@@ -516,7 +520,7 @@ window.CKmapView = Backbone.View.extend({
                 }
             }
         }
-        return node.get("id") + ' [label="' + node.getNodeDisplayTitle() + '"' + optionStr + '];';
+        return node.get("id") + ' [label="' + node.getNodeDisplayTitle(this.viewConsts.numCharLineDisplayNode) + '"' + optionStr + '];';
     },
 
     /**

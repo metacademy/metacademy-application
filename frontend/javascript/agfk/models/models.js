@@ -1,14 +1,14 @@
 /*
-* This file contains the models and must be loaded after Backbone, jQuery, and d3
-*/
+ * This file contains the models and must be loaded after Backbone, jQuery, and d3
+ */
 
 /**
-* Comprehension question model
-*/
+ * Comprehension question model
+ */
 window.CQuestion = Backbone.Model.extend({
     /**
-    * default values -- underscore attribs used to match data from server
-    */
+     * default values -- underscore attribs used to match data from server
+     */
     defaults: function () {
         return {
             text: "",
@@ -19,14 +19,14 @@ window.CQuestion = Backbone.Model.extend({
 
 
 /**
-* Learning resource model
-*/
+ * Learning resource model
+ */
 window.CResource = Backbone.Model.extend({
     listFields: ['authors', 'dependencies', 'mark', 'extra', 'note'],
 
     /**
-    * default values -- attributes match possible data from server
-    */
+     * default values -- attributes match possible data from server
+     */
     defaults: function () {
         return {
             title: "",
@@ -46,13 +46,13 @@ window.CResource = Backbone.Model.extend({
 });
 
 /**
-* general directed edge model
-*/
+ * general directed edge model
+ */
 window.CDirectedEdge = Backbone.Model.extend({
 
     /**
-    * default values -- underscore attribs used to match data from server
-    */
+     * default values -- underscore attribs used to match data from server
+     */
     defaults: function () {
         return {
             from_tag: "",
@@ -67,8 +67,8 @@ window.CDirectedEdge = Backbone.Model.extend({
     },
 
     /**
-    * return a dot (graphviz) representation of the edge
-    */
+     * return a dot (graphviz) representation of the edge
+     */
     getDotStr: function(){
         if (this.get("from_tag")){
             return this.get("from_tag") + "->" + this.get("to_tag") + ';';
@@ -81,16 +81,16 @@ window.CDirectedEdge = Backbone.Model.extend({
 
 
 /**
-* CNode: node model that encompasses several collections and sub-models
-*/
+ * CNode: node model that encompasses several collections and sub-models
+ */
 window.CNode = Backbone.Model.extend({
     collFields: ["questions", "dependencies", "outlinks", "resources"], // collection fields
     txtFields: ["id", "title", "summary", "pointers"], // text fields
     boolFields: ["visible", "learned"], // boolean fields
 
     /**
-    * all possible attributes are present by default
-    */
+     * all possible attributes are present by default
+     */
     defaults: function () {
         return {
             title: "",
@@ -107,8 +107,8 @@ window.CNode = Backbone.Model.extend({
     },
 
     /**
-    *  parse the incoming server data
-    */
+     *  parse the incoming server data
+     */
     parse: function (resp, xhr) {
         // check if we have a null response from the server
         if (resp === null) {
@@ -136,9 +136,9 @@ window.CNode = Backbone.Model.extend({
     },
 
     /**
-    * intially populate the model with all present collection, boolean and text values
-    * bind changes from collection such that they trigger changes in the original model
-    */
+     * intially populate the model with all present collection, boolean and text values
+     * bind changes from collection such that they trigger changes in the original model
+     */
     initialize: function () {
         var model = this;
         // changes in attribute collections should trigger a change in the node model
@@ -155,8 +155,8 @@ window.CNode = Backbone.Model.extend({
     },
 
     /**
-    * returns and caches the node display title
-    */
+     * returns and caches the node display title
+     */
     getNodeDisplayTitle: function(numCharNodeLine){
         if (!this.nodeDisplayTitle){
             var title = this.title || this.id.replace(/_/g, " ");
@@ -166,8 +166,8 @@ window.CNode = Backbone.Model.extend({
     },
 
     /**
-    * Check if ancestID is an ancestor of this node
-    */
+     * Check if ancestID is an ancestor of this node
+     */
     isAncestor: function(ancestID){
         if (!this.ancestors){
             this.getAncestors(true);
@@ -176,23 +176,23 @@ window.CNode = Backbone.Model.extend({
     },
 
     /**
-    * Obtain (and optionally return) a list of the ancestors of this node 
-    * side effect: creates a list of unique dependencies (dependencies not present as an 
-    * ancestor of another dependency) which is stored in this.uniqueDeps
-*/
-getAncestors: function(noReturn){
-    if (!this.ancestors){
-        var ancests = {};
-        var coll = this.collection;
-        this.get("dependencies").each(function(dep){
-            var depNode = coll.get(dep.get("from_tag"));
-            var dAncests = depNode.getAncestors();
-            for (var dAn in dAncests){
-                if(dAncests.hasOwnProperty(dAn)){
-                    ancests[dAn] = 1;
+     * Obtain (and optionally return) a list of the ancestors of this node 
+     * side effect: creates a list of unique dependencies (dependencies not present as an 
+     * ancestor of another dependency) which is stored in this.uniqueDeps
+     */
+    getAncestors: function(noReturn){
+        if (!this.ancestors){
+            var ancests = {};
+            var coll = this.collection;
+            this.get("dependencies").each(function(dep){
+                var depNode = coll.get(dep.get("from_tag"));
+                var dAncests = depNode.getAncestors();
+                for (var dAn in dAncests){
+                    if(dAncests.hasOwnProperty(dAn)){
+                        ancests[dAn] = 1;
+                    }
                 }
-            }
-        });
+            });
 
             // create list of unique dependencies
             var uniqueDeps = {};
@@ -210,44 +210,105 @@ getAncestors: function(noReturn){
         if (!noReturn){
             return this.ancestors;
         }
-    },
 
-    /**
-    * Get a list of unqiue dependencies (dependencies not present as an 
-    * ancestor of another dependency)
-*/
-getUniqueDependencies: function(noReturn){
-        if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
-        if (!noReturn){
-            return Object.keys(this.uniqueDeps);
+        else{
+            return false;
         }
     },
 
     /**
-    * Check if depID is a unique dependency (dependencies not present as an 
-    * ancestor of another dependency)
-*/
-isUniqueDependency: function(depID){
-    if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
-    return this.uniqueDeps.hasOwnProperty(depID);
-}
+     * Get a list of unqiue dependencies (dependencies not present as an 
+     * ancestor of another dependency)
+     */
+    getUniqueDependencies: function(noReturn){
+        if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
+        if (!noReturn){
+            return Object.keys(this.uniqueDeps);
+        }
+        return false;
+    },
+
+    /**
+     * Check if depID is a unique dependency (dependencies not present as an 
+     * ancestor of another dependency)
+     */
+    isUniqueDependency: function(depID){
+        if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
+        return this.uniqueDeps.hasOwnProperty(depID);
+    }
 });
 
+/** 
+ * CUserData: model to store user data -- will eventually communicate with server for registered users
+ */
+window.CUserData = Backbone.Model.extend({
+    /**
+     * default user states
+     */
+    defaults: function() {
+        return {
+	    clickedNode: null,
+            learnedNodes: {},
+            visibleNodes: {}
+        };
+    },
+    
+    /**
+     * Setter function that triggers an appropriate change
+     */
+    updateLearnedNodes: function(nodeName, status){
+        return this._updateObjProp("learnedNodes", nodeName, status);
+    },
+
+    /**
+     * Setter function that triggers an appropriate change event
+     */
+    updateVisibleNodes: function(nodeName, status){
+        return this._updateObjProp("visibleNodes", nodeName, status);
+    },
+
+    /**
+     * Internal function to change dictionary objects TODO use proper private methods
+     * objName: name of object property
+     * arName: name of add/remove property of objName
+     * arStatus: truthy values assign objName.arName = arStatus; falsy deletes objName.arName
+     */
+    _updateObjProp: function(objName, arName, arStatus){
+        if (!this.get(objName)){return false;}
+
+        var retVal;
+        if (arStatus){
+            this.get(objName)[arName] = arStatus;
+            this.trigger("change:" + arName);
+            retVal = true;
+        }
+        else if (this.get(objName).hasOwnProperty(arName)){
+            delete this.get(objName)[arName];
+            this.trigger("change:" + arName);
+            retVal = true;
+        }
+        else{
+            retVal = false;
+        }
+        return retVal;
+    }
+});
 
 /**
-* Container for CNodeCollection in order to save/parse meta information for the collection
-*/
+ * Container for CNodeCollection in order to save/parse meta information for the collection
+ */
 window.CNodeCollectionContainer = Backbone.Model.extend({
     defaults: function(){
         return {
             nodes: new CNodeCollection(),
-            keyNode: null
+            keyNode: null,
+            userData: new CUserData()
         };
     },
 
     /**
-    * parse incoming json data
-    */
+     * parse incoming json data
+     */
     parse: function(response){
         // TODO check for extending the nodes vs resetting
         this.get("nodes").add(response.nodes, {parse: true});
@@ -256,8 +317,8 @@ window.CNodeCollectionContainer = Backbone.Model.extend({
     },
 
     /**
-    * Specify URL for HTTP verbs (GET/POST/etc)
-    */
+     * Specify URL for HTTP verbs (GET/POST/etc)
+     */
     url: function(){
         return window.CONTENT_SERVER + "/nodes" + (this.get("keyNode") ? "/" + this.get("keyNode") + '?set=map' : "");
     }

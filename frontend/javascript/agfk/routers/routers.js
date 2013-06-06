@@ -1,14 +1,23 @@
 /*
-* This file contains the router and must be loaded after the models, collections, and views
-*/
+ * This file contains the router and must be loaded after the models, collections, and views
+ */
 
 /**
-* Central router to control URL state
-*/
+ * Central router to control URL state
+ */
 window.CAppRouter = Backbone.Router.extend({
     routes: {
         "":"fullGraphRoute",
         ":id":"cnodeRoute"
+    },
+
+    initialize: function() {
+        var app_router = new Backbone.Router();
+
+        // Extend the View class to include a navigation method goTo
+        Backbone.View.goTo = function (loc) {
+            app_router.navigate(loc, true);
+        };
     },
 
     showView: function (selector, view) {

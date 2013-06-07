@@ -12,8 +12,8 @@ elnavs.on("click", function(){
 	elnavs.classed("active", false);
 	d3.select(this).classed("active", true);
 });
-
-window.app = new CAppRouter();
+AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
+AGFK.app = new AGFK.AppRouter();
 Backbone.history.start();
-scaleWindowSize("header", "main", "rightpanel", "leftpanel");
-setRightPanelWidth(0);
+CUtils.scaleWindowSize("header", "main", "rightpanel", "leftpanel");
+CUtils.setRightPanelWidth(0);

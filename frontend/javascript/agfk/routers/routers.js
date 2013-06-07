@@ -1,11 +1,12 @@
 /*
  * This file contains the router and must be loaded after the models, collections, and views
  */
+AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
 
 /**
  * Central router to control URL state
  */
-window.CAppRouter = Backbone.Router.extend({
+AGFK.AppRouter = Backbone.Router.extend({
     routes: {
         "":"fullGraphRoute",
         ":id":"cnodeRoute"
@@ -37,11 +38,11 @@ window.CAppRouter = Backbone.Router.extend({
         // need to load just the given node and deps...
         console.log('in list');
         console.log(id);
-        this.cnodesContn = new CNodeCollectionContainer({keyNode: id});
+        this.cnodesContn = new AGFK.NodeCollectionContainer({keyNode: id});
         var that = this; // TODO better way to do this?
         this.cnodesContn.fetch({success:function () {
             console.log('successful fetch: collection was populated'); //  (collection was populated)
-            that.kmView = new CKmapView({model: that.cnodesContn});
+            that.kmView = new AGFK.KmapView({model: that.cnodesContn});
             that.showView("#leftpanel", that.kmView);
         }});
 

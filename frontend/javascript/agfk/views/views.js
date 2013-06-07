@@ -6,14 +6,12 @@
 // -fix hardcoded 10px summary display offset; produces strange results when zooming on graphs
 // -move summaries with node on translations
 
-/**
- * View constants -- TODO move these to main once complete or find a natural parameter in the view
- */
+AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
 
 /*
  * View for knowledge map in exploration mode
  */
-window.CKmapView = Backbone.View.extend({
+AGFK.KmapView = Backbone.View.extend({
     id: "kmview",
 
     /**
@@ -22,9 +20,9 @@ window.CKmapView = Backbone.View.extend({
     viewConsts: {
         // ----- class and id names ----- //   
         // WARNING some changes must be propagated to the css file 
-        graphClass: "graph", // WARNING currently determined by graph generation -- chaning this property will not change the class
-        nodeClass: "node", // WARNING currently determined by graph generation -- chaning this property will not change the class
-        edgeClass: "edge", // WARNING currently determined by graph generation -- chaning this property will not change the class
+        graphClass: "graph", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
+        nodeClass: "node", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
+        edgeClass: "edge", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
         exploreSvgId: "explore-svg",
         expCrossClass: "expand-node",
         expCrossID: "expand-cross",
@@ -145,7 +143,7 @@ window.CKmapView = Backbone.View.extend({
         // front-and-center the key node if present
         var keyNode = this.model.get("keyNode");
         if (keyNode) {
-            var keyNodeLoc = getSpatialNodeInfo(d3this.select("#" + keyNode).node());
+            var keyNodeLoc = CUtils.getSpatialNodeInfo(d3this.select("#" + keyNode).node());
             var swx = window.innerWidth;
             var swy = window.innerHeight;
             // set x coordinate so key node is centered on screen
@@ -249,12 +247,12 @@ window.CKmapView = Backbone.View.extend({
         var div = document.createElement("div");
         div.textContent = this.model.get("nodes").get(node.attr("id")).get("summary");
         div.id = this._getSummaryIdForDivTxt(node);
-        d3div = d3.select(div);
+        var d3div = d3.select(div);
         d3div.classed(this.viewConsts.summaryTextClass, true);
 
         // add wrapper div so we can use "overflow" pseudo elements
         var wrapDiv = document.createElement("div");
-        d3wrapDiv = d3.select(wrapDiv);
+        var d3wrapDiv = d3.select(wrapDiv);
         wrapDiv.id = this._getSummaryIdForDivWrap(node);
         d3wrapDiv.classed(this.viewConsts.summaryWrapClass, true);
 
@@ -272,7 +270,7 @@ window.CKmapView = Backbone.View.extend({
         wrapDiv.style.display = "none";
 
         // add box to document with slight fade-in
-        $wrapDiv = $(wrapDiv);
+        var $wrapDiv = $(wrapDiv);
         $wrapDiv .delay(200).queue(function(){
             if(node.classed(thisView.viewConsts.hoveredClass) || node.classed(thisView.viewConsts.clickedClass)){
                 $wrapDiv.appendTo(document.body).fadeIn(thisView.viewConsts.summaryFadeInTime);
@@ -333,14 +331,14 @@ window.CKmapView = Backbone.View.extend({
 
         // add listener to node summary so mouseouts trigger mouseout on node
         $(wrapDiv).on("mouseleave", function(evt) {
-            window.simulate(node.node(), "mouseout", {
+            CUtils.simulate(node.node(), "mouseout", {
                 relatedTarget: evt.relatedTarget
             }); 
         });
 
         // add node-hoverables if not already present
         if (!node.attr(thisView.viewConsts.dataHoveredProp)) { // TODO check if the node is already expanded
-            var svgSpatialInfo = window.getSpatialNodeInfo(nodeEl);
+            var svgSpatialInfo = CUtils.getSpatialNodeInfo(nodeEl);
 
             // display expand shape if not expanded
             var expX = svgSpatialInfo.cx - thisView.viewConsts.exPlusWidth / 2;
@@ -440,7 +438,7 @@ window.CKmapView = Backbone.View.extend({
                 thisView.interactState.lastNodeClicked = -1;
             } else {
                 // trigger mouseout event on last node
-                window.simulate(thisView.interactState.lastNodeClicked.node(), "mouseout");
+                CUtils.simulate(thisView.interactState.lastNodeClicked.node(), "mouseout");
                 thisView.interactState.lastNodeClicked = node;
             }
         }

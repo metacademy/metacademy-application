@@ -2,10 +2,11 @@
  * This file contains the models and must be loaded after Backbone, jQuery, and d3
  */
 
+AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
 /**
  * Comprehension question model
  */
-window.CQuestion = Backbone.Model.extend({
+AGFK.Question = Backbone.Model.extend({
     /**
      * default values -- underscore attribs used to match data from server
      */
@@ -21,7 +22,7 @@ window.CQuestion = Backbone.Model.extend({
 /**
  * Learning resource model
  */
-window.CResource = Backbone.Model.extend({
+AGFK.Resource = Backbone.Model.extend({
     listFields: ['authors', 'dependencies', 'mark', 'extra', 'note'],
 
     /**
@@ -48,7 +49,7 @@ window.CResource = Backbone.Model.extend({
 /**
  * general directed edge model
  */
-window.CDirectedEdge = Backbone.Model.extend({
+AGFK.DirectedEdge = Backbone.Model.extend({
 
     /**
      * default values -- underscore attribs used to match data from server
@@ -83,7 +84,7 @@ window.CDirectedEdge = Backbone.Model.extend({
 /**
  * CNode: node model that encompasses several collections and sub-models
  */
-window.CNode = Backbone.Model.extend({
+AGFK.Node = Backbone.Model.extend({
     collFields: ["questions", "dependencies", "outlinks", "resources"], // collection fields
     txtFields: ["id", "title", "summary", "pointers"], // text fields
     boolFields: ["visible", "learned"], // boolean fields
@@ -97,10 +98,10 @@ window.CNode = Backbone.Model.extend({
             id: "",
             summary: "",
             pointers: "",
-            questions: new CQuestionCollection(),
-            dependencies: new CDirectedEdgeCollection(),
-            outlinks: new CDirectedEdgeCollection(),
-            resources: new CResourceCollection(),
+            questions: new AGFK.QuestionCollection(),
+            dependencies: new AGFK.DirectedEdgeCollection(),
+            outlinks: new AGFK.DirectedEdgeCollection(),
+            resources: new AGFK.ResourceCollection(),
             visible: false,
             learned: false
         };
@@ -160,7 +161,7 @@ window.CNode = Backbone.Model.extend({
     getNodeDisplayTitle: function(numCharNodeLine){
         if (!this.nodeDisplayTitle){
             var title = this.title || this.id.replace(/_/g, " ");
-            this.nodeDisplayTitle = wrapNodeText(title, numCharNodeLine || 10);
+            this.nodeDisplayTitle = CUtils.wrapNodeText(title, numCharNodeLine || 10);
         }
         return this.nodeDisplayTitle;
     },
@@ -241,7 +242,7 @@ window.CNode = Backbone.Model.extend({
 /** 
  * CUserData: model to store user data -- will eventually communicate with server for registered users
  */
-window.CUserData = Backbone.Model.extend({
+AGFK.UserData = Backbone.Model.extend({
     /**
      * default user states
      */
@@ -297,12 +298,12 @@ window.CUserData = Backbone.Model.extend({
 /**
  * Container for CNodeCollection in order to save/parse meta information for the collection
  */
-window.CNodeCollectionContainer = Backbone.Model.extend({
+AGFK.NodeCollectionContainer = Backbone.Model.extend({
     defaults: function(){
         return {
-            nodes: new CNodeCollection(),
+            nodes: new AGFK.NodeCollection(),
             keyNode: null,
-            userData: new CUserData()
+            userData: new AGFK.UserData()
         };
     },
 

@@ -1,13 +1,14 @@
 /**
- * This file contains general purpose utility functions
+ * This file contains general purpose utility functions TODO create a namespace e.g. CUtil.function_name, etc
  */
 
+CUtils = {};
 
 /**
  * Get spatial information about input dom element that contains an svg ellipse
  */
 
-function getSpatialNodeInfo(inNode) {
+CUtils.getSpatialNodeInfo = function(inNode) {
     var ellp = inNode.getElementsByTagName("ellipse")[0];
     return {
         cx: Number(ellp.getAttribute("cx")),
@@ -21,11 +22,11 @@ function getSpatialNodeInfo(inNode) {
  * Simulate html/mouse events
  * modified code from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
  */
-var eventMatchers = {
+CUtils.eventMatchers = {
     'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
     'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
 };
-var defaultOptions = {
+CUtils.defaultOptions = {
     pointerX: 0,
     pointerY: 0,
     button: 0,
@@ -38,12 +39,12 @@ var defaultOptions = {
     relatedTarget: null
 };
 
-function simulate(element, eventName) {
-    var options = extend(defaultOptions, arguments[2] || {});
+CUtils.simulate = function(element, eventName) {
+    var options = extend(CUtils.defaultOptions, arguments[2] || {});
     var oEvent, eventType = null;
 
-    for (var name in eventMatchers) {
-        if (eventMatchers[name].test(eventName)) {
+    for (var name in CUtils.eventMatchers) {
+        if (CUtils.eventMatchers[name].test(eventName)) {
             eventType = name;
             break;
         }
@@ -84,7 +85,7 @@ function simulate(element, eventName) {
  * Wrap a long string to avoid elongated graph nodes. Translated/modified from server techniqu
  */
 
-function wrapNodeText(s, width) {
+CUtils. wrapNodeText = function(s, width) {
     if (!s) {
         return '';
     }
@@ -129,7 +130,7 @@ if (typeof Object.getPrototypeOf !== "function")
 
 /* General helper functions */
 
-function isUrl(s) {
+CUtils.isUrl = function(s) {
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
     return regexp.test(s);
 }
@@ -138,7 +139,7 @@ function isUrl(s) {
  * agfk specific helper functions
  */
 
-function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
+CUtils.setRightPanelWidth = function(rp_width, rp_lmarg, rp_rmarg) {
     /*
      Changes display size of the right margin
      See corresponding CSS entries for description of values
@@ -161,7 +162,7 @@ function setRightPanelWidth(rp_width, rp_lmarg, rp_rmarg) {
  * NB: has jQuery dependency for x-browser support
  */
 
-function scaleWindowSize(header_id, main_id, rightpanel_id, leftpanel_id) {
+ CUtils.scaleWindowSize = function(header_id, main_id, rightpanel_id, leftpanel_id) {
     var windowSize = {
         height: 0,
         mainHeight: 0,

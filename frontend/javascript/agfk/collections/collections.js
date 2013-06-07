@@ -2,35 +2,37 @@
 * This file contains the model collections and must load after the models
 */
 
+AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
+
 /**
 * collection of resource models
 */
-window.CResourceCollection = Backbone.Collection.extend({
-    model:CResource
+AGFK.ResourceCollection = Backbone.Collection.extend({
+    model:AGFK.Resource
 });
 
 
 /**
 * Collection of directed edge models
 */
-window.CDirectedEdgeCollection = Backbone.Collection.extend({
-    model:CDirectedEdge
+AGFK.DirectedEdgeCollection = Backbone.Collection.extend({
+    model:AGFK.DirectedEdge
 });
 
 
 /**
 * Collection of question models
 */
-window.CQuestionCollection = Backbone.Collection.extend({
-    model:CQuestion
+AGFK.QuestionCollection = Backbone.Collection.extend({
+    model:AGFK.Question
 });
 
 
 /**
 * Collection of node models
 */
-window.CNodeCollection = Backbone.Collection.extend({
-    model: CNode,
+AGFK.NodeCollection = Backbone.Collection.extend({
+    model: AGFK.Node,
 
     /**
     * parse incoming json data

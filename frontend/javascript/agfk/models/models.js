@@ -285,7 +285,7 @@
             },
             
             /**
-             * Setter function that triggers an appropriate change
+             * Setter function that triggers an appropriate change event
              */
             updateLearnedNodes: function(nodeName, status){
                 return pvt.updateObjProp.call(this, "learnedNodes", nodeName, status);
@@ -301,13 +301,13 @@
     })();
 
     /**
-     * Container for CNodeCollection in order to save/parse meta information for the collection
+     * Model to maintain both client and server data
      */
-    AGFK.NodeCollectionContainer = Backbone.Model.extend({
+    AGFK.CSData = Backbone.Model.extend({
         defaults: function(){
             return {
                 nodes: new AGFK.NodeCollection(),
-                keyNode: null,
+                keyNode: null, // TODO this should be an array to handle multiple key nodes
                 userData: new AGFK.UserData()
             };
         },

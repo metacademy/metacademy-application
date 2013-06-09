@@ -1,42 +1,71 @@
-{% extends "two-panel.html" %}
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block meta %}
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {% endblock %}
 
-{% block title %}
-KMap Explorer
-{% endblock %}
+    {% block css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/reset.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
+    {% endblock %}
 
-{% block jscript %}
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/d3.v2.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jQuery-latest.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/viz.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/underscore-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/backbone.js"></script>
+    <title> {% block title %}Metacademy{% endblock %}</title>
 
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/utils/utils.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/models/models.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/collections/collections.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/explore-view.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/learning-view.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/routers/routers.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/main.js"></script>
-{% endblock %}
+  </head>
 
-{% block rightpanel %}
-<div id="righttext">
-</div>
-{% endblock %}
-
-
-{% block mainstart %}
-    <div id="explore-learn-div">
-        <button class="el-nav-button button-left active">
-			Explore
-        </button>	
-        <button class="el-nav-button button-right">
-			Learn
-        </button>	
+  <body>
+    <div id="header">
+      {% block header %}
+      {% endblock %}
     </div>
-{% endblock %}
 
-{% block postmain %}
-{% include "node-item-view.html" %}
-{% endblock %}
+
+    <div id="main">
+      
+      <div id="explore-learn-button-wrapper">
+        <button class="el-nav-button button-left" id="explore-button">
+	  Explore
+        </button>	
+        <button class="el-nav-button button-right" id="learn-button">
+	  Learn
+        </button>	
+      </div>
+
+      <div id="learn-view-wrapper"></div>
+      <div id="explore-view-wrapper"></div>
+
+      {% include "node-item-view.html" %}
+
+    </div>
+
+    <script type="text/javascript">
+      // current hack for multiple development environments will change for server
+      window.CONTENT_SERVER = "{{ content_server }}";
+      window.STATIC_URL = "{{ STATIC_URL }}";
+    </script>
+
+    {% block jscript %}
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/d3.v2.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jQuery-latest.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/viz.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/underscore-min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/backbone.js"></script>
+
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/utils/utils.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/models/models.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/collections/collections.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/explore-view.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/learning-view.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/routers/routers.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/main.js"></script>
+    {% endblock %}
+  </body>
+</html>          
+
+
+
+
+

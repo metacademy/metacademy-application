@@ -149,24 +149,19 @@
      * NB: has jQuery dependency for x-browser support
      */
 
-    AGFK.utils.scaleWindowSize = function(header_id, main_id, rightpanel_id, leftpanel_id) {
+    AGFK.utils.scaleWindowSize = function(header_id, main_id) {
         var windowSize = {
             height: 0,
             mainHeight: 0,
-            rightPanelHeight: 0,
             headerHeight: 0,
             setDimensions: function() {
                 windowSize.height = $(window).height();
                 windowSize.headerHeight = $('#' + header_id).height();
                 windowSize.mainHeight = windowSize.height - windowSize.headerHeight;
-                windowSize.rightPanelHeight = windowSize.mainHeight;
-                windowSize.leftPanelHeight = windowSize.mainHeight;
                 windowSize.updateSizes();
             },
             updateSizes: function() {
                 $('#' + main_id).css('height', windowSize.mainHeight + 'px');
-                $('#' + rightpanel_id).css('height', (windowSize.rightPanelHeight) + 'px');
-                $('#' + leftpanel_id).css('height', (windowSize.leftPanelHeight) + 'px');
             },
             init: function() {
                 if ($('#' + main_id).length) {

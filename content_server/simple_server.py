@@ -61,7 +61,7 @@ def load_graph():
         # add outlinks to nodes
         for ol_node in filter(lambda x: graph.outgoing[x], graph.outgoing):
             nodes[ol_node].add_outlinks(graph.outgoing[ol_node])
-        # graph_minus_redundant = graphs.remove_redundant_edges(graph) 
+        # graph_minus_redundant = graphs.redundant_edges(graph) 
         resource_dict = resources.read_resources_file(resources.resource_db_path())
 
         # read user-supplied data

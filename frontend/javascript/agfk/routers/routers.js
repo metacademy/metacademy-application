@@ -17,9 +17,15 @@
             pexploreMode: "explore",
             plearnMode: "learn",
             leftPanelId: "leftpanel,",
-            rightPanelId: "rightpanel"
+            rightPanelId: "rightpanel",
+            lviewId: "learn-view-wrapper", // id for main learn view div
+            eviewId: "explore-view-wrapper" // id for main explore view div
         };
 
+        pvt.prevUrlParams = {}; // url parameters
+
+        pvt.viewMode = -1; // current view mode
+        
         /**
          * Get key/value parameter object from string with key1=val1&key2=val2 format
          */
@@ -41,11 +47,10 @@
             return params;
         };
 
-
         // return public object
         return Backbone.Router.extend({
             routes: {
-                ":params": "parseParams"
+                ":params": "routeParams"
             },
 
             /**
@@ -53,7 +58,7 @@
              */
             initialize: function() {
                 var app_router = new Backbone.Router();
-                // Extend the View class to include a navigation method goTo TODO consider another method for doing this?PPP
+                // Extend the View class to include a navigation method goTo TODO consider another method for doing this?
                 Backbone.View.goTo = function (loc) {
                     app_router.navigate(loc, true);
                 };
@@ -62,11 +67,13 @@
             /**
              * Show the input view in the input selector and maintain a reference for correct clean up
              */
-            showView: function (selector, view) {
+            showView: function (selector, view, c) {
                 if (this.currentView) {
+                    this.currentView.$el.parent().hide();
                     this.currentView.close();
                 }
-                $(selector).html(view.render().el);
+                // TODO add in the appropriate transition
+                $(selector).html(view.render().el).show();
                 this.currentView = view;
                 return view;
             },
@@ -74,49 +81,94 @@
             /**
              * Parse the URL parameters
              */
-            parseParams: function(params){
+            routeParams: function(params){
                 var routeConsts = pvt.routeConsts,
-                paramsObj = pvt.getParamsFromStr(params),
-                qnodeName = routeConsts.qnodeName;
+                    paramsObj = pvt.getParamsFromStr(params),
+                    qnodeName = routeConsts.qnodeName;
 
                 if (paramsObj.hasOwnProperty(qnodeName)){
                     this.nodeRoute(paramsObj[qnodeName], paramsObj);
                 }
                 else{
                     // TODO redirect to error page
-                    console.error("Must supply 'node' key value pair in URL -- defaulting to full graph view (this behavior will change in the future)");
+                    console.warn("Must supply 'node' key value pair in URL -- defaulting to full graph view (this behavior will change in the future)");
+                    this.nodeRoute("", paramsObj);
                 }
             },
 
-            fullGraphRoute: function (first_node) {
-                this.nodeRoute("");
+            /**
+             * Change the URL parameters based on the paramObj input
+             * paramObj: object of parameters to be set in URL
+             * note: unprovided parameters remain unchanged
+             */
+            changeUrlParams: function(paramsObj){
+                this.paramsToUrl($.extend({},  pvt.prevUrlParams, paramsObj));
             },
 
+            /**
+             * Change the current URL to the input in paramsObj
+             */
+            paramsToUrl: function(paramsObj){
+                var parr = [],
+                    purl,
+                    param;
+                for (param in paramsObj){
+                    if (paramsObj.hasOwnProperty(param)){
+                        parr.push(param + "=" + paramsObj[param]);
+                    }
+                }
+                purl = parr.join("&");
+                this.navigate(purl, true);
+            },
+
+            /**
+             * Main router for a given node
+             */
             nodeRoute: function(nodeId, paramsObj) {
                 var thisRoute = this,
-                routeConsts = pvt.routeConsts,
-                qviewMode = routeConsts.qviewMode,
-                pexploreMode = routeConsts.pexploreMode,
-                plearnMode = routeConsts.plearnMode;
-                // need to load just the given node and deps...
-                console.log('in list');
-                console.log(nodeId);
-                this.cnodesContn = new AGFK.NodeCollectionContainer({keyNode: nodeId});
-                this.cnodesContn.fetch({success:function () {
-                    //  (collection was populated
-                    console.log('successful fetch: collection was populated');
-                    paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode; // set default to explore mode
-                    switch (paramsObj[qviewMode]){
-                        case plearnMode:
-                                thisRoute.kmView = new AGFK.LearnView({model: thisRoute.cnodesContn});
-                        break;
-                        default:
-                            thisRoute.kmView = new AGFK.ExploreView({model: thisRoute.cnodesContn});
-                    }
-                    thisRoute.showView("#leftpanel", thisRoute.kmView);
-                }});
+                    routeConsts = pvt.routeConsts,
+                    qviewMode = routeConsts.qviewMode,
+                    qnodeName = routeConsts.qnodeName,
+                    pexploreMode = routeConsts.pexploreMode,
+                    plearnMode = routeConsts.plearnMode,
+                    keyNodeChanged = nodeId !== pvt.prevUrlParams[qnodeName];
 
+                // need to load just the given node and deps...
+                console.log("nodeRoute for: " + nodeId); 
+
+                // check if/how we need to acquire more data from the server
+                // TODO make this more general/extendable
+                if(!keyNodeChanged){
+                    postNodePop();
+                }
+                else{
+                    thisRoute.cnodesContn = new AGFK.CSData({keyNode: nodeId});
+                    thisRoute.cnodesContn.fetch({success: postNodePop});
+                }
+
+                // helper function to route change parameters appropriately
+                // -- necessary because of possible AJAX calls to obtain new data
+                function postNodePop() {
+                    // set default to explore mode
+                    paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;
+                    pvt.viewMode = paramsObj[qviewMode];
+                    
+                    switch (paramsObj[qviewMode]){
+                    case plearnMode:
+                        thisRoute.lview = keyNodeChanged || typeof thisRoute.lview === "undefined"
+                            ? new AGFK.LearnView({model: thisRoute.cnodesContn}) : thisRoute.lview;
+                        thisRoute.showView("#" + routeConsts.lviewId, thisRoute.lview);
+                        break;
+                    default:
+                        
+                        thisRoute.eview = keyNodeChanged || typeof thisRoute.eview === "undefined"
+                            ? new AGFK.ExploreView({model: thisRoute.cnodesContn}) : thisRoute.eview;
+                        thisRoute.showView("#" + routeConsts.eviewId, thisRoute.eview);
+                    }
+                    pvt.prevUrlParams = $.extend({}, paramsObj);
+                }
             }
+            
         });
     })();
 })(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.jQuery);

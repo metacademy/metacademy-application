@@ -9,7 +9,6 @@ body {
     border: 0; /* removes the border around the viewport in old versions of IE */
     width: 100%;
     height: 100%;
-    /* overflow: hidden; */ /* this may not be desireable on a global level */
     font-family: Arial, sans-serif;
     font-size: 1.0em;
 }
@@ -51,30 +50,7 @@ p {
     background: rgb(255, 238, 238);
 }
 
-#leftpanel {
-    position: relative;
-    width: 80%; /* left column content width (left column width minus left and right padding) */
-    left: 20%; /* (right column width) plus (left column left padding) */
-    border-right: 0.2ex #333 solid;
-    overflow: hidden;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-
-}
-
-#rightpanel {
-    position: relative;
-    width: 20%; /* right column content width (right column width minus left and right padding) */
-    left: 20%; /* (right column width) plus (left column left and right padding) plus (right column left padding) */
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100%;
-}
-
-
-#explore-learn-div{
+#explore-learn-button-wrapper{
     position: absolute;
     top: 0;
     right: 0;
@@ -82,19 +58,6 @@ p {
     z-index: 1;
     margin-top: 0.5em;
     margin-right: 0.8em;
-}
-
-.colcontainer {
-    float: left;
-    width: 100%;
-    position: relative;
-    right: 20%; /* right column width */
-    background: #fff; /* left column background colour */
-}
-
-.column {
-    float: left;
-    overflow: auto;
 }
 
 
@@ -140,32 +103,52 @@ p {
 /* ---------------------------------------------------*/
 /* ---------->>> Learn Mode Styles <<<----------------*/
 /* ---------------------------------------------------*/
-ul.learn-nodelist {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+
+#learn-view-wrapper{
+    display: none;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    background: white;
 }
-ul.learn-nodelist li a {
+
+.learn-title-display{
+    text-align: center;
+}
+
+.learn-title-display {
     display: block;
+    cursor: pointer;
     text-decoration: none;
-    color: #000000;
+    color: #3E4018;
     padding: 1em 0;
     padding-left: 1ex;
-    border-bottom: 0.2ex solid #CCCCCC;
-    cursor: pointer;
+    line-height: 1.5em;
+    font-size: 1.1em;
+    border-bottom: 0.3ex solid #CCCCCC;
 }
-ul.learn-nodelist li a:hover {
-    color: rgb(190, 49, 49);
-    background-color: rgba(247, 214, 214, 0.42);
-}
-ul.learn-nodelist li a strong {
-    margin-right: 1ex;
+.learn-title-display:hover {
+    background-color: rgb(241, 244, 229);
+    font-weight: bold;
 }
 
 
 /* --------------------------------------------------------*/
-/* ---------->>> Explore Graph non-SVG Style <<<-----------*/
-/* --------------------------------------------------------*/
+/* ---------->>> Explore View non-SVG Style <<<-----------*/
+/* ------------------------------------------------------*/
+
+#explore-view-wrapper{
+    display: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: white;
+}
+
+#explore-view{
+    height: 100%;
+    width: 100%;
+}
 .summary-text {
     padding: 0.4em 0.7em;
     color: #3E4018;
@@ -254,6 +237,7 @@ line, polygon, path {
 /* edge path in digraph */
 path {
     stroke-width: 4;
+    fill: transparent;
 }
 
 /* node ellipse */

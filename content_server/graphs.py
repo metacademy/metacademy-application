@@ -49,6 +49,18 @@ class Dependency(DirectedEdge):
     def __repr__(self):
         return 'Dependency(from_tag=%r, to_tag=%r, reason=%r)' % (self.from_tag, self.to_tag, self.reason)
 
+class Outlink(DirectedEdge):
+    """A struct representing a outlink link in the graph.
+
+    from_tag -- the tag of the node which is a prerequisite
+    to_tag -- the tag of the node which depends on from_tag
+    """
+    def __repr__(self):
+        return 'Outlink(from_tag=%r, to_tag=%r)' % (self.from_tag, self.to_tag)
+
+    def as_dict(self):
+        return {'from_tag': self.from_tag, 'to_tag': self.to_tag}
+
 
 class Node:
     """A struct containing the information relevant to one node in the graph.
@@ -88,6 +100,8 @@ class Node:
             d['resources'] = self.resources
         if hasattr(self, 'questions'):
             d['questions'] = self.questions
+        if hasattr(self, 'outlinks'):
+            d['outlinks'] = [ol.as_dict() for ol in self.outlinks]
 
         # add user-supplied data
         if user_nodes is not None and self.tag in user_nodes:
@@ -101,8 +115,11 @@ class Node:
             keys = [rdic['source'] for rdic in self.resources]
         return keys
 
-
-
+    def add_outlinks(self, outlink_list):
+        self.outlinks = []
+        for ol in outlink_list:
+            self.outlinks.append(Outlink(self.tag, ol))
+        
 
 class Graph:
     """A representation of the dependency graph in a form that's more convenient for graph computations

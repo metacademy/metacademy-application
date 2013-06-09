@@ -335,7 +335,6 @@ def write_graph_json(nodes, graph, resource_dict=None, outstr=None, user_nodes=N
 
     node_items = {tag: node_dict(nodes, tag, resource_dict=resource_dict, user_nodes=user_nodes)
                   for tag in nodes}
-
     items = {'nodes': node_items}
     json.dump(items, outstr)
 

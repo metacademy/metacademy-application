@@ -4,12 +4,13 @@
 
 // Global TODOS
 // -move summaries with node on translations
+// -fully separate graph generation logic from view
 
-(function(AGFK, Backbone, d3, $, Viz, undefined){
+(function(AGFK, Backbone, d3, $, Viz, _, undefined){
     /*
      * View for knowledge map in exploration mode
      */
-    AGFK.KmapView = (function(){
+    AGFK.ExploreView = (function(){
 
         /**
          * Private methods and variables
@@ -583,4 +584,4 @@
             }
         });
     })();
-})(window.AGFK = window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.d3, window.jQuery, window.Viz);
+})(window.AGFK = window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.d3, window.jQuery, window.Viz, window._);

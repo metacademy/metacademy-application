@@ -4,7 +4,7 @@
  */
 
 
-(function(AGFK, Backbone){
+(function(AGFK, Backbone, _){
 
     /**
      * Display the model as an item in the node list
@@ -70,4 +70,4 @@
 
 
 
-})(window.AGFK = typeof window.AGFK == "object"? window.AGFK : {}, window.Backbone);
+})(window.AGFK = typeof window.AGFK == "object"? window.AGFK : {}, window.Backbone, window._);

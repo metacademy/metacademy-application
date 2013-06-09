@@ -59,8 +59,7 @@
             return {
                 from_tag: "",
                 to_tag: "",
-                reason: "",
-                visible: false
+                reason: ""
             };
         },
 

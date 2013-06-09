@@ -111,7 +111,7 @@
                                 thisRoute.kmView = new AGFK.LearnView({model: thisRoute.cnodesContn});
                         break;
                         default:
-                            thisRoute.kmView = new AGFK.KmapView({model: thisRoute.cnodesContn});
+                            thisRoute.kmView = new AGFK.ExploreView({model: thisRoute.cnodesContn});
                     }
                     thisRoute.showView("#leftpanel", thisRoute.kmView);
                 }});

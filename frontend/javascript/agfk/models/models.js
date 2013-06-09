@@ -243,39 +243,16 @@
     /** 
      * CUserData: model to store user data -- will eventually communicate with server for registered users
      */
-    AGFK.UserData = Backbone.Model.extend({
+    AGFK.UserData = (function(){
+        // define private methods and variables
+        var pvt = {};
         /**
-         * default user states
-         */
-        defaults: function() {
-            return {
-	        clickedNode: null,
-                learnedNodes: {},
-                visibleNodes: {}
-            };
-        },
-        
-        /**
-         * Setter function that triggers an appropriate change
-         */
-        updateLearnedNodes: function(nodeName, status){
-            return this._updateObjProp("learnedNodes", nodeName, status);
-        },
-
-        /**
-         * Setter function that triggers an appropriate change event
-         */
-        updateVisibleNodes: function(nodeName, status){
-            return this._updateObjProp("visibleNodes", nodeName, status);
-        },
-
-        /**
-         * Internal function to change dictionary objects TODO use proper private methods
+         * Internal function to change dictionary objects 
          * objName: name of object property
          * arName: name of add/remove property of objName
          * arStatus: truthy values assign objName.arName = arStatus; falsy deletes objName.arName
          */
-        _updateObjProp: function(objName, arName, arStatus){
+        pvt.updateObjProp = function(objName, arName, arStatus){
             if (!this.get(objName)){return false;}
 
             var retVal;
@@ -293,8 +270,36 @@
                 retVal = false;
             }
             return retVal;
-        }
-    });
+        };
+
+        // return public object
+        return Backbone.Model.extend({
+            /**
+             * default user states
+             */
+            defaults: function() {
+                return {
+	            clickedNode: null,
+                    learnedNodes: {},
+                    visibleNodes: {}
+                };
+            },
+            
+            /**
+             * Setter function that triggers an appropriate change
+             */
+            updateLearnedNodes: function(nodeName, status){
+                return pvt.updateObjProp.call(this, "learnedNodes", nodeName, status);
+            },
+
+            /**
+             * Setter function that triggers an appropriate change event
+             */
+            updateVisibleNodes: function(nodeName, status){
+                return pvt.updateObjProp.call(this, "visibleNodes", nodeName, status);
+            }
+        });
+    })();
 
     /**
      * Container for CNodeCollection in order to save/parse meta information for the collection
@@ -325,5 +330,5 @@
             return window.CONTENT_SERVER + "/nodes" + (this.get("keyNode") ? "/" + this.get("keyNode") + '?set=map' : "");
         }
     });
-})(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone);
+})(typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone);
 

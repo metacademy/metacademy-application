@@ -14,7 +14,8 @@ KMap Explorer
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/utils/utils.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/models/models.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/collections/collections.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/views.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/explore-view.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/learning-view.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/routers/routers.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/main.js"></script>
 {% endblock %}
@@ -36,10 +37,6 @@ KMap Explorer
     </div>
 {% endblock %}
 
-
-
-
-
-
-
-
+{% block postmain %}
+{% include "node-item-view.html" %}
+{% endblock %}

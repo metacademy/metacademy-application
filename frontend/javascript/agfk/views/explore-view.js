@@ -16,7 +16,8 @@
          */
         var pvt = {};
         pvt.viewConsts = {
-            // ----- class and id names ----- //   
+            // ----- class and id names ----- //
+            viewId: "explore-view", // id of view element (div by default) must change in CSS as well
             // WARNING some changes must be propagated to the css file 
             graphClass: "graph", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
             nodeClass: "node", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
@@ -310,7 +311,8 @@
          * return public object
          */
         return Backbone.View.extend({
-            id: "kmview",
+            // id of view element (div unless tagName is specified)
+            id: pvt.viewConsts.viewId,
 
             /**
              * Maintain references to the user interactions with the view TODO move to the userState of the node wrapper collection?
@@ -457,7 +459,7 @@
             },
 
             /**
-             * Renders the kmap using the supplied features collection
+             * Renders the explore view using the supplied collection
              */
             render: function() {
                 var thisView = this;

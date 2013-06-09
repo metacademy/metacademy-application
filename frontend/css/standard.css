@@ -1,4 +1,38 @@
-/* header */
+/* -----------------------------------*/
+/* ---------->>> GLOBAL <<<-----------*/
+/* -----------------------------------*/
+
+
+body {
+    margin: 0;
+    padding: 0;
+    border: 0; /* removes the border around the viewport in old versions of IE */
+    width: 100%;
+    height: 100%;
+    /* overflow: hidden; */ /* this may not be desireable on a global level */
+    font-family: Arial, sans-serif;
+    font-size: 1.0em;
+}
+
+h1 {
+    margin-top: 1em;
+}
+
+h2 {
+    line-height: 0;
+    font-size: 1.3em;
+    font-style: italic;
+    margin-bottom: 1em;
+}
+
+p {
+    margin: 0.1em 0;
+}
+
+
+/* ---------------------------------------------------*/
+/* ---------->>> Layout Styles <<<--------------------*/
+/* ---------------------------------------------------*/
 #header {
     height: 1.5em;
     width: 100%;
@@ -8,18 +42,6 @@
     font-size: 1.1em;
 }
 
-/* body elements */
-body {
-    margin: 0;
-    padding: 0;
-    border: 0; /* removes the border around the viewport in old versions of IE */
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    font-size: 1.0em;
-}
-
 #main {
     clear: both;
     width: 100%;
@@ -27,19 +49,6 @@ body {
     overflow: hidden;
     position: absolute; 
     background: rgb(255, 238, 238);
-}
-
-.colcontainer {
-    float: left;
-    width: 100%;
-    position: relative;
-    right: 20%; /* right column width */
-    background: #fff; /* left column background colour */
-}
-
-.column {
-    float: left;
-    overflow: auto;
 }
 
 #leftpanel {
@@ -64,7 +73,6 @@ body {
     height: 100%;
 }
 
-/* special styles */
 
 #explore-learn-div{
     position: absolute;
@@ -76,19 +84,30 @@ body {
     margin-right: 0.8em;
 }
 
-#kmview{
-    padding: 0;
-    margine: 0;
+.colcontainer {
+    float: left;
     width: 100%;
-    height: 100%;
+    position: relative;
+    right: 20%; /* right column width */
+    background: #fff; /* left column background colour */
 }
 
+.column {
+    float: left;
+    overflow: auto;
+}
+
+
+/* --------------------------------------------------------*/
+/* ---------->>> Specific HTML Element Styles<<<-----------*/
+/* --------------------------------------------------------*/
+/* Explore-Learn Navigation Button */
 .el-nav-button{
     display: inline;
     float: left;
     border: solid;
     border-color: transparent;
-    background-color: #333;
+    background-color: #333333;
     color: white;
     padding: 2px;
     margin: 0;
@@ -99,11 +118,9 @@ body {
     -ms-box-sizing: border-box; /* IE */
     box-sizing: border-box;
 }
-
 .el-nav-button.active{
     background-color: #416685;
 }
-
 .el-nav-button:hover{
     background-color: steelblue;
 }
@@ -113,7 +130,6 @@ body {
     padding-right: 3px;
     margin-right: 0;
 }
-
 .el-nav-button.button-right{
     border-width: 3px 3px 3px 1px;
     border-radius: 0 0.3em 0.3em 0;
@@ -121,93 +137,15 @@ body {
     margin-left: 0;
 }
 
-div.edit-node {
-    margin: 0.2em;
-    margin-bottom: 0.1em;
-}
-
-section.cnode-dep{
-    margin-top: 0.15em 0;
-}
-.cnode-data-input {
-    font-size: 1.0em;
-    margin: 0.8ex 3% 1.8ex 3%;
-}
-
-.cnode-data-input label,header {
-    display: block;
-    color: rgb(151, 57, 57);
-    font-weight: bold;
-}
-.cnode-box {
-    display: inline-block;
-    width:17em;
-    margin: 0.75%;
-    padding: 1% 1.5%;
-    border: 0.15em solid;
-    border-radius: 1.2em;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-.cnode-box label{
-    display: inline;
-    color: #333;
-    font-weight: bold;
-    font-size: 1.0em
-}
-
-.cnode-data-input input, textarea {
-    border: 0.1em solid rgba(0, 0, 0, 0.34);
-    border-radius: 0.5ex;
-    width: 100%;
-    line-height: 1.2em;
-    margin-bottom: 1ex;
-    font-family: Arial, sans-serif;
-    font-size: 1.0em;
-    color: #333333;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
-
-section.dependencies{
-    background-color: #eeffee;
-    border-color: rgb(43, 83, 43)
-}
-
-section.related-concepts{
-    background-color: #eeffee;
-    border-color: rgb(43, 83, 43)
-}
-
-section.resources{
-    background-color: #ddeeff;
-    border-color: rgb(60, 108, 134);
-}
-
-/*hack to match style with cnode-box*/
-.lone-section{
-    margin: 0.75%;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
-textarea.cnode-reason-input{
-    height: 5.5em;
-}
-ul.nodelist {
+/* ---------------------------------------------------*/
+/* ---------->>> Learn Mode Styles <<<----------------*/
+/* ---------------------------------------------------*/
+ul.learn-nodelist {
     list-style: none;
     margin: 0;
     padding: 0;
 }
-
-ul.nodelist li a {
+ul.learn-nodelist li a {
     display: block;
     text-decoration: none;
     color: #000000;
@@ -216,184 +154,18 @@ ul.nodelist li a {
     border-bottom: 0.2ex solid #CCCCCC;
     cursor: pointer;
 }
-
-ul.nodelist li a:hover {
+ul.learn-nodelist li a:hover {
     color: rgb(190, 49, 49);
     background-color: rgba(247, 214, 214, 0.42);
 }
-
-ul.nodelist li a strong {
+ul.learn-nodelist li a strong {
     margin-right: 1ex;
 }
 
-.gold-text {
-    color: rgb(182, 149, 20);
-}
 
-.cost-dollar {
-    color: #008000;
-    font-family: Times, "Gill Sans", Helvetica, sans-serif;
-}
-
-.center {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.left {
-    float: left;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-.info-loc {
-    font-family: Helvetica;
-    font-size: small;
-}
-
-span.morecontent {
-    display: none;
-}
-
-.dtable {
-    display: table;
-    width: 100%;
-    text-align: right
-}
-
-.dvcenter {
-    display: table-cell;
-    vertical-align: middle;
-    height: 100%;
-}
-
-button.topic-focus {
-    margin-top: 1.5ex;
-    line-height: 1.3em;
-    font-weight: bold;
-}
-
-div.topic-focus {
-    text-align: center;
-    margin-bottom: 3em;
-}
-
-div.resource-entry {
-    margin-bottom: 1ex;
-}
-
-div.res-extras {
-    display: none;
-    margin-top: 0.1em;
-}
-
-div.res-extra-ent {
-    font-family: Helvetica;
-    font-size: small;
-    font-style: italic;
-    margin-bottom: 0.1em;
-}
-
-div.list-entry {
-    overflow: hidden;
-    width: 100%;
-}
-
-div.list-text {
-    margin-bottom: 0.25em;
-    float: right;
-    width: 90%;
-    height: 100%;
-    right: 0;
-}
-
-div.bullet-ptr {
-    float: left;
-    height: 100%;
-    width: 10%;
-    min-width: 0.9em;
-    text-align: center;
-}
-
-img.list-img {
-    vertical-align: middle;
-}
-
-.wiki-img {
-    margin-right: 0.15em;
-}
-
-.data-title {
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
-    padding: 0.5em 0;
-    color: rgb(8, 36, 9);
-}
-
-.data-subtitle {
-    text-align: left;
-    margin-top: 1ex;
-    margin-bottom: 0.1em;
-    font-weight: bold;
-    font-size: large;
-    color: rgb(8, 36, 9);
-}
-
-/* general styles */
-
-
-p {
-    margin: 0.1em 0;
-}
-
-a {
-    color: #000;
-    text-decoration: none;
-}
-
-a:active {
-    color: #0050FF;
-}
-
-a.morelink {
-    font-family: Helvetica;
-    font-size: small;
-    text-decoration: none;
-    color: rgb(0, 0, 122);
-}
-
-.list-text a {
-    color: rgb(90, 0, 0);
-    text-decoration: underline;
-}
-
-a.moreres {
-    font-size: small;
-    font-family: Helvetica;
-    text-decoration: none;
-    color: rgb(0, 0, 122);
-}
-
-a.direct-link {
-    color: #333;
-}
-
-h1 {
-    margin-top: 1em;
-}
-
-h2 {
-    line-height: 0;
-    font-size: 1.3em;
-    font-style: italic;
-    margin-bottom: 2ex;
-}
-
-/* Explore-view interactive properties **************************************************/
+/* --------------------------------------------------------*/
+/* ---------->>> Explore Graph non-SVG Style <<<-----------*/
+/* --------------------------------------------------------*/
 .summary-text {
     padding: 0.4em 0.7em;
     color: #3E4018;
@@ -428,7 +200,6 @@ h2 {
     width:0;
     -moz-transform: scale(.9999);
 }
-
 /* creates the smaller  triangle that points to the right > */
 .summary-wrap.tright:after {
     content: "";
@@ -442,7 +213,6 @@ h2 {
     width: 0;
     -moz-transform: scale(.9999);
 }
-
 /* creates the larger triangle that points to the left < */
 .summary-wrap.tleft:before {
     content: "";
@@ -456,7 +226,6 @@ h2 {
     width: 0;
     -moz-transform: scale(.9999);
 }
-
 /* creates the smaller  triangle that points to the left <*/
 .summary-wrap.tleft:after {
     content: "";
@@ -472,57 +241,59 @@ h2 {
 }
 
 
+/* ---------------------------------------------------*/
+/* ---------->>> Explore Graph Svg Style<<<-----------*/
+/* ---------------------------------------------------*/
 
-/* Graph properties **************************************************/
-path {
-    stroke-width: 4;
-    stroke: #333;
-    fill: none;
+/* set default properties for common svg elements */
+line, polygon, path {
+    stroke: #333333;
+    fill: #333333;
 }
 
+/* edge path in digraph */
+path {
+    stroke-width: 4;
+}
+
+/* node ellipse */
 ellipse{
-    stroke: #333;
+    stroke: #333333;
     stroke-width: 3;
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
 }
-
 .hovered ellipse{
     fill: #f1f3f9;
 }
-
 .clicked ellipse{
     fill: #f1f3f9;
 }
 
-line {
-    stroke: #333;
-}
 
 .node {
     cursor: default;
 }
-
 .node text{
     font-family: Arial, sans-serif;
     font-weight: bold;
-    font-size: 1.1em;
-    color: #333;
+    font-size: 1.2em;
+    stroke-width: 0;
+    fill: #333
 }
 
+/* expand node cross */
 .expand-node{
     fill: #eaf3ec;
-    stroke: #333;
+    stroke: #333333;
     stroke-width: 3;
-    /*pointer-events: none;  TODO does this cause IE problems since it's define on SVG elements? */
-    
 }
 
+/* completed checkmark for learned nodes */
 .checkmark{
     fill: transparent;
     stroke: #868686;
     stroke-width: 4;
 }
-
 .checkmark-circle{
     fill: transparent;
     stroke: #868686;
@@ -533,12 +304,12 @@ line {
     stroke: #759466;
     stroke-width: 4;
 }
-
 .checkmark-hovered .checkmark, .checkmark-clicked .checkmark, .node-learned .checkmark{
     stroke-width: 5;
     stroke: #759466;
 }
 
+/* properties for learned nodes */
 .node-learned{
     opacity: 0.5;
 }

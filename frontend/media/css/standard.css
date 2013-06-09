@@ -76,7 +76,9 @@ body {
     margin-right: 0.8em;
 }
 
-#kmview{
+#explore-view{
+    padding: 0;
+    margin: 0;
     width: 100%;
     height: 100%;
 }
@@ -86,7 +88,7 @@ body {
     float: left;
     border: solid;
     border-color: transparent;
-    background-color: #416685;
+    background-color: #333;
     color: white;
     padding: 2px;
     margin: 0;
@@ -99,7 +101,7 @@ body {
 }
 
 .el-nav-button.active{
-    background-color: #333;
+    background-color: #416685;
 }
 
 .el-nav-button:hover{
@@ -413,58 +415,61 @@ h2 {
 .summary-wrap{
     position: absolute;
 }
-/* creates the larger triangle */
+/* creates the larger triangle that points to the right > */
 .summary-wrap.tright:before {
     content: "";
     border: solid;
-    border-width: 1em 0 1em 2.1em;
-    border-color: transparent #493A5C;
+    border-width: 16px 0 16px 32px;
+    border-color: transparent #493A5C; /*#493A5C;*/
     position: absolute;
-    top: 1em;
-    right: -1.9em; /* value = - border-left-width - border-right-width */
+    top: 24px;
+    right: -28px ; /* value = - triangle width + border-right-width */
     display: block;
     width:0;
+    -moz-transform: scale(.9999);
 }
 
-/* creates the smaller  triangle */
+/* creates the smaller  triangle that points to the right > */
 .summary-wrap.tright:after {
     content: "";
     border-style: solid;
-    border-width: 0.8em 0 0.8em 1.7em;
+    border-width: 12px 0 12px 24px; /* larger triangle - border width */
     border-color: transparent white;
     position: absolute;
-    top: 1.19em;
-    right: -1.4em; /* value = - border-left-width - border-right-width */
+    top: 28px; /* position of larger triangle + border width */
+    right: -20px; /* value = - small triangle width + border-right-width */
     display: block;
     width: 0;
+    -moz-transform: scale(.9999);
 }
 
-/* creates the larger triangle */
+/* creates the larger triangle that points to the left < */
 .summary-wrap.tleft:before {
     content: "";
-    border-style: solid;
-    border-width: 1em 2.1em 1em 0;
-    border-color: transparent #493A5C;
-    position: absolute;
-    top: 1em;
-    left: -1.9em; /* value = - border-left-width - border-right-width */
-    display: block;
-    width:0;
-}
-
-/* creates the smaller  triangle */
-.summary-wrap.tleft:after {
-    content: "";
     border: solid;
-    border-width: 0.8em 1.7em 0.8em 0;
-    border-color: transparent white;
+    border-width: 16px 32px 16px 0;
+    border-color: transparent #493A5C; /*#493A5C;*/
     position: absolute;
-    top: 1.19em;
-    left: -1.4em; /* value = - border-left-width - border-right-width */
+    top: 24px;
+    left: -28px ; /* value = - triangle width + border-left-width */
     display: block;
     width: 0;
+    -moz-transform: scale(.9999);
 }
 
+/* creates the smaller  triangle that points to the left <*/
+.summary-wrap.tleft:after {
+    content: "";
+    border-style: solid;
+    border-width: 12px 24px 12px 0; /* larger triangle - border width */
+    border-color: transparent white;
+    position: absolute;
+    top: 28px; /* position of larger triangle + border width */
+    left: -20px; /* value = - small triangle width + border-left-width */
+    display: block;
+    width: 0;
+    -moz-transform: scale(.9999);
+}
 
 
 

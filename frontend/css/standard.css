@@ -2,7 +2,6 @@
 /* ---------->>> GLOBAL <<<-----------*/
 /* -----------------------------------*/
 
-
 body {
     margin: 0;
     padding: 0;
@@ -11,6 +10,7 @@ body {
     height: 100%;
     font-family: Arial, sans-serif;
     font-size: 1.0em;
+    overflow: hidden;
 }
 
 h1 {
@@ -57,7 +57,7 @@ p {
     display: inline-block;
     z-index: 1;
     margin-top: 0.5em;
-    margin-right: 0.8em;
+    margin-right: 1em;
 }
 
 
@@ -115,8 +115,7 @@ p {
 .learn-title-display{
     text-align: center;
 }
-
-.learn-title-display {
+.learn-title-display{
     display: block;
     cursor: pointer;
     text-decoration: none;
@@ -127,9 +126,40 @@ p {
     font-size: 1.1em;
     border-bottom: 0.3ex solid #CCCCCC;
 }
-.learn-title-display:hover {
-    background-color: rgb(241, 244, 229);
+.learn-title-display:hover, .learn-title-display.clicked-title:hover {
+    background-color: rgb(255, 254, 240);
     font-weight: bold;
+}
+.learn-title-display.clicked-title{
+    background-color: rgb(255, 255, 249);
+    font-weight: bold;
+    border-bottom: 1px dotted #CCCCCC;
+}
+.learn-title-display.clicked-title a:after{
+    content: "";
+    border: solid;
+    border-color: #333333 transparent;
+    border-width: 10px 5px 0 5px;
+    position: relative;
+    top: 0.1ex;
+    left: 0.5ex;
+    display: inline-block;
+    -moz-transform: scale(.9999);
+}
+
+.node-detail-view{
+    background-color: rgb(255, 255, 249);
+    border-bottom:  0.3ex solid #CCCCCC;
+    padding: 0.3em 1.5em 1em 1.5em;
+}
+
+.node-detail-title{
+    color: #333333;
+    font-size: 1em;
+    font-style: normal;
+    font-weight: bold;
+    padding: 1em 0 .7em 0;
+    margin: 0;
 }
 
 
@@ -148,6 +178,7 @@ p {
 #explore-view{
     height: 100%;
     width: 100%;
+    overflow: hidden;
 }
 .summary-text {
     padding: 0.4em 0.7em;

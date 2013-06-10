@@ -15,17 +15,19 @@
         var pvt = {};
 
         pvt.viewConsts = {
-            viewId: "node-item-view", // dom id for view
-            templateId: "node-item-view-template" // name of view template (warning: hardcoded in html)
+            templateId: "node-title-view-template", // name of view template (warning: hardcoded in html)
+            viewClass: "learn-title-display",
+            viewIdPrefix: "node-title-view-div-"
         };
 
         // return public object
         return Backbone.View.extend({
-            id: pvt.viewConsts.viewId,
             template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.id;},
+            className: pvt.viewConsts.viewClass,
+            
             /**
-             * Render the learning view given the supplied collection
+             * Render the learning view given the supplied model
              */
             render: function(){
                 var thisView = this;
@@ -36,19 +38,104 @@
         });
     })();
 
-
-    AGFK.LearnView = (function(){
+    /**
+     * Display detailed node information
+     */
+    AGFK.DetailedNodeView = (function(){
         // define private variables and methods
         var pvt = {};
 
         pvt.viewConsts = {
+            templateId: "node-detail-view-template", // name of view template (warning: hardcoded in html)
+            viewTag: "section",
+            viewIdPrefix: "node-detail-view-",
+            viewClass: "node-detail-view"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+            id: function(){ return pvt.viewConsts.viewIdPrefix + this.model.get("id");},
+            tagName: pvt.viewConsts.viewTag,
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html(thisView.template(thisView.model.toJSON()));
+                this.delegateEvents();
+                return thisView;
+            },
+
+            /**
+             * Clean up the view properly
+             */
+            close: function(){
+                this.unbind();
+                this.remove();
+            }
+
+        });
+    })();
+
+    /**
+     * Main learning view
+     */
+    AGFK.LearnView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        // keep track of expanded nodes: key: title node id, value: expanded view object
+        pvt.expandedNodes = {};
+
+        pvt.viewConsts = {
             viewId: "learn-view",
-            viewClass: ""
+            clickedItmClass: "clicked-title"
         };
 
         // return public object
         return Backbone.View.extend({
             id: pvt.viewConsts.viewId,
+
+            events: {
+                "click .learn-title-display": "showNodeDetailsFromEvt"
+            },
+
+            /**
+             * Display the given nodes details from the given event
+             */
+            showNodeDetailsFromEvt: function(evt){
+                var thisView = this,
+                clkEl = evt.currentTarget,
+                clkElClassList = clkEl.classList,
+                nid,
+                clickedItmClass = pvt.viewConsts.clickedItmClass;
+                clkElClassList.toggle(clickedItmClass);
+                if (clkElClassList.contains(clickedItmClass)){ 
+                    nid = clkEl.id.split("-").pop();
+                    var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), clkEl);
+                    pvt.expandedNodes[clkEl.id] = dnode;
+                }
+                else{
+                    if (pvt.expandedNodes.hasOwnProperty(clkEl.id)){
+                        var expView = pvt.expandedNodes[clkEl.id];
+                        expView.close();
+                    }
+                }
+            },
+
+            /**
+             * Append detailed node view to given element id that is a child of thisView
+             * Returns the view object for the appended node
+             */
+            appendDetailedNodeAfter: function(nodeModel, domNode){
+                var thisView = this,
+                dNodeView = new AGFK.DetailedNodeView({model: nodeModel});
+                domNode.parentNode.insertBefore(dNodeView.render().el, domNode.nextSibling);
+                return dNodeView;
+            },
             
             /**
              * Render the learning view given the supplied collection TODO examine the rendering type and render appropriately
@@ -75,6 +162,7 @@
                     };
                     $el.append(new AGFK.NodeListItemView({model: simpleModel}).render().el); // not using entire backbone model to reduce JSON overheaad
                 }
+                this.delegateEvents();
                 return thisView;
             },
 

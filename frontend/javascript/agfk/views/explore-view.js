@@ -57,9 +57,69 @@
             checkCircleR: 16, // radius of circle around "completed" check
             checkXOffset: 20, // px offset of checkmark from longest text element
             checkPath: "M -12,4 L -5,10 L 13,-6", // svg path to create check mark
-            checkGScale: 0.7 // relative size of "completed" check group
+            checkGScale: 0.7, // relative size of "completed" check group
+            defaultCheckDist: 90 // default px offset if exact position cannnot be computed
         };
 
+        /**
+         * Add "learned" properties to the given explore node and associated user data model
+         */
+        pvt.addLearnedProps = function(node, hasCheck){
+            var viewConsts = pvt.viewConsts,
+                thisView = this;
+            hasCheck = hasCheck || false;
+            if (!hasCheck){
+                pvt.addCheckMark.call(thisView, node);
+            }
+            // add/remove appropriate classses and entry from userData             
+            var addClick = !node.classed(viewConsts.nodeLearnedClass);
+            
+            node.classed(viewConsts.nodeLearnedClass, addClick);
+            thisView.model.get("userData")
+                .updateLearnedNodes(node.attr("id"), addClick);
+        };
+
+        /**
+         * Add the check mark and associated properties to the given node
+         */
+        pvt.addCheckMark = function(node, svgSpatialInfo){
+            var viewConsts = pvt.viewConsts,
+                checkHoveredClass = viewConsts.checkHoveredClass,
+                thisView = this;
+            svgSpatialInfo = svgSpatialInfo || AGFK.utils.getSpatialNodeInfo(node.node());
+
+            var chkG = node.append("g")
+                    .attr("id", pvt.getCheckIdForNode.call(thisView, node))
+                    .on("click", function() {
+                        pvt.addLearnedProps.call(thisView, node, true);
+                        // stop the event from firing on the ellipse
+                        d3.event.stopPropagation();
+                    })
+                    .on("mouseover", function() {
+                        d3.select(this).classed(checkHoveredClass, true);
+                    })
+                    .on("mouseout", function() {
+                        d3.select(this).classed(checkHoveredClass, false);
+                    });
+            chkG.append("circle")
+                .attr("r", viewConsts.checkCircleR)
+                .classed(viewConsts.checkCircleClass, true);
+            chkG.append("path")
+                .attr("d", viewConsts.checkPath)
+                .attr("class", viewConsts.checkClass);
+            
+            // find the max width text element in box
+            var maxTextLen = Math.max.apply(null, (node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
+            // TODO figure out better soluntion for prerendering
+            maxTextLen = maxTextLen === 0 ? viewConsts.defaultCheckDist : maxTextLen;
+                chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
+                chkY = svgSpatialInfo.cy;
+            chkG.attr("transform", 
+                      "translate(" + chkX + "," + chkY + ") "
+                      + "scale(" + viewConsts.checkGScale + ")");
+            
+        };
+        
         /**
          * Add visual mouse over properties to the explore nodes
          */
@@ -108,40 +168,10 @@
                         d3.event.stopPropagation();
                     });
 
-                // display checkmark
-                var checkHoveredClass = viewConsts.checkHoveredClass;
-                var chkG = node.append("g")
-                        .attr("id", pvt.getCheckIdForNode.call(thisView, node))
-                        .on("click", function() {
-                            // add/remove appropriate classses and entry from userData
-                            var addClick = !node.classed(viewConsts.nodeLearnedClass);
-                            node.classed(viewConsts.nodeLearnedClass, addClick);
-                            thisView.model.get("userData")
-                                .updateLearnedNodes(node.attr("id"), addClick);
-                            // stop the event from firing on the ellipse
-                            d3.event.stopPropagation();
-                        })
-                        .on("mouseover", function() {
-                            d3.select(this).classed(checkHoveredClass, true);
-                        })
-                        .on("mouseout", function() {
-                            d3.select(this).classed(checkHoveredClass, false);
-                        });
-                chkG.append("circle")
-                    .attr("r", viewConsts.checkCircleR)
-                    .classed(viewConsts.checkCircleClass, true);
-                chkG.append("path")
-                    .attr("d", viewConsts.checkPath)
-                    .attr("class", viewConsts.checkClass);
-                
-                // find the max width text element in box
-                var maxTextLen = Math.max.apply(null, (node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
-                    chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
-                    chkY = svgSpatialInfo.cy;
-                chkG.attr("transform", 
-                          "translate(" + chkX + "," + chkY + ") "
-                          + "scale(" + viewConsts.checkGScale + ")");
-
+                // add checkmark if not already added
+                if (node.select("." + viewConsts.checkClass).node() === null){
+                    pvt.addCheckMark.call(this, node, svgSpatialInfo);
+                }
                 node.attr(viewConsts.dataHoveredProp, true);
             }
             // else make the hoverables visible
@@ -368,7 +398,7 @@
                     .attr('height', '100%')
                     .attr('id', exploreSvgId);
 
-                // remove unneeded background polygon
+                // remove unneeded background polygon from graphviz TODO make sure this is the correct polygon
                 d3this.select("polygon").remove();
 
                 // add reusable svg elements //
@@ -430,9 +460,8 @@
 
                 // set the zoom scale
                 dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
-
+                
                 // helper function to redraw svg graph with correct coordinates
-
                 function redraw() {
                     // transform the graph
                     var d3event = d3.event;
@@ -447,6 +476,8 @@
                 var thisView = this,
                     d3this = d3selection || this.getd3El();
 
+                // class the learned nodes TODO consider using node models as d3 data
+
                 d3this.selectAll("." + pvt.viewConsts.nodeClass)
                     .on("mouseover", function() {
                         pvt.nodeMouseOver.call(thisView, this);
@@ -457,6 +488,14 @@
                     .on("click", function() {
                         pvt.nodeClick.call(thisView, this);
                     });
+
+                _.each(thisView.model.get("userData").get("learnedNodes"),
+                       function(val, key){
+                           var node = d3this.select("#" + key);
+                           pvt.addLearnedProps.call(thisView, node, false);
+                           node.classed(pvt.viewConsts.nodeLearnedClass, true);
+                       }
+                      );
             },
 
             /**
@@ -543,7 +582,7 @@
                 var $wrapDiv = $(wrapDiv);
                 $wrapDiv .delay(200).queue(function(){
                     if(node.classed(viewConsts.hoveredClass) || node.classed(viewConsts.clickedClass)){
-                        $wrapDiv.appendTo(document.body).fadeIn(viewConsts.summaryFadeInTime);
+                        $wrapDiv.appendTo("#" + viewConsts.viewId).fadeIn(viewConsts.summaryFadeInTime);
                     }
                     $(this).dequeue();
                 });

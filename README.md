@@ -12,7 +12,7 @@ Current testing instructions (April 11, 2013):
 
         run_test_servers.sh
 
-5. Open [localhost:8080/kmap](http://localhost:8080/kmap) with a modern javascript-enabled browser
+5. Open [localhost:8080/kmap#node=node_id](e.g. http://localhost:8080/kmap#node=logistic_regression) with a modern javascript-enabled browser
 
 Basic use:
 

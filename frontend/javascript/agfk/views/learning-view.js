@@ -38,8 +38,11 @@
         });
     })();
 
+
+//    AGFK.ResourceView()
+
     /**
-     * Display detailed node information
+     * Displays detailed node information
      */
     AGFK.DetailedNodeView = (function(){
         // define private variables and methods
@@ -63,9 +66,17 @@
              * Render the learning view given the supplied model
              */
             render: function(){
+                /*this.$el.html(this.template());
+
+                this.assign({
+                    pvt             : this.subview,
+                    '.another-subview'     : this.anotherSubview,
+                    '.yet-another-subview' : this.yetAnotherSubview
+                });
+                return this;*/
                 var thisView = this;
                 thisView.$el.html(thisView.template(thisView.model.toJSON()));
-                this.delegateEvents();
+                thisView.delegateEvents();
                 return thisView;
             },
 
@@ -95,6 +106,10 @@
             clickedItmClass: "clicked-title"
         };
 
+        pvt.insertSubViewAfter = function(subview, domNode){
+                domNode.parentNode.insertBefore(subview.render().el, domNode.nextSibling);
+        };
+
         // return public object
         return Backbone.View.extend({
             id: pvt.viewConsts.viewId,
@@ -105,6 +120,7 @@
 
             /**
              * Display the given nodes details from the given event
+             * and store the currentTarget.id:subview in pvt.expandedNodes
              */
             showNodeDetailsFromEvt: function(evt){
                 var thisView = this,
@@ -122,6 +138,7 @@
                     if (pvt.expandedNodes.hasOwnProperty(clkEl.id)){
                         var expView = pvt.expandedNodes[clkEl.id];
                         expView.close();
+                        delete pvt.expandedNodes[clkEl.id];
                     }
                 }
             },
@@ -133,7 +150,7 @@
             appendDetailedNodeAfter: function(nodeModel, domNode){
                 var thisView = this,
                 dNodeView = new AGFK.DetailedNodeView({model: nodeModel});
-                domNode.parentNode.insertBefore(dNodeView.render().el, domNode.nextSibling);
+                pvt.insertSubViewAfter(dNodeView, domNode);
                 return dNodeView;
             },
             
@@ -148,9 +165,12 @@
                     noLen,
                     simpleModel,
                     curNode,
-                    $el = thisView.$el;
+                    $el = thisView.$el,
+                    expandedNodes = pvt.expandedNodes,
+                    expNode,
+                    clkItmClass = pvt.viewConsts.clickedItmClass;
 
-                $el.html("");
+                $el.html(""); // TODO we shouldn't be doing this -- handle the subviews better
                 // TODO cache node ordering
                 nodeOrdering = thisView.getLVNodeOrdering();
 
@@ -160,9 +180,19 @@
                         title: curNode.get("title"),
                         id: curNode.get("id")
                     };
-                    $el.append(new AGFK.NodeListItemView({model: simpleModel}).render().el); // not using entire backbone model to reduce JSON overheaad
+                    $el.append(new AGFK.NodeListItemView({model: simpleModel}).render().el); // not using entire backbone model to reduce JSON overhead
                 }
-                this.delegateEvents();
+
+                // recapture previous state TODO is this desirable behavior?
+                for (var expN in expandedNodes){
+                    if (expandedNodes.hasOwnProperty(expN)){
+                        var domEl = document.getElementById(expN);
+                        pvt.insertSubViewAfter(expandedNodes[expN], domEl);
+                        domEl.classList.add(clkItmClass);
+                        
+                    }
+                }
+                thisView.delegateEvents();
                 return thisView;
             },
 
@@ -170,6 +200,16 @@
              * Clean up the view
              */
             close: function(){
+            var expN,
+            expandedNodes = pvt.expandedNodes,
+            domeEl;
+                 for (expN in expandedNodes){
+                    if (expandedNodes.hasOwnProperty(expN)){
+                        domEl = document.getElementById(expN);
+                        expandedNodes[expN].close();
+                        delete expandedNodes[expN];
+                    }
+                }
                 this.remove();
                 this.unbind();
             },

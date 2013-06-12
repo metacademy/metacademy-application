@@ -1,8 +1,31 @@
 <script type="text/template" id="node-detail-view-template">
   <div id = "node-detail-summary-<%- id %>">
-    <h2 class = "node-detail-title">Summary</h2>
-    <div class = "node-detail-summary-text">
+    <h2 class="node-detail-title">Summary</h2>
+    <div class="node-detail-summary-text">
       <%- summary.length ? summary : "-No Summary-"%>
     </div>
+
+    
+    <h2 class="node-detail-title">Free Resources</h2>
+    <div class="node-detail-comp-wrap" id="node-detail-fresource-<%- id %>">
+    </div>
+    
+    <h2 class="node-detail-title">Paid Resources</h2>
+    <div class="node-detail-comp-wrap" id="node-detail-presource-<%- id %>">
+    </div>
+    
+    <h2 class="node-detail-title">Dependencies</h2>
+    <div class="node-detail-comp-wrap" id="node-detail-deps-<%- id %>">
+    </div>
+    
+    <h2 class="node-detail-title">Additional Notes</h2>
+    <div class="node-detail-comp-wrap" id="node-detail-anotes-<%- id %>">
+    </div>
+
   </div>
+</script>
+
+<!-- see wiki for attributes and think about future changes and how these could be propagated -->
+<script type="text/template" id="node-detail-resource-template">
+  
 </script>

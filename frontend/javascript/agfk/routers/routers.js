@@ -25,6 +25,21 @@
         pvt.prevUrlParams = {}; // url parameters
 
         pvt.viewMode = -1; // current view mode
+
+        /**
+         * Clean up active views
+         */
+        pvt.cleanUpViews = function(){
+            thisRoute = this;
+            if (thisRoute.eview instanceof AGFK.ExploreView){
+                thisRoute.eview.close();
+                thisRoute.eview = undefined;
+                }
+            if (thisRoute.lview instanceof AGFK.LearnView){
+                thisRoute.lview.close();
+                thisRoute.lview = undefined;
+                }
+        };
         
         /**
          * Get key/value parameter object from string with key1=val1&key2=val2 format
@@ -67,13 +82,18 @@
             /**
              * Show the input view in the input selector and maintain a reference for correct clean up
              */
-            showView: function (selector, view, c) {
+            showView: function (selector, view, doRender) {
+                doRender = doRender || false;
                 if (this.currentView) {
                     this.currentView.$el.parent().hide();
-                    this.currentView.close();
+                    //this.currentView.close();
                 }
-                // TODO add in the appropriate transition
-                $(selector).html(view.render().el).show();
+                if (doRender){
+                    $(selector).html(view.render().el).show();
+                }
+                else{
+                    view.$el.parent().show();
+                }
                 this.currentView = view;
                 return view;
             },
@@ -91,8 +111,7 @@
                 }
                 else{
                     // TODO redirect to error page
-                    console.warn("Must supply 'node' key value pair in URL -- defaulting to full graph view (this behavior will change in the future)");
-                    this.nodeRoute("", paramsObj);
+                    throw new Error("Must supply 'node' key-value pair in URL");
                 }
             },
 
@@ -114,9 +133,10 @@
                     param;
                 for (param in paramsObj){
                     if (paramsObj.hasOwnProperty(param)){
-                        parr.push(param + "=" + paramsObj[param]);
+                        parr.push(encodeURIComponent(param) + "=" + encodeURIComponent(paramsObj[param]));
                     }
                 }
+                parr.sort();
                 purl = parr.join("&");
                 this.navigate(purl, true);
             },
@@ -131,7 +151,8 @@
                     qnodeName = routeConsts.qnodeName,
                     pexploreMode = routeConsts.pexploreMode,
                     plearnMode = routeConsts.plearnMode,
-                    keyNodeChanged = nodeId !== pvt.prevUrlParams[qnodeName];
+                    keyNodeChanged = nodeId !== pvt.prevUrlParams[qnodeName],
+                    doRender = true;
 
                 // need to load just the given node and deps...
                 console.log("nodeRoute for: " + nodeId); 
@@ -142,7 +163,10 @@
                     postNodePop();
                 }
                 else{
-                    thisRoute.cnodesContn = new AGFK.CSData({keyNode: nodeId});
+                    // clean up the old views
+                        pvt.cleanUpViews.call(thisRoute);
+                    // fetch the new data
+                    thisRoute.cnodesContn = new AGFK.CSData({keyNode: nodeId, userData: thisRoute.cnodesContn ?  thisRoute.cnodesContn.get("userData") : new AGFK.UserData()}); // this is hacky TODO reconsider the model structure
                     thisRoute.cnodesContn.fetch({success: postNodePop});
                 }
 
@@ -155,15 +179,24 @@
                     
                     switch (paramsObj[qviewMode]){
                     case plearnMode:
-                        thisRoute.lview = keyNodeChanged || typeof thisRoute.lview === "undefined"
-                            ? new AGFK.LearnView({model: thisRoute.cnodesContn}) : thisRoute.lview;
-                        thisRoute.showView("#" + routeConsts.lviewId, thisRoute.lview);
+                            if (keyNodeChanged || typeof thisRoute.lview === "undefined"){
+                                thisRoute.lview = new AGFK.LearnView({model: thisRoute.cnodesContn});
+                                doRender = true;
+                            }
+                            else{
+                                doRender = false;
+                            }
+                        thisRoute.showView("#" + routeConsts.lviewId, thisRoute.lview, doRender);
                         break;
                     default:
-                        
-                        thisRoute.eview = keyNodeChanged || typeof thisRoute.eview === "undefined"
-                            ? new AGFK.ExploreView({model: thisRoute.cnodesContn}) : thisRoute.eview;
-                        thisRoute.showView("#" + routeConsts.eviewId, thisRoute.eview);
+                            if (keyNodeChanged || typeof thisRoute.eview === "undefined"){
+                                thisRoute.eview = new AGFK.ExploreView({model: thisRoute.cnodesContn});
+                                doRender = true;
+                            }
+                            else{
+                                doRender = false;
+                            }
+                        thisRoute.showView("#" + routeConsts.eviewId, thisRoute.eview, doRender);
                     }
                     pvt.prevUrlParams = $.extend({}, paramsObj);
                 }

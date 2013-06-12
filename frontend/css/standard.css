@@ -133,6 +133,7 @@ p {
 .learn-title-display.clicked-title{
     background-color: rgb(255, 255, 249);
     font-weight: bold;
+    color: #333333;
     border-bottom: 1px dotted #CCCCCC;
 }
 .learn-title-display.clicked-title a:after{

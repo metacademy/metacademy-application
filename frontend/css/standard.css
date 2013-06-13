@@ -28,7 +28,29 @@ p {
     margin: 0.1em 0;
 }
 
+/* ---------------------------------------------------*/
+/* ---------->>> General Functional Styles<<<---------*/
+/* ---------------------------------------------------*/
+.external-link{
+    font-size: 1em;
+    color:#2B7536;
+    text-decoration: none;
+}
+.external-link:hover{
+    color:#14330E;
+};
 
+.internal-link{
+
+}
+
+.expand-collapse-link{
+    font-size: 0.8em;
+    color: #471666
+}
+.expand-collapse-link:hover{
+    color: #241494;
+}
 /* ---------------------------------------------------*/
 /* ---------->>> Layout Styles <<<--------------------*/
 /* ---------------------------------------------------*/
@@ -127,11 +149,11 @@ p {
     border-bottom: 0.3ex solid #CCCCCC;
 }
 .learn-title-display:hover, .learn-title-display.clicked-title:hover {
-    background-color: rgb(255, 254, 240);
+    background-color: #f8f5f0;
     font-weight: bold;
 }
 .learn-title-display.clicked-title{
-    background-color: rgb(255, 255, 249);
+    /*background-color: rgb(255, 255, 249);*/
     font-weight: bold;
     color: #333333;
     border-bottom: 1px dotted #CCCCCC;
@@ -149,7 +171,7 @@ p {
 }
 
 .node-detail-view{
-    background-color: rgb(255, 255, 249);
+   /* background-color: rgb(255, 255, 249);*/
     border-bottom:  0.3ex solid #CCCCCC;
     padding: 0.3em 1.5em 1em 1.5em;
 }
@@ -163,7 +185,36 @@ p {
     margin: 0;
 }
 
+.node-detail-comp-wrap{
+    margin: 0 0 0.7em 0;
+}
+.resource-view{
+    color: #333333;
+    padding: 0.5em 1em;
+    line-height: 1.1em;
+    width: 80%;
+    display: inline-block;
+    overflow: auto;
+    max-height: 10em;
+}
 
+.resource-title a{
+    color: #223804;
+}
+
+.more-resource-info{
+    display: inline-block;
+    cursor: pointer;
+}
+
+.resource-location{
+    font-size: 0.9em
+}
+
+.dependency-view{
+    line-height: 1.2em;
+    margin: 0.5em 0;
+}
 /* --------------------------------------------------------*/
 /* ---------->>> Explore View non-SVG Style <<<-----------*/
 /* ------------------------------------------------------*/

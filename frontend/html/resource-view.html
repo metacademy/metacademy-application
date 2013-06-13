@@ -1,0 +1,47 @@
+<script type="text/template" id="resource-view-template">
+  <div class="resource-title-display">
+    <% var titleDisp = title ? title : "-no title-" %>
+    <% if (url){ %>
+    <span class="resource-link"> <a class="external-link" href="<%= url %>"> <%- titleDisp %> </a> </span>
+    <% } else{ %>
+    <%= titleDisp %>
+    <% } %>
+  </div>
+
+  <div class="resource-location-display">
+    <% if (location){ %>
+    <span class="resource-location"> <%- location %> </span>
+    <% } %>
+    <% if (edition){ %>
+    <span class="resource-edition"> (edition: <%- edition %>) </span>
+    <% } %>
+  </div>
+  
+  <div class="more-resource-info">
+    <a class="expand-collapse-link"> [more details] </a>
+  </div>
+  <ul class="extra-resource-details" style="display: none">
+    <li> <span class="resource-detail-tag"> resource type: </span> <%- resource_type %>  </li>
+    <li> <span class="resource-detail-tag"> authors: </span> <%- authors %> </li>
+    <li> <span class="resource-detail-tag"> dependencies: </span> <%- dependencies %> </li>
+    <% if (note.length){  %>
+    <li> <span class="resource-detail-tag"> notes </span>
+      <ul>
+        <% for (var nitem in note ){ %>
+        <li> <%= note[nitem] %> </li>
+        <% } %>
+      </ul>
+    </li>
+    <% } %>
+    <% if (extra.length){ %>
+    <li> <span class="resource-detail-tag"> extra details </span>
+      <ul>
+        <% for (var eitem in extra ){ %>
+        <li> <%= eitem %> </li>
+        <% } %>
+      </ul>
+    </li>
+    <% } %>
+  </ul>
+
+</script>

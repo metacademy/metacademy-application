@@ -87,7 +87,6 @@
     AGFK.Node = Backbone.Model.extend({
         collFields: ["questions", "dependencies", "outlinks", "resources"], // collection fields
         txtFields: ["id", "title", "summary", "pointers"], // text fields
-        boolFields: ["visible", "learned"], // boolean fields
 
         /**
          * all possible attributes are present by default
@@ -101,9 +100,7 @@
                 questions: new AGFK.QuestionCollection(),
                 dependencies: new AGFK.DirectedEdgeCollection(),
                 outlinks: new AGFK.DirectedEdgeCollection(),
-                resources: new AGFK.ResourceCollection(),
-                visible: false,
-                learned: false
+                resources: new AGFK.ResourceCollection()
             };
         },
 

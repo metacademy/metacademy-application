@@ -7,6 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     {% endblock %}
 
+    <base target="_blank">
+    
     {% block css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/reset.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
@@ -39,6 +41,10 @@
 
       {% include "node-title-view.html" %}
       {% include "node-detail-view.html" %}
+      {% include "node-detail-view.html" %}
+      {% include "resource-view.html" %}
+      {% include "dependency-view.html" %}
+      {% include "pointers-view.html" %}
 
     </div>
 

@@ -9,7 +9,28 @@
      * collection of resource models
      */
     AGFK.ResourceCollection = Backbone.Collection.extend({
-        model:AGFK.Resource
+        model:AGFK.Resource,
+
+        /**
+         * Returns a backbone collection of the free resources TODO does this maintain the cid correctly?
+         */
+        getFreeResources: function(){
+            return new AGFK.ResourceCollection(this.where({free: 1}));
+        },
+
+        /**
+         * Returns a backbone collection of the paid resources TODO does this maintain the cid correctly?
+         */
+        getPaidResources: function(){
+            return new AGFK.ResourceCollection(this.where({free: 0}));
+        },
+
+        /**
+         * Keep the resource sorted by mark !== 'star'
+         */
+        comparator: function(rsrc){
+            return ! "star" in rsrc.get("mark");
+        }
     });
 
 

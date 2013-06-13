@@ -4,7 +4,7 @@
  */
 
 
-(function(AGFK, Backbone, _){
+(function(AGFK, Backbone, _, $){
 
     /**
      * Display the model as an item in the node list
@@ -39,7 +39,177 @@
     })();
 
 
-//    AGFK.ResourceView()
+    /**
+     * View to display detailed resource information
+     */
+    AGFK.ResourceView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            templateId: "resource-view-template",
+            viewClass: "resource-view",
+            viewIdPrefix: "resource-details-",
+            extraResourceInfoClass: "extra-resource-details"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+
+            events: {
+                'click .more-resource-info': 'toggleAdditionalInfo'
+            },
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html(thisView.template(thisView.model.toJSON()));
+                return thisView;
+            },
+
+            toggleAdditionalInfo: function(evt){
+                this.$el.find("." + pvt.viewConsts.extraResourceInfoClass).toggle();
+            }
+
+        });
+    })();
+
+
+    /**
+     * Wrapper view to display all dependencies
+     */
+    AGFK.ResourcesSectionView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            viewClass: "resources-wrapper",
+            viewIdPrefix: "resources-wrapper-"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html("");
+                thisView.model.each(function(itm){
+                    thisView.$el.append(new AGFK.ResourceView({model: itm}).render().el);
+                });
+                thisView.delegateEvents();
+                return thisView;
+            }
+
+        });
+    })();
+
+    /**
+     * View to display details of all provided resources (wrapper view)
+     */
+    AGFK.DependencyView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            templateId: "dependency-view-template",
+            viewClass: "dependency-view",
+            viewIdPrefix: "dependency-details-"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html(thisView.template(thisView.model.toJSON()));
+                return thisView;
+            }
+
+        });
+   })();
+    
+    /**
+     * Wrapper view to display all dependencies
+     */
+    AGFK.DependencySectionView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            viewClass: "dependencies-wrapper",
+            viewIdPrefix: "dependencies-wrapper-"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html("");
+                thisView.model.each(function(itm){
+                    thisView.$el.append(new AGFK.DependencyView({model: itm}).render().el);
+                });
+                thisView.delegateEvents();
+                return thisView;
+            }
+
+        });
+    })();
+
+
+    /**
+     * View to display additional notes/pointers
+     * NOTE: expects a javascript model as input (for now) with one field: text
+     */
+    AGFK.PointersView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            templateId: "pointers-view-template",
+            viewClass: "pointers-view",
+            viewIdPrefix: "pointers-view-"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html(thisView.template(thisView.model));
+                return thisView;
+            }
+
+        });
+   })();
+    
 
     /**
      * Displays detailed node information
@@ -52,7 +222,11 @@
             templateId: "node-detail-view-template", // name of view template (warning: hardcoded in html)
             viewTag: "section",
             viewIdPrefix: "node-detail-view-",
-            viewClass: "node-detail-view"
+            viewClass: "node-detail-view",
+            freeResourcesLocClass: 'free-resources-wrap',
+            paidResourcesLocClass: 'paid-resources-wrap',
+            depLocClass: 'dep-wrap',
+            ptrLocClass: 'pointers-wrap'
         };
 
         // return public object
@@ -63,21 +237,51 @@
             className: pvt.viewConsts.viewClass,
             
             /**
-             * Render the learning view given the supplied model
+             * Render the learning view given the supplied model TODO consider using setElement instead of html
+             * TODO try to reduce the boiler-plate repetition in rendering this view
              */
             render: function(){
-                /*this.$el.html(this.template());
-
-                this.assign({
-                    pvt             : this.subview,
-                    '.another-subview'     : this.anotherSubview,
-                    '.yet-another-subview' : this.yetAnotherSubview
-                });
-                return this;*/
-                var thisView = this;
+                var thisView = this,
+                    viewConsts = pvt.viewConsts,
+                    assignObj = {},
+                    freeResourcesLocClass = "." + viewConsts.freeResourcesLocClass,
+                    paidResourcesLocClass = "." + viewConsts.paidResourcesLocClass,
+                    depLocClass = "." + viewConsts.depLocClass,
+                    ptrLocClass = "." + viewConsts.ptrLocClass;
+                
                 thisView.$el.html(thisView.template(thisView.model.toJSON()));
+                thisView.fresources =
+                    thisView.fresource || new AGFK.ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
+                thisView.presources = thisView.presources || new AGFK.ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
+                thisView.dependencies = thisView.dependencies || new AGFK.DependencySectionView({model: thisView.model.get("dependencies")});
+                thisView.pointers = thisView.pointers || new AGFK.PointersView({model: {text: thisView.model.get("pointers")}});
+                
+                assignObj[freeResourcesLocClass] = thisView.fresources;
+                assignObj[paidResourcesLocClass] = thisView.presources;
+                assignObj[depLocClass] = thisView.dependencies;
+                assignObj[ptrLocClass] = thisView.pointers;
+                
+                thisView.assign(assignObj);
                 thisView.delegateEvents();
                 return thisView;
+            },
+
+            /**
+             * Assign subviews: method groked from http://ianstormtaylor.com/assigning-backbone-subviews-made-even-cleaner/
+             */
+            assign : function (selector, view) {
+                var selectors;
+                if (_.isObject(selector)) {
+                    selectors = selector;
+                }
+                else {
+                    selectors = {};
+                    selectors[selector] = view;
+                }
+                if (!selectors) return;
+                _.each(selectors, function (view, selector) {
+                    view.setElement(this.$(selector)).render();
+                }, this);
             },
 
             /**
@@ -268,4 +472,4 @@
 
 
 
-})(window.AGFK = typeof window.AGFK == "object"? window.AGFK : {}, window.Backbone, window._);
+})(window.AGFK = typeof window.AGFK == "object"? window.AGFK : {}, window.Backbone, window._, window.jQuery);

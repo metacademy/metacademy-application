@@ -3,6 +3,7 @@
  */
 
 // Global TODOS
+// carefully refactor variables to distinguish nodes from tags
 // -move summaries with node on translations
 // -fully separate graph generation logic from view
 
@@ -43,6 +44,7 @@
             summaryRightClass: "tright",
             // ----- rendering options ----- //
             defaultGraphDepth: 2, // default depth of graph
+            defaultExpandDepth: 1, // default number of dependencies to show on expand
             defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
             defaultNodeSepDist: 1.5, // separation of graph nodes
             defaultNodeWidth: 2.5, // diameter of graph nodes
@@ -61,6 +63,18 @@
             defaultCheckDist: 90 // default px offset if exact position cannnot be computed
         };
 
+        /**
+         * Preprocess the given d3 selection of nodes and edge from graphviz output
+         * (1) set all ids to the titles and remove the title
+         */
+        pvt.preprocessNodesEdges = function(d3Sel){
+            d3Sel.attr('id', function() {
+                return d3.select(this).select('title').text();
+            });
+            d3Sel.selectAll("title").remove(); // remove the title for a cleaner hovering experience
+            return true;
+        };
+        
         /**
          * Add "learned" properties to the given explore node and associated user data model
          */
@@ -164,6 +178,7 @@
                     .attr("y", expY)
                     .attr("class", viewConsts.useExpandClass)
                     .on("click", function() {
+                        thisView.appendDepsToGraph(node.attr('id'));
                         // don't propagate click to lower level objects
                         d3.event.stopPropagation();
                     });
@@ -252,40 +267,52 @@
         };
 
         /**
-         * Return a dot string array from keyNode and specified depth
+         * Return a dot string array from the specified keyNode 
+         * depth: desired depth of dot string
+         * keyNode: root keynode, defaults to graph keynode (if exists, otherwise throws an error)
+         * checkVisible: true will only add nodes that are not already visible, defaults to false
          */
-        pvt.getDSFromKeyArr = function(depth) {
+        pvt.getDSFromKeyArr = function(depth, keyNode, checkVisible) {
             var dgArr = [],
                 thisView = this,
-                // build graph of appropriate depth from given keyNod,
-                curEndNodes = [thisView.model.get("nodes").get(thisView.model.get("keyNode"))]; // this should generalize easily to multiple end nodes, if desired
+                thisModel = thisView.model,
+                visNodes = thisModel.get("userData").get("visibleNodes"),
+                thisNodes = thisModel.get("nodes"),
+                curEndNodes = [keyNode]; // this should generalize easily to multiple end nodes
             _.each(curEndNodes, function(node) {
-                dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
+                if (!checkVisible || !visNodes.hasOwnProperty(node.get("id"))){
+                    dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
+                }
             });
 
             // This is essentially adding nodes via a breadth-first search to the desired dependency depth
             // for each dependency depth level...
             var addedNodes = {},
-                curDep;
+                curDep,
+                cenLen,
+                node,
+                depNode;
             for (curDep = 0; curDep < depth; curDep++) {
                 // obtain number of nodes at given depth
-                var cenLen = curEndNodes.length;
+                cenLen = curEndNodes.length;
                 // iterate over the nodes
                 while (cenLen--) {
                     // grab a specific node at that depth
-                    var node = curEndNodes.shift();
+                    node = curEndNodes.shift();
                     // for each unqiue dependency for the specific node...
                     _.each(node.getUniqueDependencies(), function(depNodeId) {
-                        // grab the dependency node
-                        var depNode = thisView.model.get("nodes").get(depNodeId);
-                        // add node strings to the front of the dgArr
-                        dgArr.unshift(pvt.fullGraphVizStr.call(thisView, depNode));
-                        // add edge string to the end
-                        dgArr.push(node.get("dependencies").get(depNodeId + node.get("id")).getDotStr());
-                        // then add dependency to the end of curEndNodes if it has not been previously added
-                        if (!addedNodes.hasOwnProperty(depNodeId)) {
-                            curEndNodes.push(depNode);
-                            addedNodes[depNodeId] = true;
+                        if (!checkVisible || !visNodes.hasOwnProperty(depNodeId)){
+                            // grab the dependency node
+                            depNode = thisNodes.get(depNodeId);
+                            // add node strings to the front of the dgArr
+                            dgArr.unshift(pvt.fullGraphVizStr.call(thisView, depNode));
+                            // add edge string to the end
+                            dgArr.push(node.get("dependencies").get(depNodeId + node.get("id")).getDotStr());
+                            // then add dependency to the end of curEndNodes if it has not been previously added
+                            if (!addedNodes.hasOwnProperty(depNodeId)) {
+                                curEndNodes.push(depNode);
+                                addedNodes[depNodeId] = true;
+                            }
                         }
                     });
                 }
@@ -386,10 +413,7 @@
                 });
                 gelems.data(gdata).sort();
                 // change id to title, remove title, then
-                gelems.attr('id', function() {
-                    return d3.select(this).select('title').text();
-                });
-                gelems.selectAll("title").remove(); // remove the title for a cleaner hovering experience
+                pvt.preprocessNodesEdges(gelems);
                 d3this.select('g').selectAll("title").remove(); // also remove title from graph
 
                 // make the svg canvas fill the entire enclosing element
@@ -419,9 +443,9 @@
 
 
                 // add reusable svg elements to defs
-                d3this.select("#" + exploreSvgId)
-                    .insert("svg:defs", ":first-child")
-                    .append("polygon")
+                var defs = d3this.select("#" + exploreSvgId)
+                    .insert("svg:defs", ":first-child");
+                defs.append("polygon")
                     .attr("points", plusPts)
                     .attr("id", viewConsts.expCrossID)
                     .classed(viewConsts.expCrossClass, true);
@@ -472,14 +496,15 @@
             /**
              * Use D3 to add dynamic properties to the nodes
              */
-            addNodeProps: function(d3selection) {
+            addNodeProps: function(d3selection, containsEls) {
                 var thisView = this,
+                    containsEls = containsEls || false,
                     d3this = d3selection || this.getd3El();
+                d3this = containsEls ? d3this : d3this.selectAll("." + pvt.viewConsts.nodeClass);
 
+                // add nodes to observed list TODO move this some else
                 // class the learned nodes TODO consider using node models as d3 data
-
-                d3this.selectAll("." + pvt.viewConsts.nodeClass)
-                    .on("mouseover", function() {
+                d3this.on("mouseover", function() {
                         pvt.nodeMouseOver.call(thisView, this);
                     })
                     .on("mouseout", function() {
@@ -522,17 +547,20 @@
              * nodeWidth: width of node
              * nodeSep: node separation
              */
-            collToDot: function(depth, graphOrient, nodeWidth, nodeSep) {
+            collToDot: function(args){ //depth, graphOrient, nodeWidth, nodeSep) {
                 var thisView = this,
                     viewConsts = pvt.viewConsts,
-                    dgArr;
-                depth = depth || viewConsts.defaultGraphDepth;
-                graphOrient = graphOrient || viewConsts.defaultGraphOrient;
-                nodeSep = nodeSep || viewConsts.defaultNodeSepDist;
-                nodeWidth = nodeWidth || viewConsts.defaultNodeWidth;
+                    dgArr,
+                    args = args || {},
+                    depth = args.depth || viewConsts.defaultGraphDepth,
+                    graphOrient = args.graphOrient || viewConsts.defaultGraphOrient,
+                    nodeSep = args.nodeSep || viewConsts.defaultNodeSepDist,
+                    nodeWidth = args.nodeWidth || viewConsts.defaultNodeWidth,
+                    keyNode = args.keyNode || thisView.model.get("nodes").get(thisView.model.get("keyNode")),
+                    remVisible = args.remVisible || false; // TODO describe these params
 
                 if (thisView.model.get("keyNode")) {
-                    dgArr = pvt.getDSFromKeyArr.call(this, depth);
+                    dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible);
                 } else {
                     dgArr = pvt.getFullDSArr.call(this);
                 }
@@ -544,7 +572,92 @@
 
                 return "digraph G{\n" + dgArr.join("\n") + "}";
             },
+            
+            /**
+             * Append dependencies of the given node to the main graph
+             */
+            appendDepsToGraph: function(conNodeId, depth){
+                var thisView = this,
+                viewConsts = pvt.viewConsts,
+                edgeClass = viewConsts.edgeClass,
+                nodeClass = viewConsts.nodeClass,
+                newElClass = "newel-class-tmp", // temporary class so d3 can find ndew elements
+                depth = depth || pvt.viewConsts.defaultExpandDepth,
+                args = {depth: depth || 1,
+                        keyNode: thisView.model.get("nodes").get(conNodeId),
+                        remVisible: true};
 
+                var dotStr = thisView.collToDot(args);
+
+                // generate dependency subgraph with connecting node
+                var svgStr = thisView.createSvgGV(dotStr);
+                var $newNEs = $(svgStr).find("." + edgeClass +  ", ." + nodeClass);
+                // uses jquery to replace the preprocessNodesEdges function since d3 won't take existing content as input TODO think about a different structure
+                var newnum = -1;
+                $newNEs.each(function(num){
+                    var $this = $(this);
+                    $(this).attr("id", function(){
+                        var $title = $(this.getElementsByTagName("title")[0]),
+                        txtContent = $title.text();
+                        $title.remove();
+                        return txtContent;
+                    });
+                    newnum = $this.attr("id") === conNodeId ? num : newnum;
+                });
+                // assert(newnum > -1, "Could not find new element in jquery collection");
+                // obtain transformation coordinates from connecting node
+                var newConNode = $($newNEs[newnum]).find("ellipse"),
+                newCx = Number(newConNode.attr("cx")),
+                newCy = Number(newConNode.attr("cy"));
+
+                var oldConNode = thisView.getd3El().select("#" + conNodeId).select("ellipse"),
+                oldCx = Number(oldConNode.attr("cx")),
+                oldCy = Number(oldConNode.attr("cy"));
+
+                var transX = oldCx - newCx,
+                transY = oldCy - newCy;
+
+                // translate the new elements appropriately and add them to the graph
+                var $graphEl = $("." + viewConsts.graphClass);
+                $newNEs.each(function(){
+                    var $this = $(this);
+
+                    if ($this.attr("id") !== conNodeId){
+                        
+                        // hack if-statement since jquery doesn't play nice with svg elements
+                        if($this.attr("class") === edgeClass){
+                            $this.find("path").attr("transform", "translate(" + transX + "," +  transY + ")"); // TODO we may want to actually change the coordinates
+                            $this.find("polygon").attr("transform", "translate(" + transX + "," +  transY + ")"); // TODO we may want to actually change the coordinates
+                            //$this.attr("class", $this.attr("class") + " " + newElClass);
+                            $graphEl.prepend($this);
+                        }
+                        else if($this.attr("class") === nodeClass){
+                            
+                            $this.find("ellipse").attr("cx", function(){
+                                return Number(this.getAttribute("cx")) + transX;
+                            })
+                                .attr("cy", function(){
+                                    return Number(this.getAttribute("cy")) + transY;
+                                });
+                            $this.find("text").each(function(){
+                                var $thisText = $(this);
+                                $thisText.attr("x", Number($thisText.attr("x")) + transX)
+                                    .attr("y", Number($thisText.attr("y")) + transY);
+                            });
+                            $this.attr("class", $this.attr("class") + " " + newElClass);                       
+                            $graphEl.append($this);
+                        }
+                    }
+                });
+                              
+                // add node properties to new subgraph
+                var d3els = d3.selectAll("." + newElClass);
+                d3els.classed(newElClass, false);
+                thisView.addNodeProps(d3els, true);
+
+                // TODO do we need to update the d3this?
+            },
+            
             /**
              * Show the node summary in "hover box" next to the node
              */  
@@ -574,7 +687,7 @@
                 var summaryWidth = viewConsts.summaryWidth,
                     shiftDiff = placeLeft ? -summaryWidth + nodeRect.width * 0.03 : nodeRect.width * 0.97;
                 wrapDiv.style.left = (nodeRect.left + shiftDiff) + "px";
-                wrapDiv.style.top = nodeRect.top + "px";
+                wrapDiv.style.top = (nodeRect.top) + "px"; // TODO remove harcoded header offset
                 wrapDiv.style.width = summaryWidth + "px";
                 wrapDiv.style.display = "none";
 

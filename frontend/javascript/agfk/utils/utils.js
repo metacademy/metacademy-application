@@ -21,6 +21,15 @@
     };
 
     /**
+     * Returns an x/y translated path of the input path;
+     * NOTE: this function only works with absolute paths in the graphviz outpu
+     * TODO also take into account relative paths
+     */
+    AGFK.utils.translateSvgPath = function(pathstr, tx, ty){
+        throw new Error("translateSvgPath is not yet implemented");
+    };
+
+    /**
      * Simulate html/mouse events
      * modified code from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
      */

@@ -92,7 +92,22 @@
             thisView.model.get("userData")
                 .updateLearnedNodes(node.attr("id"), addClick);
         };
+        
+        /**
+         * Helper function to attach the summary div and add an event listener for leaving the summary
+         */
+        pvt.attachNodeSummary = function(node){
+            // display the node summary
+            var wrapDiv = this.showNodeSummary(node);
 
+            // add listener to node summary so mouseouts trigger mouseout on node
+            $(wrapDiv).on("mouseleave", function(evt) {
+                AGFK.utils.simulate(node.node(), "mouseout", {
+                    relatedTarget: evt.relatedTarget
+                }); 
+            });
+        };
+        
         /**
          * Add the check mark and associated properties to the given node
          */
@@ -156,16 +171,6 @@
             // update last hovered node
             thisView.interactState.lastNodeHovered = node;
 
-            // display the node summary
-            var wrapDiv = thisView.showNodeSummary(node);
-
-            // add listener to node summary so mouseouts trigger mouseout on node
-            $(wrapDiv).on("mouseleave", function(evt) {
-                AGFK.utils.simulate(node.node(), "mouseout", {
-                    relatedTarget: evt.relatedTarget
-                }); 
-            });
-
             // add node-hoverables if not already present
             if (!node.attr(viewConsts.dataHoveredProp)) { // TODO check if the node is already expanded
                 var svgSpatialInfo = AGFK.utils.getSpatialNodeInfo(nodeEl),
@@ -220,7 +225,7 @@
                         node.select("#" + pvt.getCheckIdForNode.call(thisView, node)).attr("visibility", "hidden");
                     }
                     node.select("." + viewConsts.useExpandClass).attr("visibility", "hidden");
-                    d3.select("#" + pvt.getSummaryIdForDivWrap.call(thisView, node)).remove(); // use d3 remove for x-browser support
+
                 }
             }
         };
@@ -231,20 +236,18 @@
         pvt.nodeClick = function(nodeEl) {
             var thisView = this,
                 viewConsts = pvt.viewConsts,
-                node = d3.select(nodeEl);
+                node = d3.select(nodeEl),
+                clickedClass = viewConsts.clickedClass;
 
-            node.classed(viewConsts.clickedClass, true);
-            if (thisView.interactState.lastNodeClicked === -1) {
+            // remove previous click information/display
+            if (node.classed(clickedClass)){
+               node.classed(clickedClass, false);
+                d3.select("#" + pvt.getSummaryIdForDivWrap.call(thisView, node)).remove(); // use d3 remove for x-browser support
+            }
+            else{
+                node.classed(clickedClass, true);
                 thisView.interactState.lastNodeClicked = node;
-            } else {
-                thisView.interactState.lastNodeClicked.classed(viewConsts.clickedClass, false);
-                if (node.attr("id") === thisView.interactState.lastNodeClicked.attr("id")) {
-                    thisView.interactState.lastNodeClicked = -1;
-                } else {
-                    // trigger mouseout event on last node
-                    AGFK.utils.simulate(thisView.interactState.lastNodeClicked.node(), "mouseout");
-                    thisView.interactState.lastNodeClicked = node;
-                }
+                pvt.attachNodeSummary.call(thisView, node);
             }
         };
 
@@ -502,7 +505,11 @@
                     d3this = d3selection || this.getd3El();
                 d3this = containsEls ? d3this : d3this.selectAll("." + pvt.viewConsts.nodeClass);
 
-                // add nodes to observed list TODO move this some else
+                // add nodes to observed list TODO move this somewhere else
+                d3this.each(function(){
+                    thisView.model.get("userData").updateVisibleNodes(this.id, 1);
+                });
+                
                 // class the learned nodes TODO consider using node models as d3 data
                 d3this.on("mouseover", function() {
                         pvt.nodeMouseOver.call(thisView, this);

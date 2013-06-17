@@ -43,7 +43,7 @@
             summaryLeftClass: "tleft",
             summaryRightClass: "tright",
             // ----- rendering options ----- //
-            defaultGraphDepth: 2, // default depth of graph
+            defaultGraphDepth: 100, // default depth of graph
             defaultExpandDepth: 1, // default number of dependencies to show on expand
             defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
             defaultNodeSepDist: 1.5, // separation of graph nodes
@@ -51,7 +51,7 @@
             numCharLineDisplayNode: 10, // max number of characters to display per title line of graph nodes
             summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
             summaryAppearDelay: 250, // delay before summary appears (makes smoother navigation)
-            summaryFadeInTime: 200, // summary fade in time (ms)
+            summaryFadeInTime: 100, // summary fade in time (ms)
             exPlusWidth: 5.5, // px width of expand cross component
             edgePlusW: 28, // px distance of expand cross from circle edge
             maxZoomScale: 5, // maximum zoom-in level for graph
@@ -62,6 +62,7 @@
             checkGScale: 0.7, // relative size of "completed" check group
             defaultCheckDist: 90 // default px offset if exact position cannnot be computed
         };
+        pvt.summaryDisplays = {};
 
         /**
          * Preprocess the given d3 selection of nodes and edge from graphviz output
@@ -120,9 +121,9 @@
             var chkG = node.append("g")
                     .attr("id", pvt.getCheckIdForNode.call(thisView, node))
                     .on("click", function() {
-                        pvt.addLearnedProps.call(thisView, node, true);
                         // stop the event from firing on the ellipse
                         d3.event.stopPropagation();
+                        pvt.addLearnedProps.call(thisView, node, true);
                     })
                     .on("mouseover", function() {
                         d3.select(this).classed(checkHoveredClass, true);
@@ -141,7 +142,7 @@
             var maxTextLen = Math.max.apply(null, (node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
             // TODO figure out better soluntion for prerendering
             maxTextLen = maxTextLen === 0 ? viewConsts.defaultCheckDist : maxTextLen;
-                chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
+                var chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
                 chkY = svgSpatialInfo.cy;
             chkG.attr("transform", 
                       "translate(" + chkX + "," + chkY + ") "
@@ -183,9 +184,9 @@
                     .attr("y", expY)
                     .attr("class", viewConsts.useExpandClass)
                     .on("click", function() {
-                        thisView.appendDepsToGraph(node.attr('id'));
                         // don't propagate click to lower level objects
                         d3.event.stopPropagation();
+                        thisView.appendDepsToGraph(node.attr('id'));
                     });
 
                 // add checkmark if not already added
@@ -222,7 +223,8 @@
                 // remove visual properties unless node is clicked
                 if (!node.classed(viewConsts.clickedClass)) {
                     if (!node.classed(viewConsts.nodeLearnedClass)) {
-                        node.select("#" + pvt.getCheckIdForNode.call(thisView, node)).attr("visibility", "hidden");
+                        var chkId = pvt.getCheckIdForNode.call(thisView, node);
+                        node.select("#" + chkId).attr("visibility", "hidden");
                     }
                     node.select("." + viewConsts.useExpandClass).attr("visibility", "hidden");
 
@@ -242,7 +244,9 @@
             // remove previous click information/display
             if (node.classed(clickedClass)){
                node.classed(clickedClass, false);
-                d3.select("#" + pvt.getSummaryIdForDivWrap.call(thisView, node)).remove(); // use d3 remove for x-browser support
+                var summId = pvt.getSummaryIdForDivWrap.call(thisView, node);
+                d3.select("#" + summId).remove(); // use d3 remove for x-browser support
+                delete pvt.summaryDisplays[summId];
             }
             else{
                 node.classed(clickedClass, true);
@@ -342,7 +346,7 @@
          * Helper function to obtain checkmark element for the given node
          */
         pvt.getCheckIdForNode = function(node) {
-            return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.checkNodeSuffix;
+            return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.checkNodeIdSuffix;
         };
 
         /**
@@ -486,6 +490,7 @@
                         .select("." + graphClass);
 
                 // set the zoom scale
+                var summaryDisplays = pvt.summaryDisplays;
                 dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
                 
                 // helper function to redraw svg graph with correct coordinates
@@ -493,7 +498,40 @@
                     // transform the graph
                     var d3event = d3.event;
                     vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + d3event.scale + ")");
+                    if (summaryDisplays.length > 0){
+                        // obtain dx dy from selected node for the entire graph
+                    }
                 }
+
+                // add the drag event listeners for the summary boxes
+                var lastX, lastY, dx, dy, valOffset, ecX, ecY,
+                mouseIsDown = false;
+                var $svg = $(d3this.select("#" + viewConsts.exploreSvgId).node());
+            // TODO why does the mousemouve and mousedown/up need different elements
+                $(window).on("mousemove", function(e){
+                    if (mouseIsDown){
+                        $.each(pvt.summaryDisplays, function(key, $val){
+                            ecX = e.clientX;
+                            ecY = e.clientY;
+                            dx = e.clientX - lastX;
+                            dy = e.clientY - lastY;
+                            valOffset = $val.offset();
+                            valOffset.left += dx;
+                            valOffset.top += dy;
+                            $val.offset(valOffset);
+                        });
+                        lastX = ecX;
+                        lastY = ecY;
+                    }
+                });
+                $svg.on("mousedown", function(e){
+                    mouseIsDown = true;
+                    lastX = e.clientX;
+                    lastY = e.clientY;
+                });
+                $(window).on("mouseup", function(e){
+                    mouseIsDown = false;
+                });
             },
 
             /**
@@ -700,7 +738,7 @@
 
                 // add box to document with slight fade-in
                 var $wrapDiv = $(wrapDiv);
-                $wrapDiv .delay(200).queue(function(){
+                $wrapDiv.delay(0).queue(function(){
                     if(node.classed(viewConsts.hoveredClass) || node.classed(viewConsts.clickedClass)){
                         $wrapDiv.appendTo("#" + viewConsts.viewId).fadeIn(viewConsts.summaryFadeInTime);
                     }
@@ -708,7 +746,7 @@
                 });
 
                 // TODO listen for translated graphs and translate accordingly
-
+                pvt.summaryDisplays[wrapDiv.id] = $wrapDiv;
                 return wrapDiv;
             },
 

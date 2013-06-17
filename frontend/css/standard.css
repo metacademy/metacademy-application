@@ -61,6 +61,8 @@ p {
     overflow: hidden;
     border-bottom: 0.1em #333 solid;
     font-size: 1.1em;
+    position: relative;
+    z-index: 1000;
 }
 
 #main {

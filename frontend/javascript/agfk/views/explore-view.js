@@ -42,8 +42,10 @@
             summaryWrapClass: "summary-wrap",
             summaryLeftClass: "tleft",
             summaryRightClass: "tright",
+            locElemId: "invis-loc-elem", // invisible location element
+            locElemClass: "invis-loc",
             // ----- rendering options ----- //
-            defaultGraphDepth: 100, // default depth of graph
+            defaultGraphDepth: 200, // default depth of graph
             defaultExpandDepth: 1, // default number of dependencies to show on expand
             defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
             defaultNodeSepDist: 1.5, // separation of graph nodes
@@ -63,6 +65,19 @@
             defaultCheckDist: 90 // default px offset if exact position cannnot be computed
         };
         pvt.summaryDisplays = {};
+
+        /**
+         * Shift the summary displays by dx and dy
+         */
+        pvt.shiftSummaryDisplays = function(dx, dy){
+            var valOffset;
+            $.each(pvt.summaryDisplays, function(key, $val){
+                valOffset = $val.offset();
+                valOffset.left += dx;
+                valOffset.top += dy;
+                $val.offset(valOffset);
+            });
+        };
 
         /**
          * Preprocess the given d3 selection of nodes and edge from graphviz output
@@ -431,7 +446,7 @@
 
                 // remove unneeded background polygon from graphviz TODO make sure this is the correct polygon
                 d3this.select("polygon").remove();
-
+                
                 // add reusable svg elements //
                 // points to make a cross of width  exPlusWidth
                 var plusPts = "0,0 " +
@@ -492,46 +507,41 @@
                 // set the zoom scale
                 var summaryDisplays = pvt.summaryDisplays;
                 dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
-                
+                var initDraw = true,
+                locElem, 
+                prevCx,
+                prevCy,
+                curCx,
+                curCy,
+                dx,
+                dy,
+                bloc;
                 // helper function to redraw svg graph with correct coordinates
                 function redraw() {
                     // transform the graph
                     var d3event = d3.event;
-                    vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + d3event.scale + ")");
-                    if (summaryDisplays.length > 0){
-                        // obtain dx dy from selected node for the entire graph
+                    if (initDraw){
+                        locElem = d3this.select("ellipse").node(),
+                        bloc  = locElem.getBoundingClientRect(),
+                        prevCx = bloc.left + bloc.width/2;
+                        prevCy = bloc.top + bloc.height/2;
+                        initDraw = false;
                     }
+                    vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + d3event.scale + ")");
+                   
+                    bloc = locElem.getBoundingClientRect();
+                    curCx = bloc.left + bloc.width/2;
+                    curCy = bloc.top + bloc.height/2;
+                    if (!$.isEmptyObject(summaryDisplays)){
+                        dx = curCx - prevCx;
+                        dy = curCy - prevCy;
+                        pvt.shiftSummaryDisplays(dx, dy);
+                    }
+                    prevCx = curCx;
+                    prevCy = curCy;
                 }
 
-                // add the drag event listeners for the summary boxes
-                var lastX, lastY, dx, dy, valOffset, ecX, ecY,
-                mouseIsDown = false;
-                var $svg = $(d3this.select("#" + viewConsts.exploreSvgId).node());
-            // TODO why does the mousemouve and mousedown/up need different elements
-                $(window).on("mousemove", function(e){
-                    if (mouseIsDown){
-                        $.each(pvt.summaryDisplays, function(key, $val){
-                            ecX = e.clientX;
-                            ecY = e.clientY;
-                            dx = e.clientX - lastX;
-                            dy = e.clientY - lastY;
-                            valOffset = $val.offset();
-                            valOffset.left += dx;
-                            valOffset.top += dy;
-                            $val.offset(valOffset);
-                        });
-                        lastX = ecX;
-                        lastY = ecY;
-                    }
-                });
-                $svg.on("mousedown", function(e){
-                    mouseIsDown = true;
-                    lastX = e.clientX;
-                    lastY = e.clientY;
-                });
-                $(window).on("mouseup", function(e){
-                    mouseIsDown = false;
-                });
+
             },
 
             /**
@@ -561,7 +571,7 @@
 
                 _.each(thisView.model.get("userData").get("learnedNodes"),
                        function(val, key){
-                           var node = d3this.select("#" + key);
+                           var node = d3this.filter(function(){return this.id === key;});
                            pvt.addLearnedProps.call(thisView, node, false);
                            node.classed(pvt.viewConsts.nodeLearnedClass, true);
                        }

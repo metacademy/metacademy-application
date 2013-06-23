@@ -30,7 +30,7 @@
          * Clean up active views
          */
         pvt.cleanUpViews = function(){
-            thisRoute = this;
+            var thisRoute = this;
             if (thisRoute.eview instanceof AGFK.ExploreView){
                 thisRoute.eview.close();
                 thisRoute.eview = undefined;
@@ -111,7 +111,8 @@
                 }
                 else{
                     // TODO redirect to error page
-                    throw new Error("Must supply 'node' key-value pair in URL");
+                    //this.nodeRoute("",paramsObj);
+                    throw new Error("Must supply 'node' key-value pair in URL, e.g: node=logistic_regression");
                 }
             },
 
@@ -139,6 +140,19 @@
                 parr.sort();
                 purl = parr.join("&");
                 this.navigate(purl, true);
+            },
+
+            /**
+             * Parse the entered text in the search box
+             */
+            parseSearchBox: function(event, box){
+                if (event.which === 13 || event.keyCode === 13){
+                    var prm = {},
+                    nodeName;
+                    nodeName = box.value.toLowerCase().replace(/ /g, "_");
+                    prm[pvt.routeConsts.qnodeName] = nodeName;
+                    this.changeUrlParams(prm);
+                }
             },
 
             /**

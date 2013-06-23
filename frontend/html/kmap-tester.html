@@ -21,6 +21,7 @@
   <body>
     <div id="header">
       {% block header %}
+      <input type="text" id="searchbox" onkeyup="AGFK.appRouter.parseSearchBox(event, this)"> </input>
       {% endblock %}
     </div>
 

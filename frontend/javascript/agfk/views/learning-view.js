@@ -442,13 +442,13 @@
                     });
                 }
                 else{
-                    curAddNodes.push(keyTag);
+                    curAddNodes.unshift(keyTag);
                 }
                 
                 // perform a level-based breadth first search 
                 while(curAddNodes.length > 0){
                     curTag = curAddNodes.shift();
-                    nodeOrdering.push(curTag);
+                    nodeOrdering.unshift(curTag);
                     
                     _.each(nodes.get(curTag).getUniqueDependencies(),
                     function(toAddNode){

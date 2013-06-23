@@ -31,6 +31,18 @@ p {
 /* ---------------------------------------------------*/
 /* ---------->>> General Functional Styles<<<---------*/
 /* ---------------------------------------------------*/
+#searchbox{
+    width: 12em;
+    margin-left: 1em;
+    border-radius: 5px;
+    position: absolute; /* parent must be relative ? */
+    bottom: 0.2em;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+
 .external-link{
     font-size: 1em;
     color:#2B7536;

@@ -5,11 +5,10 @@
 (function(AGFK, $, undefined){
 
     AGFK.utils = {};
-
+    
     /**
      * Get spatial information about input dom element that contains an svg ellipse
      */
-    
     AGFK.utils.getSpatialNodeInfo = function(inNode) {
         var ellp = inNode.getElementsByTagName("ellipse")[0];
         return {

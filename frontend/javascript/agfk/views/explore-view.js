@@ -52,8 +52,11 @@
             defaultNodeWidth: 2.5, // diameter of graph nodes
             numCharLineDisplayNode: 10, // max number of characters to display per title line of graph nodes
             summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
+            summaryArrowWidth: 32, // summary triangle width
+            summaryArrowTop: 28, // top distance to triangle apex 
             summaryAppearDelay: 250, // delay before summary appears (makes smoother navigation)
             summaryFadeInTime: 100, // summary fade in time (ms)
+            SQRT2DIV2: Math.sqrt(2)/2,
             exPlusWidth: 5.5, // px width of expand cross component
             edgePlusW: 28, // px distance of expand cross from circle edge
             maxZoomScale: 5, // maximum zoom-in level for graph
@@ -66,17 +69,21 @@
         };
         pvt.summaryDisplays = {};
 
+        /* boolean indicator for when the user displays/hides a node summary */
+        pvt.nodeSummariesChanged = true;
+
         /**
-         * Shift the summary displays by dx and dy
+         * Get summary box placement (top left) given node placement
          */
-        pvt.shiftSummaryDisplays = function(dx, dy){
-            var valOffset;
-            $.each(pvt.summaryDisplays, function(key, $val){
-                valOffset = $val.offset();
-                valOffset.left += dx;
-                valOffset.top += dy;
-                $val.offset(valOffset);
-            });
+        pvt.getSummaryBoxPlacement = function(nodeRect, placeLeft){
+            var viewConsts = pvt.viewConsts,
+                leftMultSign = placeLeft ? -1: 1,
+                shiftDiff = (1 + leftMultSign*viewConsts.SQRT2DIV2)*nodeRect.width/2 + leftMultSign*viewConsts.summaryArrowWidth;
+            if (placeLeft){shiftDiff -= viewConsts.summaryWidth;}
+            return {
+                    top:  (nodeRect.top + (1-viewConsts.SQRT2DIV2)*nodeRect.height/2 - viewConsts.summaryArrowTop) + "px",
+                    left:  (nodeRect.left + shiftDiff) + "px"
+                   };
         };
 
         /**
@@ -155,9 +162,9 @@
             
             // find the max width text element in box
             var maxTextLen = Math.max.apply(null, (node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
-            // TODO figure out better soluntion for prerendering
-            maxTextLen = maxTextLen === 0 ? viewConsts.defaultCheckDist : maxTextLen;
-                var chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
+                // TODO figure out better soluntion for prerendering
+                maxTextLen = maxTextLen === 0 ? viewConsts.defaultCheckDist : maxTextLen;
+            var chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
                 chkY = svgSpatialInfo.cy;
             chkG.attr("transform", 
                       "translate(" + chkX + "," + chkY + ") "
@@ -258,7 +265,7 @@
 
             // remove previous click information/display
             if (node.classed(clickedClass)){
-               node.classed(clickedClass, false);
+                node.classed(clickedClass, false);
                 var summId = pvt.getSummaryIdForDivWrap.call(thisView, node);
                 d3.select("#" + summId).remove(); // use d3 remove for x-browser support
                 delete pvt.summaryDisplays[summId];
@@ -268,6 +275,7 @@
                 thisView.interactState.lastNodeClicked = node;
                 pvt.attachNodeSummary.call(thisView, node);
             }
+            pvt.nodeSummariesChanged = true;
         };
 
         /**
@@ -466,7 +474,7 @@
 
                 // add reusable svg elements to defs
                 var defs = d3this.select("#" + exploreSvgId)
-                    .insert("svg:defs", ":first-child");
+                        .insert("svg:defs", ":first-child");
                 defs.append("polygon")
                     .attr("points", plusPts)
                     .attr("id", viewConsts.expCrossID)
@@ -505,43 +513,21 @@
                         .select("." + graphClass);
 
                 // set the zoom scale
-                var summaryDisplays = pvt.summaryDisplays;
                 dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
-                var initDraw = true,
-                locElem, 
-                prevCx,
-                prevCy,
-                curCx,
-                curCy,
-                dx,
-                dy,
-                bloc;
+                var summaryDisplays = pvt.summaryDisplays,
+                    nodeLoc,
+                    d3event;
                 // helper function to redraw svg graph with correct coordinates
                 function redraw() {
                     // transform the graph
-                    var d3event = d3.event;
-                    if (initDraw){
-                        locElem = d3this.select("ellipse").node(),
-                        bloc  = locElem.getBoundingClientRect(),
-                        prevCx = bloc.left + bloc.width/2;
-                        prevCy = bloc.top + bloc.height/2;
-                        initDraw = false;
-                    }
+                    d3event = d3.event;
                     vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + d3event.scale + ")");
-                   
-                    bloc = locElem.getBoundingClientRect();
-                    curCx = bloc.left + bloc.width/2;
-                    curCy = bloc.top + bloc.height/2;
-                    if (!$.isEmptyObject(summaryDisplays)){
-                        dx = curCx - prevCx;
-                        dy = curCy - prevCy;
-                        pvt.shiftSummaryDisplays(dx, dy);
-                    }
-                    prevCx = curCx;
-                    prevCy = curCy;
+                    // move the summary divs if needed
+                    $.each(summaryDisplays, function(key, val){
+                        nodeLoc = pvt.getSummaryBoxPlacement(val.d3node.node().getBoundingClientRect(), val.placeLeft);
+                        val.$wrapDiv.css(nodeLoc);
+                    });
                 }
-
-
             },
 
             /**
@@ -560,8 +546,8 @@
                 
                 // class the learned nodes TODO consider using node models as d3 data
                 d3this.on("mouseover", function() {
-                        pvt.nodeMouseOver.call(thisView, this);
-                    })
+                    pvt.nodeMouseOver.call(thisView, this);
+                })
                     .on("mouseout", function() {
                         pvt.nodeMouseOut.call(thisView, this);
                     })
@@ -571,7 +557,7 @@
 
                 _.each(thisView.model.get("userData").get("learnedNodes"),
                        function(val, key){
-                           var node = d3this.filter(function(){return this.id === key;});
+                           var node = d3this.select("#" + key);
                            pvt.addLearnedProps.call(thisView, node, false);
                            node.classed(pvt.viewConsts.nodeLearnedClass, true);
                        }
@@ -633,14 +619,14 @@
              */
             appendDepsToGraph: function(conNodeId, depth){
                 var thisView = this,
-                viewConsts = pvt.viewConsts,
-                edgeClass = viewConsts.edgeClass,
-                nodeClass = viewConsts.nodeClass,
-                newElClass = "newel-class-tmp", // temporary class so d3 can find ndew elements
-                depth = depth || pvt.viewConsts.defaultExpandDepth,
-                args = {depth: depth || 1,
-                        keyNode: thisView.model.get("nodes").get(conNodeId),
-                        remVisible: true};
+                    viewConsts = pvt.viewConsts,
+                    edgeClass = viewConsts.edgeClass,
+                    nodeClass = viewConsts.nodeClass,
+                    newElClass = "newel-class-tmp", // temporary class so d3 can find ndew elements
+                    depth = depth || pvt.viewConsts.defaultExpandDepth,
+                    args = {depth: depth || 1,
+                            keyNode: thisView.model.get("nodes").get(conNodeId),
+                            remVisible: true};
 
                 var dotStr = thisView.collToDot(args);
 
@@ -653,7 +639,7 @@
                     var $this = $(this);
                     $(this).attr("id", function(){
                         var $title = $(this.getElementsByTagName("title")[0]),
-                        txtContent = $title.text();
+                            txtContent = $title.text();
                         $title.remove();
                         return txtContent;
                     });
@@ -662,15 +648,15 @@
                 // assert(newnum > -1, "Could not find new element in jquery collection");
                 // obtain transformation coordinates from connecting node
                 var newConNode = $($newNEs[newnum]).find("ellipse"),
-                newCx = Number(newConNode.attr("cx")),
-                newCy = Number(newConNode.attr("cy"));
+                    newCx = Number(newConNode.attr("cx")),
+                    newCy = Number(newConNode.attr("cy"));
 
                 var oldConNode = thisView.getd3El().select("#" + conNodeId).select("ellipse"),
-                oldCx = Number(oldConNode.attr("cx")),
-                oldCy = Number(oldConNode.attr("cy"));
+                    oldCx = Number(oldConNode.attr("cx")),
+                    oldCy = Number(oldConNode.attr("cy"));
 
                 var transX = oldCx - newCx,
-                transY = oldCy - newCy;
+                    transY = oldCy - newCy;
 
                 // translate the new elements appropriately and add them to the graph
                 var $graphEl = $("." + viewConsts.graphClass);
@@ -704,7 +690,7 @@
                         }
                     }
                 });
-                              
+                
                 // add node properties to new subgraph
                 var d3els = d3.selectAll("." + newElClass);
                 d3els.classed(newElClass, false);
@@ -738,12 +724,11 @@
                 d3wrapDiv.classed(placeLeft ? viewConsts.summaryRightClass : viewConsts.summaryLeftClass, true);
                 wrapDiv.appendChild(div);
 
-                // calculate location of box
-                var summaryWidth = viewConsts.summaryWidth,
-                    shiftDiff = placeLeft ? -summaryWidth + nodeRect.width * 0.03 : nodeRect.width * 0.97;
-                wrapDiv.style.left = (nodeRect.left + shiftDiff) + "px";
-                wrapDiv.style.top = (nodeRect.top) + "px"; // TODO remove harcoded header offset
-                wrapDiv.style.width = summaryWidth + "px";
+                // get/set location of box
+                var sumLoc = pvt.getSummaryBoxPlacement(nodeRect, placeLeft);
+                wrapDiv.style.left = sumLoc.left;
+                wrapDiv.style.top = sumLoc.top;
+                wrapDiv.style.width = viewConsts.summaryWidth + "px";
                 wrapDiv.style.display = "none";
 
                 // add box to document with slight fade-in
@@ -756,7 +741,7 @@
                 });
 
                 // TODO listen for translated graphs and translate accordingly
-                pvt.summaryDisplays[wrapDiv.id] = $wrapDiv;
+                pvt.summaryDisplays[wrapDiv.id] = {"$wrapDiv": $wrapDiv, "d3node": node, "placeLeft": placeLeft};
                 return wrapDiv;
             },
 

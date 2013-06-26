@@ -69,9 +69,6 @@
         };
         pvt.summaryDisplays = {};
 
-        /* boolean indicator for when the user displays/hides a node summary */
-        pvt.nodeSummariesChanged = true;
-
         /**
          * Get summary box placement (top left) given node placement
          */
@@ -275,7 +272,6 @@
                 thisView.interactState.lastNodeClicked = node;
                 pvt.attachNodeSummary.call(thisView, node);
             }
-            pvt.nodeSummariesChanged = true;
         };
 
         /**

@@ -275,9 +275,9 @@
              */
             defaults: function() {
                 return {
-	            clickedNode: null,
                     learnedNodes: {},
-                    visibleNodes: {}
+                    visibleNodes: {},
+                    implicitLearnedNodes: {}
                 };
             },
             
@@ -286,6 +286,13 @@
              */
             updateLearnedNodes: function(nodeName, status){
                 return pvt.updateObjProp.call(this, "learnedNodes", nodeName, status);
+            },
+
+            /**
+             * Setter function that triggers an appropriate change event
+             */
+            updateImplicitLearnedNodes: function(nodeName, status){
+                return pvt.updateObjProp.call(this, "implicitLearnedNodes", nodeName, status);
             },
 
             /**

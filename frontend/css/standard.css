@@ -393,3 +393,7 @@ ellipse{
 .node-learned{
     opacity: 0.5;
 }
+
+.implicit-learned{
+    opacity: 0.6;
+}

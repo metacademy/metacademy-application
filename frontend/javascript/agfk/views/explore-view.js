@@ -31,6 +31,8 @@
             clickedClass: "clicked",
             useExpandClass: "use-expand",
             nodeLearnedClass: "node-learned",
+            implicitLearnedClass: "implicit-learned",
+            implicitLearnedCtProp: "data-ilct",
             dataHoveredProp: "data-hovered",
             checkClass: "checkmark",
             checkCircleClass: "checkmark-circle",
@@ -88,7 +90,7 @@
          * (1) set all ids to the titles and remove the title
          */
         pvt.preprocessNodesEdges = function(d3Sel){
-            d3Sel.attr('id', function() {
+            d3Sel.attr('id', function(){
                 return d3.select(this).select('title').text();
             });
             d3Sel.selectAll("title").remove(); // remove the title for a cleaner hovering experience
@@ -143,6 +145,7 @@
                         // stop the event from firing on the ellipse
                         d3.event.stopPropagation();
                         pvt.addLearnedProps.call(thisView, node, true);
+                        pvt.changeILStateDFS.call(thisView, node.attr("id"), node.classed(viewConsts.nodeLearnedClass));
                     })
                     .on("mouseover", function() {
                         d3.select(this).classed(checkHoveredClass, true);
@@ -274,6 +277,52 @@
             }
         };
 
+        /**
+         * Change the implicit learn state by performing a DFS from the rootNode
+         */
+        pvt.changeILStateDFS = function(rootTag, changeState){
+            var thisView = this,
+                thisNodes = thisView.model.get("nodes"),
+                d3Node,
+                viewConsts = pvt.viewConsts,
+                ilClass = viewConsts.implicitLearnedClass,
+                nlClass = viewConsts.nodeLearnedClass,
+                depNodes = [thisNodes.get(rootTag)],
+                ilCtProp = viewConsts.implicitLearnedCtProp,
+                nextRoot,
+                ilct,
+                passedNodes = {};
+            while ((nextRoot = depNodes.pop())){
+                $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
+                    if (!passedNodes.hasOwnProperty(dt)){
+                        d3Node = d3.select("#" + dt);
+                        ilct = d3Node.attr(ilCtProp);
+                        if (changeState){
+                            // keep track of the number of nodes with the given dependency so we don't [un]gray a node unnecessarily
+                            if (ilct && ilct > 0){
+                                d3Node.attr(ilCtProp, Number(ilct) + 1);
+                            }
+                            else{
+                                d3Node.attr(ilCtProp, 1);
+                                d3Node.classed(ilClass, true);
+                            }
+                        }
+                        else{
+                            // TODO assert ilct is a number
+                            ilct = Number(ilct) - 1;
+                            d3Node.attr(ilCtProp, ilct);
+                            if (ilct === 0){
+                                d3Node.classed(ilClass, false);
+                            }
+                        }
+                        thisView.model.get("userData").updateImplicitLearnedNodes(dt, changeState);
+                        passedNodes[dt] = true;
+                        depNodes.push(thisNodes.get(dt));
+                    }
+                });
+            }
+        };
+        
         /**
          * Return a dot string array from the entire model
          */
@@ -553,7 +602,7 @@
 
                 _.each(thisView.model.get("userData").get("learnedNodes"),
                        function(val, key){
-                           var node = d3this.select("#" + key);
+                           var node = d3this.filter(function(){return this.id === key;});
                            pvt.addLearnedProps.call(thisView, node, false);
                            node.classed(pvt.viewConsts.nodeLearnedClass, true);
                        }

@@ -2,7 +2,7 @@
  * This file contains the models and must be loaded after Backbone, jQuery, and d3
  */
 
-(function(AGFK, Backbone, undefined){
+(function(AGFK, Backbone, _, undefined){
 
     /**
      * Comprehension question model
@@ -240,7 +240,7 @@
     });
 
     /** 
-     * CUserData: model to store user data -- will eventually communicate with server for registered users
+     * UserData: model to store user data -- will eventually communicate with server for registered users
      */
     AGFK.UserData = (function(){
         // define private methods and variables
@@ -252,17 +252,18 @@
          * arStatus: truthy values assign objName.arName = arStatus; falsy deletes objName.arName
          */
         pvt.updateObjProp = function(objName, arName, arStatus){
-            if (!this.get(objName)){return false;}
+            var thisModel = this;
+            if (!thisModel.get(objName)){return false;}
 
             var retVal;
             if (arStatus){
-                this.get(objName)[arName] = arStatus;
-                this.trigger("change:" + arName);
+                thisModel.get(objName)[arName] = arStatus;
+                thisModel.trigger("change:" + objName);
                 retVal = true;
             }
-            else if (this.get(objName).hasOwnProperty(arName)){
-                delete this.get(objName)[arName];
-                this.trigger("change:" + arName);
+            else if (thisModel.get(objName).hasOwnProperty(arName)){
+                delete thisModel.get(objName)[arName];
+                thisModel.trigger("change:" + objName);
                 retVal = true;
             }
             else{
@@ -311,12 +312,33 @@
      * Model to maintain both client and server data
      */
     AGFK.CSData = Backbone.Model.extend({
+        collVals : ["nodes", "userData"],
+        chvals : ["change", "change:implicitLearnedNodes", "change:learnedNodes"],
+
+        /**
+         * Default model attributes
+         */
         defaults: function(){
             return {
                 nodes: new AGFK.NodeCollection(),
                 keyNode: null, // TODO this should be an array to handle multiple key nodes
                 userData: new AGFK.UserData()
             };
+        },
+
+        /**
+         * Initialize the model by binding the appropriate callback functions
+         */
+        initialize: function(){
+            var thisModel = this;
+            _.each(thisModel.collVals, function(collv){
+                _.each(thisModel.chvals, function(chv){ // TODO how to not enumerate each change?
+                    thisModel.get(collv).bind(chv, function(){
+                        thisModel.trigger(chv, collv);
+                    });
+                });                
+            });
+
         },
 
         /**
@@ -336,5 +358,5 @@
             return window.CONTENT_SERVER + "/nodes" + (this.get("keyNode") ? "/" + this.get("keyNode") + '?set=map' : "");
         }
     });
-})(typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone);
+})(typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window._);
 

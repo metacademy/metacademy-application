@@ -282,7 +282,9 @@
          */
         pvt.changeILStateDFS = function(rootTag, changeState, d3Sel){
             var thisView = this,
-                thisNodes = thisView.model.get("nodes"),
+                thisModel = thisView.model,
+                userData = thisModel.get("userData"),
+                thisNodes = thisModel.get("nodes"),
                 d3Node,
                 viewConsts = pvt.viewConsts,
                 ilClass = viewConsts.implicitLearnedClass,
@@ -307,6 +309,7 @@
                             else{
                                 d3Node.attr(ilCtProp, 1);
                                 d3Node.classed(ilClass, true);
+                                userData.updateImplicitLearnedNodes(dt, true);
                             }
                         }
                         else{
@@ -315,9 +318,9 @@
                             d3Node.attr(ilCtProp, ilct);
                             if (ilct === 0){
                                 d3Node.classed(ilClass, false);
+                                userData.updateImplicitLearnedNodes(dt, false);
                             }
                         }
-                        thisView.model.get("userData").updateImplicitLearnedNodes(dt, changeState);
                         passedNodes[dt] = true;
                         depNodes.push(thisNodes.get(dt));
                     }

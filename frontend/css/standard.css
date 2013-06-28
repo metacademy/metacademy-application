@@ -198,6 +198,16 @@ p {
     margin: 0;
 }
 
+.learned-concept-title, .implicit-learned-concept-title{
+    opacity: 0.5;
+}
+
+.learned-concept-title:before{
+    content: "✓"; /* TODO make an interactive checkmark */
+    margin-right: 0.2ex;
+    color: green;
+}
+
 .node-detail-comp-wrap{
     margin: 0 0 0.7em 0;
 }

@@ -16,6 +16,8 @@
 
         pvt.viewConsts = {
             templateId: "node-title-view-template", // name of view template (warning: hardcoded in html)
+            learnedClass: "learned-concept-title",
+            implicitLearnedClass: "implicit-learned-concept-title",
             viewClass: "learn-title-display",
             viewIdPrefix: "node-title-view-div-"
         };
@@ -24,7 +26,11 @@
         return Backbone.View.extend({
             template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
             id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.id;},
-            className: pvt.viewConsts.viewClass,
+            className: function(){
+                var viewConsts = pvt.viewConsts,
+                thisView = this;
+                return pvt.viewConsts.viewClass + (thisView.model.learned ? " " + viewConsts.learnedClass : "") + (thisView.model.implicitLearned ? " " + viewConsts.implicitLearnedClass : "");
+            },
             
             /**
              * Render the learning view given the supplied model
@@ -305,11 +311,16 @@
         // keep track of expanded nodes: key: title node id, value: expanded view object
         pvt.expandedNodes = {};
 
+        pvt.nodeOrdering = null;
+
         pvt.viewConsts = {
             viewId: "learn-view",
             clickedItmClass: "clicked-title"
         };
 
+        /**
+         * Insert a given subview after the specified dom node
+         */
         pvt.insertSubViewAfter = function(subview, domNode){
                 domNode.parentNode.insertBefore(subview.render().el, domNode.nextSibling);
         };
@@ -320,6 +331,15 @@
 
             events: {
                 "click .learn-title-display": "showNodeDetailsFromEvt"
+            },
+
+            /**
+             * Init the view and bind appropriate callbacks
+             */
+            initialize: function(){
+                var thisView = this;
+                _.bindAll(thisView);
+                    thisView.model.bind("change:implicitLearnedNodes change:learnedNodes", thisView.render); // TODO delegate specific changes so we don't rerender the entire view each time
             },
 
             /**
@@ -359,35 +379,20 @@
             },
             
             /**
-             * Render the learning view given the supplied collection TODO examine the rendering type and render appropriately
+             * Render the learning view given the supplied collection
+             * TODO rerender (the appropriate section) when the model changes
              */
             render: function(){
                 var thisView = this,
-                    nodes = thisView.model.get("nodes"),
-                    nodeOrdering,
-                    inum,
-                    noLen,
-                    simpleModel,
-                    curNode,
                     $el = thisView.$el,
                     expandedNodes = pvt.expandedNodes,
-                    expNode,
                     clkItmClass = pvt.viewConsts.clickedItmClass;
 
                 $el.html(""); // TODO we shouldn't be doing this -- handle the subviews better
-                // TODO cache node ordering
-                nodeOrdering = thisView.getLVNodeOrdering();
-
-                for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
-                    curNode = nodes.get(nodeOrdering[inum]);
-                    simpleModel = {
-                        title: curNode.get("title"),
-                        id: curNode.get("id")
-                    };
-                    $el.append(new AGFK.NodeListItemView({model: simpleModel}).render().el); // not using entire backbone model to reduce JSON overhead
-                }
-
-                // recapture previous state TODO is this desirable behavior?
+                pvt.nodeOrdering = thisView.getLVNodeOrdering();
+                thisView.renderTitles();
+                
+                // recapture previous expand/collapse state TODO is this desirable behavior?
                 for (var expN in expandedNodes){
                     if (expandedNodes.hasOwnProperty(expN)){
                         var domEl = document.getElementById(expN);
@@ -401,6 +406,37 @@
             },
 
             /**
+             * Render the learning view titles TODO allow for rerendering of only titles
+             */
+            renderTitles: function(){
+            var inum,
+                noLen,
+                nodeOrdering = pvt.nodeOrdering || [],
+                curNode,
+                nid,
+                simpleModel,
+                thisView = this,
+                $el = thisView.$el,
+                thisModel = thisView.model,
+                nodes = thisModel.get("nodes"),
+                userData = thisModel.get("userData"),
+                learnedNodes = userData.get("learnedNodes"),
+                implicitLearnedNodes = userData.get("implicitLearnedNodes");
+                
+                for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
+                    curNode = nodes.get(nodeOrdering[inum]);
+                    nid = curNode.get("id");
+                    simpleModel = {
+                        title: curNode.get("title"),
+                        id: nid,
+                        learned: learnedNodes.hasOwnProperty(nid),
+                        implicitLearned: implicitLearnedNodes.hasOwnProperty(nid)
+                    };
+                    $el.append(new AGFK.NodeListItemView({model: simpleModel}).render().el); // not using entire backbone model to reduce JSON overhead
+                }
+            },
+
+            /**
              * Clean up the view
              */
             close: function(){
@@ -409,7 +445,7 @@
             domeEl;
                  for (expN in expandedNodes){
                     if (expandedNodes.hasOwnProperty(expN)){
-                        domEl = document.getElementById(expN);
+                        var domEl = document.getElementById(expN);
                         expandedNodes[expN].close();
                         delete expandedNodes[expN];
                     }

@@ -280,7 +280,7 @@
         /**
          * Change the implicit learn state by performing a DFS from the rootNode
          */
-        pvt.changeILStateDFS = function(rootTag, changeState){
+        pvt.changeILStateDFS = function(rootTag, changeState, d3Sel){
             var thisView = this,
                 thisNodes = thisView.model.get("nodes"),
                 d3Node,
@@ -292,10 +292,12 @@
                 nextRoot,
                 ilct,
                 passedNodes = {};
+            d3Sel = d3Sel || d3.selectAll("." + pvt.viewConsts.nodeClass);
+
             while ((nextRoot = depNodes.pop())){
                 $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
                     if (!passedNodes.hasOwnProperty(dt)){
-                        d3Node = d3.select("#" + dt);
+                        d3Node = d3Sel.filter(function(){return this.id === dt;});
                         ilct = d3Node.attr(ilCtProp);
                         if (changeState){
                             // keep track of the number of nodes with the given dependency so we don't [un]gray a node unnecessarily
@@ -603,8 +605,11 @@
                 _.each(thisView.model.get("userData").get("learnedNodes"),
                        function(val, key){
                            var node = d3this.filter(function(){return this.id === key;});
-                           pvt.addLearnedProps.call(thisView, node, false);
-                           node.classed(pvt.viewConsts.nodeLearnedClass, true);
+                           if (node.node() !== null){
+                               pvt.addLearnedProps.call(thisView, node, false);
+                               node.classed(pvt.viewConsts.nodeLearnedClass, true);
+                               pvt.changeILStateDFS.call(thisView, node.attr("id"), true, d3this);
+                           } 
                        }
                       );
             },

@@ -63,6 +63,9 @@
             };
         },
 
+        /**
+         * Initialize the DE (currently sets the id properly)
+         */
         initialize: function(inp){
             this.id = inp.id || inp.from_tag + inp.to_tag;
         },

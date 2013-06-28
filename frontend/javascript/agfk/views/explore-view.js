@@ -91,7 +91,7 @@
          */
         pvt.preprocessNodesEdges = function(d3Sel){
             d3Sel.attr('id', function(){
-                return d3.select(this).select('title').text();
+                return d3.select(this).select('title').text().replace(/->/g, "TO"); // TODO remove all undesired characters from ID (chars that cause css problems like '>')
             });
             d3Sel.selectAll("title").remove(); // remove the title for a cleaner hovering experience
             return true;
@@ -102,17 +102,19 @@
          */
         pvt.addLearnedProps = function(node, hasCheck){
             var viewConsts = pvt.viewConsts,
-                thisView = this;
+                thisView = this,
+                nid = node.attr("id"),
+                nodeLearnedClass = viewConsts.nodeLearnedClass;
             hasCheck = hasCheck || false;
             if (!hasCheck){
                 pvt.addCheckMark.call(thisView, node);
             }
-            // add/remove appropriate classses and entry from userData             
-            var addClick = !node.classed(viewConsts.nodeLearnedClass);
-            
-            node.classed(viewConsts.nodeLearnedClass, addClick);
+            // add/remove appropriate classses and entry from userData for both the edges and the nodes
+            var addClick = !node.classed(nodeLearnedClass);
+            thisView.changeEdgesClass(thisView.model.get("nodes").get(nid).get("outlinks"), nodeLearnedClass, addClick);
+            node.classed(nodeLearnedClass, addClick);
             thisView.model.get("userData")
-                .updateLearnedNodes(node.attr("id"), addClick);
+                .updateLearnedNodes(nid, addClick);
         };
         
         /**
@@ -293,13 +295,16 @@
                 ilCtProp = viewConsts.implicitLearnedCtProp,
                 nextRoot,
                 ilct,
+                modelNode,
                 passedNodes = {};
             d3Sel = d3Sel || d3.selectAll("." + pvt.viewConsts.nodeClass);
 
+            // DFS to [un]gray the appropriate nodes and edges
             while ((nextRoot = depNodes.pop())){
                 $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
                     if (!passedNodes.hasOwnProperty(dt)){
                         d3Node = d3Sel.filter(function(){return this.id === dt;});
+                        modelNode = thisNodes.get(dt);
                         ilct = d3Node.attr(ilCtProp);
                         if (changeState){
                             // keep track of the number of nodes with the given dependency so we don't [un]gray a node unnecessarily
@@ -310,6 +315,7 @@
                                 d3Node.attr(ilCtProp, 1);
                                 d3Node.classed(ilClass, true);
                                 userData.updateImplicitLearnedNodes(dt, true);
+                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true);
                             }
                         }
                         else{
@@ -319,10 +325,11 @@
                             if (ilct === 0){
                                 d3Node.classed(ilClass, false);
                                 userData.updateImplicitLearnedNodes(dt, false);
+                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false);
                             }
                         }
                         passedNodes[dt] = true;
-                        depNodes.push(thisNodes.get(dt));
+                        depNodes.push(modelNode);
                     }
                 });
             }
@@ -617,6 +624,23 @@
                       );
             },
 
+            /**
+             * Change the class of the provided edge models
+             * edgeCollections: a collection of DirectedEdge models
+             * className: name of class to add/remove
+             * addClass: true to add class, false to remove
+             */
+            changeEdgesClass: function(edgeCollections, className, addClass){
+            var d3edge;
+                edgeCollections.each(function(edge){
+                    d3edge = d3.select("#" + edge.get("from_tag") + "TO" + edge.get("to_tag"));
+                    if (d3edge.node() !== null){
+                        d3edge.classed(className, addClass);
+                    }
+                });
+                return true;
+            },
+            
             /**
              * Renders the explore view using the supplied collection
              */

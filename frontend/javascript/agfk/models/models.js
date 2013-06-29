@@ -161,7 +161,7 @@
         getNodeDisplayTitle: function(numCharNodeLine){
             if (!this.nodeDisplayTitle){
                 var title = this.title || this.id.replace(/_/g, " ");
-                this.nodeDisplayTitle = AGFK.utils.wrapNodeText(title, numCharNodeLine || 10);
+                this.nodeDisplayTitle = AGFK.utils.wrapNodeText(title, numCharNodeLine || 9);
             }
             return this.nodeDisplayTitle;
         },

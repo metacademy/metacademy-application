@@ -52,7 +52,7 @@
             defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
             defaultNodeSepDist: 1.5, // separation of graph nodes
             defaultNodeWidth: 2.5, // diameter of graph nodes
-            numCharLineDisplayNode: 10, // max number of characters to display per title line of graph nodes
+            numCharLineDisplayNode: 9, // max number of characters to display per title line of graph nodes
             summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
             summaryArrowWidth: 32, // summary triangle width
             summaryArrowTop: 28, // top distance to triangle apex 
@@ -100,7 +100,7 @@
         /**
          * Add "learned" properties to the given explore node and associated user data model
          */
-        pvt.addLearnedProps = function(node, hasCheck){
+        pvt.addLearnedProps = function(node, hasCheck, d3Sel){
             var viewConsts = pvt.viewConsts,
                 thisView = this,
                 nid = node.attr("id"),
@@ -111,7 +111,7 @@
             }
             // add/remove appropriate classses and entry from userData for both the edges and the nodes
             var addClick = !node.classed(nodeLearnedClass);
-            thisView.changeEdgesClass(thisView.model.get("nodes").get(nid).get("outlinks"), nodeLearnedClass, addClick);
+            thisView.changeEdgesClass(thisView.model.get("nodes").get(nid).get("outlinks"), nodeLearnedClass, addClick, d3Sel);
             node.classed(nodeLearnedClass, addClick);
             thisView.model.get("userData")
                 .updateLearnedNodes(nid, addClick);
@@ -297,13 +297,13 @@
                 ilct,
                 modelNode,
                 passedNodes = {};
-            d3Sel = d3Sel || d3.selectAll("." + pvt.viewConsts.nodeClass);
+            d3Sel = d3Sel || d3.selectAll("." + viewConsts.graphClass);
 
             // DFS to [un]gray the appropriate nodes and edges
             while ((nextRoot = depNodes.pop())){
                 $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
                     if (!passedNodes.hasOwnProperty(dt)){
-                        d3Node = d3Sel.filter(function(){return this.id === dt;});
+                        d3Node = d3Sel.select("#" + dt);
                         modelNode = thisNodes.get(dt);
                         ilct = d3Node.attr(ilCtProp);
                         if (changeState){
@@ -315,7 +315,7 @@
                                 d3Node.attr(ilCtProp, 1);
                                 d3Node.classed(ilClass, true);
                                 userData.updateImplicitLearnedNodes(dt, true);
-                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true);
+                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true, d3Sel);
                             }
                         }
                         else{
@@ -325,7 +325,7 @@
                             if (ilct === 0){
                                 d3Node.classed(ilClass, false);
                                 userData.updateImplicitLearnedNodes(dt, false);
-                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false);
+                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false, d3Sel);
                             }
                         }
                         passedNodes[dt] = true;
@@ -538,7 +538,7 @@
                     .classed(viewConsts.expCrossClass, true);
 
                 // add node properties
-                this.addNodeProps(d3this);
+                this.addGraphProps(d3this);
 
                 // -- post processing of initial SVG -- //
 
@@ -588,21 +588,21 @@
             },
 
             /**
-             * Use D3 to add dynamic properties to the nodes
+             * Use D3 to add dynamic properties to the graph
              */
-            addNodeProps: function(d3selection, containsEls) {
+            addGraphProps: function(d3selection) {
                 var thisView = this,
-                    containsEls = containsEls || false,
-                    d3this = d3selection || this.getd3El();
-                d3this = containsEls ? d3this : d3this.selectAll("." + pvt.viewConsts.nodeClass);
-
+                    viewConsts = pvt.viewConsts,
+                    d3this = d3selection || this.getd3El(),
+                    d3Nodes = d3this.selectAll("." + viewConsts.nodeClass);
+               
                 // add nodes to observed list TODO move this somewhere else
-                d3this.each(function(){
+                d3Nodes.each(function(){
                     thisView.model.get("userData").updateVisibleNodes(this.id, 1);
                 });
                 
                 // class the learned nodes TODO consider using node models as d3 data
-                d3this.on("mouseover", function() {
+                d3Nodes.on("mouseover", function() {
                     pvt.nodeMouseOver.call(thisView, this);
                 })
                     .on("mouseout", function() {
@@ -614,9 +614,9 @@
 
                 _.each(thisView.model.get("userData").get("learnedNodes"),
                        function(val, key){
-                           var node = d3this.filter(function(){return this.id === key;});
+                           var node = d3this.select("#" + key);
                            if (node.node() !== null){
-                               pvt.addLearnedProps.call(thisView, node, false);
+                               pvt.addLearnedProps.call(thisView, node, false, d3this);
                                node.classed(pvt.viewConsts.nodeLearnedClass, true);
                                pvt.changeILStateDFS.call(thisView, node.attr("id"), true, d3this);
                            } 
@@ -630,10 +630,13 @@
              * className: name of class to add/remove
              * addClass: true to add class, false to remove
              */
-            changeEdgesClass: function(edgeCollections, className, addClass){
-            var d3edge;
+            changeEdgesClass: function(edgeCollections, className, addClass, d3Sel){
+            var d3edge,
+                edgeId;
+            d3Sel = d3Sel || d3.select("." + pvt.viewConsts.graphClass);
                 edgeCollections.each(function(edge){
-                    d3edge = d3.select("#" + edge.get("from_tag") + "TO" + edge.get("to_tag"));
+                    edgeId = edge.get("from_tag") + "TO" + edge.get("to_tag");
+                    d3edge = d3Sel.select("#" + edgeId);
                     if (d3edge.node() !== null){
                         d3edge.classed(className, addClass);
                     }
@@ -771,7 +774,7 @@
                 // add node properties to new subgraph
                 var d3els = d3.selectAll("." + newElClass);
                 d3els.classed(newElClass, false);
-                thisView.addNodeProps(d3els, true);
+                thisView.addGraphProps(d3els, true);
 
                 // TODO do we need to update the d3this?
             },

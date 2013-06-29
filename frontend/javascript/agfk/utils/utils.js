@@ -92,13 +92,24 @@
         };
     })();
 
+    
+    /**
+     * Simple function to break long strings and insert a hyphen (idea from http://ejohn.org/blog/injecting-word-breaks-with-javascript/)
+     * str: string to be potentially hyphenated
+     * num: longest accecptable length -1 (single letters will not be broken)
+     */
+    AGFK.utils.wbr = function(str, num) {  
+        return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
+            return text + "-\\n" + ch;
+        });
+    };
 
 
     /**
      * Wrap a long string to avoid elongated graph nodes. Translated/modified from server techniqu
      */
 
-    AGFK.utils. wrapNodeText = function(s, width) {
+    AGFK.utils.wrapNodeText = function(s, width) {
         if (!s) {
             return '';
         }
@@ -113,7 +124,7 @@
                 result = [];
                 total = 0;
             }
-            result.push(parts[i]);
+            result.push(AGFK.utils.wbr(parts[i], width));
             total += parts[i].length + 1;
         }
         resArr.push(result.join(" "));

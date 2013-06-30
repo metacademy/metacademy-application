@@ -72,6 +72,20 @@
         },
 
         /**
+         * Apply the user data to the given node collection
+         */
+        applyUserData: function(userModel){
+            var thisColl = this,
+                collNode;
+            _.each(userModel.get("learnedNodes"), function(val, key){
+                collNode = thisColl.get(key);
+                if (collNode !== undefined){
+                    thisColl.get(key).setLearnedStatus(true);
+                }
+            });
+        },
+
+        /**
          * DFS to change the implicit learned count of the dependencies of rootTag
          */
         dfsChangeILCount: function(rootTag, ctChange){

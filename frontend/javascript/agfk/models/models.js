@@ -388,7 +388,7 @@
      */
     AGFK.CSData = Backbone.Model.extend({
         collVals : ["nodes", "userData"],
-        chvals : ["change", "change:implicitLearnedNodes", "change:learnedNodes"],
+        chvals : ["change", "change:learnStatus", "change:visibleStatus"],
 
         /**
          * Default model attributes
@@ -406,14 +406,10 @@
          */
         initialize: function(){
             var thisModel = this;
-            _.each(thisModel.collVals, function(collv){
-                _.each(thisModel.chvals, function(chv){ // TODO how to not enumerate each change?
-                    thisModel.get(collv).bind(chv, function(){
-                        thisModel.trigger(chv, collv);
-                    });
-                });                
-            });
-
+            // TODO more elegant way to handle this?
+            thisModel.get("userData").listenTo(thisModel.get("nodes"), "change:learnStatus",thisModel.get("userData").updateLearnedNodes);
+            thisModel.get("userData").listenTo(thisModel.get("nodes"), "change:implicitLearnStatus",thisModel.get("userData").updateImplicitLearnedNodes);
+            thisModel.get("userData").listenTo(thisModel.get("nodes"), "change:visibleStatus",thisModel.get("userData").updateVisibleNodes);
         },
 
         /**
@@ -422,6 +418,7 @@
         parse: function(response){
             // TODO check for extending the nodes vs resetting
             this.get("nodes").add(response.nodes, {parse: true});
+            this.get("nodes").applyUserData(this.get("userData"));
             delete response.nodes;
             return response;
         },

@@ -237,7 +237,7 @@
                 d3node.classed(justLeftClass, true);
                 // wait a bit before removing the summary
                 window.setTimeout(function(){
-                    if (!pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass) && d3node.classed(justLeftClass)){
+                    if (pvt.summaryDisplays[summId] && !pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass) && d3node.classed(justLeftClass)){
                         if (!d3node.classed(viewConsts.clickedClass)){
                             d3.select("#" + summId).remove(); // use d3 remove for x-browser support
                             delete pvt.summaryDisplays[summId];

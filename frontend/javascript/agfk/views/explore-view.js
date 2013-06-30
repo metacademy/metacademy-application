@@ -42,6 +42,8 @@
             summaryWrapClass: "summary-wrap",
             summaryLeftClass: "tleft",
             summaryRightClass: "tright",
+            waitSummaryClass: "waiting-for-summary",
+            justLeftClass: "just-left-node",
             locElemId: "invis-loc-elem", // invisible location element
             locElemClass: "invis-loc",
             // ----- rendering options ----- //
@@ -55,7 +57,8 @@
             summaryArrowWidth: 32, // summary triangle width
             summaryArrowTop: 28, // top distance to triangle apex 
             summaryAppearDelay: 250, // delay before summary appears (makes smoother navigation)
-            summaryFadeInTime: 100, // summary fade in time (ms)
+            summaryHideDelay: 100,
+            summaryFadeInTime: 50, // summary fade in time (ms)
             SQRT2DIV2: Math.sqrt(2)/2,
             exPlusWidth: 5.5, // px width of expand cross component
             edgePlusW: 28, // px distance of expand cross from circle edge
@@ -98,13 +101,18 @@
         /**
          * Helper function to attach the summary div and add an event listener for leaving the summary
          */
-        pvt.attachNodeSummary = function(node){
+        pvt.attachNodeSummary = function(d3node){
             // display the node summary
-            var wrapDiv = this.showNodeSummary(node);
+            var $wrapDiv = this.showNodeSummary(d3node);
+            var hoveredClass = pvt.viewConsts.hoveredClass;
 
+            $wrapDiv.on("mouseenter", function(){
+                $(this).addClass(hoveredClass);
+            });
             // add listener to node summary so mouseouts trigger mouseout on node
-            $(wrapDiv).on("mouseleave", function(evt) {
-                AGFK.utils.simulate(node.node(), "mouseout", {
+            $wrapDiv.on("mouseleave", function(evt) {
+                $(this).removeClass(hoveredClass);
+                AGFK.utils.simulate(d3node.node(), "mouseout", {
                     relatedTarget: evt.relatedTarget
                 }); 
             });
@@ -162,28 +170,35 @@
                 viewConsts = pvt.viewConsts,
                 hoveredClass = viewConsts.hoveredClass,
                 clickedClass = viewConsts.clickedClass,
-                node = d3.select(nodeEl);
+                d3node = d3.select(nodeEl);
 
+            d3node.classed(viewConsts.justLeftClass, false);
+            if (d3node.classed(hoveredClass) || d3node.classed(clickedClass)){
+                d3node.classed(hoveredClass, true);
+                return false;
+            }
+            
             // add the appropriate class
-            node.classed(hoveredClass, true);
+            d3node.classed(hoveredClass, true);
 
-            // add checkmark if not already added (just add this by default and make it hidden)
+            // add node summary
+            pvt.attachNodeSummary.call(thisView, d3node);
 
             // add node-hoverables if not already present
-            if (!node.attr(viewConsts.dataHoveredProp)) {
+            if (!d3node.attr(viewConsts.dataHoveredProp)) {
                 // add checkmark if not present
-                if (node.select("." + viewConsts.checkClass).node() === null){
-                    pvt.addCheckMark.call(this, node, svgSpatialInfo);
+                if (d3node.select("." + viewConsts.checkClass).node() === null){
+                    pvt.addCheckMark.call(this, d3node, svgSpatialInfo);
                 }
                 var svgSpatialInfo = AGFK.utils.getSpatialNodeInfo(nodeEl),
                     // display expand shape if not expanded
                     expX = svgSpatialInfo.cx - viewConsts.exPlusWidth / 2,
                     expY = svgSpatialInfo.cy + svgSpatialInfo.ry - viewConsts.edgePlusW;
-                if (node.select("." + viewConsts.checkClass).node() === null){
-                    pvt.addCheckMark.call(this, node, svgSpatialInfo);
+                if (d3node.select("." + viewConsts.checkClass).node() === null){
+                    pvt.addCheckMark.call(this, d3node, svgSpatialInfo);
                 }
                 // Node expand cross TODO make an expandable/collapsable graph?
-                // node.append("use")
+                // d3node.append("use")
                 //     .attr("xlink:href", "#" + viewConsts.expCrossID)
                 //     .attr("x", expX)
                 //     .attr("y", expY)
@@ -193,7 +208,7 @@
                 //         d3.event.stopPropagation();
                 //         thisView.appendDepsToGraph(node.attr('id'));
                 //     });
-                node.attr(viewConsts.dataHoveredProp, true);
+                d3node.attr(viewConsts.dataHoveredProp, true);
             }
         };
 
@@ -202,28 +217,35 @@
          */
         pvt.nodeMouseOut = function(nodeEl) {
             var relTarget = d3.event.relatedTarget;
-            if (!relTarget) { 
+            // check if we're in a semantically related el
+            if (!relTarget ||nodeEl.contains(relTarget) || relTarget.id.match(nodeEl.id)){
                 return;
             }
 
-            // check if we're outside of the node but not in a semantically related element
-            if (!nodeEl.contains(relTarget) && !relTarget.id.match(nodeEl.id)){
-                var thisView = this,
-                    viewConsts = pvt.viewConsts,
-                    node = d3.select(nodeEl);
+            var thisView = this,
+                d3node = d3.select(nodeEl),
+                summId = pvt.getSummaryIdForDivWrap.call(thisView, d3node),
+                viewConsts = pvt.viewConsts,
+                hoveredClass = viewConsts.hoveredClass,
+                justLeftClass = viewConsts.justLeftClass;
 
-                //remove hovered class
-                node.classed(viewConsts.hoveredClass, false);
-
-                // remove visual properties unless node is clicked
-                if (!node.classed(viewConsts.clickedClass)) {
-                    if (!node.classed(viewConsts.nodeLearnedClass)) {
-                        var chkId = pvt.getCheckIdForNode.call(thisView, node);
-                        node.select("#" + chkId).attr("visibility", "hidden");
+            if(d3node.classed(viewConsts.waitSummaryClass)){
+                 d3node.classed(hoveredClass, false);
+            }
+            else{
+                //remove hovered class (we left the node)
+                d3node.classed(justLeftClass, true);
+                // wait a bit before removing the summary
+                window.setTimeout(function(){
+                    if (!pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass) && d3node.classed(justLeftClass)){
+                        if (!d3node.classed(viewConsts.clickedClass)){
+                            d3.select("#" + summId).remove(); // use d3 remove for x-browser support
+                            delete pvt.summaryDisplays[summId];
+                        }
+                        d3node.classed(justLeftClass, false);
+                        d3node.classed(hoveredClass, false);
                     }
-                    node.select("." + viewConsts.useExpandClass).attr("visibility", "hidden");
-
-                }
+                }, viewConsts.summaryHideDelay);
             }
         };
 
@@ -232,21 +254,11 @@
          */
         pvt.nodeClick = function(nodeEl) {
             var thisView = this,
-                viewConsts = pvt.viewConsts,
                 node = d3.select(nodeEl),
-                clickedClass = viewConsts.clickedClass;
-
-            // remove previous click information/display
-            if (node.classed(clickedClass)){
-                node.classed(clickedClass, false);
-                var summId = pvt.getSummaryIdForDivWrap.call(thisView, node);
-                d3.select("#" + summId).remove(); // use d3 remove for x-browser support
-                delete pvt.summaryDisplays[summId];
-            }
-            else{
-                node.classed(clickedClass, true);
-                pvt.attachNodeSummary.call(thisView, node);
-            }
+                clickedClass = pvt.viewConsts.clickedClass;
+            node.classed(clickedClass, function(){
+                return !node.classed(clickedClass);
+            });
         };
 
         /**
@@ -530,7 +542,8 @@
                 // short helper function only needed below
                 var addPropFunction = function(nid, prop){
                     var d3node = d3this.select("#" + nid);
-                    if (d3node.node() !== null){
+            
+        if (d3node.node() !== null){
                         thisView.toggleNodeProps(d3node, true, prop, d3this);
                     } 
                 };
@@ -759,17 +772,19 @@
                 wrapDiv.style.display = "none";
 
                 // add box to document with slight fade-in
-                var $wrapDiv = $(wrapDiv);
-                $wrapDiv.delay(0).queue(function(){
+                var $wrapDiv = $(wrapDiv),
+                waitSummaryClass = viewConsts.waitSummaryClass;
+                node.classed(waitSummaryClass, true);
+                window.setTimeout(function(){
+                    node.classed(waitSummaryClass, false);
                     if(node.classed(viewConsts.hoveredClass) || node.classed(viewConsts.clickedClass)){
                         $wrapDiv.appendTo("#" + viewConsts.viewId).fadeIn(viewConsts.summaryFadeInTime);
                     }
-                    $(this).dequeue();
-                });
+                }, viewConsts.summaryAppearDelay);
 
                 // TODO listen for translated graphs and translate accordingly
                 pvt.summaryDisplays[wrapDiv.id] = {"$wrapDiv": $wrapDiv, "d3node": node, "placeLeft": placeLeft};
-                return wrapDiv;
+                return $wrapDiv;
             },
 
             /**

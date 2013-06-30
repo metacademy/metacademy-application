@@ -400,6 +400,7 @@ ellipse{
     fill: transparent;
     stroke: #868686;
     stroke-width: 3;
+    visibility: hidden;
 }
 .checkmark-hovered circle, .node-learned .checkmark circle{
     fill: transparent;

@@ -262,6 +262,62 @@
         };
 
         /**
+         * Change the implicit learn state by performing a DFS from the rootNode
+         */
+        pvt.changeILStateDFS = function(rootTag, changeState, d3Sel){
+            var thisView = this,
+                thisModel = thisView.model,
+                userData = thisModel.get("userData"),
+                thisNodes = thisModel.get("nodes"),
+                d3Node,
+                viewConsts = pvt.viewConsts,
+                ilClass = viewConsts.implicitLearnedClass,
+                nlClass = viewConsts.nodeLearnedClass,
+                depNodes = [thisNodes.get(rootTag)],
+                ilCtProp = viewConsts.implicitLearnedCtProp,
+                nextRoot,
+                ilct,
+                modelNode,
+                passedNodes = {};
+            d3Sel = d3Sel || d3.selectAll("." + pvt.viewConsts.nodeClass);
+
+            // DFS to [un]gray the appropriate nodes and edges
+            while ((nextRoot = depNodes.pop())){
+                $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
+                    if (!passedNodes.hasOwnProperty(dt)){
+                        d3Node = d3Sel.filter(function(){return this.id === dt;});
+                        modelNode = thisNodes.get(dt);
+                        ilct = d3Node.attr(ilCtProp);
+                        if (changeState){
+                            // keep track of the number of nodes with the given dependency so we don't [un]gray a node unnecessarily
+                            if (ilct && ilct > 0){
+                                d3Node.attr(ilCtProp, Number(ilct) + 1);
+                            }
+                            else{
+                                d3Node.attr(ilCtProp, 1);
+                                d3Node.classed(ilClass, true);
+                                userData.updateImplicitLearnedNodes(dt, true);
+                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true);
+                            }
+                        }
+                        else{
+                            // TODO assert ilct is a number
+                            ilct = Number(ilct) - 1;
+                            d3Node.attr(ilCtProp, ilct);
+                            if (ilct === 0){
+                                d3Node.classed(ilClass, false);
+                                userData.updateImplicitLearnedNodes(dt, false);
+                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false);
+                            }
+                        }
+                        passedNodes[dt] = true;
+                        depNodes.push(modelNode);
+                    }
+                });
+            }
+        };
+        
+        /**
          * Return a dot string array from the entire model
          */
         pvt.getFullDSArr = function() {

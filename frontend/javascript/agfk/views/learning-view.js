@@ -4,22 +4,25 @@
  */
 
 
-(function(AGFK, Backbone, _, $){
+(function(AGFK, Backbone, _, $, undefined){
+    "use strict";
 
     /**
      * Display the model as an item in the node list
-     * NOTE: the model is assumed to be a simple javascript object NOT a backbone model
      */
     AGFK.NodeListItemView = (function(){
         // define private variables and methods
         var pvt = {};
 
+        pvt.parentView = null;
+        
         pvt.viewConsts = {
             templateId: "node-title-view-template", // name of view template (warning: hardcoded in html)
             learnedClass: "learned-concept-title",
             implicitLearnedClass: "implicit-learned-concept-title",
             viewClass: "learn-title-display",
-            viewIdPrefix: "node-title-view-div-"
+            viewIdPrefix: "node-title-view-div-",
+            learnedCheckClass: "lcheck"
         };
 
         // return public object
@@ -28,8 +31,29 @@
             id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.id;},
             className: function(){
                 var viewConsts = pvt.viewConsts,
-                thisView = this;
-                return pvt.viewConsts.viewClass + (thisView.model.learned ? " " + viewConsts.learnedClass : "") + (thisView.model.implicitLearned ? " " + viewConsts.implicitLearnedClass : "");
+                thisView = this,
+                thisModel = thisView.model;
+                return pvt.viewConsts.viewClass + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnCt() > 0 ? " " + viewConsts.implicitLearnedClass : "");
+            },
+
+            events: {
+                "click .learn-view-check": "toggleLearnedConcept"
+            },
+
+            /**
+             * Initialize the view with appropriate listeners
+             */
+            initialize: function(){
+                var thisView = this,
+                viewConsts = pvt.viewConsts,
+                learnClass = viewConsts.learnedClass,
+                implicitLearnedClass = viewConsts.implicitLearnedClass;
+                thisView.listenTo(thisView.model, "change:learnStatus", function(nodeId, status){
+                        thisView.changeTitleClass(learnClass, status);
+                });
+                thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
+                        thisView.changeTitleClass(implicitLearnedClass, status);
+                });
             },
             
             /**
@@ -37,10 +61,45 @@
              */
             render: function(){
                 var thisView = this;
-                thisView.$el.html(thisView.template(thisView.model));
+                var thisModel = thisView.model;
+                thisView.$el.html(thisView.template(thisModel.toJSON()));
                 return thisView;
-            }
+            },
 
+            /**
+             * Toggle learned state of given concept
+             */
+            toggleLearnedConcept: function(evt){
+                evt.stopPropagation();
+                var lclass = pvt.viewConsts.learnedClass;
+                this.model.setLearnedStatus(!this.$el.hasClass(lclass));
+            },
+
+            /**
+             * Change the title display properties given by prop
+             */
+            changeTitleClass: function(classVal, status){
+                if (status){
+                    this.$el.addClass(classVal);
+                }
+                else{
+                    this.$el.removeClass(classVal);
+                }
+            },
+
+            /**
+             * Set the parent view
+             */
+            setParentView: function(pview){
+                pvt.parentView = pview;
+            },
+
+            /**
+             * Get the parent view
+             */
+            getParentView: function(){
+                return pvt.pview;
+            }
         });
     })();
 
@@ -337,9 +396,9 @@
              * Init the view and bind appropriate callbacks
              */
             initialize: function(){
-                var thisView = this;
-                _.bindAll(thisView);
-                    thisView.model.bind("change:implicitLearnedNodes change:learnedNodes", thisView.render); // TODO delegate specific changes so we don't rerender the entire view each time
+                // var thisView = this;
+                //_.bindAll(thisView);
+                   // thisView.model.bind("change:implicitLearnedNodes change:learnedNodes", thisView.render); // TODO delegate specific changes so we don't rerender the entire view each time
             },
 
             /**
@@ -409,13 +468,13 @@
              * Render the learning view titles TODO allow for rerendering of only titles
              */
             renderTitles: function(){
-            var inum,
+            var thisView = this,
+                inum,
                 noLen,
-                nodeOrdering = pvt.nodeOrdering || [],
+                nodeOrdering = pvt.nodeOrdering || thisView.getLVNodeOrdering(),
                 curNode,
                 nid,
-                simpleModel,
-                thisView = this,
+                nliview,
                 $el = thisView.$el,
                 thisModel = thisView.model,
                 nodes = thisModel.get("nodes"),
@@ -426,13 +485,15 @@
                 for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
                     curNode = nodes.get(nodeOrdering[inum]);
                     nid = curNode.get("id");
-                    simpleModel = {
-                        title: curNode.get("title"),
-                        id: nid,
-                        learned: learnedNodes.hasOwnProperty(nid),
-                        implicitLearned: implicitLearnedNodes.hasOwnProperty(nid)
-                    };
-                    $el.append(new AGFK.NodeListItemView({model: simpleModel}).render().el); // not using entire backbone model to reduce JSON overhead
+                 //   simpleModel = {
+                 //       title: curNode.get("title"),
+                 //       id: nid,
+                 //       learned: learnedNodes.hasOwnProperty(nid),
+                 //       implicitLearned: implicitLearnedNodes.hasOwnProperty(nid)
+                 //   };
+                    nliview = new AGFK.NodeListItemView({model: curNode});
+                    nliview.setParentView(thisView);
+                    $el.append(nliview.render().el); 
                 }
             },
 

@@ -202,10 +202,21 @@ p {
     opacity: 0.5;
 }
 
-.learned-concept-title:before{
-    content: "✓"; /* TODO make an interactive checkmark */
-    margin-right: 0.2ex;
+.learn-view-check{
+    visibility: hidden;
+    display: inline-block;
+    margin-right: 0.5ex;
+    color: #8e8888;
+    font-size: 1.3em;
+}
+
+.learned-concept-title > .learn-view-check, .learn-view-check:hover{
+   visibility: visible;
     color: green;
+}
+
+.learn-title-display:hover > .learn-view-check{
+    visibility: visible;
 }
 
 .node-detail-comp-wrap{
@@ -379,26 +390,31 @@ ellipse{
 }
 
 /* completed checkmark for learned nodes */
-.checkmark{
+.checkmark path{
     fill: transparent;
     stroke: #868686;
     stroke-width: 4;
+    visibility: hidden;
 }
-.checkmark-circle{
+.checkmark circle{
     fill: transparent;
     stroke: #868686;
     stroke-width: 3;
 }
-.checkmark-hovered .checkmark-circle, .checkmark-clicked .checkmark-circle, .node-learned .checkmark-circle{
+.checkmark-hovered circle, .node-learned .checkmark circle{
     fill: transparent;
     stroke: #759466;
     stroke-width: 4;
+    visibility: visible;
 }
-.checkmark-hovered .checkmark, .checkmark-clicked .checkmark, .node-learned .checkmark{
+.checkmark-hovered path, .node-learned .checkmark path{
     stroke-width: 5;
     stroke: #759466;
+    visibility: visible;
 }
-
+.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle{
+    visibility: visible;
+}
 /* properties for learned nodes */
 .node-learned{
     opacity: 0.5;

@@ -3,6 +3,7 @@
  */
 
 (function(AGFK, Backbone, _, undefined){
+    "use strict";
 
     /**
      * Comprehension question model
@@ -87,157 +88,231 @@
     /**
      * CNode: node model that encompasses several collections and sub-models
      */
-    AGFK.Node = Backbone.Model.extend({
-        collFields: ["questions", "dependencies", "outlinks", "resources"], // collection fields
-        txtFields: ["id", "title", "summary", "pointers"], // text fields
+    AGFK.Node = (function(){
+        // maintain ancillary/user-specific info and fields in a private object
+        var pvt = {};
+        pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
+        pvt.txtFields = ["id", "title", "summary", "pointers"];
+        
+        return Backbone.Model.extend({
+            /**
+             * all possible attributes are present by default
+             */
+            defaults: function() {
+                return {
+                    title: "",
+                    id: "",
+                    summary: "",
+                    pointers: "",
+                    questions: new AGFK.QuestionCollection(),
+                    dependencies: new AGFK.DirectedEdgeCollection(),
+                    outlinks: new AGFK.DirectedEdgeCollection(),
+                    resources: new AGFK.ResourceCollection()
+                };
+            },
 
-        /**
-         * all possible attributes are present by default
-         */
-        defaults: function () {
-            return {
-                title: "",
-                id: "",
-                summary: "",
-                pointers: "",
-                questions: new AGFK.QuestionCollection(),
-                dependencies: new AGFK.DirectedEdgeCollection(),
-                outlinks: new AGFK.DirectedEdgeCollection(),
-                resources: new AGFK.ResourceCollection()
-            };
-        },
-
-        /**
-         *  parse the incoming server data
-         */
-        parse: function (resp, xhr) {
-            // check if we have a null response from the server
-            if (resp === null) {
-                return {};
-            }
-            var output = this.defaults();
-            // ---- parse the text values ---- //
-            var i = this.txtFields.length;
-            while (i--) {
-                var tv = this.txtFields[i];
-                if (resp[tv]) {
-                    output[tv] = resp[tv];
+            /**
+             *  parse the incoming server data
+             */
+            parse: function(resp, xhr) {
+                // check if we have a null response from the server
+                if (resp === null) {
+                    return {};
                 }
-            }
-            // ---- parse the collection values ---- //
-            i = this.collFields.length;
-            while (i--) {
-                var cv = this.collFields[i];
-                output[cv].parent = this;
-                if (resp[cv]) {
-                    output[cv].add(resp[cv]);
+                var output = this.defaults();
+                // ---- parse the text values ---- //
+                var i = pvt.txtFields.length;
+                while (i--) {
+                    var tv = pvt.txtFields[i];
+                    if (resp[tv]) {
+                        output[tv] = resp[tv];
+                    }
                 }
-            }
-            return output;
-        },
+                // ---- parse the collection values ---- //
+                i = pvt.collFields.length;
+                while (i--) {
+                    var cv = pvt.collFields[i];
+                    output[cv].parent = this;
+                    if (resp[cv]) {
+                        output[cv].add(resp[cv]);
+                    }
+                }
+                return output;
+            },
 
-        /**
-         * intially populate the model with all present collection, boolean and text values
-         * bind changes from collection such that they trigger changes in the original model
-         */
-        initialize: function () {
-            var model = this;
-            // changes in attribute collections should trigger a change in the node model
-            var i = this.collFields.length;
-            while (i--) {
-                var cval = this.collFields[i];
-                this.get(cval).bind("change", function () {
-                    model.trigger("change", cval);
+            /**
+             * intially populate the model with all present collection, boolean and text values
+             * bind changes from collection such that they trigger changes in the original model
+             */
+            initialize: function() {
+                var model = this;
+                // changes in attribute collections should trigger a change in the node model
+                var i = pvt.collFields.length;
+                while (i--) {
+                    var cval = pvt.collFields[i];
+                    this.get(cval).bind("change", function () {
+                        model.trigger("change", cval);
+                    });
+                } 
+                this.bind("change", function () {
+                    this.save();
                 });
-            } 
-            this.bind("change", function () {
-                this.save();
-            });
-        },
 
-        /**
-         * returns and caches the node display title
-         */
-        getNodeDisplayTitle: function(numCharNodeLine){
-            if (!this.nodeDisplayTitle){
-                var title = this.title || this.id.replace(/_/g, " ");
-                this.nodeDisplayTitle = AGFK.utils.wrapNodeText(title, numCharNodeLine || 9);
-            }
-            return this.nodeDisplayTitle;
-        },
+                // ***** Add private instance variable workaround ***** //
+                var nodePvt = {};
+                nodePvt.visible = false;
+                nodePvt.implicitLearnCt = 0;
+                nodePvt.implicitLearn = false;
+                nodePvt.learned = false;
+                /**
+                 * Increment the implicit learn count by ival (deafault 1)
+                 */
+                this.incrementILCt = function(ival){
+                    ival = ival || 1;
+                    this.setImplicitLearnCt(nodePvt.implicitLearnCt + ival);
+                };
 
-        /**
-         * Check if ancestID is an ancestor of this node
-         */
-        isAncestor: function(ancestID){
-            if (!this.ancestors){
-                this.getAncestors(true);
-            }
-            return this.ancestors.hasOwnProperty(ancestID);
-        },
+                
+                this.setLearnedStatus = function(status){
+                    if (status !== nodePvt.learned){
+                        nodePvt.learned = status;
+                        this.trigger("change:learnStatus", this.get("id"), status);
+                    }
+                };
 
-        /**
-         * Obtain (and optionally return) a list of the ancestors of this node 
-         * side effect: creates a list of unique dependencies (dependencies not present as an 
-         * ancestor of another dependency) which is stored in this.uniqueDeps
-         */
-        getAncestors: function(noReturn){
-            if (!this.ancestors){
-                var ancests = {};
-                var coll = this.collection;
-                this.get("dependencies").each(function(dep){
-                    var depNode = coll.get(dep.get("from_tag"));
-                    var dAncests = depNode.getAncestors();
-                    for (var dAn in dAncests){
-                        if(dAncests.hasOwnProperty(dAn)){
-                            ancests[dAn] = 1;
+                this.setVisibleStatus = function(status){
+                    if (nodePvt.visible !== nodePvt.visible){
+                        nodePvt.visible = status;
+                        this.trigger("change:visibleStatus", this.get("id"), status);
+                    }
+                };
+
+                this.setImplicitLearnCt = function(ilct){
+                    if (nodePvt.implicitLearnCt !== nodePvt.ilct){
+                        nodePvt.implicitLearnCt = ilct;
+                        this.trigger("change:implicitLearnCt", this.get("id"), ilct);
+                        this.setImplicitLearnStatus(ilct > 0);
+                    }
+                };
+
+                this.setImplicitLearnStatus = function(status){
+                    if (nodePvt.implicitLearn !== status){
+                        nodePvt.implicitLearn = status;
+                        this.trigger("change:implicitLearnStatus", this.get("id"), status);
+                    }
+                };
+
+                this.getImplicitLearnCt = function(){
+                    return nodePvt.implicitLearnCt;
+                };
+                
+                this.getImplicitLearnStatus = function(){
+                    return nodePvt.implicitLearn;
+                };
+
+                this.getVisibleStatus = function(){
+                    return nodePvt.visible;
+                };
+                
+                this.getCollFields = function(){
+                    return nodePvt.collFields;
+                };
+
+                this.getTxtFields = function(){
+                    return nodePvt.txtFields;
+                };
+                                
+                this.getLearnedStatus = function(){
+                    return nodePvt.learned;
+                };
+
+            },
+
+            /**
+             * returns and caches the node display title
+             */
+            getNodeDisplayTitle: function(numCharNodeLine){
+                if (!this.nodeDisplayTitle){
+                    var title = this.title || this.id.replace(/_/g, " ");
+                    this.nodeDisplayTitle = AGFK.utils.wrapNodeText(title, numCharNodeLine || 9);
+                }
+                return this.nodeDisplayTitle;
+            },
+
+            /**
+             * Check if ancestID is an ancestor of this node
+             */
+            isAncestor: function(ancestID){
+                if (!this.ancestors){
+                    this.getAncestors(true);
+                }
+                return this.ancestors.hasOwnProperty(ancestID);
+            },
+
+            /**
+             * Obtain (and optionally return) a list of the ancestors of this node 
+             * side effect: creates a list of unique dependencies (dependencies not present as an 
+             * ancestor of another dependency) which is stored in this.uniqueDeps
+             */
+            getAncestors: function(noReturn){
+                if (!this.ancestors){
+                    var ancests = {};
+                    var coll = this.collection;
+                    this.get("dependencies").each(function(dep){
+                        var depNode = coll.get(dep.get("from_tag"));
+                        var dAncests = depNode.getAncestors();
+                        for (var dAn in dAncests){
+                            if(dAncests.hasOwnProperty(dAn)){
+                                ancests[dAn] = 1;
+                            }
                         }
-                    }
-                });
+                    });
 
-                // create list of unique dependencies
-                var uniqueDeps = {};
-                this.get("dependencies").each(function(dep){
-                    var dtag = dep.get("from_tag");
-                    if (!ancests.hasOwnProperty(dtag)){
-                        uniqueDeps[dtag] = 1;
-                    }
-                    ancests[dtag] = 1;
-                });
-                this.uniqueDeps = uniqueDeps;
-                this.ancestors = ancests;
-            }
+                    // create list of unique dependencies
+                    var uniqueDeps = {};
+                    this.get("dependencies").each(function(dep){
+                        var dtag = dep.get("from_tag");
+                        if (!ancests.hasOwnProperty(dtag)){
+                            uniqueDeps[dtag] = 1;
+                        }
+                        ancests[dtag] = 1;
+                    });
+                    this.uniqueDeps = uniqueDeps;
+                    this.ancestors = ancests;
+                }
 
-            if (!noReturn){
-                return this.ancestors;
-            }
+                if (!noReturn){
+                    return this.ancestors;
+                }
 
-            else{
+                else{
+                    return false;
+                }
+            },
+
+            /**
+             * Get a list of unqiue dependencies (dependencies not present as an 
+             * ancestor of another dependency)
+             */
+            getUniqueDependencies: function(noReturn){
+                if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
+                if (!noReturn){
+                    return Object.keys(this.uniqueDeps);
+                }
                 return false;
-            }
-        },
+            },
 
-        /**
-         * Get a list of unqiue dependencies (dependencies not present as an 
-         * ancestor of another dependency)
-         */
-        getUniqueDependencies: function(noReturn){
-            if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
-            if (!noReturn){
-                return Object.keys(this.uniqueDeps);
+            /**
+             * Check if depID is a unique dependency (dependencies not present as an 
+             * ancestor of another dependency)
+             */
+            isUniqueDependency: function(depID){
+                if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
+                return this.uniqueDeps.hasOwnProperty(depID);
             }
-            return false;
-        },
-
-        /**
-         * Check if depID is a unique dependency (dependencies not present as an 
-         * ancestor of another dependency)
-         */
-        isUniqueDependency: function(depID){
-            if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
-            return this.uniqueDeps.hasOwnProperty(depID);
-        }
-    });
+        });
+    }
+                )();
 
     /** 
      * UserData: model to store user data -- will eventually communicate with server for registered users

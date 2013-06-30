@@ -31,11 +31,9 @@
             clickedClass: "clicked",
             useExpandClass: "use-expand",
             nodeLearnedClass: "node-learned",
-            implicitLearnedClass: "implicit-learned",
-            implicitLearnedCtProp: "data-ilct",
+            nodeImplicitLearnedClass: "implicit-learned",
             dataHoveredProp: "data-hovered",
             checkClass: "checkmark",
-            checkCircleClass: "checkmark-circle",
             checkHoveredClass: "checkmark-hovered",
             checkNodeIdSuffix: "-check-g",
             summaryDivSuffix: "-summary-txt",
@@ -98,26 +96,6 @@
         };
         
         /**
-         * Add "learned" properties to the given explore node and associated user data model
-         */
-        pvt.addLearnedProps = function(node, hasCheck, d3Sel){
-            var viewConsts = pvt.viewConsts,
-                thisView = this,
-                nid = node.attr("id"),
-                nodeLearnedClass = viewConsts.nodeLearnedClass;
-            hasCheck = hasCheck || false;
-            if (!hasCheck){
-                pvt.addCheckMark.call(thisView, node);
-            }
-            // add/remove appropriate classses and entry from userData for both the edges and the nodes
-            var addClick = !node.classed(nodeLearnedClass);
-            thisView.changeEdgesClass(thisView.model.get("nodes").get(nid).get("outlinks"), nodeLearnedClass, addClick, d3Sel);
-            node.classed(nodeLearnedClass, addClick);
-            thisView.model.get("userData")
-                .updateLearnedNodes(nid, addClick);
-        };
-        
-        /**
          * Helper function to attach the summary div and add an event listener for leaving the summary
          */
         pvt.attachNodeSummary = function(node){
@@ -135,19 +113,23 @@
         /**
          * Add the check mark and associated properties to the given node
          */
-        pvt.addCheckMark = function(node, svgSpatialInfo){
+        pvt.addCheckMark = function(d3node, svgSpatialInfo){
             var viewConsts = pvt.viewConsts,
                 checkHoveredClass = viewConsts.checkHoveredClass,
-                thisView = this;
-            svgSpatialInfo = svgSpatialInfo || AGFK.utils.getSpatialNodeInfo(node.node());
+                thisView = this,
+                nodeId = d3node.attr("id"),
+                mnode = thisView.model.get("nodes").get(nodeId),
+                nodeLearnedClass = viewConsts.nodeLearnedClass;
+            svgSpatialInfo = svgSpatialInfo || AGFK.utils.getSpatialNodeInfo(d3node.node());
 
-            var chkG = node.append("g")
-                    .attr("id", pvt.getCheckIdForNode.call(thisView, node))
+            var chkG = d3node.append("g")
+                    .attr("class", viewConsts.checkClass)
+                    .attr("id", pvt.getCheckIdForNode.call(thisView, d3node))
                     .on("click", function() {
                         // stop the event from firing on the ellipse
                         d3.event.stopPropagation();
-                        pvt.addLearnedProps.call(thisView, node, true);
-                        pvt.changeILStateDFS.call(thisView, node.attr("id"), node.classed(viewConsts.nodeLearnedClass));
+                        // change the learned status on the node model which will fire events changing the appropriate views
+                        mnode.setLearnedStatus(!d3node.classed(nodeLearnedClass));
                     })
                     .on("mouseover", function() {
                         d3.select(this).classed(checkHoveredClass, true);
@@ -156,14 +138,12 @@
                         d3.select(this).classed(checkHoveredClass, false);
                     });
             chkG.append("circle")
-                .attr("r", viewConsts.checkCircleR)
-                .classed(viewConsts.checkCircleClass, true);
+                .attr("r", viewConsts.checkCircleR);
             chkG.append("path")
-                .attr("d", viewConsts.checkPath)
-                .attr("class", viewConsts.checkClass);
+                .attr("d", viewConsts.checkPath);
             
             // find the max width text element in box
-            var maxTextLen = Math.max.apply(null, (node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
+            var maxTextLen = Math.max.apply(null, (d3node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
                 // TODO figure out better soluntion for prerendering
                 maxTextLen = maxTextLen === 0 ? viewConsts.defaultCheckDist : maxTextLen;
             var chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
@@ -184,45 +164,36 @@
                 clickedClass = viewConsts.clickedClass,
                 node = d3.select(nodeEl);
 
-            // make sure we're not already hovered
-            if (node.classed(hoveredClass) || node.classed(clickedClass)) {
-                node.classed(hoveredClass, true);
-                return;
-            }
-
             // add the appropriate class
             node.classed(hoveredClass, true);
 
-            // update last hovered node
-            thisView.interactState.lastNodeHovered = node;
+            // add checkmark if not already added (just add this by default and make it hidden)
 
             // add node-hoverables if not already present
-            if (!node.attr(viewConsts.dataHoveredProp)) { // TODO check if the node is already expanded
+            if (!node.attr(viewConsts.dataHoveredProp)) {
+                // add checkmark if not present
+                if (node.select("." + viewConsts.checkClass).node() === null){
+                    pvt.addCheckMark.call(this, node, svgSpatialInfo);
+                }
                 var svgSpatialInfo = AGFK.utils.getSpatialNodeInfo(nodeEl),
                     // display expand shape if not expanded
                     expX = svgSpatialInfo.cx - viewConsts.exPlusWidth / 2,
                     expY = svgSpatialInfo.cy + svgSpatialInfo.ry - viewConsts.edgePlusW;
-                node.append("use")
-                    .attr("xlink:href", "#" + viewConsts.expCrossID)
-                    .attr("x", expX)
-                    .attr("y", expY)
-                    .attr("class", viewConsts.useExpandClass)
-                    .on("click", function() {
-                        // don't propagate click to lower level objects
-                        d3.event.stopPropagation();
-                        thisView.appendDepsToGraph(node.attr('id'));
-                    });
-
-                // add checkmark if not already added
                 if (node.select("." + viewConsts.checkClass).node() === null){
                     pvt.addCheckMark.call(this, node, svgSpatialInfo);
                 }
+                // Node expand cross TODO make an expandable/collapsable graph?
+                // node.append("use")
+                //     .attr("xlink:href", "#" + viewConsts.expCrossID)
+                //     .attr("x", expX)
+                //     .attr("y", expY)
+                //     .attr("class", viewConsts.useExpandClass)
+                //     .on("click", function() {
+                //         // don't propagate click to lower level objects
+                //         d3.event.stopPropagation();
+                //         thisView.appendDepsToGraph(node.attr('id'));
+                //     });
                 node.attr(viewConsts.dataHoveredProp, true);
-            }
-            // else make the hoverables visible
-            else {
-                node.select("." + viewConsts.useExpandClass).attr("visibility", "visible");
-                node.select("#" + pvt.getCheckIdForNode.call(thisView, node)).attr("visibility", "visible");
             }
         };
 
@@ -274,67 +245,10 @@
             }
             else{
                 node.classed(clickedClass, true);
-                thisView.interactState.lastNodeClicked = node;
                 pvt.attachNodeSummary.call(thisView, node);
             }
         };
 
-        /**
-         * Change the implicit learn state by performing a DFS from the rootNode
-         */
-        pvt.changeILStateDFS = function(rootTag, changeState, d3Sel){
-            var thisView = this,
-                thisModel = thisView.model,
-                userData = thisModel.get("userData"),
-                thisNodes = thisModel.get("nodes"),
-                d3Node,
-                viewConsts = pvt.viewConsts,
-                ilClass = viewConsts.implicitLearnedClass,
-                nlClass = viewConsts.nodeLearnedClass,
-                depNodes = [thisNodes.get(rootTag)],
-                ilCtProp = viewConsts.implicitLearnedCtProp,
-                nextRoot,
-                ilct,
-                modelNode,
-                passedNodes = {};
-            d3Sel = d3Sel || d3.selectAll("." + viewConsts.graphClass);
-
-            // DFS to [un]gray the appropriate nodes and edges
-            while ((nextRoot = depNodes.pop())){
-                $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
-                    if (!passedNodes.hasOwnProperty(dt)){
-                        d3Node = d3Sel.select("#" + dt);
-                        modelNode = thisNodes.get(dt);
-                        ilct = d3Node.attr(ilCtProp);
-                        if (changeState){
-                            // keep track of the number of nodes with the given dependency so we don't [un]gray a node unnecessarily
-                            if (ilct && ilct > 0){
-                                d3Node.attr(ilCtProp, Number(ilct) + 1);
-                            }
-                            else{
-                                d3Node.attr(ilCtProp, 1);
-                                d3Node.classed(ilClass, true);
-                                userData.updateImplicitLearnedNodes(dt, true);
-                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true, d3Sel);
-                            }
-                        }
-                        else{
-                            // TODO assert ilct is a number
-                            ilct = Number(ilct) - 1;
-                            d3Node.attr(ilCtProp, ilct);
-                            if (ilct === 0){
-                                d3Node.classed(ilClass, false);
-                                userData.updateImplicitLearnedNodes(dt, false);
-                                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false, d3Sel);
-                            }
-                        }
-                        passedNodes[dt] = true;
-                        depNodes.push(modelNode);
-                    }
-                });
-            }
-        };
-        
         /**
          * Return a dot string array from the entire model
          */
@@ -363,11 +277,10 @@
             var dgArr = [],
                 thisView = this,
                 thisModel = thisView.model,
-                visNodes = thisModel.get("userData").get("visibleNodes"),
                 thisNodes = thisModel.get("nodes"),
                 curEndNodes = [keyNode]; // this should generalize easily to multiple end nodes
             _.each(curEndNodes, function(node) {
-                if (!checkVisible || !visNodes.hasOwnProperty(node.get("id"))){
+                if (!checkVisible || thisNodes.get(node.get("id")).getVisibleStatus()){
                     dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
                 }
             });
@@ -388,9 +301,10 @@
                     node = curEndNodes.shift();
                     // for each unqiue dependency for the specific node...
                     _.each(node.getUniqueDependencies(), function(depNodeId) {
-                        if (!checkVisible || !visNodes.hasOwnProperty(depNodeId)){
-                            // grab the dependency node
-                            depNode = thisNodes.get(depNodeId);
+                        // grab the dependency node
+                        depNode = thisNodes.get(depNodeId);
+
+                        if (!checkVisible || depNode.getVisibleStatus()){
                             // add node strings to the front of the dgArr
                             dgArr.unshift(pvt.fullGraphVizStr.call(thisView, depNode));
                             // add edge string to the end
@@ -460,24 +374,25 @@
             id: pvt.viewConsts.viewId,
 
             /**
-             * Maintain references to the user interactions with the view TODO move to the userState of the node wrapper collection?
-             */
-            interactState: {
-                lastNodeClicked: -1,
-                lastNodeHovered: -1
-            },
-
-            /**
              * Obtain initial kmap coordinates and render results
              */
             initialize: function() {
                 // build initial graph based on input collection
                 var thisView = this,
-                    dotStr = thisView.collToDot();
+                    dotStr = thisView.collToDot(),
+                    d3this = thisView.getd3El();
                 thisView.svgGraph = thisView.createSvgGV(dotStr);
                 thisView.initialSvg = true;
+                
+                thisView.listenTo(thisView.model.get("nodes"), "change:learnStatus", function(nodeId, status){
+                    thisView.toggleNodeProps(d3this.select("#" + nodeId), status, "learned", d3this);
+                });
+                thisView.listenTo(thisView.model.get("nodes"), "change:implicitLearnStatus", function(nodeId, status){
+                    thisView.toggleNodeProps(d3this.select("#" + nodeId), status, "implicitLearned", d3this);
+                });
+                
             },
-
+            
             /**
              * Initial rendering for view (necessary because of particular d3 use case)
              */
@@ -527,7 +442,6 @@
                         (-exPlusWidth) + "," + exPlusWidth + " " +
                         "0," + exPlusWidth + " " +
                         "0,0";
-
 
                 // add reusable svg elements to defs
                 var defs = d3this.select("#" + exploreSvgId)
@@ -594,11 +508,12 @@
                 var thisView = this,
                     viewConsts = pvt.viewConsts,
                     d3this = d3selection || this.getd3El(),
-                    d3Nodes = d3this.selectAll("." + viewConsts.nodeClass);
+                    d3Nodes = d3this.selectAll("." + viewConsts.nodeClass),
+                    thisNodes = thisView.model.get("nodes");
                
                 // add nodes to observed list TODO move this somewhere else
                 d3Nodes.each(function(){
-                    thisView.model.get("userData").updateVisibleNodes(this.id, 1);
+                    thisNodes.get(this.id).setVisibleStatus(true);
                 });
                 
                 // class the learned nodes TODO consider using node models as d3 data
@@ -612,18 +527,50 @@
                         pvt.nodeClick.call(thisView, this);
                     });
 
-                _.each(thisView.model.get("userData").get("learnedNodes"),
-                       function(val, key){
-                           var node = d3this.select("#" + key);
-                           if (node.node() !== null){
-                               pvt.addLearnedProps.call(thisView, node, false, d3this);
-                               node.classed(pvt.viewConsts.nodeLearnedClass, true);
-                               pvt.changeILStateDFS.call(thisView, node.attr("id"), true, d3this);
-                           } 
-                       }
-                      );
+                // short helper function only needed below
+                var addPropFunction = function(nid, prop){
+                    var d3node = d3this.select("#" + nid);
+                    if (d3node.node() !== null){
+                        thisView.toggleNodeProps(d3node, true, prop, d3this);
+                    } 
+                };
+
+                _.each(thisNodes.filter(function(nde){return nde.getLearnedStatus();}), function(mnode){
+                    addPropFunction(mnode.get("id"), "learned");
+                });
+                  _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
+                    addPropFunction(mnode.get("id"), "implicitLearned");
+                });
             },
 
+            
+            /**
+             * Toggle propType properties for the given explore node
+             * d3node: d3 selection for the given node
+             * toggleOn: whether to toggle on (true) or off (false) the learned properties
+             * propType: specify the property type: "learned" or "implicitLearned"
+             * d3sel: d3selection with graph nodes/edges as children (defaults to thisView.getd3El()
+             */
+            toggleNodeProps: function(d3node, toggleOn, propType, d3Sel){
+                var viewConsts = pvt.viewConsts,
+                    thisView = this,
+                    mnode = thisView.model.get("nodes").get(d3node.attr("id")),
+                    addLearnProps = propType === "learned",
+                    propClass = addLearnProps ? viewConsts.nodeLearnedClass : viewConsts.nodeImplicitLearnedClass,
+                    hasCheck = d3node.select("." + viewConsts.checkClass).node() !== null;
+                d3Sel = d3Sel || thisView.getd3El();
+
+                // insert checkmark if needed
+                if (addLearnProps && toggleOn && !hasCheck){
+                    pvt.addCheckMark.call(thisView, d3node);
+                }
+                
+                // toggle appropriate class for outlinks
+                thisView.changeEdgesClass(mnode.get("outlinks"), propClass, toggleOn, d3Sel);
+                d3node.classed(propClass, toggleOn);
+            },
+            
+            
             /**
              * Change the class of the provided edge models
              * edgeCollections: a collection of DirectedEdge models

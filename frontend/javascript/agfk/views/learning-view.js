@@ -528,10 +528,12 @@
                     traversedNodes = {}, // nodes already added to list
                     curTag,  // current node being added to list
                     nodes = thisView.model.get("nodes"),
-                    keyTag = thisView.model.get("keyNode");
+                    nodeNames = nodes.pluck("id"),
+                    keyTag = thisView.model.get("keyNode"),
+                    allOutLinksAdded;
 
                 if (keyTag === ""){
-                    // init: obtain node tags with 0 dependencies
+                    // init: obtain node tags with 0 outlinks
                     curAddNodes = _.map(nodes.filter(function(mdl){
                         return mdl.get("outlinks").length == 0;
                     }), function(itm){
@@ -541,6 +543,10 @@
                 else{
                     curAddNodes.unshift(keyTag);
                 }
+
+                curAddNodes.forEach(function(el){
+                    traversedNodes[el] = 1;
+                });
                 
                 // perform a level-based breadth first search 
                 while(curAddNodes.length > 0){
@@ -550,10 +556,17 @@
                     _.each(nodes.get(curTag).getUniqueDependencies(),
                     function(toAddNode){
                         // make sure we're adding a valid node'
-                        if (!traversedNodes.hasOwnProperty(toAddNode) ){
+                        allOutLinksAdded = true;
+                        $.each(nodes.get(toAddNode).get("outlinks").pluck("to_tag"),function(inum, ol){
+                            if (!traversedNodes.hasOwnProperty(ol) && nodeNames.indexOf(ol) !== -1){
+                                allOutLinksAdded = false;
+                                return false;
+                            }
+                        });
+                        if (!traversedNodes.hasOwnProperty(toAddNode) && allOutLinksAdded){
                             nextAddNodes.push(toAddNode);
+                            traversedNodes[toAddNode] = 1;
                         }
-                        traversedNodes[toAddNode] = 1;
                     });
                     if (curAddNodes.length === 0){
                         // TODO disambiguate nodes at the same level here

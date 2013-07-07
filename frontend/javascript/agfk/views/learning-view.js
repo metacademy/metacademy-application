@@ -139,6 +139,7 @@
 
             toggleAdditionalInfo: function(evt){
                 this.$el.find("." + pvt.viewConsts.extraResourceInfoClass).toggle();
+                $(evt.currentTarget).remove();
             }
 
         });

@@ -54,14 +54,19 @@ p {
 };
 
 .internal-link{
-
+    color: #712579;
 }
 
-.expand-collapse-link{
+.internal-link:hover{
+    text-decoration: underline;
+    color: #241494;
+}
+
+a.expand-collapse-link{
     font-size: 0.8em;
-    color: #471666
+    color: #712579;
 }
-.expand-collapse-link:hover{
+a.expand-collapse-link:hover{
     color: #241494;
 }
 /* ---------------------------------------------------*/
@@ -225,7 +230,7 @@ p {
     margin: 0 0 0.7em 1em;
 }
 .resource-view{
-    color: #333333;
+    color: #252313;
     padding: 0.5em 0;
     line-height: 1.1em;
     width: 80%;
@@ -238,12 +243,12 @@ p {
     color: #223804;
 }
 
-.more-resource-info{
+.more-resource-info{ 
     display: inline-block;
     cursor: pointer;
 }
 
-.resource-location{
+.resource-location, .resource-edition, .extra-resource-details{
     font-size: 0.9em
 }
 

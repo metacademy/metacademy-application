@@ -81,7 +81,26 @@
             else{
                 return "";
             }
+        },
+
+        /**
+         *
+         */
+        getFromTitle: function(){
+            var fromTag = this.get("from_tag"),
+                fromNode = this.collection.parent.collection.get(fromTag);
+            return fromNode ? fromNode.get("title").toLowerCase() : AGFK.utils.getTitleGuessFromTag(fromTag);
+        },
+
+        /**
+         *
+         */
+        getToTitle: function(){
+            var toTag = this.get("to_tag"),
+                toNode = this.collection.parent.collection.get(toTag);
+            return toNode ? toNode.get("title").toLowerCase() : AGFK.utils.getTitleGuessFromTag(toTag);
         }
+
     });
 
 

@@ -1,3 +1,3 @@
 <script type="text/template" id="dependency-view-template">
-&uarr; <%= from_tag %> <%= reason ? '<span class="dependency-reason">(' + reason + ')</span>' : "" %>
+&uarr; <a class="dependency-link"><%- fromTitle? fromTitle : from_tag %></a> <%= reason ? '<span class="dependency-reason">(' + reason + ')</span>' : "" %>
 </script>

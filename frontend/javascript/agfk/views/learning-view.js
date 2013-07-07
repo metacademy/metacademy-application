@@ -202,7 +202,7 @@
              */
             render: function(){
                 var thisView = this;
-                thisView.$el.html(thisView.template(thisView.model.toJSON()));
+                thisView.$el.html(thisView.template(_.extend(thisView.model.toJSON(), {fromTitle: thisView.model.getFromTitle()})));
                 return thisView;
             }
 
@@ -234,6 +234,71 @@
                 thisView.$el.html("");
                 thisView.model.each(function(itm){
                     thisView.$el.append(new AGFK.DependencyView({model: itm}).render().el);
+                });
+                thisView.delegateEvents();
+                return thisView;
+            }
+
+        });
+    })();
+
+    /**
+     * View to display details of all provided resources (wrapper view)
+     */
+    AGFK.OutlinkView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            templateId: "outlink-view-template",
+            viewClass: "outlink-view",
+            viewIdPrefix: "outlink-details-"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the learning view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html(thisView.template(_.extend(thisView.model.toJSON(), {toTitle: thisView.model.getToTitle()})));
+                return thisView;
+            }
+
+        });
+   })();
+
+
+    /**
+     * Wrapper view to display all outlinks
+     */
+    AGFK.OutlinkSectionView = (function(){
+        // define private variables and methods
+        var pvt = {};
+
+        pvt.viewConsts = {
+            viewClass: "outlinks-wrapper",
+            viewIdPrefix: "outlinks-wrapper-"
+        };
+
+        // return public object
+        return Backbone.View.extend({
+            id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+            className: pvt.viewConsts.viewClass,
+            
+            /**
+             * Render the view given the supplied model
+             */
+            render: function(){
+                var thisView = this;
+                thisView.$el.html("");
+                thisView.model.each(function(itm){
+                    thisView.$el.append(new AGFK.OutlinkView({model: itm}).render().el);
                 });
                 thisView.delegateEvents();
                 return thisView;
@@ -288,10 +353,11 @@
             viewTag: "section",
             viewIdPrefix: "node-detail-view-",
             viewClass: "node-detail-view",
-            freeResourcesLocClass: 'free-resources-wrap',
+            freeResourcesLocClass: 'free-resources-wrap', // classes are specified in the node-detail template
             paidResourcesLocClass: 'paid-resources-wrap',
             depLocClass: 'dep-wrap',
-            ptrLocClass: 'pointers-wrap'
+            ptrLocClass: 'pointers-wrap',
+            outlinkLocClass: 'outlinks-wrap'
         };
 
         // return public object
@@ -312,6 +378,7 @@
                     freeResourcesLocClass = "." + viewConsts.freeResourcesLocClass,
                     paidResourcesLocClass = "." + viewConsts.paidResourcesLocClass,
                     depLocClass = "." + viewConsts.depLocClass,
+                    outlinkLocClass = "." + viewConsts.outlinkLocClass,
                     ptrLocClass = "." + viewConsts.ptrLocClass;
                 
                 thisView.$el.html(thisView.template(thisView.model.toJSON()));
@@ -319,12 +386,23 @@
                     thisView.fresource || new AGFK.ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
                 thisView.presources = thisView.presources || new AGFK.ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
                 thisView.dependencies = thisView.dependencies || new AGFK.DependencySectionView({model: thisView.model.get("dependencies")});
+                thisView.outlinks = thisView.outlinks || new AGFK.OutlinkSectionView({model: thisView.model.get("outlinks")});
                 thisView.pointers = thisView.pointers || new AGFK.PointersView({model: {text: thisView.model.get("pointers")}});
-                
-                assignObj[freeResourcesLocClass] = thisView.fresources;
-                assignObj[paidResourcesLocClass] = thisView.presources;
-                assignObj[depLocClass] = thisView.dependencies;
-                assignObj[ptrLocClass] = thisView.pointers;
+                if (thisView.fresources.model.length > 0){
+                    assignObj[freeResourcesLocClass] = thisView.fresources;
+                }
+                if (thisView.presources.model.length > 0){
+                    assignObj[paidResourcesLocClass] = thisView.presources;
+                }
+                if (thisView.dependencies.model.length > 0){
+                    assignObj[depLocClass] = thisView.dependencies;
+                }
+                if (thisView.outlinks.model.length > 0){
+                    assignObj[outlinkLocClass] = thisView.outlinks;
+                }
+                if (thisView.pointers.model.text.length > 1){
+                    assignObj[ptrLocClass] = thisView.pointers;
+                }
                 
                 thisView.assign(assignObj);
                 thisView.delegateEvents();
@@ -390,15 +468,6 @@
 
             events: {
                 "click .learn-title-display": "showNodeDetailsFromEvt"
-            },
-
-            /**
-             * Init the view and bind appropriate callbacks
-             */
-            initialize: function(){
-                // var thisView = this;
-                //_.bindAll(thisView);
-                   // thisView.model.bind("change:implicitLearnedNodes change:learnedNodes", thisView.render); // TODO delegate specific changes so we don't rerender the entire view each time
             },
 
             /**

@@ -5,6 +5,10 @@
 (function(AGFK, $, undefined){
 
     AGFK.utils = {};
+
+    AGFK.utils.getTitleGuessFromTag = function(tag){
+        return tag.replace(/_/g," "); // TODO make this better
+    };
     
     /**
      * Get spatial information about input dom element that contains an svg ellipse

@@ -50,6 +50,7 @@ p {
 }
 .external-link:hover{
     color:#14330E;
+    text-decoration: underline;
 };
 
 .internal-link{
@@ -184,7 +185,8 @@ p {
 }
 
 .node-detail-view{
-   /* background-color: rgb(255, 255, 249);*/
+   background-color: white;
+   color: #23240D;
     border-bottom:  0.3ex solid #CCCCCC;
     padding: 0.3em 1.5em 1em 1.5em;
 }
@@ -195,7 +197,7 @@ p {
     font-style: normal;
     font-weight: bold;
     padding: 1em 0 .7em 0;
-    margin: 0;
+    margin: 1em 0 0 0;
 }
 
 .learned-concept-title, .implicit-learned-concept-title{
@@ -220,11 +222,11 @@ p {
 }
 
 .node-detail-comp-wrap{
-    margin: 0 0 0.7em 0;
+    margin: 0 0 0.7em 1em;
 }
 .resource-view{
     color: #333333;
-    padding: 0.5em 1em;
+    padding: 0.5em 0;
     line-height: 1.1em;
     width: 80%;
     display: inline-block;
@@ -245,9 +247,16 @@ p {
     font-size: 0.9em
 }
 
-.dependency-view{
+.dependency-view, .outlink-view{
     line-height: 1.2em;
     margin: 0.5em 0;
+}
+
+.no-content-msg{
+    margin: 0.2em 0;
+    display: inline-block;
+    font-size: 0.8em;
+    font-style: italic;
 }
 /* --------------------------------------------------------*/
 /* ---------->>> Explore View non-SVG Style <<<-----------*/

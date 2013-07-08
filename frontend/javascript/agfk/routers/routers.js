@@ -72,11 +72,7 @@
              * initialize the custom backbone router 
              */
             initialize: function() {
-                var app_router = new Backbone.Router();
-                // Extend the View class to include a navigation method goTo TODO consider another method for doing this?
-                Backbone.View.goTo = function (loc) {
-                    app_router.navigate(loc, true);
-                };
+              
             },
 
             /**

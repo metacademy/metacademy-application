@@ -51,12 +51,12 @@ p {
 .external-link:hover{
     color:#14330E;
     text-decoration: underline;
-};
-
-.internal-link{
-    color: #712579;
 }
 
+.internal-link{
+    color: #5C1F63;
+    text-decoration: none;
+}
 .internal-link:hover{
     text-decoration: underline;
     color: #241494;
@@ -64,10 +64,10 @@ p {
 
 a.expand-collapse-link{
     font-size: 0.8em;
-    color: #712579;
+    color:#190797;
 }
 a.expand-collapse-link:hover{
-    color: #241494;
+    color: #190797;
 }
 /* ---------------------------------------------------*/
 /* ---------->>> Layout Styles <<<--------------------*/
@@ -257,12 +257,17 @@ a.expand-collapse-link:hover{
     margin: 0.5em 0;
 }
 
+.dependency-reason{
+    color: #333;
+}
+
 .no-content-msg{
     margin: 0.2em 0;
     display: inline-block;
     font-size: 0.8em;
     font-style: italic;
 }
+
 /* --------------------------------------------------------*/
 /* ---------->>> Explore View non-SVG Style <<<-----------*/
 /* ------------------------------------------------------*/

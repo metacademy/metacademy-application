@@ -69,13 +69,6 @@
             },
 
             /**
-             * initialize the custom backbone router 
-             */
-            initialize: function() {
-              
-            },
-
-            /**
              * Show the input view in the input selector and maintain a reference for correct clean up
              */
             showView: function (selector, view, doRender) {
@@ -106,8 +99,6 @@
                     this.nodeRoute(paramsObj[qnodeName], paramsObj);
                 }
                 else{
-                    // TODO redirect to error page
-                    //this.nodeRoute("",paramsObj);
                     throw new Error("Must supply 'node' key-value pair in URL, e.g: node=logistic_regression");
                 }
             },
@@ -139,7 +130,7 @@
             },
 
             /**
-             * Parse the entered text in the search box
+             * Parse the text in the search box after enter is pressed
              */
             parseSearchBox: function(event, box){
                 if (event.which === 13 || event.keyCode === 13){
@@ -165,7 +156,7 @@
                     doRender = true;
 
                 // need to load just the given node and deps...
-                console.log("nodeRoute for: " + nodeId); 
+                console.log("nodeRoute for: " + nodeId);
 
                 // check if/how we need to acquire more data from the server
                 // TODO make this more general/extendable
@@ -183,6 +174,9 @@
                 // helper function to route change parameters appropriately
                 // -- necessary because of possible AJAX calls to obtain new data
                 function postNodePop() {
+                    // set the document title to be the searched node
+                    document.title = thisRoute.cnodesContn.get("nodes").get(thisRoute.cnodesContn.get("keyNode")).get("title").toLowerCase() + " - Metacademy";
+                    
                     // set default to explore mode
                     paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;
                     pvt.viewMode = paramsObj[qviewMode];

@@ -268,6 +268,23 @@ a.expand-collapse-link:hover{
     font-style: italic;
 }
 
+.pointers-wrap ul ul{
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+.pointers-wrap li{
+    margin: 0.5em 0;
+}
+
+.pointers-wrap ul{
+    list-style-type: disc;
+}
+
+
+.pointers-wrap ul ul{
+    list-style-type: circle;
+}
 /* --------------------------------------------------------*/
 /* ---------->>> Explore View non-SVG Style <<<-----------*/
 /* ------------------------------------------------------*/

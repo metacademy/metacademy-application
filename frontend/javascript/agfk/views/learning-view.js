@@ -315,12 +315,23 @@
      */
     AGFK.PointersView = (function(){
         // define private variables and methods
-        var pvt = {};
+        var pvt = {
+        };
 
         pvt.viewConsts = {
             templateId: "pointers-view-template",
             viewClass: "pointers-view",
             viewIdPrefix: "pointers-view-"
+        };
+
+        /**
+         * Parse the tags in the pointer string
+         */
+        pvt.parsePtrStr = function(ptrStr){
+            return ptrStr.replace(new RegExp("\\[([^\\s]+)\\]", "g"),
+                                  function(all, text, ch){
+                                      return '[<a class="internal-link" href="#node=' + text.replace(/[-]/g,"_") + '">' + text.replace(/[-_]/g," ") + '</a>]'
+                                      ;});
         };
 
         // return public object
@@ -334,10 +345,53 @@
              */
             render: function(){
                 var thisView = this;
-                thisView.$el.html(thisView.template(thisView.model));
+                thisView.$el.html(thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
                 return thisView;
-            }
+            },
 
+            /**
+             * Parse the markup-style pointer text to html list
+             * TODO separate HTML generation better
+             */
+            parsePtrTextToHtml: function(ptrText){
+                var ptrArr = ptrText.split(/(?=\*)/),
+                    i,
+                    depth = 0,
+                    prevDepth = 0,
+                    tmpDepth,
+                    htmlStr = "<ul>",
+                    liStr;
+
+                // array depth corresponds to list depth
+                for (i = 0; i < ptrArr.length; i++){
+                    if (ptrArr[i] === "*"){
+                        depth++;
+                    }
+                    else{
+                        tmpDepth = depth;
+                        while (depth < prevDepth){
+                            htmlStr += '</ul>\n';
+                            depth++;
+                        }
+
+                        while (depth > prevDepth){
+                            htmlStr += '<ul>';
+                            depth--;
+                        }
+                        liStr = pvt.parsePtrStr(ptrArr[i].substring(1));
+                        htmlStr += "<li>" + liStr + "</li>\n";
+                        
+                        prevDepth = tmpDepth;
+                        depth = 0;
+                    }
+                }
+                while (prevDepth--){
+                    htmlStr += '</ul>\n';
+                }
+                htmlStr += "</ul>";
+                
+                return htmlStr;
+            }
         });
    })();
     

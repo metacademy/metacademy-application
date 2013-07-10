@@ -42,8 +42,6 @@
             summaryWrapClass: "summary-wrap",
             summaryLeftClass: "tleft",
             summaryRightClass: "tright",
-            waitSummaryClass: "waiting-for-summary",
-            justLeftClass: "just-left-node",
             locElemId: "invis-loc-elem", // invisible location element
             locElemClass: "invis-loc",
             // ----- rendering options ----- //
@@ -71,7 +69,8 @@
             defaultCheckDist: 90 // default px offset if exact position cannnot be computed
         };
         pvt.summaryDisplays = {};
-
+        pvt.summaryTOKillList = {};
+        pvt.summaryTOStartList = {};
         /**
          * Get summary box placement (top left) given node placement
          */
@@ -172,17 +171,23 @@
                 clickedClass = viewConsts.clickedClass,
                 d3node = d3.select(nodeEl);
 
-            d3node.classed(viewConsts.justLeftClass, false);
             if (d3node.classed(hoveredClass) || d3node.classed(clickedClass)){
                 d3node.classed(hoveredClass, true);
                 return false;
             }
+
+            var nodeId = nodeEl.id;
             
             // add the appropriate class
             d3node.classed(hoveredClass, true);
 
-            // add node summary
+            // add node summary if not already present
+            if (pvt.summaryTOKillList.hasOwnProperty(nodeId)){
+                window.clearInterval(pvt.summaryTOKillList[nodeId]);
+                delete pvt.summaryTOKillList[nodeId];
+            }
             pvt.attachNodeSummary.call(thisView, d3node);
+
 
             // add node-hoverables if not already present
             if (!d3node.attr(viewConsts.dataHoveredProp)) {
@@ -227,22 +232,22 @@
                 summId = pvt.getSummaryIdForDivWrap.call(thisView, d3node),
                 viewConsts = pvt.viewConsts,
                 hoveredClass = viewConsts.hoveredClass,
-                justLeftClass = viewConsts.justLeftClass;
+                nodeId = nodeEl.id;
 
-            if(d3node.classed(viewConsts.waitSummaryClass)){
-                 d3node.classed(hoveredClass, false);
+            if(pvt.summaryTOStartList.hasOwnProperty(nodeId)){
+                window.clearInterval(pvt.summaryTOStartList[nodeId]);
+                delete pvt.summaryTOStartList[nodeId];
+                d3node.classed(hoveredClass, false);
             }
             else{
-                //remove hovered class (we left the node)
-                d3node.classed(justLeftClass, true);
                 // wait a bit before removing the summary
-                window.setTimeout(function(){
-                    if (pvt.summaryDisplays[summId] && !pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass) && d3node.classed(justLeftClass)){
+                pvt.summaryTOKillList[nodeId] = window.setTimeout(function(){
+                    delete pvt.summaryTOKillList[nodeId];
+                    if (pvt.summaryDisplays[summId] && !pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass)){
                         if (!d3node.classed(viewConsts.clickedClass)){
                             d3.select("#" + summId).remove(); // use d3 remove for x-browser support
                             delete pvt.summaryDisplays[summId];
                         }
-                        d3node.classed(justLeftClass, false);
                         d3node.classed(hoveredClass, false);
                     }
                 }, viewConsts.summaryHideDelay);
@@ -802,8 +807,9 @@
                 var thisView = this,
                     viewConsts = pvt.viewConsts,
                     // add content div
-                    div = document.createElement("div");
-                div.textContent = this.model.get("nodes").get(node.attr("id")).get("summary");
+                    div = document.createElement("div"),
+                    nodeId = node.attr("id");
+                div.textContent = this.model.get("nodes").get(nodeId).get("summary");
                 div.id = pvt.getSummaryIdForDivTxt.call(thisView, node);
                 var d3div = d3.select(div);
                 d3div.classed(viewConsts.summaryTextClass, true);
@@ -828,14 +834,10 @@
                 wrapDiv.style.display = "none";
 
                 // add box to document with slight fade-in
-                var $wrapDiv = $(wrapDiv),
-                waitSummaryClass = viewConsts.waitSummaryClass;
-                node.classed(waitSummaryClass, true);
-                window.setTimeout(function(){
-                    node.classed(waitSummaryClass, false);
-                    if(node.classed(viewConsts.hoveredClass) || node.classed(viewConsts.clickedClass)){
-                        $wrapDiv.appendTo("#" + viewConsts.viewId).fadeIn(viewConsts.summaryFadeInTime);
-                    }
+                var $wrapDiv = $(wrapDiv);
+                pvt.summaryTOStartList[nodeId] = window.setTimeout(function(){
+                    delete pvt.summaryTOStartList[nodeId];
+                    $wrapDiv.appendTo("#" + viewConsts.viewId).fadeIn(viewConsts.summaryFadeInTime);
                 }, viewConsts.summaryAppearDelay);
 
                 // TODO listen for translated graphs and translate accordingly

@@ -29,7 +29,7 @@
          * Keep the resource sorted by mark !== 'star'
          */
         comparator: function(rsrc){
-            return ! "star" in rsrc.get("mark");
+            return rsrc.get("mark").indexOf("star") === -1;
         }
     });
 

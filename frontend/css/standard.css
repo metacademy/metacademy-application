@@ -281,9 +281,14 @@ a.expand-collapse-link:hover{
     list-style-type: disc;
 }
 
-
 .pointers-wrap ul ul{
     list-style-type: circle;
+}
+
+.key-resource-star{
+    font-size: 0.8em;
+    display: inline-block;
+    margin-right: 0.25em;
 }
 /* --------------------------------------------------------*/
 /* ---------->>> Explore View non-SVG Style <<<-----------*/

@@ -215,10 +215,11 @@ def read_node(content_path, tag):
     pointers = ""
     if os.path.exists(see_also_file(content_path, tag)):
         pointers = read_see_also(open(see_also_file(content_path, tag)))
-    
-    return graphs.Node(
-        {'tag': tag, 'resources': node_resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
-         'pointers': pointers, 'questions': questions})
+
+    return graphs.Node(tag, title, summary, dependencies, pointers, node_resources, questions)
+    #return graphs.Node(
+    #    {'tag': tag, 'resources': node_resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
+    #     'pointers': pointers, 'questions': questions})
 
 def check_required_files(content_path, node_tag):
     if not os.path.exists(title_file(content_path, node_tag)):

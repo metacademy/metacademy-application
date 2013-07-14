@@ -71,13 +71,18 @@ class Node:
     dependencies -- a list of Dependency objects giving the immediate dependencies
     pointers -- a list of Pointer objects representing the see-also links
     """
-    # TODO: perhaps we should be explicit about the attributes of the node? --CJR
-    def __init__(self, *init_data, **kwargs):
-            for dictionary in init_data:
-                for key in dictionary:
-                    setattr(self, key, dictionary[key])
-            for key in kwargs:
-                setattr(self, key, kwargs[key])
+    def __init__(self, tag, title, summary, dependencies, pointers, resources, questions):
+        self.tag = tag
+        self.title = title
+        self.summary = summary
+        self.dependencies = dependencies
+        self.pointers = pointers
+        self.resources = resources
+        self.questions = questions
+
+    def copy(self):
+        return Node(self.tag, self.title, self.summary, list(self.dependencies), self.pointers,
+                    list(self.resources), list(self.questions))
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
@@ -195,10 +200,9 @@ def remove_missing_links(nodes):
     dependencies or see-also links which aren't contained in the set of nodes."""
     new_nodes = {}
     for tag, node in nodes.items():
-        nprops = vars(node)
-        nprops['dependencies'] = [d for d in node.dependencies if d.from_tag in nodes]
-        # nprops['pointers'] = [p for p in node.pointers if p.to_tag in nodes]
-        new_nodes[tag] = Node(nprops)
+        new_node = node.copy()
+        new_node.dependencies = [d for d in node.dependencies if d.from_tag in nodes]
+        new_nodes[tag] = new_node
     return new_nodes
 
 
@@ -226,7 +230,7 @@ def topo_sort(graph):
     return sorted_deps
 
     
-def gather_dependencies(graph):
+def gather_dependencies(graph, ignore=None):
     """Construct a dict mapping a tag to the set of all tags which it depends on."""
     tags = topo_sort(graph)
 
@@ -235,14 +239,16 @@ def gather_dependencies(graph):
         curr_deps = set(graph.incoming[tag])
         for parent_tag in graph.incoming[tag]:
             curr_deps.update(dependencies[parent_tag])
+        if ignore is not None and ignore in curr_deps:
+            curr_deps.remove(ignore)
         dependencies[tag] = curr_deps
 
     return dependencies
 
     
-def count_dependencies(graph):
+def count_dependencies(graph, ignore=None):
     """Return a dict counting the total number of (long-range) dependencies for each node."""
-    return sum([len(deps) for tag, deps in gather_dependencies(graph).items()])
+    return sum([len(deps) for tag, deps in gather_dependencies(graph, ignore).items()])
 
 def bottleneck_score(nodes, tag):
     """Compute the bottleneck score for a tag, which is the total number of long-range dependencies which are
@@ -254,8 +260,12 @@ def bottleneck_score(nodes, tag):
     assert tag in nodes
     nodes_rem = dict(nodes)
     del nodes_rem[tag]
-    orig = count_dependencies(nodes) - len(nodes[tag].dependencies)
-    diff = orig - count_dependencies(nodes_rem)
+    nodes_rem = remove_missing_links(nodes_rem)
+    graph = Graph.from_node_dependencies(nodes)
+    graph_rem = Graph.from_node_dependencies(nodes_rem)
+    
+    orig = count_dependencies(graph, ignore=tag) - len(graph.incoming[tag])
+    diff = orig - count_dependencies(graph_rem)
     return diff / float(orig)
 
 def rank_bottleneck_scores(nodes):

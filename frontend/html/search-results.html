@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block main %}
+<ol>
+{% for sobj in search_data %}
+<li> {{sobj.title}} </li>
+{% endfor %}
+</ol>
+{% endblock %}

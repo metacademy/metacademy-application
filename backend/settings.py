@@ -117,7 +117,8 @@ ROOT_URLCONF = 'backend.urls'
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(AGFK_PATH,'frontend/html/')
+    os.path.join(AGFK_PATH,'frontend/html/'),
+    os.path.join(AGFK_PATH,'frontend/html/underscore-templates/')
 )
 
 INSTALLED_APPS = (

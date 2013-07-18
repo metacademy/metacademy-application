@@ -1,385 +1,16 @@
-/* header */
-#header {
-    height: 1.5em;
-    width: 100%;
-    background: #333;
-    overflow: hidden;
-    border-bottom: 0.1em #333 solid;
-    font-size: 1.1em;
-}
+/* -----------------------------------*/
+/* ---------->>> GLOBAL <<<-----------*/
+/* -----------------------------------*/
 
-/* body elements */
 body {
     margin: 0;
     padding: 0;
     border: 0; /* removes the border around the viewport in old versions of IE */
     width: 100%;
     height: 100%;
-    overflow: hidden;
     font-family: Arial, sans-serif;
     font-size: 1.0em;
-}
-
-#main {
-    clear: both;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
-    position: absolute; 
-    background: rgb(255, 238, 238);
-}
-
-.colcontainer {
-    float: left;
-    width: 100%;
-    position: relative;
-    right: 20%; /* right column width */
-    background: #fff; /* left column background colour */
-}
-
-.column {
-    float: left;
-    overflow: auto;
-}
-
-#leftpanel {
-    position: relative;
-    width: 80%; /* left column content width (left column width minus left and right padding) */
-    left: 20%; /* (right column width) plus (left column left padding) */
-    border-right: 0.2ex #333 solid;
-    overflow: hidden;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-
-}
-
-#rightpanel {
-    position: relative;
-    width: 20%; /* right column content width (right column width minus left and right padding) */
-    left: 20%; /* (right column width) plus (left column left and right padding) plus (right column left padding) */
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100%;
-}
-
-/* special styles */
-
-#explore-learn-div{
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: inline-block;
-    z-index: 1;
-    margin-top: 0.5em;
-    margin-right: 0.8em;
-}
-
-#explore-view{
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.el-nav-button{
-    display: inline;
-    float: left;
-    border: solid;
-    border-color: transparent;
-    background-color: #333;
-    color: white;
-    padding: 2px;
-    margin: 0;
-    font-size: 0.8em;
-    cursor: default;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
-.el-nav-button.active{
-    background-color: #416685;
-}
-
-.el-nav-button:hover{
-    background-color: steelblue;
-}
-.el-nav-button.button-left{
-    border-width: 3px 1px 3px 3px;
-    border-radius: 0.3em 0 0 0.3em;
-    padding-right: 3px;
-    margin-right: 0;
-}
-
-.el-nav-button.button-right{
-    border-width: 3px 3px 3px 1px;
-    border-radius: 0 0.3em 0.3em 0;
-    padding-left: 3px;
-    margin-left: 0;
-}
-
-div.edit-node {
-    margin: 0.2em;
-    margin-bottom: 0.1em;
-}
-
-section.cnode-dep{
-    margin-top: 0.15em 0;
-}
-.cnode-data-input {
-    font-size: 1.0em;
-    margin: 0.8ex 3% 1.8ex 3%;
-}
-
-.cnode-data-input label,header {
-    display: block;
-    color: rgb(151, 57, 57);
-    font-weight: bold;
-}
-.cnode-box {
-    display: inline-block;
-    width:17em;
-    margin: 0.75%;
-    padding: 1% 1.5%;
-    border: 0.15em solid;
-    border-radius: 1.2em;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-.cnode-box label{
-    display: inline;
-    color: #333;
-    font-weight: bold;
-    font-size: 1.0em
-}
-
-.cnode-data-input input, textarea {
-    border: 0.1em solid rgba(0, 0, 0, 0.34);
-    border-radius: 0.5ex;
-    width: 100%;
-    line-height: 1.2em;
-    margin-bottom: 1ex;
-    font-family: Arial, sans-serif;
-    font-size: 1.0em;
-    color: #333333;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
-
-section.dependencies{
-    background-color: #eeffee;
-    border-color: rgb(43, 83, 43)
-}
-
-section.related-concepts{
-    background-color: #eeffee;
-    border-color: rgb(43, 83, 43)
-}
-
-section.resources{
-    background-color: #ddeeff;
-    border-color: rgb(60, 108, 134);
-}
-
-/*hack to match style with cnode-box*/
-.lone-section{
-    margin: 0.75%;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
-textarea.cnode-reason-input{
-    height: 5.5em;
-}
-ul.nodelist {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-ul.nodelist li a {
-    display: block;
-    text-decoration: none;
-    color: #000000;
-    padding: 1em 0;
-    padding-left: 1ex;
-    border-bottom: 0.2ex solid #CCCCCC;
-    cursor: pointer;
-}
-
-ul.nodelist li a:hover {
-    color: rgb(190, 49, 49);
-    background-color: rgba(247, 214, 214, 0.42);
-}
-
-ul.nodelist li a strong {
-    margin-right: 1ex;
-}
-
-.gold-text {
-    color: rgb(182, 149, 20);
-}
-
-.cost-dollar {
-    color: #008000;
-    font-family: Times, "Gill Sans", Helvetica, sans-serif;
-}
-
-.center {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.left {
-    float: left;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-.info-loc {
-    font-family: Helvetica;
-    font-size: small;
-}
-
-span.morecontent {
-    display: none;
-}
-
-.dtable {
-    display: table;
-    width: 100%;
-    text-align: right
-}
-
-.dvcenter {
-    display: table-cell;
-    vertical-align: middle;
-    height: 100%;
-}
-
-button.topic-focus {
-    margin-top: 1.5ex;
-    line-height: 1.3em;
-    font-weight: bold;
-}
-
-div.topic-focus {
-    text-align: center;
-    margin-bottom: 3em;
-}
-
-div.resource-entry {
-    margin-bottom: 1ex;
-}
-
-div.res-extras {
-    display: none;
-    margin-top: 0.1em;
-}
-
-div.res-extra-ent {
-    font-family: Helvetica;
-    font-size: small;
-    font-style: italic;
-    margin-bottom: 0.1em;
-}
-
-div.list-entry {
-    overflow: hidden;
-    width: 100%;
-}
-
-div.list-text {
-    margin-bottom: 0.25em;
-    float: right;
-    width: 90%;
-    height: 100%;
-    right: 0;
-}
-
-div.bullet-ptr {
-    float: left;
-    height: 100%;
-    width: 10%;
-    min-width: 0.9em;
-    text-align: center;
-}
-
-img.list-img {
-    vertical-align: middle;
-}
-
-.wiki-img {
-    margin-right: 0.15em;
-}
-
-.data-title {
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
-    padding: 0.5em 0;
-    color: rgb(8, 36, 9);
-}
-
-.data-subtitle {
-    text-align: left;
-    margin-top: 1ex;
-    margin-bottom: 0.1em;
-    font-weight: bold;
-    font-size: large;
-    color: rgb(8, 36, 9);
-}
-
-/* general styles */
-
-
-p {
-    margin: 0.1em 0;
-}
-
-a {
-    color: #000;
-    text-decoration: none;
-}
-
-a:active {
-    color: #0050FF;
-}
-
-a.morelink {
-    font-family: Helvetica;
-    font-size: small;
-    text-decoration: none;
-    color: rgb(0, 0, 122);
-}
-
-.list-text a {
-    color: rgb(90, 0, 0);
-    text-decoration: underline;
-}
-
-a.moreres {
-    font-size: small;
-    font-family: Helvetica;
-    text-decoration: none;
-    color: rgb(0, 0, 122);
-}
-
-a.direct-link {
-    color: #333;
 }
 
 h1 {
@@ -390,10 +21,292 @@ h2 {
     line-height: 0;
     font-size: 1.3em;
     font-style: italic;
-    margin-bottom: 2ex;
+    margin-bottom: 1em;
 }
 
-/* Explore-view interactive properties **************************************************/
+p {
+    margin: 0.1em 0;
+}
+
+/* ---------------------------------------------------*/
+/* ---------->>> General Functional Styles<<<---------*/
+/* ---------------------------------------------------*/
+#searchbox{
+    width: 12em;
+    margin-left: 1em;
+    border-radius: 5px;
+    position: absolute; /* parent must be relative ? */
+    bottom: 0.2em;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+
+.external-link{
+    font-size: 1em;
+    color:#2B7536;
+    text-decoration: none;
+}
+.external-link:hover{
+    color:#14330E;
+    text-decoration: underline;
+}
+
+.internal-link{
+    color: #5C1F63;
+    text-decoration: none;
+}
+.internal-link:hover{
+    text-decoration: underline;
+    color: #241494;
+}
+
+a.expand-collapse-link{
+    font-size: 0.8em;
+    color:#190797;
+}
+a.expand-collapse-link:hover{
+    color: #190797;
+}
+/* ---------------------------------------------------*/
+/* ---------->>> Layout Styles <<<--------------------*/
+/* ---------------------------------------------------*/
+#header {
+    height: 1.5em;
+    width: 100%;
+    background: #333;
+    overflow: hidden;
+    border-bottom: 0.1em #333 solid;
+    font-size: 1.1em;
+    position: relative;
+    z-index: 1000;
+}
+
+#main {
+    clear: both;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: rgb(255, 238, 238);
+}
+
+#explore-learn-button-wrapper{
+    position: absolute;
+    top: 2em;
+    right: 0;
+    display: inline-block;
+    z-index: 1;
+    margin-top: 0.2em;
+    margin-right: 1em;
+}
+
+
+/* --------------------------------------------------------*/
+/* ---------->>> Specific HTML Element Styles<<<-----------*/
+/* --------------------------------------------------------*/
+/* Explore-Learn Navigation Button */
+.el-nav-button{
+    display: inline;
+    float: left;
+    border: solid;
+    border-color: transparent;
+    background-color: #333333;
+    color: white;
+    padding: 2px;
+    margin: 0;
+    font-size: 0.8em;
+    cursor: default;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+.el-nav-button.active{
+    background-color: #416685;
+}
+.el-nav-button:hover{
+    background-color: steelblue;
+}
+.el-nav-button.button-left{
+    border-width: 3px 1px 3px 3px;
+    border-radius: 0.3em 0 0 0.3em;
+    padding-right: 3px;
+    margin-right: 0;
+}
+.el-nav-button.button-right{
+    border-width: 3px 3px 3px 1px;
+    border-radius: 0 0.3em 0.3em 0;
+    padding-left: 3px;
+    margin-left: 0;
+}
+
+/* ---------------------------------------------------*/
+/* ---------->>> Learn Mode Styles <<<----------------*/
+/* ---------------------------------------------------*/
+
+#learn-view-wrapper{
+    display: none;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    background: white;
+}
+
+.learn-title-display{
+    text-align: center;
+}
+.learn-title-display{
+    display: block;
+    cursor: pointer;
+    text-decoration: none;
+    color: #3E4018;
+    padding: 1em 0;
+    padding-left: 1ex;
+    line-height: 1.5em;
+    font-size: 1.1em;
+    border-bottom: 0.3ex solid #CCCCCC;
+}
+.learn-title-display:hover, .learn-title-display.clicked-title:hover {
+    background-color: #f8f5f0;
+    font-weight: bold;
+}
+.learn-title-display.clicked-title{
+    /*background-color: rgb(255, 255, 249);*/
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 1px dotted #CCCCCC;
+}
+.learn-title-display.clicked-title a:after{
+    content: "";
+    border: solid;
+    border-color: #333333 transparent;
+    border-width: 10px 5px 0 5px;
+    position: relative;
+    top: 0.1ex;
+    left: 0.5ex;
+    display: inline-block;
+    -moz-transform: scale(.9999);
+}
+
+.node-detail-view{
+   background-color: white;
+   color: #23240D;
+    border-bottom:  0.3ex solid #CCCCCC;
+    padding: 0.3em 1.5em 1em 1.5em;
+}
+
+.node-detail-title{
+    color: #333333;
+    font-size: 1em;
+    font-style: normal;
+    font-weight: bold;
+    padding: 1em 0 .7em 0;
+    margin: 1em 0 0 0;
+}
+
+.learned-concept-title, .implicit-learned-concept-title{
+    opacity: 0.5;
+}
+
+.learn-view-check{
+    visibility: hidden;
+    display: inline-block;
+    margin-right: 0.5ex;
+    color: #8e8888;
+    font-size: 1.3em;
+}
+
+.learned-concept-title > .learn-view-check, .learn-view-check:hover{
+   visibility: visible;
+    color: green;
+}
+
+.learn-title-display:hover > .learn-view-check{
+    visibility: visible;
+}
+
+.node-detail-comp-wrap{
+    margin: 0 0 0.7em 1em;
+}
+.resource-view{
+    color: #252313;
+    padding: 0.5em 0;
+    line-height: 1.1em;
+    width: 80%;
+    display: inline-block;
+    overflow: auto;
+    max-height: 10em;
+}
+
+.resource-title a{
+    color: #223804;
+}
+
+.more-resource-info{ 
+    display: inline-block;
+    cursor: pointer;
+}
+
+.resource-location, .resource-edition, .extra-resource-details{
+    font-size: 0.9em
+}
+
+.dependency-view, .outlink-view{
+    line-height: 1.2em;
+    margin: 0.5em 0;
+}
+
+.dependency-reason{
+    color: #333;
+}
+
+.no-content-msg{
+    margin: 0.2em 0;
+    display: inline-block;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+.pointers-wrap ul ul{
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+.pointers-wrap li{
+    margin: 0.5em 0;
+}
+
+.pointers-wrap ul{
+    list-style-type: disc;
+}
+
+.pointers-wrap ul ul{
+    list-style-type: circle;
+}
+
+.key-resource-star{
+    font-size: 0.8em;
+    display: inline-block;
+    margin-right: 0.25em;
+}
+/* --------------------------------------------------------*/
+/* ---------->>> Explore View non-SVG Style <<<-----------*/
+/* ------------------------------------------------------*/
+
+#explore-view-wrapper{
+    display: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: white;
+}
+
+#explore-view{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
 .summary-text {
     padding: 0.4em 0.7em;
     color: #3E4018;
@@ -422,13 +335,12 @@ h2 {
     border-width: 16px 0 16px 32px;
     border-color: transparent #493A5C; /*#493A5C;*/
     position: absolute;
-    top: 24px;
+    top: 20px;
     right: -28px ; /* value = - triangle width + border-right-width */
     display: block;
     width:0;
     -moz-transform: scale(.9999);
 }
-
 /* creates the smaller  triangle that points to the right > */
 .summary-wrap.tright:after {
     content: "";
@@ -436,13 +348,12 @@ h2 {
     border-width: 12px 0 12px 24px; /* larger triangle - border width */
     border-color: transparent white;
     position: absolute;
-    top: 28px; /* position of larger triangle + border width */
+    top: 24px; /* position of larger triangle + border width */
     right: -20px; /* value = - small triangle width + border-right-width */
     display: block;
     width: 0;
     -moz-transform: scale(.9999);
 }
-
 /* creates the larger triangle that points to the left < */
 .summary-wrap.tleft:before {
     content: "";
@@ -450,13 +361,12 @@ h2 {
     border-width: 16px 32px 16px 0;
     border-color: transparent #493A5C; /*#493A5C;*/
     position: absolute;
-    top: 24px;
+    top: 20px;
     left: -28px ; /* value = - triangle width + border-left-width */
     display: block;
     width: 0;
     -moz-transform: scale(.9999);
 }
-
 /* creates the smaller  triangle that points to the left <*/
 .summary-wrap.tleft:after {
     content: "";
@@ -464,7 +374,7 @@ h2 {
     border-width: 12px 24px 12px 0; /* larger triangle - border width */
     border-color: transparent white;
     position: absolute;
-    top: 28px; /* position of larger triangle + border width */
+    top: 24px; /* position of larger triangle + border width */
     left: -20px; /* value = - small triangle width + border-left-width */
     display: block;
     width: 0;
@@ -472,73 +382,86 @@ h2 {
 }
 
 
+/* ---------------------------------------------------*/
+/* ---------->>> Explore Graph Svg Style<<<-----------*/
+/* ---------------------------------------------------*/
 
-/* Graph properties **************************************************/
-path {
-    stroke-width: 4;
-    stroke: #333;
-    fill: none;
+/* set default properties for common svg elements */
+line, polygon, path {
+    stroke: #333333;
+    fill: #333333;
 }
 
+/* edge path in digraph */
+path {
+    stroke-width: 4;
+    fill: transparent;
+}
+
+/* node ellipse */
 ellipse{
-    stroke: #333;
+    stroke: #333333;
     stroke-width: 3;
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
 }
-
 .hovered ellipse{
     fill: #f1f3f9;
 }
-
 .clicked ellipse{
     fill: #f1f3f9;
 }
 
-line {
-    stroke: #333;
-}
 
 .node {
     cursor: default;
 }
-
 .node text{
     font-family: Arial, sans-serif;
     font-weight: bold;
-    font-size: 1.1em;
-    color: #333;
+    font-size: 1.2em;
+    stroke-width: 0;
+    fill: #333
 }
 
+/* expand node cross */
 .expand-node{
     fill: #eaf3ec;
-    stroke: #333;
+    stroke: #333333;
     stroke-width: 3;
-    /*pointer-events: none;  TODO does this cause IE problems since it's define on SVG elements? */
-    
 }
 
-.checkmark{
+/* completed checkmark for learned nodes */
+.checkmark path{
     fill: transparent;
     stroke: #868686;
     stroke-width: 4;
+    visibility: hidden;
 }
-
-.checkmark-circle{
+.checkmark circle{
     fill: transparent;
     stroke: #868686;
     stroke-width: 3;
+    visibility: hidden;
 }
-.checkmark-hovered .checkmark-circle, .checkmark-clicked .checkmark-circle, .node-learned .checkmark-circle{
+.checkmark-hovered circle, .node-learned .checkmark circle{
     fill: transparent;
     stroke: #759466;
     stroke-width: 4;
+    visibility: visible;
 }
-
-.checkmark-hovered .checkmark, .checkmark-clicked .checkmark, .node-learned .checkmark{
+.checkmark-hovered path, .node-learned .checkmark path{
     stroke-width: 5;
     stroke: #759466;
+    visibility: visible;
 }
-
+.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle{
+    visibility: visible;
+}
+/* properties for learned nodes */
 .node-learned{
     opacity: 0.5;
+}
+
+.implicit-learned{
+    opacity: 0.6;
 }

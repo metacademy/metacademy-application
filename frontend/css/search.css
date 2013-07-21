@@ -1,0 +1,34 @@
+/* CSS for search results */
+
+.search-res-wrapper{
+    overflow: scroll;
+    height: 100%;
+    width: 100%;
+    background: white;
+    position: absolute;
+}    
+
+.search-res{
+    margin-left: 15%;
+    margin-right: 15%;
+}
+.search-res-list{
+    margin-top: 1em;
+    line-height: 1.1em;
+}
+
+.search-res-li{
+    padding-bottom: 0.8em;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #eaeaea
+}
+
+.search-res-title{
+    font-size: 1.3em;
+}
+
+.search-res-description{
+    line-height: 1.1em;
+    margin-top: 0.4em;
+    font-size: 0.9em;
+}

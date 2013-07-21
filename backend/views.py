@@ -40,5 +40,5 @@ def get_search_view(request):
     else:
         search_data = cserver_comm.get_search_json(qstring)
     
-    return render_to_response('search-results.html', {'content_server':CONTENT_SERVER, 'search_data': search_data}, context_instance=RequestContext(request))
+    return render_to_response('search-results.html', {'content_server': CONTENT_SERVER, 'search_data': search_data, 'search_query': qstring}, context_instance=RequestContext(request))
 

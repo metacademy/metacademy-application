@@ -3,14 +3,11 @@
     {% block css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/reset.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/explore-learn.css"/>
     {% endblock %}
 
   </head>
 
-      {% block header %}
-      <input type="text" id="searchbox" onkeyup="AGFK.appRouter.parseSearchBox(event, this)"> </input>
-      {% endblock %}
-      
       {% block main %}
       
       <div id="explore-learn-button-wrapper">
@@ -48,6 +45,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/learning-view.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/routers/routers.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/main.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}javascript/header-utils.js"></script>
     {% endblock %}
 
 

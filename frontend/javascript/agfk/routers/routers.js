@@ -130,19 +130,6 @@
             },
 
             /**
-             * Parse the text in the search box after enter is pressed
-             */
-            parseSearchBox: function(event, box){
-                if (event.which === 13 || event.keyCode === 13){
-                    var prm = {},
-                    nodeName;
-                    nodeName = box.value.toLowerCase().replace(/ /g, "_");
-                    prm[pvt.routeConsts.qnodeName] = nodeName;
-                    this.changeUrlParams(prm);
-                }
-            },
-
-            /**
              * Main router for a given node
              */
             nodeRoute: function(nodeId, paramsObj) {

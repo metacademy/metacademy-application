@@ -33,11 +33,10 @@ p {
 /* ---------------------------------------------------*/
 #searchbox{
     width: 15em;
-    margin-left: 1em;
-    border-radius: 5px;
+    border-radius: 2px;
     position: absolute; /* parent must be relative ? */
-    left: 0.5em;
-    bottom: 0.16em;
+    right: 0.5em;
+    line-height: 1.5em;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
@@ -70,6 +69,12 @@ a.expand-collapse-link{
 a.expand-collapse-link:hover{
     color: #190797;
 }
+
+.placeholder
+{
+  color: #aaa;
+}
+
 /* ---------------------------------------------------*/
 /* ---------->>> Layout Styles <<<--------------------*/
 /* ---------------------------------------------------*/
@@ -90,4 +95,5 @@ a.expand-collapse-link:hover{
     height: 100%;
     overflow: hidden;
     background: white;
+    color: #333;
 }

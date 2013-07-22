@@ -29,7 +29,7 @@
     {% block body %}
     <div id="header">
       {% block header %}
-      <input type="text" id="searchbox" value="{% block search-text %}search{% endblock %}">
+      <input type="text" id="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
       </input>
       {% endblock %}
     </div>

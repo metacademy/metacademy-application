@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block title %}
- {{search_query}} - Meta Search
+{{search_query}} - Meta Search
 {% endblock %}
 
 {% block extra-css %}
@@ -12,29 +12,34 @@
 {% endblock %}
 
 {% block jscript %}
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jquery-latest.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/header-utils.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jquery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/header-utils.js"></script>
 {% endblock %}
 
 {% block search-text %}
 {{search_query}}
 {% endblock %}
-    
-    {% block main %}
-    <div class="search-res-wrapper">
-      <div class="search-res">
-        <ol class="search-res-list">
-          {% for sobj in search_data %}
-          <li class="search-res-li">
-            <h3 class="search-res-title">
-              <a class="search-res-link internal-link" href="/kmap#node={{sobj.tag}}"> {{sobj.title}} </a>
-            </h3>
-            <div class="search-res-description">
-              {{sobj.summary}}
-            </div>
-          </li>
-          {% endfor %}
-        </ol>
-      </div>
-    </div>
-    {% endblock %}
+
+{% block main %}
+
+
+<div class="search-res-wrapper">
+  <div class="search-info">
+    We found {{ search_data|length }} matching concepts
+  </div>
+  <div class="search-res">
+    <ol class="search-res-list">
+      {% for sobj in search_data %}
+      <li class="search-res-li">
+        <h3 class="search-res-title">
+          <a class="search-res-link internal-link" href="/kmap#node={{sobj.tag}}"> {{sobj.title}} </a>
+        </h3>
+        <div class="search-res-description">
+          {{sobj.summary}}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</div>
+{% endblock %}

@@ -50,7 +50,7 @@
             defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
             defaultNodeSepDist: 1.5, // separation of graph nodes
             defaultNodeWidth: 2.5, // diameter of graph nodes
-            numCharLineDisplayNode: 9, // max number of characters to display per title line of graph nodes
+            numCharLineDisplayNode: 11, // max number of characters to display per title line of graph nodes
             summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
             summaryArrowWidth: 32, // summary triangle width
             summaryArrowTop: 28, // top distance to triangle apex 

@@ -1,5 +1,15 @@
 /* CSS for search results */
 
+.search-info{
+    line-height: 1.1em;
+    font-size: 1.1em;
+    padding-bottom: 1.2em;
+    margin-bottom: 1em;
+    margin-top: 1.8em;
+    margin-left: 10%;
+    margin-right: 10%;
+    border-bottom: 1px solid #eaeaea
+}
 .search-res-wrapper{
     overflow: scroll;
     height: 100%;
@@ -9,11 +19,10 @@
 }    
 
 .search-res{
-    margin-left: 15%;
-    margin-right: 15%;
+    margin-left: 10%;
+    margin-right: 10%;
 }
 .search-res-list{
-    margin-top: 1em;
     line-height: 1.1em;
 }
 
@@ -24,7 +33,8 @@
 }
 
 .search-res-title{
-    font-size: 1.3em;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .search-res-description{

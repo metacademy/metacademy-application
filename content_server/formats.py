@@ -5,6 +5,7 @@ import re
 import sys
 import pdb
 
+import concepts
 import graphs
 import resources
 
@@ -165,7 +166,7 @@ def mark_wiki(summary):
     return '%s%s' % ('*Wiki*', summary)
 
 def read_node(content_path, tag):
-    """Read a Node object from a directory which optionally contains title.txt,
+    """Read a Concept object from a directory which optionally contains title.txt,
     dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
     # TODO: normalize string cleaning (get rid of double quotes that mess up json)
     
@@ -216,10 +217,7 @@ def read_node(content_path, tag):
     if os.path.exists(see_also_file(content_path, tag)):
         pointers = read_see_also(open(see_also_file(content_path, tag)))
 
-    return graphs.Node(tag, title, summary, dependencies, pointers, node_resources, questions)
-    #return graphs.Node(
-    #    {'tag': tag, 'resources': node_resources, 'title': title, 'summary': summary, 'dependencies': dependencies,
-    #     'pointers': pointers, 'questions': questions})
+    return concepts.Concept(tag, title, summary, dependencies, pointers, node_resources, questions)
 
 def check_required_files(content_path, node_tag):
     if not os.path.exists(title_file(content_path, node_tag)):
@@ -231,7 +229,7 @@ def check_required_files(content_path, node_tag):
 
 
 def read_nodes(content_path, onlytitle=False):
-    """Read all the nodes in a directory and return a dict mapping tags to Node objects."""
+    """Read all the nodes in a directory and return a dict mapping tags to Concept objects."""
     nodes_path = os.path.join(content_path, 'nodes')
     tags = map(normalize_input_tag,_filter_non_nodes(os.listdir(nodes_path)))
     if onlytitle:
@@ -259,13 +257,13 @@ def check_format(content_path):
     # make sure tags do not have spaces
     for node in nodes:
         if re.search(r'\s', node.tag):
-            print 'Node tag "%s" contains whitespace' % node.tag
+            print 'Concept tag "%s" contains whitespace' % node.tag
         for d in node.dependencies:
             if re.search(r'\s', d.from_tag):
-                print 'Node "%s" has dependency "%s" which contains whitespace' % (node.tag, d.from_tag)
+                print 'Concept "%s" has dependency "%s" which contains whitespace' % (node.tag, d.from_tag)
         for p in node.pointers:
             if re.search(r'\s', p.to_tag):
-                print 'Node "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
+                print 'Concept "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
 
 
 ################################# write .dot files #############################

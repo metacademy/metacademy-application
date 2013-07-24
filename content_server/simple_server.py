@@ -10,7 +10,6 @@ import os
 import config
 import formats
 import graphs
-from graphs import Node
 import resources
 import search
 

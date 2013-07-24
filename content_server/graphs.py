@@ -4,64 +4,6 @@ import numpy as np
 import scipy.linalg
 import config
 
-class DirectedEdge:
-    """A struct representing an abstract directed edge in the graph.
-
-    from_tag -- the tag of the node which is a prereqisite
-    to_tag -- the tag of the node which depends on from_tag
-    reason -- a verbal description of the reason for the diedge
-    """
-    def __init__(self, from_tag=None, to_tag=None, reason=None):
-        self.from_tag = from_tag
-        self.to_tag = to_tag
-        self.reason = reason
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
-
-    def __getitem__(self, key):
-        return  self.__dict__[key]
-
-    def __iter__(self):
-        for key in self.__dict__:
-            yield(key)
-
-    def __repr__(self):
-        return 'DirectedEdge(from_tag=%r, to_tag=%r, reason=%r)' % (self.from_tag, self.to_tag, self.reason)
-
-    def as_dict(self):
-        return {'from_tag': self.from_tag,
-                'to_tag': self.to_tag,
-                'reason': self.reason,
-                }
-    def add_json_content(self,jsonc):
-        for attr in jsonc:
-            self[attr] = jsonc[attr]
-
-
-class Dependency(DirectedEdge):
-    """A struct representing a dependency link in the graph.
-
-    from_tag -- the tag of the node which is a prerequisite
-    to_tag -- the tag of the node which depends on from_tag
-    reason -- a verbal description of the reason for the dependency
-    """
-    def __repr__(self):
-        return 'Dependency(from_tag=%r, to_tag=%r, reason=%r)' % (self.from_tag, self.to_tag, self.reason)
-
-class Outlink(DirectedEdge):
-    """A struct representing a outlink link in the graph.
-
-    from_tag -- the tag of the node which is a prerequisite
-    to_tag -- the tag of the node which depends on from_tag
-    """
-    def __repr__(self):
-        return 'Outlink(from_tag=%r, to_tag=%r)' % (self.from_tag, self.to_tag)
-
-    def as_dict(self):
-        return {'from_tag': self.from_tag, 'to_tag': self.to_tag}
-
-
 
 
 class Graph:
@@ -106,9 +48,9 @@ class Graph:
         edges = set()
         for tag, node in nodes.items():
             for dep in node.dependencies:
-                outgoing[dep.from_tag].append(dep.to_tag)
-                incoming[dep.to_tag].append(dep.from_tag)
-                edges.add((dep.from_tag, dep.to_tag))
+                outgoing[dep.tag].append(tag)
+                incoming[tag].append(dep.tag)
+                edges.add((dep.tag, tag))
 
         return Graph(incoming, outgoing, edges)
 
@@ -139,7 +81,7 @@ def remove_missing_links(nodes):
     new_nodes = {}
     for tag, node in nodes.items():
         new_node = node.copy()
-        new_node.dependencies = [d for d in node.dependencies if d.from_tag in nodes]
+        new_node.dependencies = [d for d in node.dependencies if d.tag in nodes]
         new_nodes[tag] = new_node
     return new_nodes
 
@@ -300,7 +242,7 @@ def missing_dependencies(nodes):
     dependencies = set()
     for node in nodes.values():
         for d in node.dependencies:
-            dependencies.add(d.from_tag)
+            dependencies.add(d.tag)
 
     return dependencies.difference(set(nodes.keys()))
 

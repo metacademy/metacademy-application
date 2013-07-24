@@ -55,9 +55,6 @@ def load_graph():
         nodes = graphs.remove_missing_links(nodes)
         graph = graphs.Graph.from_node_dependencies(nodes)
         # add outlinks to nodes
-        for ol_node in filter(lambda x: graph.outgoing[x], graph.outgoing):
-            nodes[ol_node].add_outlinks(graph.outgoing[ol_node])
-        # graph_minus_redundant = graphs.redundant_edges(graph) 
         resource_dict = resources.read_resources_file(resources.resource_db_path())
 
         # load search index
@@ -199,7 +196,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_node_json(self, tag):
         load_graph()
-        return formats.node_to_json(nodes, tag, resource_dict=resource_dict)
+        return formats.node_to_json(nodes, tag, resource_dict)
 
     def get_map(self, tag, fmt):
         load_graph()

@@ -1,4 +1,11 @@
-import graphs
+import resources
+
+class Dependency:
+    """A struct representing a dependency on another concept."""
+    def __init__(self, tag, reason):
+        self.tag = tag
+        self.reason = reason
+
 
 class Concept:
     """A struct containing the information relevant to a single concept node.
@@ -22,23 +29,26 @@ class Concept:
         return Concept(self.tag, self.title, self.summary, list(self.dependencies), self.pointers,
                        list(self.resources), list(self.questions))
 
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
+    def json_repr(self, resource_dict, graph=None):
+        res = [resources.add_defaults(r, resource_dict) for r in self.resources]
+        
+        if graph is not None and self.tag in graph.outgoing:
+            outlinks = [{'from_tag': self.tag, 'to_tag': t}
+                        for t in graph.outgoing[self.tag]]
+        else:
+            outlinks = []
 
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def as_dict(self):
+        dependencies = [{'from_tag': dep.tag, 'to_tag': self.tag, 'reason': dep.reason}
+                        for dep in self.dependencies]
+        
         d = {'title': self.title,
              'summary': self.summary,
              'pointers': self.pointers,
-             'dependencies': [dep.as_dict() for dep in self.dependencies],
-             'resources': self.resources,
+             'dependencies': dependencies,
+             'resources': res,
              'questions': self.questions,
+             'outlinks': outlinks,
              }
-
-        if hasattr(self, 'outlinks'):
-            d['outlinks'] = [ol.as_dict() for ol in self.outlinks]
 
         return d
              
@@ -48,10 +58,4 @@ class Concept:
         if self.resources:
             keys = [rdic['source'] for rdic in self.resources]
         return keys
-
-    def add_outlinks(self, outlink_list):
-        self.outlinks = []
-        for ol in outlink_list:
-            self.outlinks.append(graphs.Outlink(self.tag, ol))
-
 

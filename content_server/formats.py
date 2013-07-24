@@ -156,7 +156,7 @@ def read_dependencies(f, tag):
               'reason': (str, None),
               }
     dependencies_dicts = read_text_db(f, fields)
-    return [graphs.Dependency(d['tag'], tag, d['reason'])
+    return [concepts.Dependency(d['tag'], d['reason'])
             for d in dependencies_dicts]
 
 def read_see_also(f):
@@ -319,21 +319,17 @@ def write_graph_dot(nodes, graph, outstr=None, bottom_up=False):
 
 def node_dict(nodes, tag, resource_dict=None):
     node = nodes[tag]
-    d = node.as_dict()
-    if resource_dict is not None:
-        d = dict(d)
-        d['resources'] = [resources.add_defaults(r, resource_dict) for r in d['resources']]
+    d = node.json_repr(resource_dict)
     return d
 
-def node_to_json(nodes, tag, resource_dict=None):
-    return json.dumps(node_dict(nodes, tag, resource_dict=resource_dict))
+def node_to_json(nodes, tag, resource_dict):
+    return json.dumps(nodes[tag].json_repr(resource_dict))
 
 def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
-    node_items = {tag: node_dict(nodes, tag, resource_dict=resource_dict)
-                  for tag in nodes}
+    node_items = {tag: nodes[tag].json_repr(resource_dict, graph) for tag in nodes}
     items = {'nodes': node_items}
     json.dump(items, outstr)
 

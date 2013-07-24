@@ -21,8 +21,6 @@ in various formats. It responds to the following requests:
   GET nodes/node-name?set=map             get the part of the graph that a node depends on
   GET nodes/node-name?set=related         get the part of the graph that's related to a node
                                          (ancestors/descendants)
-  GET nodes/node-name/user_data       get the JSON representation of the user-supplied data for a node
-  PUT nodes/node-name/user_data       update the user-supplied data for a node
   GET nodes/node-name/resources       get a JSON representation of the resource list for a given node
 
   GET search                          process a search query, return a list of JSON objects for the results
@@ -48,11 +46,10 @@ nodes = None
 graph = None
 # graph_minus_redundant = None # now computed client side; still needed? -CJR
 resource_dict = None
-user_nodes = None
 
 
 def load_graph():
-    global nodes, graph, resource_dict, user_nodes
+    global nodes, graph, resource_dict
     if nodes is None:
         nodes = formats.read_nodes(config.CONTENT_PATH)
         nodes = graphs.remove_missing_links(nodes)
@@ -63,17 +60,9 @@ def load_graph():
         # graph_minus_redundant = graphs.redundant_edges(graph) 
         resource_dict = resources.read_resources_file(resources.resource_db_path())
 
-        # read user-supplied data
-        user_nodes = formats.read_user_nodes(config.USER_CONTENT_PATH)
-
         # load search index
         search.load_main_index()
 
-
-def update_node_user_data(node_tag, jdata):
-    formats.check_node_user_data_format(jdata)
-    user_nodes[node_tag] = jdata
-    formats.write_node_user_data(config.USER_CONTENT_PATH, node_tag, jdata)
 
 
 class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -91,26 +80,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pass
 
     def do_PUT(self):
-        """ Update user-supplied data """
-        load_graph()
-        parse = urlparse.urlparse(self.path)
-        parts = parse.path.lower().split('/')
-        parts = filter(bool, parts)
-        if len(parts) != 3 or parts[0] != 'nodes' or parts[2] != 'user_data' or parts[1] not in nodes:
-            self.send_error(404, 'Invalid resource: %s' % self.path)
-        node_name = parts[1]
-
-        try:
-            clen = int(self.headers.getheader('content-length'))
-            if clen:
-                post_body = self.rfile.read(clen)
-                jdata = json.loads(post_body)
-                update_node_user_data(node_name, jdata)
-            self.send_response(201)
-            self.add_cors_header()
-            self.end_headers()
-        except:
-            self.send_error(500, traceback.format_exc())
+        pass
 
     def do_POST(self):
         """ TODO: make unique from PUT"""
@@ -153,14 +123,6 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                         text = self.get_related_nodes(parts[1], fmt=fmt)
                     elif dset == 'map':
                         text = self.get_map(parts[1], fmt=fmt)
-                elif parts[2] == 'user_data':
-                    assert len(parts) == 3
-                    assert fmt == 'json'
-                    if parts[1] in user_nodes:
-                        text = json.dumps(user_nodes[parts[1]])   # JSON representation of user-supplied data
-                    else:
-                        text = json.dumps({})
-                    print 'text', text
                 elif parts[2] == 'resources':
                     assert len(parts) == 3
                     text = formats.node_resources_json(nodes[node], resource_dict)
@@ -204,7 +166,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         """Return graph in desired format"""
         if fmt == 'json':
             f = cStringIO.StringIO()
-            formats.write_graph_json(nodes, graph, resource_dict, f, user_nodes=user_nodes)
+            formats.write_graph_json(nodes, graph, resource_dict, f)
             return f.getvalue()
         elif fmt == 'dot':
             f = cStringIO.StringIO()
@@ -237,7 +199,7 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_node_json(self, tag):
         load_graph()
-        return formats.node_to_json(nodes, tag, user_nodes=user_nodes, resource_dict=resource_dict)
+        return formats.node_to_json(nodes, tag, resource_dict=resource_dict)
 
     def get_map(self, tag, fmt):
         load_graph()

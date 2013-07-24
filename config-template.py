@@ -1,5 +1,4 @@
 CONTENT_PATH = '/path/to/agfk-content'
-USER_CONTENT_PATH = '/path/to/agfk-user-content'
 TEMP_PATH = '/path/to/tmp-area'
 HASH = 'randomLettersAndNumbers'
 CONTENT_SERVER_PORT = 9090

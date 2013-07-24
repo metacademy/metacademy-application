@@ -28,31 +28,7 @@ class Concept:
     def __getitem__(self, key):
         return getattr(self, key)
 
-    ## def as_dict(self, user_nodes=None):
-    ##     d = {}
-
-    ##     if hasattr(self, 'title'):
-    ##         d['title'] = self.title
-    ##     if hasattr(self, 'summary'):
-    ##         d['summary'] = self.summary
-    ##     if hasattr(self, 'pointers'):
-    ##         d['pointers'] = self.pointers # [p.as_dict() for p in self.pointers]
-    ##     if hasattr(self, 'dependencies'):
-    ##         d['dependencies'] = [dep.as_dict() for dep in self.dependencies]
-    ##     if hasattr(self, 'resources'):
-    ##         d['resources'] = self.resources
-    ##     if hasattr(self, 'questions'):
-    ##         d['questions'] = self.questions
-    ##     if hasattr(self, 'outlinks'):
-    ##         d['outlinks'] = [ol.as_dict() for ol in self.outlinks]
-
-    ##     # add user-supplied data
-    ##     if user_nodes is not None and self.tag in user_nodes:
-    ##         d['user_data'] = user_nodes[self.tag]
-
-    ##     return d
-
-    def as_dict(self, user_nodes=None):
+    def as_dict(self):
         d = {'title': self.title,
              'summary': self.summary,
              'pointers': self.pointers,
@@ -63,10 +39,6 @@ class Concept:
 
         if hasattr(self, 'outlinks'):
             d['outlinks'] = [ol.as_dict() for ol in self.outlinks]
-
-        # add user-supplied data
-        if user_nodes is not None and self.tag in user_nodes:
-            d['user_data'] = user_nodes[self.tag]
 
         return d
              

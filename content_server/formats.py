@@ -317,22 +317,22 @@ def write_graph_dot(nodes, graph, outstr=None, bottom_up=False):
 
 #################################### JSON ######################################
 
-def node_dict(nodes, tag, resource_dict=None, user_nodes=None):
+def node_dict(nodes, tag, resource_dict=None):
     node = nodes[tag]
-    d = node.as_dict(user_nodes=user_nodes)
+    d = node.as_dict()
     if resource_dict is not None:
         d = dict(d)
         d['resources'] = [resources.add_defaults(r, resource_dict) for r in d['resources']]
     return d
 
-def node_to_json(nodes, tag, resource_dict=None, user_nodes=None):
-    return json.dumps(node_dict(nodes, tag, resource_dict=resource_dict, user_nodes=user_nodes))
+def node_to_json(nodes, tag, resource_dict=None):
+    return json.dumps(node_dict(nodes, tag, resource_dict=resource_dict))
 
-def write_graph_json(nodes, graph, resource_dict=None, outstr=None, user_nodes=None):
+def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
-    node_items = {tag: node_dict(nodes, tag, resource_dict=resource_dict, user_nodes=user_nodes)
+    node_items = {tag: node_dict(nodes, tag, resource_dict=resource_dict)
                   for tag in nodes}
     items = {'nodes': node_items}
     json.dump(items, outstr)
@@ -342,39 +342,6 @@ def node_resources(node, resource_defaults):
 
 def node_resources_json(node, resource_dict):
     return json.dumps(node_resources(node, resource_dict))
-
-
-############################### User data ######################################
-
-def node_user_data_file(user_content_path, tag):
-    return os.path.join(user_content_path, 'nodes', '%s.json' % tag)
-
-def read_user_nodes(user_content_path):
-    user_nodes_path = os.path.join(user_content_path, 'nodes')
-    if not os.path.exists(user_nodes_path):
-        return {}
-
-    nodes = {}
-    fnames = os.listdir(user_nodes_path)
-    for fname in fnames:
-        full_path = os.path.join(user_nodes_path, fname)
-        tag, ext = fname.split('.')
-        assert ext == 'json'
-        nodes[tag] = json.load(open(full_path))
-
-    return nodes
-
-def check_node_user_data_format(jdata):
-    pass   # TODO
-
-def write_node_user_data(user_content_path, tag, jdata):
-    user_nodes_path = os.path.join(user_content_path, 'nodes')
-    if not os.path.exists(user_nodes_path):
-        os.mkdir(user_nodes_path)
-    fname = node_user_data_file(user_content_path, tag)
-    json.dump(jdata, open(fname, 'w'))
-
-
 
 
 

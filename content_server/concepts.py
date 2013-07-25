@@ -34,15 +34,17 @@ class Concept:
     def json_repr(self, resource_dict, graph=None):
         res = [resources.add_defaults(r, resource_dict) for r in self.resources]
         
-        if graph is not None and self.tag in graph.outgoing:
+        if graph is not None and ('concept', self.tag) in graph.outgoing:
             outlinks = [{'from_tag': self.tag, 'to_tag': t}
-                        for t in graph.outgoing[self.tag]]
+                        for _, t in graph.outgoing['concept', self.tag]]
         else:
             outlinks = []
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.tag, 'reason': dep.reason}
                         for dep in self.dependencies]
-        
+
+        print dependencies
+
         d = {'title': self.title,
              'summary': self.summary,
              'pointers': self.pointers,
@@ -86,9 +88,9 @@ class Shortcut:
     def json_repr(self, resource_dict, graph=None):
         res = [resources.add_defaults(r, resource_dict) for r in self.resources]
         
-        if graph is not None and self.concept.tag in graph.outgoing:
+        if graph is not None and ('shortcut', self.concept.tag) in graph.outgoing:
             outlinks = [{'from_tag': self.concept.tag, 'to_tag': t}
-                        for t in graph.outgoing[self.concept.tag]]
+                        for _, t in graph.outgoing['shortcut', self.concept.tag]]
         else:
             outlinks = []
 

@@ -1,19 +1,17 @@
-import os
-import pdb
 import numpy as np
 import scipy.linalg
-import config
 
 
 
 class Graph:
     """A representation of the dependency graph in a form that's more convenient for graph computations
     like Page Rank or the bottleneck score. Can be used to represent either the dependency graph or
-    the see-also graph (or some other kind of graph).
+    the see-also graph (or some other kind of graph). Note that the vertex labels are arbitrary, so the
+    Graph class doesn't know anything about the structure of the database.
 
-    incoming -- a dict mapping tags to the list of parent tags
-    outgoing -- a dict mapping tags to the list of child tags
-    edges -- the set of all (from_tag, to_tag) pairs
+    incoming -- a dict mapping vertex labels to the list of parent labels
+    outgoing -- a dict mapping vertex labels to the list of child labels
+    edges -- the set of all (from_label, to_label) pairs
     """
     def __init__(self, vertices, incoming, outgoing, edges):
         self.vertices = vertices
@@ -21,44 +19,12 @@ class Graph:
         self.outgoing = outgoing
         self.edges = edges
 
-    def copy(self):
-        vertices = set(self.vertices)
-        incoming = {tag: list(parents) for tag, parents in self.incoming.items()}
-        outgoing = {tag: list(children) for tag, children in self.outgoing.items()}
-        edges = set(self.edges)
-        return Graph(vertices, incoming, outgoing, edges)
-
-    def add_edge(self, parent, child):
-        assert parent, child not in self.edges
-        self.outgoing[parent].append(child)
-        self.incoming[child].append(parent)
-        self.edges.add((parent, child))
-
-    def remove_edge(self, parent, child):
-        self.outgoing[parent].remove(child)
-        self.incoming[child].remove(parent)
-        self.edges.remove((parent, child))
-
-    def remove_vertex(self, tag):
-        # remove all incoming and outgoing edges
-        incoming = list(self.incoming[tag])
-        for parent in incoming:
-            self.remove_edge(parent, tag)
-        outgoing = list(self.outgoing[tag])
-        for child in outgoing:
-            self.remove_edge(tag, child)
-
-        # remove the vertex itself
-        self.vertices.remove(tag)
-        del self.incoming[tag]
-        del self.outgoing[tag]
-
     @staticmethod
-    def init_empty(tags):
-        outgoing = {tag: [] for tag in tags}
-        incoming = {tag: [] for tag in tags}
+    def init_empty(vertices):
+        outgoing = {v: [] for v in vertices}
+        incoming = {v: [] for v in vertices}
         edges = set()
-        return Graph(set(tags), incoming, outgoing, edges)
+        return Graph(set(vertices), incoming, outgoing, edges)
 
     @staticmethod
     def from_node_dependencies(nodes):
@@ -96,6 +62,100 @@ class Graph:
 
         return graph
 
+    def copy(self):
+        vertices = set(self.vertices)
+        incoming = {v: list(parents) for v, parents in self.incoming.items()}
+        outgoing = {v: list(children) for v, children in self.outgoing.items()}
+        edges = set(self.edges)
+        return Graph(vertices, incoming, outgoing, edges)
+
+    def add_edge(self, parent, child):
+        assert parent, child not in self.edges
+        self.outgoing[parent].append(child)
+        self.incoming[child].append(parent)
+        self.edges.add((parent, child))
+
+    def remove_edge(self, parent, child):
+        self.outgoing[parent].remove(child)
+        self.incoming[child].remove(parent)
+        self.edges.remove((parent, child))
+
+    def remove_vertex(self, v):
+        # remove all incoming and outgoing edges
+        incoming = list(self.incoming[v])
+        for parent in incoming:
+            self.remove_edge(parent, v)
+        outgoing = list(self.outgoing[v])
+        for child in outgoing:
+            self.remove_edge(v, child)
+
+        # remove the vertex itself
+        self.vertices.remove(v)
+        del self.incoming[v]
+        del self.outgoing[v]
+
+    def topo_sort(self):
+        """Return a list of all tags topologically ordered such that if B depends on A, then
+        A precedes B in the list."""
+        graph = self.copy()   # since we destructively modify it
+
+        # nodes with no dependencies
+        start_vertices = filter(lambda v: graph.incoming[v] == [], self.vertices)
+
+        sorted_deps = []
+        while start_vertices:
+            s, start_vertices = start_vertices[0], start_vertices[1:]
+            sorted_deps.append(s)
+            for child in list(graph.outgoing[s]):
+                graph.remove_edge(s, child)
+                if not graph.incoming[child]:
+                    start_vertices.append(child)
+
+        if graph.edges:
+            raise CycleException()
+
+        return sorted_deps
+
+    def gather_dependencies(self):
+        """Construct a dict mapping a tag to the set of all tags which it depends on."""
+        vertices = self.topo_sort()
+
+        dependencies = {}
+        for v in vertices:
+            curr_deps = set(self.incoming[v])
+            for parent in self.incoming[v]:
+                curr_deps.update(dependencies[parent])
+            dependencies[v] = curr_deps
+
+        return dependencies
+
+    def ancestors_set(self, v):
+        """Compute the set of ancestor tags for a given node."""
+        ancestors = set(self.incoming[v])
+        queue = self.incoming[v]
+
+        while queue:
+            curr, queue = queue[0], queue[1:]
+            for parent in self.incoming[curr]:
+                if parent not in ancestors:
+                    ancestors.add(parent)
+                    queue.append(parent)
+
+        return ancestors
+
+    def descendants_set(self, v):
+        """Compute the set of descendant tags for a given node."""
+        descendants = set(self.outgoing[v])
+        queue = self.outgoing[v]
+
+        while queue:
+            curr, queue = queue[0], queue[1:]
+            for child in self.outgoing[curr]:
+                if child not in descendants:
+                    descendants.add(child)
+                    queue.append(child)
+
+        return descendants
 
 
 class CycleException(Exception):
@@ -112,47 +172,14 @@ def remove_missing_links(nodes):
     return new_nodes
 
 
-def topo_sort(graph):
-    """Return a list of all tags topologically ordered such that if B depends on A, then
-    A precedes B in the list."""
-    graph = graph.copy()   # since we destructively modify it
-    tags = graph.incoming.keys()
-    
-    # nodes with no dependencies
-    start_tags = filter(lambda t: graph.incoming[t] == [], tags)
-
-    sorted_deps = []
-    while start_tags:
-        s, start_tags = start_tags[0], start_tags[1:]
-        sorted_deps.append(s)
-        for child in list(graph.outgoing[s]):
-            graph.remove_edge(s, child)
-            if not graph.incoming[child]:
-                start_tags.append(child)
-
-    if graph.edges:
-        raise CycleException()
-
-    return sorted_deps
 
     
-def gather_dependencies(graph):
-    """Construct a dict mapping a tag to the set of all tags which it depends on."""
-    tags = topo_sort(graph)
 
-    dependencies = {}
-    for tag in tags:
-        curr_deps = set(graph.incoming[tag])
-        for parent_tag in graph.incoming[tag]:
-            curr_deps.update(dependencies[parent_tag])
-        dependencies[tag] = curr_deps
-
-    return dependencies
 
     
 def count_dependencies(graph, ignore=None):
     """Count the total number of long-distance dependencies in a graph."""
-    all_deps = gather_dependencies(graph)
+    all_deps = graph.gather_dependencies()
     
     total = 0
     for vertex, deps in all_deps.items():
@@ -236,50 +263,20 @@ def print_page_ranks(nodes, damping):
     order = sorted(nodes.keys(), key=lambda t: scores[t], reverse=True)
     for tag in order:
         print '%10.5f %s' % (scores[tag], nodes[tag].title)
-    
             
 def missing_titles(nodes):
     """List the tags of all nodes with missing titles."""
     return [tag for tag in nodes if nodes[tag].title is None]
 
-
-def ancestors_set(graph, vertex):
-    """Compute the set of ancestor tags for a given node."""
-    ancestors = set(graph.incoming[vertex])
-    queue = graph.incoming[vertex]
-
-    while queue:
-        curr, queue = queue[0], queue[1:]
-        for parent in graph.incoming[curr]:
-            if parent not in ancestors:
-                ancestors.add(parent)
-                queue.append(parent)
-
-    return ancestors
-
 def get_ancestors(graph, tag):
-    ancestors = ancestors_set(graph, ('concept', tag))
+    ancestors = graph.ancestors_set(('concept', tag))
     full_tags = set([tag for label, tag in ancestors if label == 'concept'])
     shortcut_tags = set([tag for label, tag in ancestors if label == 'shortcut'])
     shortcut_tags = shortcut_tags.difference(full_tags)
     return full_tags, shortcut_tags
 
-def descendants_set(graph, vertex):
-    """Compute the set of descendant tags for a given node."""
-    descendants = set(graph.outgoing[vertex])
-    queue = graph.outgoing[vertex]
-
-    while queue:
-        curr, queue = queue[0], queue[1:]
-        for child in graph.outgoing[curr]:
-            if child not in descendants:
-                descendants.add(child)
-                queue.append(child)
-
-    return descendants
-
 def get_descendants(graph, tag):
-    descendants = descendants_set(graph, ('concept', tag))
+    descendants = graph.descendants_set(('concept', tag))
     full_tags = set([tag for label, tag in descendants if label == 'concept'])
     shortcut_tags = set([tag for label, tag in descendants if label == 'shortcut'])
     shortcut_tags = shortcut_tags.difference(full_tags)
@@ -295,7 +292,7 @@ def missing_dependencies(nodes):
 
 def remove_redundant_edges(graph):
     graph = graph.copy()
-    ancestors = gather_dependencies(graph)
+    ancestors = graph.gather_dependencies()
     tags = graph.incoming.keys()
 
     for tag in tags:

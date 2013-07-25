@@ -34,13 +34,13 @@ p {
 #searchbox{
     width: 15em;
     border-radius: 2px;
-    position: absolute; /* parent must be relative ? */
-    right: 0.5em;
+    float: right;
     line-height: 1.5em;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
     box-sizing: border-box;
+    margin-right: 0.5ex;
 }
 
 .external-link{
@@ -78,6 +78,11 @@ a.expand-collapse-link:hover{
 /* ---------------------------------------------------*/
 /* ---------->>> Layout Styles <<<--------------------*/
 /* ---------------------------------------------------*/
+#header-wrapper{
+    display: table;
+    width: 100%;
+}
+
 #header {
     height: 1.5em;
     width: 100%;
@@ -87,6 +92,15 @@ a.expand-collapse-link:hover{
     font-size: 1.1em;
     position: relative;
     z-index: 1000;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/* so element within the header can be vertically centered */
+.header-inner-wrap{
+    height: 100%;
+    width: 100%;
+    display: table-cell;
 }
 
 #main {

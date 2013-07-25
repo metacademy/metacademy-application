@@ -15,60 +15,86 @@ class Graph:
     outgoing -- a dict mapping tags to the list of child tags
     edges -- the set of all (from_tag, to_tag) pairs
     """
-    def __init__(self, incoming, outgoing, edges):
+    def __init__(self, vertices, incoming, outgoing, edges):
+        self.vertices = vertices
         self.incoming = incoming
         self.outgoing = outgoing
         self.edges = edges
 
     def copy(self):
+        vertices = set(self.vertices)
         incoming = {tag: list(parents) for tag, parents in self.incoming.items()}
         outgoing = {tag: list(children) for tag, children in self.outgoing.items()}
         edges = set(self.edges)
-        return Graph(incoming, outgoing, edges)
+        return Graph(vertices, incoming, outgoing, edges)
+
+    def add_edge(self, parent, child):
+        assert parent, child not in self.edges
+        self.outgoing[parent].append(child)
+        self.incoming[child].append(parent)
+        self.edges.add((parent, child))
 
     def remove_edge(self, parent, child):
         self.outgoing[parent].remove(child)
         self.incoming[child].remove(parent)
         self.edges.remove((parent, child))
 
-    def subset(self, tags):
-        incoming = {tag: filter(lambda t: t in tags, self.incoming[tag])
-                    for tag in tags}
-        outgoing = {tag: filter(lambda t: t in tags, self.outgoing[tag])
-                    for tag in tags}
-        edges = set(filter(lambda (p, c): p in tags and c in tags, self.edges))
-        return Graph(incoming, outgoing, edges)
+    def remove_vertex(self, tag):
+        # remove all incoming and outgoing edges
+        incoming = list(self.incoming[tag])
+        for parent in incoming:
+            self.remove_edge(parent, tag)
+        outgoing = list(self.outgoing[tag])
+        for child in outgoing:
+            self.remove_edge(tag, child)
+
+        # remove the vertex itself
+        self.vertices.remove(tag)
+        del self.incoming[tag]
+        del self.outgoing[tag]
+
+    @staticmethod
+    def init_empty(tags):
+        outgoing = {tag: [] for tag in tags}
+        incoming = {tag: [] for tag in tags}
+        edges = set()
+        return Graph(set(tags), incoming, outgoing, edges)
 
     @staticmethod
     def from_node_dependencies(nodes):
         """Construct the dependency graph from a dict of nodes. Expects all the links to be present in the
         graph (so call remove_missing_links on nodes first)."""
-        outgoing = {tag: [] for tag in nodes}
-        incoming = {tag: [] for tag in nodes}
-        edges = set()
+        graph = Graph.init_empty(nodes.keys())
+        
         for tag, node in nodes.items():
             for dep in node.dependencies:
-                outgoing[dep.tag].append(tag)
-                incoming[tag].append(dep.tag)
-                edges.add((dep.tag, tag))
+                graph.add_edge(dep.tag, tag)
 
-        return Graph(incoming, outgoing, edges)
+        return graph
 
-    # April 12 2013: broken due to new pointer handling
-    # @staticmethod
-    # def from_node_pointers(nodes):
-    #     """Construct the see-also graph from a dict of nodes. Expects all the links to be present in the
-    #     graph (so call remove_missing_links on nodes first)."""
-    #     outgoing = {tag: [] for tag in nodes}
-    #     incoming = {tag: [] for tag in nodes}
-    #     edges = set()
-    #     for tag, node in nodes.items():
-    #         for ptr in node.pointers:
-    #             outgoing[ptr.from_tag].append(ptr.to_tag)
-    #             incoming[ptr.to_tag].append(ptr.from_tag)
-    #             edges.add((ptr.from_tag, ptr.to_tag))
+    @staticmethod
+    def from_node_and_shortcut_dependencies(nodes, shortcuts):
+        """Construct the dependency graph from dicts of nodes and shortcuts. Expects all the links to be
+        present in the graph (so call remove_missing_liks on nodes first). Returns a dependency graph
+        where shortcuts are represented separately from the concept nodes."""
+        vertices = [('concept', tag) for tag in nodes] + [('shortcut', tag) for tag in shortcuts]
+        graph = Graph.init_empty(vertices)
+        
+        for tag, node in nodes.items():
+            for dep in node.dependencies:
+                if dep.shortcut and dep.tag in shortcuts:
+                    graph.add_edge(('shortcut', dep.tag), ('concept', tag))
+                else:
+                    graph.add_edge(('concept', dep.tag), ('concept', tag))
 
-    #     return Graph(incoming, outgoing, edges)
+        for tag, shortcut in shortcuts.items():
+            for dep in shortcut.dependencies:
+                if dep.shortcut and dep.tag in shortcuts:
+                    graph.add_edge(('shortcut', dep.tag), ('shortcut', tag))
+                else:
+                    graph.add_edge(('concept', dep.tag), ('shortcut', tag))
+
+        return graph
 
 
 
@@ -110,7 +136,7 @@ def topo_sort(graph):
     return sorted_deps
 
     
-def gather_dependencies(graph, ignore=None):
+def gather_dependencies(graph):
     """Construct a dict mapping a tag to the set of all tags which it depends on."""
     tags = topo_sort(graph)
 
@@ -119,32 +145,39 @@ def gather_dependencies(graph, ignore=None):
         curr_deps = set(graph.incoming[tag])
         for parent_tag in graph.incoming[tag]:
             curr_deps.update(dependencies[parent_tag])
-        if ignore is not None and ignore in curr_deps:
-            curr_deps.remove(ignore)
         dependencies[tag] = curr_deps
 
     return dependencies
 
     
 def count_dependencies(graph, ignore=None):
-    """Return a dict counting the total number of (long-range) dependencies for each node."""
-    return sum([len(deps) for tag, deps in gather_dependencies(graph, ignore).items()])
+    """Count the total number of long-distance dependencies in a graph."""
+    all_deps = gather_dependencies(graph)
+    
+    total = 0
+    for vertex, deps in all_deps.items():
+        if vertex[0] == 'concept' and vertex[1] != ignore:
+            dep_tags = set(d[1] for d in deps)     # don't double count concepts and shortcuts
+            if ignore in dep_tags:
+                dep_tags.remove(ignore)
+            total += len(dep_tags)
 
-def bottleneck_score(nodes, tag):
+    return total
+
+
+def bottleneck_score(graph, tag):
     """Compute the bottleneck score for a tag, which is the total number of long-range dependencies which are
     eliminated when we delete the node, divided by the total number of long-range dependencies. If a node has
     a high bottleneck score, this indicates that the user has to sift through a lot of additional nodes
     as a result of this one being required. If the long-range dependencies seem to be mostly unnecessary,
     the node should be split into more precise chunks. If the long-range dependencies seem necessary even
     in the absence of this node, they should probably be added explicitly to the graph."""
-    assert tag in nodes
-    nodes_rem = dict(nodes)
-    del nodes_rem[tag]
-    nodes_rem = remove_missing_links(nodes_rem)
-    graph = Graph.from_node_dependencies(nodes)
-    graph_rem = Graph.from_node_dependencies(nodes_rem)
+    graph_rem = graph.copy()
+    graph_rem.remove_vertex(('concept', tag))
+    if ('shortcut', tag) in graph_rem.vertices:
+        graph_rem.remove_vertex(('shortcut', tag))
     
-    orig = count_dependencies(graph, ignore=tag) - len(graph.incoming[tag])
+    orig = count_dependencies(graph, ignore=tag)
     diff = orig - count_dependencies(graph_rem)
     return diff / float(orig)
 
@@ -210,10 +243,10 @@ def missing_titles(nodes):
     return [tag for tag in nodes if nodes[tag].title is None]
 
 
-def ancestors_set(nodes, graph, tag):
+def ancestors_set(graph, vertex):
     """Compute the set of ancestor tags for a given node."""
-    ancestors = set(graph.incoming[tag])
-    queue = graph.incoming[tag]
+    ancestors = set(graph.incoming[vertex])
+    queue = graph.incoming[vertex]
 
     while queue:
         curr, queue = queue[0], queue[1:]
@@ -224,10 +257,17 @@ def ancestors_set(nodes, graph, tag):
 
     return ancestors
 
-def descendants_set(nodes, graph, tag):
+def get_ancestors(graph, tag):
+    ancestors = ancestors_set(graph, ('concept', tag))
+    full_tags = set([tag for label, tag in ancestors if label == 'concept'])
+    shortcut_tags = set([tag for label, tag in ancestors if label == 'shortcut'])
+    shortcut_tags = shortcut_tags.difference(full_tags)
+    return full_tags, shortcut_tags
+
+def descendants_set(graph, vertex):
     """Compute the set of descendant tags for a given node."""
-    descendants = set(graph.outgoing[tag])
-    queue = graph.outgoing[tag]
+    descendants = set(graph.outgoing[vertex])
+    queue = graph.outgoing[vertex]
 
     while queue:
         curr, queue = queue[0], queue[1:]
@@ -237,6 +277,13 @@ def descendants_set(nodes, graph, tag):
                 queue.append(child)
 
     return descendants
+
+def get_descendants(graph, tag):
+    descendants = descendants_set(graph, ('concept', tag))
+    full_tags = set([tag for label, tag in descendants if label == 'concept'])
+    shortcut_tags = set([tag for label, tag in descendants if label == 'shortcut'])
+    shortcut_tags = shortcut_tags.difference(full_tags)
+    return full_tags, shortcut_tags
 
 def missing_dependencies(nodes):
     dependencies = set()

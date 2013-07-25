@@ -36,6 +36,18 @@ def dependencies_file(content_path, tag):
 def see_also_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'see-also.txt')
 
+def shortcut_dir(content_path, tag):
+    return os.path.join(content_path, 'shortcuts', tag)
+
+def shortcut_questions_file(content_path, tag):
+    return os.path.join(shortcut_dir(content_path, tag), 'questions.txt')
+
+def shortcut_resources_file(content_path, tag):
+    return os.path.join(shortcut_dir(content_path, tag), 'resources.txt')
+
+def shortcut_dependencies_file(content_path, tag):
+    return os.path.join(shortcut_dir(content_path, tag), 'dependencies.txt')
+
 
 
 ############################## utility functions ###############################
@@ -128,6 +140,9 @@ def parse_list(s, sep):
 
 ############################ read nodes as directories #########################
 
+class DatabaseFormatError(RuntimeError):
+    pass
+
 def read_title(f):
     return f.readlines()[0].strip()
 
@@ -151,12 +166,13 @@ def read_questions(f):
             questions.append({"text":line})
     return questions
 
-def read_dependencies(f, tag):
+def read_dependencies(f):
     fields = {'tag': normalize_input_tag,
               'reason': (str, None),
+              'shortcut': (int, 0),
               }
     dependencies_dicts = read_text_db(f, fields)
-    return [concepts.Dependency(d['tag'], d['reason'])
+    return [concepts.Dependency(d['tag'], d['reason'], d['shortcut'])
             for d in dependencies_dicts]
 
 def read_see_also(f):
@@ -208,7 +224,7 @@ def read_node(content_path, tag):
 
     ### process dependencies
     if os.path.exists(dependencies_file(content_path, tag)):
-        dependencies = read_dependencies(open(dependencies_file(content_path, tag)), tag)
+        dependencies = read_dependencies(open(dependencies_file(content_path, tag)))
     else:
         dependencies = []
     
@@ -218,6 +234,31 @@ def read_node(content_path, tag):
         pointers = read_see_also(open(see_also_file(content_path, tag)))
 
     return concepts.Concept(tag, title, summary, dependencies, pointers, node_resources, questions)
+
+def read_shortcut(content_path, tag, concept_node):
+    """Read a Shortcut object from a directory which contains dependencies.txt and resources.txt,
+    and optionally questions.txt."""
+
+    # process resources
+    if not os.path.exists(shortcut_resources_file(content_path, tag)):
+        raise DatabaseFormatError('Missing resources file for shortcut %s' % tag)
+    shortcut_resources = read_node_resources(open(shortcut_resources_file(content_path, tag)))
+
+    # process dependencies
+    if not os.path.exists(shortcut_resources_file(content_path, tag)):
+        raise DatabaseFormatError('Missing dependencies file for shortcut %s' % tag)
+    dependencies = read_dependencies(open(shortcut_dependencies_file(content_path, tag)))
+
+    # process questions
+    if os.path.exists(shortcut_questions_file(content_path, tag)):
+        questions = read_questions(open(shortcut_questions_file(content_path, tag)))
+    else:
+        questions = []
+
+    return concepts.Shortcut(concept_node, dependencies, shortcut_resources, questions)
+    
+
+    
 
 def check_required_files(content_path, node_tag):
     if not os.path.exists(title_file(content_path, node_tag)):
@@ -237,6 +278,20 @@ def read_nodes(content_path, onlytitle=False):
     else:
         nodes = [read_node(content_path, tag) for tag in tags]
         return {node.tag: node for node in nodes}
+
+def read_shortcuts(content_path, concept_nodes):
+    shortcuts_path = os.path.join(content_path, 'shortcuts')
+    if not os.path.exists(shortcuts_path):
+        return {}
+    tags = map(normalize_input_tag, _filter_non_nodes(os.listdir(shortcuts_path)))
+    shortcuts = {}
+    for tag in tags:
+        try:
+            shortcuts[tag] = read_shortcut(content_path, tag, concept_nodes[tag])
+        except DatabaseFormatError:
+            pass
+    return shortcuts
+    
 
 
 def _filter_non_nodes(tags):
@@ -296,21 +351,24 @@ def wrap(s, width):
     return result
 
 
-def write_graph_dot(nodes, graph, outstr=None, bottom_up=False):
+def write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, outstr=None, bottom_up=False):
     if outstr is None:
         outstr = sys.stdout
+    tags = set(full_tags).union(set(shortcut_tags))
 
     print >> outstr, 'digraph G {'
 
     if bottom_up:
         print >> outstr, '    rankdir=BT;'
 
-    for tag, node in nodes.items():
-        usetag = tag
-        print >> outstr, '    %s [label="%s"];' % (usetag, wrap(node.title, WRAP_WIDTH))
+    for tag in tags:
+        node = nodes[tag]
+        print >> outstr, '    %s [label="%s"];' % (tag, wrap(node.title, WRAP_WIDTH))
 
     for parent, child in graph.edges:
-        print >> outstr, '    %s -> %s;' % (parent, child)
+        parent_tag, child_tag = parent[1], child[1]
+        if parent_tag in tags and child_tag in tags:
+            print >> outstr, '    %s -> %s;' % (parent_tag, child_tag)
 
     print >> outstr, '}'
 
@@ -325,11 +383,15 @@ def node_dict(nodes, tag, resource_dict=None):
 def node_to_json(nodes, tag, resource_dict):
     return json.dumps(nodes[tag].json_repr(resource_dict))
 
-def write_graph_json(nodes, graph, resource_dict=None, outstr=None):
+def write_graph_json(nodes, shortcuts, graph, full_tags, shortcut_tags, resource_dict=None, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
-    node_items = {tag: nodes[tag].json_repr(resource_dict, graph) for tag in nodes}
+    node_items = {}
+    for tag in full_tags:
+        node_items[tag] = nodes[tag].json_repr(resource_dict, graph)
+    for tag in shortcut_tags:
+        node_items[tag] = shortcuts[tag].json_repr(resource_dict, graph)
     items = {'nodes': node_items}
     json.dump(items, outstr)
 

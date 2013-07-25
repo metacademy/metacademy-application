@@ -44,17 +44,18 @@ Start the server by typing (from the main knowledge-maps directory):
 
 nodes = None
 graph = None
+shortcuts = None
 # graph_minus_redundant = None # now computed client side; still needed? -CJR
 resource_dict = None
 
 
 def load_graph():
-    global nodes, graph, resource_dict
+    global nodes, shortcuts, graph, resource_dict
     if nodes is None:
         nodes = formats.read_nodes(config.CONTENT_PATH)
         nodes = graphs.remove_missing_links(nodes)
-        graph = graphs.Graph.from_node_dependencies(nodes)
-        # add outlinks to nodes
+        shortcuts = formats.read_shortcuts(config.CONTENT_PATH, nodes)
+        graph = graphs.Graph.from_node_and_shortcut_dependencies(nodes, shortcuts)
         resource_dict = resources.read_resources_file(resources.resource_db_path())
 
         # load search index
@@ -159,20 +160,20 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(text)
 
-    def format_graph(self, nodes, graph, fmt):
+    def format_graph(self, nodes, shortcuts, graph, full_tags, shortcut_tags, fmt):
         """Return graph in desired format"""
         if fmt == 'json':
             f = cStringIO.StringIO()
-            formats.write_graph_json(nodes, graph, resource_dict, f)
+            formats.write_graph_json(nodes, shortcuts, graph, full_tags, shortcut_tags, resource_dict, f)
             return f.getvalue()
         elif fmt == 'dot':
             f = cStringIO.StringIO()
-            formats.write_graph_dot(nodes, graph, f, bottom_up=True)
+            formats.write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, f, bottom_up=True)
             return f.getvalue()
         elif fmt == 'svg':
             dotfile = os.path.join(config.TEMP_PATH, 'graph.dot')
             svgfile = os.path.join(config.TEMP_PATH, 'graph.svg')
-            formats.write_graph_dot(nodes, graph, open(dotfile, 'w'), bottom_up=True)
+            formats.write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, open(dotfile, 'w'), bottom_up=True)
             os.system('dot -Tsvg %s -o %s' % (dotfile, svgfile))
             return open(svgfile, 'rb').read()
         else:
@@ -180,19 +181,17 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def get_full_graph(self, fmt):
         load_graph()
-        return self.format_graph(nodes, graph, fmt) #graph_minus_redundant, fmt)
+        return self.format_graph(nodes, {}, graph, nodes.keys(), set(), fmt) #graph_minus_redundant, fmt)
 
     def get_related_nodes(self, tag, fmt):
         load_graph()
 
-        ancestors = graphs.ancestors_set(nodes, graph, tag)
-        descendants = graphs.descendants_set(nodes, graph, tag)
-        relevant = set([tag]).union(ancestors).union(descendants)
-        rel_nodes = {tag: node for tag, node in nodes.items() if tag in relevant}
-        rel_graph = graph.subset(relevant)
-        # rel_graph = graphs.remove_redundant_edges(rel_graph)
-
-        return self.format_graph(rel_nodes, rel_graph, fmt)
+        ancestors_full, ancestors_shortcut = graphs.get_ancestors(graph, tag)
+        descendants_full, descendants_shortcut = graphs.get_descendants(graph, tag)
+        #relevant = set([tag]).union(ancestors).union(descendants)
+        relevant_full = set([tag]).union(ancestors_full).union(descendants_full)
+        relevant_shortcut = ancestors_shortcut.union(descendants_shortcut).difference(relevant_full)
+        return self.format_graph(nodes, shortcuts, graph, relevant_full, relevant_shortcut, fmt)
 
     def get_node_json(self, tag):
         load_graph()
@@ -201,13 +200,9 @@ class HTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def get_map(self, tag, fmt):
         load_graph()
 
-        ancestors = graphs.ancestors_set(nodes, graph, tag)
-        relevant = set([tag]).union(ancestors)
-        rel_nodes = {tag: node for tag, node in nodes.items() if tag in relevant}
-        rel_graph = graph.subset(relevant)
-        # rel_graph = graphs.remove_redundant_edges(rel_graph)
-
-        return self.format_graph(rel_nodes, rel_graph, fmt)
+        full, short = graphs.get_ancestors(graph, tag)
+        relevant_full = set([tag]).union(full)
+        return self.format_graph(nodes, shortcuts, graph, relevant_full, short, fmt)
 
 def run_server(port):
     server_address = ('', port)

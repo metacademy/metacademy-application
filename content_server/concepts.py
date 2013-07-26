@@ -43,8 +43,6 @@ class Concept:
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.tag, 'reason': dep.reason}
                         for dep in self.dependencies]
 
-        print dependencies
-
         d = {'title': self.title,
              'summary': self.summary,
              'pointers': self.pointers,

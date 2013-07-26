@@ -251,7 +251,7 @@
              */
             getNodeDisplayTitle: function(numCharNodeLine){
                 if (!this.nodeDisplayTitle){
-                    var title = this.title || this.id.replace(/_/g, " ");
+                    var title = this.get("title") || this.id.replace(/_/g, " ");
                     this.nodeDisplayTitle = AGFK.utils.wrapNodeText(title, numCharNodeLine || 9);
                 }
                 return this.nodeDisplayTitle;
@@ -262,7 +262,6 @@
               */
             getLearnViewTitle: function(){
                 return this.get("is_shortcut") ? this.get("title") + " (shortcut)" : this.get("title");
-                //return "a";
             },
 
             /**

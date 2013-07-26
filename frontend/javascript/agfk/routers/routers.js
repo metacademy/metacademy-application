@@ -162,7 +162,7 @@
                 // -- necessary because of possible AJAX calls to obtain new data
                 function postNodePop() {
                     // set the document title to be the searched node
-                    document.title = thisRoute.cnodesContn.get("nodes").get(thisRoute.cnodesContn.get("keyNode")).get("title").toLowerCase() + " - Metacademy";
+                    document.title = thisRoute.cnodesContn.get("nodes").get(thisRoute.cnodesContn.get("keyNode")).get("title") + " - Metacademy";
                     
                     // set default to explore mode
                     paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;

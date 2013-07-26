@@ -112,20 +112,3 @@ a.expand-collapse-link:hover{
     color: #333;
 }
 
-.main-search-wrap{
-    position:absolute;  
-    top: 30%; /* todo look for a better solution */  
-    left: 50%;  
-    margin:-45.5px 0 0 -181.5px;  /* dependent on logo image size*/
-}
-
-#main-search-input{
-    width: 471px;
-    min-height: 2em;
-    display: inline-block;
-    margin: 1em 0 0 -54px;
-}
-
-#main-search-logo{
-    display: block;
-}

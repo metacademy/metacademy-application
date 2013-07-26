@@ -1,15 +1,64 @@
 /* CSS for search results */
+#sres-search-logo{
+    height: 60px;
+    width: auto;
+    display: inline-block;
+}
+
+#sres-search-input{
+    width: 500px;
+    margin-top: 18px;
+    margin-left: 1em;
+    min-height: 2.1em;
+    outline: none;
+    display: inline-block;
+    border: 1px solid #999999;
+    padding: 0.2ex 1ex;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+    background-color: white;
+    border-radius: 3px;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+#sres-search-input:focus{
+    border-color: #501644;
+    box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
+}
+#sres-search-input:hover{
+    box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
+}
+
+.sres-search-wrapper{
+    margin: 1.2em auto;
+    display: table;
+    vertical-align: middle;
+}
+
+.search-els{
+    display: table-cell;
+    vertical-align: middle;
+}
 
 .search-info{
-    line-height: 1.1em;
-    font-size: 1.1em;
+    font-size: 0.98em;
+    font-weight: bold;
     padding-bottom: 1.2em;
     margin-bottom: 1em;
     margin-top: 1.2em;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 20%;
+    margin-right: 20%;
     border-bottom: 1px solid #eaeaea
 }
+
+.sres-separator{
+    color: #0E0319;
+    text-align: center;
+    margin: 1em auto;
+    letter-spacing: 2em;
+}
+
 .search-res-wrapper{
     overflow: scroll;
     height: 100%;
@@ -19,8 +68,8 @@
 }    
 
 .search-res{
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 20%;
+    margin-right: 20%;
 }
 .search-res-list{
     line-height: 1.1em;

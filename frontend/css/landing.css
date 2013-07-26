@@ -1,0 +1,33 @@
+.main-search-wrap{
+    position:absolute;  
+    top: 30%; /* todo look for a better solution */  
+    left: 50%;  
+    margin:-68.5px 0 0 -298.5px;  /* dependent on logo image size*/
+}
+
+#main-search-input{
+    width: 703px;
+    min-height: 2.3em;
+    outline: none;
+    display: block;
+    margin: 1em 0 0 -53px;
+    border: 1px solid #999999;
+    padding: 0.2ex 1ex;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+    background-color: white;
+    border-radius: 3px;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+#main-search-input:focus{
+    border-color: #501644;
+    box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
+}
+#main-search-input:hover{
+   box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
+}
+#main-search-logo{
+    display: block;
+}

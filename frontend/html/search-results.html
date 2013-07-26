@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block targetblank %}
 {% endblock %}
@@ -8,22 +9,34 @@
 {% endblock %}
 
 {% block extra-css %}
-<link rel="stylesheet" href="{{STATIC_URL}}css/search.css"> </rel>
+<link rel="stylesheet" href="{% static "css/search.css" %}"> </rel>
 {% endblock %}
 
 {% block jscript %}
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jquery-latest.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}javascript/header-utils.js"></script>
+<script type="text/javascript" src="{% static "javascript/lib/jquery-latest.js" %}"></script>
+<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
 {% endblock %}
 
-{% block search-text %}
-{{search_query}}
+{% block header %}
 {% endblock %}
+
+
 
 {% block main %}
 
 
 <div class="search-res-wrapper">
+  <div class="sres-search-wrapper">
+   <a href="/"> <img id="sres-search-logo" class="mlogo" src="{% static "images/banner2-meta.png" %}" /> </a>
+    <div class="search-els">
+      <input type="text" class="searchbox" id="sres-search-input" placeholder="search" value="{{search_query}}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
+    </div>
+  </div>
+
+  <div class="sres-separator">
+ &loz; &loz; &loz;
+  </div>
+
   <div class="search-info">
     We found {{ search_data|length }} matching concepts
   </div>

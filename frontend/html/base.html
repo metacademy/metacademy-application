@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,8 +14,8 @@
     {% endblock %}
 
     {% block css %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/reset.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
+    <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/standard.css" %}"/>
     {% endblock %}
 
     {% block extra-css %}
@@ -30,7 +31,7 @@
     <div id="header-wrapper">
     <div id="header">
       {% block header %}
-      <input type="text" id="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
+      <input type="text" id="header-search-box" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
       </input>
       {% endblock %}
     </div>

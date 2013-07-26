@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block header %}
+{% endblock %}
+
+{% block main %}
+<div class="main-search-wrap">
+  <img id="main-search-logo" class="searchbox" src="{% static "images/banner1-meta.png" %}" />
+  <input type="text" class="searchbox" id="main-search-input" placeholder="I want to learn about..." value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
+</div>
+{% endblock %}
+
+
+{% block jscript %}
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jquery-latest.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}javascript/header-utils.js"></script>
+{% endblock %}

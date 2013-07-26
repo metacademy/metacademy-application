@@ -5,7 +5,7 @@
     /**
      * Parse the text in the search box after enter is pressed
      */
-    $('#searchbox').bind('keyup', function(event){
+    $('.searchbox').bind('keyup', function(event){
         if (event.which === 13 || event.keyCode === 13){
             window.location.href = "/search?q=" + window.encodeURI(event.currentTarget.value);
         }

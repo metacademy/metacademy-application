@@ -19,6 +19,12 @@ import urllib2
 """
 Django view functions: handles web requests and queries content server for content
 """
+def get_landing_page(request):
+    """
+    Returns the landing page
+    """
+    return render_to_response('landing.html', {'content_server':CONTENT_SERVER}, context_instance=RequestContext(request))
+
 
 def get_kmap_browser_view(request):
     """
@@ -26,8 +32,10 @@ def get_kmap_browser_view(request):
     """
     return render_to_response('kmap-tester.html', {'content_server':CONTENT_SERVER}, context_instance=RequestContext(request))
 
+
 def process_content_form(request):
     return render_to_response('content-submission.html',{'content_server':CONTENT_SERVER},context_instance=RequestContext(request))
+
 
 def get_search_view(request):
     """

@@ -260,6 +260,14 @@
             },
 
             /**
+              * Returns the title to be displayed in the learning view
+              */
+            getLearnViewTitle: function(){
+                return this.get("is_shortcut") ? this.get("title") + " (shortcut)" : this.get("title");
+                //return "a";
+            },
+
+            /**
              * Check if ancestID is an ancestor of this node
              */
             isAncestor: function(ancestID){

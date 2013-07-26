@@ -62,7 +62,9 @@
             render: function(){
                 var thisView = this;
                 var thisModel = thisView.model;
-                thisView.$el.html(thisView.template(thisModel.toJSON()));
+                var h = _.clone(thisModel.toJSON());
+                h.title = thisModel.getLearnViewTitle();
+                thisView.$el.html(thisView.template(h));
                 return thisView;
             },
 

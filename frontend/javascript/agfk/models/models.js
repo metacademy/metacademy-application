@@ -111,7 +111,7 @@
         // maintain ancillary/user-specific info and fields in a private object
         var pvt = {};
         pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
-        pvt.txtFields = ["id", "title", "summary", "pointers"];
+        pvt.txtFields = ["id", "title", "summary", "pointers", "is_shortcut"];
         
         return Backbone.Model.extend({
             /**
@@ -123,6 +123,7 @@
                     id: "",
                     summary: "",
                     pointers: "",
+                    is_shortcut: 0,
                     questions: new AGFK.QuestionCollection(),
                     dependencies: new AGFK.DirectedEdgeCollection(),
                     outlinks: new AGFK.DirectedEdgeCollection(),

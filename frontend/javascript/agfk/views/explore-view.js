@@ -406,6 +406,9 @@
                     }
                 }
             }
+            if (node.get("is_shortcut")) {
+                optionStr += ",style=dashed";
+            }
             return node.get("id") + ' [label="' + node.getNodeDisplayTitle(pvt.viewConsts.numCharLineDisplayNode) + '"' + optionStr + '];';
         };
 

@@ -87,18 +87,16 @@
          *
          */
         getFromTitle: function(){
-            var fromTag = this.get("from_tag"),
-                fromNode = this.collection.parent.collection.get(fromTag);
-            return fromNode ? fromNode.get("title").toLowerCase() : AGFK.utils.getTitleGuessFromTag(fromTag);
+            var fromTag = this.get("from_tag");
+            return AGFK.titles[fromTag] ? AGFK.titles[fromTag] : AGFK.utils.getTitleGuessFromTag(fromTag);
         },
 
         /**
          *
          */
         getToTitle: function(){
-            var toTag = this.get("to_tag"),
-                toNode = this.collection.parent.collection.get(toTag);
-            return toNode ? toNode.get("title").toLowerCase() : AGFK.utils.getTitleGuessFromTag(toTag);
+	    var toTag = this.get("to_tag");
+            return AGFK.titles[toTag] ? AGFK.titles[toTag] : AGFK.utils.getTitleGuessFromTag(toTag);
         }
 
     });
@@ -415,7 +413,7 @@
      * Model to maintain both client and server data
      */
     AGFK.CSData = Backbone.Model.extend({
-        collVals : ["nodes", "userData"],
+        collVals : ["nodes", "userData", "titles"],
         chvals : ["change", "change:learnStatus", "change:visibleStatus"],
 
         /**
@@ -424,6 +422,7 @@
         defaults: function(){
             return {
                 nodes: new AGFK.NodeCollection(),
+                titles: {},
                 keyNode: null, // TODO this should be an array to handle multiple key nodes
                 userData: new AGFK.UserData()
             };
@@ -448,6 +447,7 @@
             this.get("nodes").add(response.nodes, {parse: true});
             this.get("nodes").applyUserData(this.get("userData"));
             delete response.nodes;
+            AGFK.titles = response.titles;     // TODO: better way to make titles available to DirectedEdge?
             return response;
         },
 

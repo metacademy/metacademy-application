@@ -392,7 +392,10 @@ def write_graph_json(nodes, shortcuts, graph, full_tags, shortcut_tags, resource
         node_items[tag] = nodes[tag].json_repr(resource_dict, graph)
     for tag in shortcut_tags:
         node_items[tag] = shortcuts[tag].json_repr(resource_dict, graph)
-    items = {'nodes': node_items}
+
+    titles = {node.tag: node.title for node in nodes.values()}
+    
+    items = {'nodes': node_items, 'titles': titles}
     json.dump(items, outstr)
 
 def node_resources(node, resource_defaults):

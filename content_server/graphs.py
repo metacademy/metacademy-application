@@ -208,9 +208,9 @@ def bottleneck_score(graph, tag):
     diff = orig - count_dependencies(graph_rem)
     return diff / float(orig)
 
-def rank_bottleneck_scores(nodes):
+def rank_bottleneck_scores(nodes, graph):
     """Print the list of nodes sorted by their bottleneck scores."""
-    scores = {tag: bottleneck_score(nodes, tag) for tag in nodes}
+    scores = {tag: bottleneck_score(graph, tag) for tag in nodes}
     order = sorted(nodes.keys(), key=lambda t: scores[t], reverse=True)
     for tag in order:
         print '%10.5f %s' % (scores[tag], nodes[tag].title)

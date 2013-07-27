@@ -12,41 +12,6 @@ import resources
 WRAP_WIDTH = 12
 
 
-def node_dir(content_path, tag):
-    return os.path.join(content_path, 'nodes', tag)
-
-def title_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'title.txt')
-
-def summary_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'summary.txt')
-
-def wiki_summary_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'wiki-summary.txt')
-
-def questions_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'questions.txt')
-
-def node_resources_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'resources.txt')
-
-def dependencies_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'dependencies.txt')
-
-def see_also_file(content_path, tag):
-    return os.path.join(node_dir(content_path, tag), 'see-also.txt')
-
-def shortcut_dir(content_path, tag):
-    return os.path.join(content_path, 'shortcuts', tag)
-
-def shortcut_questions_file(content_path, tag):
-    return os.path.join(shortcut_dir(content_path, tag), 'questions.txt')
-
-def shortcut_resources_file(content_path, tag):
-    return os.path.join(shortcut_dir(content_path, tag), 'resources.txt')
-
-def shortcut_dependencies_file(content_path, tag):
-    return os.path.join(shortcut_dir(content_path, tag), 'dependencies.txt')
 
 
 
@@ -140,8 +105,7 @@ def parse_list(s, sep):
 
 ############################ read nodes as directories #########################
 
-class DatabaseFormatError(RuntimeError):
-    pass
+
 
 def read_title(f):
     return f.readlines()[0].strip()
@@ -181,144 +145,6 @@ def read_see_also(f):
 def mark_wiki(summary):
     return '%s%s' % ('*Wiki*', summary)
 
-def read_node(content_path, tag):
-    """Read a Concept object from a directory which optionally contains title.txt,
-    dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
-    # TODO: normalize string cleaning (get rid of double quotes that mess up json)
-    
-    ### process title
-    if os.path.exists(title_file(content_path, tag)):
-        title = read_title(open(title_file(content_path, tag)))
-    else:
-        title = None
-
-    ### process summary
-    summary = ""
-    usewiki = False
-    sfile = None
-    if os.path.exists(summary_file(content_path, tag)):
-        sfile = summary_file(content_path, tag)
-    elif os.path.exists(wiki_summary_file(content_path, tag)):
-        sfile = wiki_summary_file(content_path, tag)
-        usewiki = True
-
-    if sfile:
-        summary = read_summary(open(sfile))
-
-    if usewiki and len(summary):
-        summary = mark_wiki(summary)
-
-
-    # process resources
-    if os.path.exists(node_resources_file(content_path, tag)):
-        node_resources = read_node_resources(open(node_resources_file(content_path, tag)))
-    else:
-        node_resources = []
-
-    ### process questions
-    if os.path.exists(questions_file(content_path, tag)):
-        questions = read_questions(open(questions_file(content_path, tag)))
-    else:
-        questions = []
-            
-
-    ### process dependencies
-    if os.path.exists(dependencies_file(content_path, tag)):
-        dependencies = read_dependencies(open(dependencies_file(content_path, tag)))
-    else:
-        dependencies = []
-    
-    ### process see-also
-    pointers = ""
-    if os.path.exists(see_also_file(content_path, tag)):
-        pointers = read_see_also(open(see_also_file(content_path, tag)))
-
-    return concepts.Concept(tag, title, summary, dependencies, pointers, node_resources, questions)
-
-def read_shortcut(content_path, tag, concept_node):
-    """Read a Shortcut object from a directory which contains dependencies.txt and resources.txt,
-    and optionally questions.txt."""
-
-    # process resources
-    if not os.path.exists(shortcut_resources_file(content_path, tag)):
-        raise DatabaseFormatError('Missing resources file for shortcut %s' % tag)
-    shortcut_resources = read_node_resources(open(shortcut_resources_file(content_path, tag)))
-
-    # process dependencies
-    if not os.path.exists(shortcut_resources_file(content_path, tag)):
-        raise DatabaseFormatError('Missing dependencies file for shortcut %s' % tag)
-    dependencies = read_dependencies(open(shortcut_dependencies_file(content_path, tag)))
-
-    # process questions
-    if os.path.exists(shortcut_questions_file(content_path, tag)):
-        questions = read_questions(open(shortcut_questions_file(content_path, tag)))
-    else:
-        questions = []
-
-    return concepts.Shortcut(concept_node, dependencies, shortcut_resources, questions)
-    
-
-    
-
-def check_required_files(content_path, node_tag):
-    if not os.path.exists(title_file(content_path, node_tag)):
-        raise RuntimeError('No title for %s' % node_tag)
-    if not os.path.exists(dependencies_file(content_path, node_tag)):
-        raise RuntimeError('No dependencies for %s' % node_tag)
-    if not os.path.exists(see_also_file(content_path, node_tag)):
-        raise RuntimeError('No see-also for %s' % node_tag)
-
-
-def read_nodes(content_path, onlytitle=False):
-    """Read all the nodes in a directory and return a dict mapping tags to Concept objects."""
-    nodes_path = os.path.join(content_path, 'nodes')
-    tags = map(normalize_input_tag,_filter_non_nodes(os.listdir(nodes_path)))
-    if onlytitle:
-        return tags
-    else:
-        nodes = [read_node(content_path, tag) for tag in tags]
-        return {node.tag: node for node in nodes}
-
-def read_shortcuts(content_path, concept_nodes):
-    shortcuts_path = os.path.join(content_path, 'shortcuts')
-    if not os.path.exists(shortcuts_path):
-        return {}
-    tags = map(normalize_input_tag, _filter_non_nodes(os.listdir(shortcuts_path)))
-    shortcuts = {}
-    for tag in tags:
-        try:
-            shortcuts[tag] = read_shortcut(content_path, tag, concept_nodes[tag])
-        except DatabaseFormatError:
-            pass
-    return shortcuts
-    
-
-
-def _filter_non_nodes(tags):
-    return filter(lambda(x): x[0] != '.', tags) # remove hidden files from list
-
-
-def check_format(content_path):
-    nodes_path = os.path.join(content_path, 'nodes')
-    tags = map(normalize_input_tag,os.listdir(nodes_path))
-    # make sure files exist and are formatted correctly
-    nodes = []
-    for tag in tags:
-        try:
-            nodes.append(read_node(content_path, tag, assert_exists=True))
-        except RuntimeError as e:
-            print e
-
-    # make sure tags do not have spaces
-    for node in nodes:
-        if re.search(r'\s', node.tag):
-            print 'Concept tag "%s" contains whitespace' % node.tag
-        for d in node.dependencies:
-            if re.search(r'\s', d.from_tag):
-                print 'Concept "%s" has dependency "%s" which contains whitespace' % (node.tag, d.from_tag)
-        for p in node.pointers:
-            if re.search(r'\s', p.to_tag):
-                print 'Concept "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
 
 
 ################################# write .dot files #############################
@@ -351,7 +177,7 @@ def wrap(s, width):
     return result
 
 
-def write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, outstr=None, bottom_up=False):
+def write_graph_dot(db, full_tags, shortcut_tags, outstr=None, bottom_up=False):
     if outstr is None:
         outstr = sys.stdout
     tags = set(full_tags).union(set(shortcut_tags))
@@ -362,10 +188,10 @@ def write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, outstr=No
         print >> outstr, '    rankdir=BT;'
 
     for tag in tags:
-        node = nodes[tag]
+        node = db.nodes[tag]
         print >> outstr, '    %s [label="%s"];' % (tag, wrap(node.title, WRAP_WIDTH))
 
-    for parent, child in graph.edges:
+    for parent, child in db.graph.edges:
         parent_tag, child_tag = parent[1], child[1]
         if parent_tag in tags and child_tag in tags:
             print >> outstr, '    %s -> %s;' % (parent_tag, child_tag)
@@ -375,25 +201,20 @@ def write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, outstr=No
 
 #################################### JSON ######################################
 
-def node_dict(nodes, tag, resource_dict=None):
-    node = nodes[tag]
-    d = node.json_repr(resource_dict)
-    return d
+def node_to_json(db, tag):
+    return json.dumps(db.nodes[tag].json_repr(db.resource_dict))
 
-def node_to_json(nodes, tag, resource_dict):
-    return json.dumps(nodes[tag].json_repr(resource_dict))
-
-def write_graph_json(nodes, shortcuts, graph, full_tags, shortcut_tags, resource_dict=None, outstr=None):
+def write_graph_json(db, full_tags, shortcut_tags, outstr=None):
     if outstr is None:
         outstr = sys.stdout
 
     node_items = {}
     for tag in full_tags:
-        node_items[tag] = nodes[tag].json_repr(resource_dict, graph)
+        node_items[tag] = db.nodes[tag].json_repr(db.resources, db.graph)
     for tag in shortcut_tags:
-        node_items[tag] = shortcuts[tag].json_repr(resource_dict, graph)
+        node_items[tag] = db.shortcuts[tag].json_repr(db.resources, db.graph)
 
-    titles = {node.tag: node.title for node in nodes.values()}
+    titles = {node.tag: node.title for node in db.nodes.values()}
     
     items = {'nodes': node_items, 'titles': titles}
     json.dump(items, outstr)
@@ -401,10 +222,4 @@ def write_graph_json(nodes, shortcuts, graph, full_tags, shortcut_tags, resource
 def node_resources(node, resource_defaults):
     return [resources.add_defaults(r, resource_defaults) for r in node.resources]
 
-def node_resources_json(node, resource_dict):
-    return json.dumps(node_resources(node, resource_dict))
 
-
-
-
-    

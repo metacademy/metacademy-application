@@ -6,9 +6,9 @@ import os
 import sys
 
 import config
+import database
 import formats
 import graphs
-import resources
 import search
 
 """This server responds to the following requests:
@@ -36,10 +36,7 @@ Start the server by typing (from the main knowledge-maps directory):
 """
 
 
-nodes = None
-graph = None
-shortcuts = None
-resource_dict = None
+db = None
 
 NOT_FOUND = 404
 
@@ -50,13 +47,9 @@ CONTENT_TYPES = {'json': 'application/json',
 
 
 def load_graph():
-    global nodes, shortcuts, graph, resource_dict
-    if nodes is None:
-        nodes = formats.read_nodes(config.CONTENT_PATH)
-        nodes = graphs.remove_missing_links(nodes)
-        shortcuts = formats.read_shortcuts(config.CONTENT_PATH, nodes)
-        graph = graphs.Graph.from_node_and_shortcut_dependencies(nodes, shortcuts)
-        resource_dict = resources.read_resources_file(resources.resource_db_path())
+    global db
+    if db is None:
+        db = database.Database.load(config.CONTENT_PATH)
 
         # load search index
         search.load_main_index()
@@ -65,16 +58,16 @@ def format_graph(full_tags, shortcut_tags, fmt):
     """Return graph in desired format"""
     if fmt == 'json':
         f = cStringIO.StringIO()
-        formats.write_graph_json(nodes, shortcuts, graph, full_tags, shortcut_tags, resource_dict, f)
+        formats.write_graph_json(db, full_tags, shortcut_tags, f)
         return f.getvalue()
     elif fmt == 'dot':
         f = cStringIO.StringIO()
-        formats.write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, f, bottom_up=True)
+        formats.write_graph_dot(db, full_tags, shortcut_tags, f, bottom_up=True)
         return f.getvalue()
     elif fmt == 'svg':
         dotfile = os.path.join(config.TEMP_PATH, 'graph.dot')
         svgfile = os.path.join(config.TEMP_PATH, 'graph.svg')
-        formats.write_graph_dot(nodes, shortcuts, graph, full_tags, shortcut_tags, open(dotfile, 'w'), bottom_up=True)
+        formats.write_graph_dot(db, full_tags, shortcut_tags, open(dotfile, 'w'), bottom_up=True)
         os.system('dot -Tsvg %s -o %s' % (dotfile, svgfile))
         return open(svgfile, 'rb').read()
     else:
@@ -82,20 +75,20 @@ def format_graph(full_tags, shortcut_tags, fmt):
 
 def get_node_json(tag):
     load_graph()
-    return formats.node_to_json(nodes, tag, resource_dict)
+    return formats.node_to_json(db.nodes, tag, db.resources)
 
 def compute_dependencies(tag):
     load_graph()
 
-    full, short = graphs.get_ancestors(graph, tag)
+    full, short = graphs.get_ancestors(db.graph, tag)
     relevant_full = set([tag]).union(full)
     return relevant_full, short
 
 def compute_relevant(tag):
     load_graph()
 
-    ancestors_full, ancestors_shortcut = graphs.get_ancestors(graph, tag)
-    descendants_full, descendants_shortcut = graphs.get_descendants(graph, tag)
+    ancestors_full, ancestors_shortcut = graphs.get_ancestors(db.graph, tag)
+    descendants_full, descendants_shortcut = graphs.get_descendants(db.graph, tag)
     relevant_full = set([tag]).union(ancestors_full).union(descendants_full)
     relevant_shortcut = ancestors_shortcut.union(descendants_shortcut).difference(relevant_full)
     return relevant_full, relevant_shortcut
@@ -121,7 +114,7 @@ def do_full_graph():
     else:
         fmt = 'json'
 
-    text = format_graph(set(nodes.keys()), set(), fmt)
+    text = format_graph(set(db.nodes.keys()), set(), fmt)
     return make_response(text, fmt)
 
 @app.route('/nodes/<node_name>')
@@ -162,8 +155,8 @@ def do_search():
     load_graph()
 
     tags = search.answer_query(q)
-    tags = filter(lambda t: t in nodes, tags)
-    result_nodes = [nodes[t] for t in tags]
+    tags = filter(lambda t: t in db.nodes, tags)
+    result_nodes = [db.nodes[t] for t in tags]
     results = [{'tag': node.tag, 'title': node.title, 'summary': node.summary}
                for node in result_nodes]
     text = json.dumps(results)

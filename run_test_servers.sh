@@ -8,7 +8,7 @@ cp=$1
 shift
 fp=$@
 
-python content_server/simple_server.py $cp &
+python content_server/server.py $cp &
 cserver_id=$!
 python manage.py runserver $fp
 

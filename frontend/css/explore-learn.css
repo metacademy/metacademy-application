@@ -40,11 +40,11 @@
 #explore-learn-button-wrapper{
     position: absolute;
     top: 2em;
-    left: 0;
+    right: 0;
     display: inline-block;
     z-index: 1;
     margin-top: 0.2em;
-    margin-left: 1em;
+    margin-right: 1em;
 }
 
 /* ---------------------------------------------------*/

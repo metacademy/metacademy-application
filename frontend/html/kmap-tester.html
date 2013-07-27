@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-    
+{% load staticfiles %}
+
     {% block css %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/reset.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/standard.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/explore-learn.css"/>
+    <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/standard.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
     {% endblock %}
 
   </head>
@@ -32,20 +33,20 @@
       {% endblock %}
 
     {% block jscript %}
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/d3.v2.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/jquery-latest.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/viz.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/underscore-min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/lib/backbone.js"></script>
+    <script type="text/javascript" src="{% static "javascript/lib/d3.v2.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/lib/jquery-latest.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/lib/viz.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/lib/backbone.js" %}"></script>
 
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/utils/utils.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/models/models.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/collections/collections.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/explore-view.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/views/learning-view.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/routers/routers.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/agfk/main.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}javascript/gen-utils.js"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/utils/utils.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/models/models.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/collections/collections.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/views/explore-view.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/views/learning-view.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/routers/routers.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/main.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
     {% endblock %}
 
 

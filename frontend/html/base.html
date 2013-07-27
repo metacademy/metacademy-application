@@ -28,13 +28,22 @@
 
   <body>
     {% block body %}
-    <div id="header-wrapper">
-    <div id="header">
-      {% block header %}
-      <input type="text" id="header-search-box" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
-      </input>
-      {% endblock %}
-    </div>
+
+    <div class="header-bar">
+      <div class="header-content-wrapper">
+	{% block header %}
+	<div class="header-el">
+	  <a href="/" target="_self">
+	    <img class="header-img" src="{% static "images/metacademy-toolbar-icon1.png" %}" alt="metacademy logo link">
+	  </a>
+	</div>
+
+	<div class="header-el">
+	  <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
+	</div>
+
+	{% endblock %}
+      </div>
     </div>
 
 
@@ -50,7 +59,7 @@
       window.CONTENT_SERVER = "{{ content_server }}";
     </script>
     {% endblock %}
-    
+
     {% block jscript %}
     {% endblock %}
 

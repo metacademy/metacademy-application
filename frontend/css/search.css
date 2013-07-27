@@ -32,6 +32,7 @@
 
 .sres-search-wrapper{
     margin: 1.2em auto;
+    margin-bottom: 1.6em;
     display: table;
     vertical-align: middle;
 }
@@ -50,13 +51,6 @@
     margin-left: 20%;
     margin-right: 20%;
     border-bottom: 1px solid #eaeaea
-}
-
-.sres-separator{
-    color: #0E0319;
-    text-align: center;
-    margin: 1em auto;
-    letter-spacing: 2em;
 }
 
 .search-res-wrapper{

@@ -31,17 +31,6 @@ p {
 /* ---------------------------------------------------*/
 /* ---------->>> General Functional Styles<<<---------*/
 /* ---------------------------------------------------*/
-#header-search-box{
-    width: 15em;
-    border-radius: 2px;
-    float: right;
-    line-height: 1.5em;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-    margin-right: 0.8ex;
-}
 
 .external-link{
     font-size: 1em;
@@ -78,13 +67,14 @@ a.expand-collapse-link:hover{
 /* ---------------------------------------------------*/
 /* ---------->>> Layout Styles <<<--------------------*/
 /* ---------------------------------------------------*/
-#header-wrapper{
-    display: table;
-    width: 100%;
-}
 
-#header {
-    height: 1.5em;
+/* #header-wrapper{ */
+/*     display: table; */
+/*     width: 100%; */
+/* } */
+
+.header-bar {
+    height: 1.6em;		 
     width: 100%;
     background: #333;
     overflow: hidden;
@@ -92,16 +82,50 @@ a.expand-collapse-link:hover{
     font-size: 1.1em;
     position: relative;
     z-index: 1000;
-    display: table-cell;
-    vertical-align: middle;
 }
 
-/* so element within the header can be vertically centered */
-.header-inner-wrap{
+.header-content-wrapper{
+    display: table;
     height: 100%;
-    width: 100%;
-    display: table-cell;
 }
+
+#header-search-input{
+    outline: none;
+    display: inline-block;
+    border: 1px solid #999999;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+    background-color: white;
+    border-radius: 3px;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+#header-search-input:focus{
+    border-color: #501644;
+    box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
+}
+
+#header-search-input:hover{
+    box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
+}
+
+.header-el{
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0 1em;
+    padding: 0 0.2em;
+}
+
+.header-img{
+    vertical-align: middle;
+}
+/* /\* so element within the header can be vertically centered *\/ */
+/* .header-inner-wrap{ */
+/*     height: 100%; */
+/*     width: 100%; */
+/*     display: table-cell; */
+/* } */
 
 #main {
     clear: both;

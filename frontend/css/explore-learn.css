@@ -59,6 +59,10 @@
     background: white;
 }
 
+#learn-view{
+    padding-bottom: 5em;
+}
+
 .learn-title-display{
     text-align: center;
 }

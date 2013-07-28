@@ -49,10 +49,10 @@
                 learnClass = viewConsts.learnedClass,
                 implicitLearnedClass = viewConsts.implicitLearnedClass;
                 thisView.listenTo(thisView.model, "change:learnStatus", function(nodeId, status){
-                        thisView.changeTitleClass(learnClass, status);
+                    thisView.changeTitleClass(learnClass, status);
                 });
                 thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
-                        thisView.changeTitleClass(implicitLearnedClass, status);
+                    thisView.changeTitleClass(implicitLearnedClass, status);
                 });
             },
             
@@ -210,7 +210,7 @@
             }
 
         });
-   })();
+    })();
     
     /**
      * Wrapper view to display all dependencies
@@ -274,7 +274,7 @@
             }
 
         });
-   })();
+    })();
 
 
     /**
@@ -357,12 +357,12 @@
              */
             parsePtrTextToHtml: function(ptrText){
                 var ptrArr = ptrText.split(/(?=\*)/),
-                    i,
-                    depth = 0,
-                    prevDepth = 0,
-                    tmpDepth,
-                    htmlStr = "<ul>",
-                    liStr;
+                i,
+                depth = 0,
+                prevDepth = 0,
+                tmpDepth,
+                htmlStr = "<ul>",
+                liStr;
 
                 // array depth corresponds to list depth
                 for (i = 0; i < ptrArr.length; i++){
@@ -395,7 +395,7 @@
                 return htmlStr;
             }
         });
-   })();
+    })();
     
 
     /**
@@ -430,13 +430,13 @@
              */
             render: function(){
                 var thisView = this,
-                    viewConsts = pvt.viewConsts,
-                    assignObj = {},
-                    freeResourcesLocClass = "." + viewConsts.freeResourcesLocClass,
-                    paidResourcesLocClass = "." + viewConsts.paidResourcesLocClass,
-                    depLocClass = "." + viewConsts.depLocClass,
-                    outlinkLocClass = "." + viewConsts.outlinkLocClass,
-                    ptrLocClass = "." + viewConsts.ptrLocClass;
+                viewConsts = pvt.viewConsts,
+                assignObj = {},
+                freeResourcesLocClass = "." + viewConsts.freeResourcesLocClass,
+                paidResourcesLocClass = "." + viewConsts.paidResourcesLocClass,
+                depLocClass = "." + viewConsts.depLocClass,
+                outlinkLocClass = "." + viewConsts.outlinkLocClass,
+                ptrLocClass = "." + viewConsts.ptrLocClass;
                 
                 thisView.$el.html(thisView.template(thisView.model.toJSON()));
                 thisView.fresources =
@@ -516,7 +516,7 @@
          * Insert a given subview after the specified dom node
          */
         pvt.insertSubViewAfter = function(subview, domNode){
-                domNode.parentNode.insertBefore(subview.render().el, domNode.nextSibling);
+            domNode.parentNode.insertBefore(subview.render().el, domNode.nextSibling);
         };
 
         // return public object
@@ -569,12 +569,12 @@
              */
             render: function(){
                 var thisView = this,
-                    $el = thisView.$el,
-                    expandedNodes = pvt.expandedNodes,
-                    clkItmClass = pvt.viewConsts.clickedItmClass;
+                $el = thisView.$el,
+                expandedNodes = pvt.expandedNodes,
+                clkItmClass = pvt.viewConsts.clickedItmClass;
 
                 $el.html(""); // TODO we shouldn't be doing this -- handle the subviews better
-                pvt.nodeOrdering = thisView.getLVNodeOrdering();
+                pvt.nodeOrdering = thisView.getTopoSortedConcepts();
                 thisView.renderTitles();
                 
                 // recapture previous expand/collapse state TODO is this desirable behavior?
@@ -594,10 +594,10 @@
              * Render the learning view titles TODO allow for rerendering of only titles
              */
             renderTitles: function(){
-            var thisView = this,
+		var thisView = this,
                 inum,
                 noLen,
-                nodeOrdering = pvt.nodeOrdering || thisView.getLVNodeOrdering(),
+                nodeOrdering = pvt.nodeOrdering || thisView.getTopoSortedConcepts(),
                 curNode,
                 nid,
                 nliview,
@@ -611,12 +611,12 @@
                 for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
                     curNode = nodes.get(nodeOrdering[inum]);
                     nid = curNode.get("id");
-                 //   simpleModel = {
-                 //       title: curNode.get("title"),
-                 //       id: nid,
-                 //       learned: learnedNodes.hasOwnProperty(nid),
-                 //       implicitLearned: implicitLearnedNodes.hasOwnProperty(nid)
-                 //   };
+                    //   simpleModel = {
+                    //       title: curNode.get("title"),
+                    //       id: nid,
+                    //       learned: learnedNodes.hasOwnProperty(nid),
+                    //       implicitLearned: implicitLearnedNodes.hasOwnProperty(nid)
+                    //   };
                     nliview = new AGFK.NodeListItemView({model: curNode});
                     nliview.setParentView(thisView);
                     $el.append(nliview.render().el); 
@@ -627,10 +627,10 @@
              * Clean up the view
              */
             close: function(){
-            var expN,
-            expandedNodes = pvt.expandedNodes,
-            domeEl;
-                 for (expN in expandedNodes){
+		var expN,
+		expandedNodes = pvt.expandedNodes,
+		domeEl;
+                for (expN in expandedNodes){
                     if (expandedNodes.hasOwnProperty(expN)){
                         var domEl = document.getElementById(expN);
                         expandedNodes[expN].close();
@@ -642,70 +642,58 @@
             },
 
             /**
-             * Compute the learning view ordering
+             * Compute the learning view ordering (topological sort)
              * TODO this function may be migrated 
              * if the view ordering is user-dependent
              */
-            getLVNodeOrdering: function(){
-                var thisView = this,
-                    curAddNodes = [], // current layer in the BFS
-                    nextAddNodes = [], // next layel in the BFS
-                    nodeOrdering = [], // returned node ordering
-                    traversedNodes = {}, // nodes already added to list
-                    curTag,  // current node being added to list
-                    nodes = thisView.model.get("nodes"),
-                    nodeNames = nodes.pluck("id"),
-                    keyTag = thisView.model.get("keyNode"),
-                    allOutLinksAdded;
+            getTopoSortedConcepts: function(){
+		var thisView = this,
+		keyTag = thisView.model.get("keyNode"),
+                nodes = thisView.model.get("nodes"),
+		traversedNodes = {}, // keep track of traversed nodes
+		startRootNodes; // nodes already added to the list
 
                 if (keyTag === ""){
-                    // init: obtain node tags with 0 outlinks
-                    curAddNodes = _.map(nodes.filter(function(mdl){
+                    // init: obtain node tags with 0 outlinks (root nodes)
+                    startRootNodes = _.map(nodes.filter(function(mdl){
                         return mdl.get("outlinks").length == 0;
                     }), function(itm){
                         return itm.get("id");
                     });
                 }
                 else{
-                    curAddNodes.unshift(keyTag);
+		    // root node is the keyTag
+                    startRootNodes = [keyTag];
                 }
 
-                curAddNodes.forEach(function(el){
-                    traversedNodes[el] = 1;
-                });
-                
-                // perform a level-based breadth first search 
-                while(curAddNodes.length > 0){
-                    curTag = curAddNodes.shift();
-                    nodeOrdering.unshift(curTag);
-                    
-                    _.each(nodes.get(curTag).getUniqueDependencies(),
-                    function(toAddNode){
-                        // make sure we're adding a valid node'
-                        allOutLinksAdded = true;
-                        $.each(nodes.get(toAddNode).get("outlinks").pluck("to_tag"),function(inum, ol){
-                            if (!traversedNodes.hasOwnProperty(ol) && nodeNames.indexOf(ol) !== -1){
-                                allOutLinksAdded = false;
-                                return false;
-                            }
-                        });
-                        if (!traversedNodes.hasOwnProperty(toAddNode) && allOutLinksAdded){
-                            nextAddNodes.push(toAddNode);
-                            traversedNodes[toAddNode] = 1;
-                        }
-                    });
-                    if (curAddNodes.length === 0){
-                        // TODO disambiguate nodes at the same level here
-                        curAddNodes = nextAddNodes;
-                        nextAddNodes = [];
-                    }
-                }
-                
-                return nodeOrdering;   
+		// recursive dfs topological sort
+		function dfsTopSort (rootNodeTags){
+		    var curRootNodeTagDepth,
+		    returnArr = [],
+		    rootNodeRoundArr = [],
+		    curRootNodeTag,
+		    unqDepTags;
+
+		    // recurse on the input root node tags
+		    for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
+			curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
+			if (!traversedNodes.hasOwnProperty(curRootNodeTag)){
+			    unqDepTags = nodes.get(curRootNodeTag);
+			    unqDepTags = unqDepTags ? unqDepTags.getUniqueDependencies() : [];
+			    if (unqDepTags.length > 0){
+				returnArr = returnArr.concat(dfsTopSort(unqDepTags));
+			    }
+			    returnArr.push(curRootNodeTag);
+			    traversedNodes[curRootNodeTag] = 1;
+			}
+		    }
+		    return returnArr
+		};
+		
+                return dfsTopSort(startRootNodes);
             }
         });
     })();
-
 
 
 })(window.AGFK = typeof window.AGFK == "object"? window.AGFK : {}, window.Backbone, window._, window.jQuery);

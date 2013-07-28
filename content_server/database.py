@@ -10,11 +10,12 @@ class DatabaseFormatError(RuntimeError):
     pass
 
 class Database:
-    def __init__(self, nodes, shortcuts, graph, resources):
+    def __init__(self, nodes, shortcuts, graph, resources, id2tag):
         self.nodes = nodes
         self.shortcuts = shortcuts
         self.graph = graph
         self.resources = resources
+        self.id2tag = id2tag
 
     @staticmethod
     def load(content_dir):
@@ -23,13 +24,18 @@ class Database:
         shortcuts = read_shortcuts(content_dir, nodes)
         graph = graphs.Graph.from_node_and_shortcut_dependencies(nodes, shortcuts)
         resource_dict = resources.read_resources_file(resources.resource_db_path())
-        return Database(nodes, shortcuts, graph, resource_dict)
+        id2tag = dict([(node.id, tag) for tag, node in nodes.items()
+                       if node.id is not None])
+        return Database(nodes, shortcuts, graph, resource_dict, id2tag)
 
         
 
 
 def node_dir(content_path, tag):
     return os.path.join(content_path, 'nodes', tag)
+
+def id_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'id.txt')
 
 def title_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'title.txt')
@@ -77,6 +83,12 @@ def read_node(content_path, tag):
     else:
         title = None
 
+    ### process ID
+    if os.path.exists(id_file(content_path, tag)):
+        node_id = formats.read_id(open(id_file(content_path, tag)))
+    else:
+        node_id = None
+
     ### process summary
     summary = ""
     usewiki = False
@@ -118,7 +130,7 @@ def read_node(content_path, tag):
     if os.path.exists(see_also_file(content_path, tag)):
         pointers = formats.read_see_also(open(see_also_file(content_path, tag)))
 
-    return concepts.Concept(tag, title, summary, dependencies, pointers, node_resources, questions)
+    return concepts.Concept(tag, node_id, title, summary, dependencies, pointers, node_resources, questions)
 
 def read_shortcut(content_path, tag, concept_node):
     """Read a Shortcut object from a directory which contains dependencies.txt and resources.txt,
@@ -204,5 +216,31 @@ def check_format(content_path):
         for p in node.pointers:
             if re.search(r'\s', p.to_tag):
                 print 'Concept "%s" has forward link "%s" which contains whitespace' % (node.tag, p.to_tag)
+
+
+def assign_ids(content_path):
+    """Assign unique IDs to all of the concepts which don't already have IDs."""
+    nodes_path = os.path.join(content_path, 'nodes')
+    tags = os.listdir(nodes_path)
+
+    # read in current ID strings
+    ids = set()
+    for tag in tags:
+        if os.path.exists(id_file(content_path, tag)):
+            node_id = open(id_file(content_path, tag)).read().strip()
+            ids.add(node_id)
+
+    for tag in tags:
+        if not os.path.exists(id_file(content_path, tag)):
+            new_id = None
+            while new_id is None or new_id in ids:
+                new_id = concepts.random_id()
+            open(id_file(content_path, tag), 'w').write(new_id)
+
+def concepts_without_ids(content_path):
+    nodes_path = os.path.join(content_path, 'nodes')
+    tags = os.listdir(nodes_path)
+
+    return [t for t in tags if not os.path.exists(id_file(content_path, t))]
 
 

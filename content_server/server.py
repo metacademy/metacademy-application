@@ -75,7 +75,7 @@ def format_graph(full_tags, shortcut_tags, fmt):
 
 def get_node_json(tag):
     load_graph()
-    return formats.node_to_json(db.nodes, tag, db.resources)
+    return formats.node_to_json(db, tag)
 
 def compute_dependencies(tag):
     load_graph()
@@ -120,6 +120,14 @@ def do_full_graph():
 @app.route('/nodes/<node_name>')
 def do_single_node(node_name=None):
     args = flask.request.args
+
+    load_graph()
+    if node_name in db.nodes:
+        tag = node_name
+    elif node_name in db.id2tag:
+        tag = db.id2tag[node_name]
+    else:
+        flask.abort(NOT_FOUND)
     
     if 'set' in args:
         dset = args['set']
@@ -133,12 +141,12 @@ def do_single_node(node_name=None):
 
     if dset == 'single':
         assert fmt == 'json'
-        text = get_node_json(node_name)
+        text = get_node_json(tag)
     elif dset == 'related':
-        full, shortcut = compute_relevant(node_name)
+        full, shortcut = compute_relevant(tag)
         text = format_graph(full, shortcut, fmt)
     elif dset == 'map':
-        full, shortcut = compute_dependencies(node_name)
+        full, shortcut = compute_dependencies(tag)
         text = format_graph(full, shortcut, fmt)
     else:
         flask.abort(NOT_FOUND)

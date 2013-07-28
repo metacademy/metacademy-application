@@ -110,6 +110,9 @@ def parse_list(s, sep):
 def read_title(f):
     return f.readlines()[0].strip()
 
+def read_id(f):
+    return f.read().strip()
+
 def read_summary(f):
     return remove_comments(unicode(f.read(), 'utf-8'))
 
@@ -202,7 +205,7 @@ def write_graph_dot(db, full_tags, shortcut_tags, outstr=None, bottom_up=False):
 #################################### JSON ######################################
 
 def node_to_json(db, tag):
-    return json.dumps(db.nodes[tag].json_repr(db.resource_dict))
+    return json.dumps(db.nodes[tag].json_repr(db.resources))
 
 def write_graph_json(db, full_tags, shortcut_tags, outstr=None):
     if outstr is None:

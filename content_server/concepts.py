@@ -1,4 +1,8 @@
+import random
 import resources
+import string
+
+ID_LENGTH = 8
 
 class Dependency:
     """A struct representing a dependency on another concept."""
@@ -18,8 +22,9 @@ class Concept:
     dependencies -- a list of Dependency objects giving the immediate dependencies
     pointers -- a list of Pointer objects representing the see-also links
     """
-    def __init__(self, tag, title, summary, dependencies, pointers, resources, questions):
+    def __init__(self, tag, id, title, summary, dependencies, pointers, resources, questions):
         self.tag = tag
+        self.id = id
         self.title = title
         self.summary = summary
         self.dependencies = dependencies
@@ -28,7 +33,7 @@ class Concept:
         self.questions = questions
 
     def copy(self):
-        return Concept(self.tag, self.title, self.summary, list(self.dependencies), self.pointers,
+        return Concept(self.tag, self.id, self.title, self.summary, list(self.dependencies), self.pointers,
                        list(self.resources), list(self.questions))
 
     def json_repr(self, resource_dict, graph=None):
@@ -44,6 +49,7 @@ class Concept:
                         for dep in self.dependencies]
 
         d = {'title': self.title,
+             'id': self.id,
              'summary': self.summary,
              'pointers': self.pointers,
              'dependencies': dependencies,
@@ -96,6 +102,7 @@ class Shortcut:
                         for dep in self.dependencies]
         
         d = {'title': self.concept.title,
+             'id': self.concept.id,
              'summary': self.concept.summary,
              'pointers': self.concept.pointers,
              'dependencies': dependencies,
@@ -106,3 +113,8 @@ class Shortcut:
              }
 
         return d
+
+def random_id():
+    """Generate a random ID for a concept. The IDs are arbitrary, apart from the requirement that they be distinct."""
+    return ''.join([random.choice(string.lowercase + string.digits) for i in range(ID_LENGTH)])
+

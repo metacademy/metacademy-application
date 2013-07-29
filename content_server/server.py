@@ -77,12 +77,17 @@ def get_node_json(tag):
     load_graph()
     return formats.node_to_json(db, tag)
 
-def compute_dependencies(tag):
+def compute_dependencies(tags):
     load_graph()
 
-    full, short = graphs.get_ancestors(db.graph, tag)
-    relevant_full = set([tag]).union(full)
-    return relevant_full, short
+    full, short = set(), set()
+    for tag in tags:
+        curr_full, curr_short = graphs.get_ancestors(db.graph, tag)
+        full.update(curr_full)
+        short.update(curr_short)
+    full = set([tag]).union(full)
+    short = short.difference(full)
+    return full, short
 
 def compute_relevant(tag):
     load_graph()
@@ -106,16 +111,27 @@ def make_response(text, fmt):
     resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,Content-Type'
     return resp
 
-@app.route('/nodes')
-def do_full_graph():
+@app.route('/dependencies')
+def do_dependencies():
     args = flask.request.args
-    if 'format' in args:
-        fmt = args['format'][0]
-    else:
-        fmt = 'json'
 
-    text = format_graph(set(db.nodes.keys()), set(), fmt)
-    return make_response(text, fmt)
+    load_graph()
+    tags = set()
+    if 'concepts' in args:
+        query_tags = args.getlist('concepts')
+        tags.update([t for t in query_tags if t in db.nodes])
+    if 'ids' in args:
+        query_ids = args.getlist('ids')
+        tags.update([db.id2tag[i] for i in query_ids if i in db.id2tag])
+    if len(tags) == 0:
+        flask.abort(NOT_FOUND)
+
+    full, shortcut = compute_dependencies(tags)
+    text = format_graph(full, shortcut, 'json')
+
+    return make_response(text, 'json')
+    
+    
 
 @app.route('/nodes/<node_name>')
 def do_single_node(node_name=None):

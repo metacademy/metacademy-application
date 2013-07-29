@@ -25,6 +25,9 @@
     <% if (resource_type.length > 0){ %>
     <li> <span class="resource-detail-tag"> resource type: </span> <%- resource_type %>  </li>
     <% } %>
+    <% if (level){ %>
+    <li> <span class="resource-detail-tag"> level: </span> <%= level %> </li>
+    <% } %>
     <% if (authors.length > 0){ %>
     <li> <span class="resource-detail-tag"> authors: </span> <%- authors %> </li>
     <% } %>

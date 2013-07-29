@@ -39,6 +39,7 @@
                 resource_type: "",
                 free: 0,
                 edition: "",
+                level: "",
                 authors: [],
                 dependencies: [],
                 mark: [],

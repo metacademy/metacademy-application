@@ -2,13 +2,16 @@ from django.conf.urls import patterns, include, url
 # handle static files locally
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.decorators.cache import cache_page
-from backend.views import get_kmap_browser_view, get_search_view, get_landing_page
+
+from apps.content_search.views import get_search_view, get_landing_page
+from apps.graph.views import get_kmap_browser_view 
+
 
 """
 Django urls handler. Valid URLS/Requests:
   kmap(s)                           display knowledge-map browser
 
-see backend/simple_server for valid content requests
+see simple_server for valid content requests
 """
 
 urlpatterns = patterns('',

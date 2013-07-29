@@ -1,4 +1,4 @@
-from backend.settings import CONTENT_SERVER
+from settings import CONTENT_SERVER
 import urllib2
 import urllib
 import json

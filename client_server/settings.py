@@ -5,6 +5,7 @@ import config
 
 CONTENT_SERVER = 'http://localhost:' + str(config.CONTENT_SERVER_PORT)
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
+CLIENT_SERVER_PATH = SETTINGS_PATH
 AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../'))
 
 
@@ -67,7 +68,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(AGFK_PATH, 'frontend','media')  
+STATIC_ROOT = os.path.join(CLIENT_SERVER_PATH, '/static/media')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -75,9 +76,9 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    ('css',os.path.join(AGFK_PATH, 'frontend/css')),
-    ('images',os.path.join(AGFK_PATH, 'frontend/images')),
-    ('javascript',os.path.join(AGFK_PATH, 'frontend/javascript'))
+    ('css',os.path.join(CLIENT_SERVER_PATH, 'static/css')),
+    ('images',os.path.join(CLIENT_SERVER_PATH, 'static/images')),
+    ('javascript',os.path.join(CLIENT_SERVER_PATH, 'static/javascript'))
 )
 
 # List of finder classes that know how to find static files in
@@ -111,14 +112,14 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(AGFK_PATH,'frontend/html/'),
-    os.path.join(AGFK_PATH,'frontend/html/underscore-templates/')
+    os.path.join(CLIENT_SERVER_PATH,'static/html/'),
+    os.path.join(CLIENT_SERVER_PATH,'static/html/underscore-templates/')
 )
 
 INSTALLED_APPS = (
@@ -128,6 +129,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'apps.graph',
+    'apps.content_search',
+    'apps.user_management',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

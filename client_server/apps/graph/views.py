@@ -1,7 +1,8 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from settings import CONTENT_SERVER
-def get_kmap_browser_view(request):
+
+def graph_browser(request):
     """
     Returns the knowledge-map browser (learning/explore view)
     """

@@ -9,7 +9,7 @@ from apps.content_search.utils.cserver_communicator import get_search_json
 Django search-related view functions: handles web requests and queries content server for content
 """
 
-def get_landing_page(request):
+def landing_page(request):
     """
     Returns the landing page
     """

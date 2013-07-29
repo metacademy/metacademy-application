@@ -24,6 +24,8 @@
 
         pvt.prevUrlParams = {}; // url parameters
 
+	pvt.prevNodeId = undefined;
+
         pvt.viewMode = -1; // current view mode
 
         /**
@@ -65,7 +67,8 @@
         // return public object
         return Backbone.Router.extend({
             routes: {
-                ":params": "routeParams"
+                ":params": "routeParams",
+		"": "routeParams"
             },
 
             /**
@@ -90,17 +93,11 @@
             /**
              * Parse the URL parameters
              */
-            routeParams: function(params){
+            routeParams: function( params){
                 var routeConsts = pvt.routeConsts,
-                    paramsObj = pvt.getParamsFromStr(params),
-                    qnodeName = routeConsts.qnodeName;
-
-                if (paramsObj.hasOwnProperty(qnodeName)){
-                    this.nodeRoute(paramsObj[qnodeName], paramsObj);
-                }
-                else{
-                    throw new Error("Must supply 'node' key-value pair in URL, e.g: node=logistic_regression");
-                }
+		    nodeName = window.location.href.split('/').pop().split('#').shift(), // TODO replace this hack when rewriting the router
+                    paramsObj = pvt.getParamsFromStr(params || "");
+                    this.nodeRoute(nodeName, paramsObj);
             },
 
             /**
@@ -139,7 +136,7 @@
                     qnodeName = routeConsts.qnodeName,
                     pexploreMode = routeConsts.pexploreMode,
                     plearnMode = routeConsts.plearnMode,
-                    keyNodeChanged = nodeId !== pvt.prevUrlParams[qnodeName],
+                    keyNodeChanged = nodeId !== pvt.prevNodeId,
                     doRender = true;
 
                 // need to load just the given node and deps...
@@ -152,7 +149,7 @@
                 }
                 else{
                     // clean up the old views
-                        pvt.cleanUpViews.call(thisRoute);
+                    pvt.cleanUpViews.call(thisRoute);
                     // fetch the new data
                     thisRoute.cnodesContn = new AGFK.CSData({keyNode: nodeId, userData: thisRoute.cnodesContn ?  thisRoute.cnodesContn.get("userData") : new AGFK.UserData()}); // this is hacky TODO reconsider the model structure
                     thisRoute.cnodesContn.fetch({success: postNodePop});
@@ -190,6 +187,7 @@
                         thisRoute.showView("#" + routeConsts.eviewId, thisRoute.eview, doRender);
                     }
                     pvt.prevUrlParams = $.extend({}, paramsObj);
+		    pvt.prevNodeId = nodeId;
                 }
             }
             

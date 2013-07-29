@@ -332,8 +332,8 @@
         pvt.parsePtrStr = function(ptrStr){
             return ptrStr.replace(new RegExp("\\[([^\\s]+)\\]", "g"),
                                   function(all, text, ch){
-                                      return '[<a class="internal-link" href="#node=' + text.replace(/[-]/g,"_") + '">' + text.replace(/[-_]/g," ") + '</a>]'
-                                      ;});
+                                      return '[<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + text.replace(/[-]/g,"_") + '">' + text.replace(/[-_]/g," ") + '</a>]'; // TODO fix hardcoded urls
+                                      });
         };
 
         // return public object

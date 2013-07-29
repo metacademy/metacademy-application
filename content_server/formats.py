@@ -204,8 +204,11 @@ def write_graph_dot(db, full_tags, shortcut_tags, outstr=None, bottom_up=False):
 
 #################################### JSON ######################################
 
-def node_to_json(db, tag):
-    return json.dumps(db.nodes[tag].json_repr(db.resources))
+def node_to_json(db, tag, shortcut=False):
+    if shortcut and tag in db.shortcuts:
+        return json.dumps(db.shortcuts[tag].json_repr(db.resources))
+    else:
+        return json.dumps(db.nodes[tag].json_repr(db.resources))
 
 def write_graph_json(db, full_tags, shortcut_tags, outstr=None):
     if outstr is None:

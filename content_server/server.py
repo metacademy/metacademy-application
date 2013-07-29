@@ -73,9 +73,9 @@ def format_graph(full_tags, shortcut_tags, fmt):
     else:
         raise RuntimeError('Unknown format: %s' % fmt)
 
-def get_node_json(tag):
+def get_node_json(tag, shortcut=False):
     load_graph()
-    return formats.node_to_json(db, tag)
+    return formats.node_to_json(db, tag, shortcut)
 
 def compute_dependencies(tags):
     load_graph()
@@ -130,11 +130,25 @@ def do_dependencies():
     text = format_graph(full, shortcut, 'json')
 
     return make_response(text, 'json')
-    
+
+@app.route('/concepts/<node_name>')
+def do_concept(node_name=None):
+    args = flask.request.args
+    load_graph()
+    if node_name not in db.nodes:
+        flask.abort(NOT_FOUND)
+
+    shortcut = ('shortcut' in args and args['shortcut'] != '0')
+
+    text = get_node_json(node_name, shortcut=shortcut)
+
+    return make_response(text, 'json')
+
     
 
 @app.route('/nodes/<node_name>')
 def do_single_node(node_name=None):
+    # deprecated; use /dependencies or /concepts paths instead
     args = flask.request.args
 
     load_graph()

@@ -4,7 +4,7 @@ from whoosh.fields import Schema, TEXT, ID
 from whoosh.qparser import MultifieldParser
 
 import config
-import formats
+import database
 
 main_index = None
 
@@ -22,8 +22,8 @@ def build_index(nodes, content_dir, index_dir):
     writer.commit()
     
 def build_main_index():
-    nodes = formats.read_nodes(config.CONTENT_PATH)
-    build_index(nodes, config.CONTENT_PATH, config.INDEX_PATH)
+    db = database.Database.load(config.CONTENT_PATH)
+    build_index(db.nodes, config.CONTENT_PATH, config.INDEX_PATH)
 
 def load_main_index():
     global main_index

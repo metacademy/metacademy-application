@@ -158,7 +158,7 @@ def do_single_node(node_name=None):
         tag = db.id2tag[node_name]
     else:
         flask.abort(NOT_FOUND)
-    
+
     if 'set' in args:
         dset = args['set']
     else:
@@ -173,10 +173,10 @@ def do_single_node(node_name=None):
         assert fmt == 'json'
         text = get_node_json(tag)
     elif dset == 'related':
-        full, shortcut = compute_relevant(tag)
+        full, shortcut = compute_relevant(set([tag]))
         text = format_graph(full, shortcut, fmt)
     elif dset == 'map':
-        full, shortcut = compute_dependencies(tag)
+        full, shortcut = compute_dependencies(set([tag]))
         text = format_graph(full, shortcut, fmt)
     else:
         flask.abort(NOT_FOUND)

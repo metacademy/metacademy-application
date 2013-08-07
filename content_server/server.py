@@ -13,6 +13,8 @@ import search
 
 """This server responds to the following requests:
 
+TODO this description is no longer accurate -- update once API is finalized
+
   GET nodes                           get a JSON object representing the full graph
   GET nodes/node-name                 get the JSON representation of a single node
   GET nodes/node-name?set=map             get the part of the graph that a node depends on
@@ -142,46 +144,7 @@ def do_concept(node_name=None):
 
     text = get_node_json(node_name, shortcut=shortcut)
 
-    return make_response(text, 'json')
-
-    
-
-@app.route('/nodes/<node_name>')
-def do_single_node(node_name=None):
-    # deprecated; use /dependencies or /concepts paths instead
-    args = flask.request.args
-
-    load_graph()
-    if node_name in db.nodes:
-        tag = node_name
-    elif node_name in db.id2tag:
-        tag = db.id2tag[node_name]
-    else:
-        flask.abort(NOT_FOUND)
-
-    if 'set' in args:
-        dset = args['set']
-    else:
-        dset = 'single'
-
-    if 'format' in args:
-        fmt = args['format'][0]
-    else:
-        fmt = 'json'
-
-    if dset == 'single':
-        assert fmt == 'json'
-        text = get_node_json(tag)
-    elif dset == 'related':
-        full, shortcut = compute_relevant(set([tag]))
-        text = format_graph(full, shortcut, fmt)
-    elif dset == 'map':
-        full, shortcut = compute_dependencies(set([tag]))
-        text = format_graph(full, shortcut, fmt)
-    else:
-        flask.abort(NOT_FOUND)
-
-    return make_response(text, fmt)
+    return make_response(text, 'json')    
 
 @app.route('/search')
 def do_search():

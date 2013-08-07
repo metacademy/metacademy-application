@@ -272,7 +272,6 @@
         pvt.changeILStateDFS = function(rootTag, changeState, d3Sel){
             var thisView = this,
                 thisModel = thisView.model,
-                userData = thisModel.get("userData"),
                 thisNodes = thisModel.get("nodes"),
                 d3Node,
                 viewConsts = pvt.viewConsts,
@@ -301,7 +300,8 @@
                             else{
                                 d3Node.attr(ilCtProp, 1);
                                 d3Node.classed(ilClass, true);
-                                userData.updateImplicitLearnedNodes(dt, true);
+//                                userData.updateImplicitLearnedNodes(dt, true);
+				// TODO CR-Restruct update implicit learned
                                 thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true);
                             }
                         }
@@ -311,7 +311,8 @@
                             d3Node.attr(ilCtProp, ilct);
                             if (ilct === 0){
                                 d3Node.classed(ilClass, false);
-                                userData.updateImplicitLearnedNodes(dt, false);
+				// TODO CR-Restruct update implicit learned
+//                                userData.updateImplicitLearnedNodes(dt, false);
                                 thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false);
                             }
                         }
@@ -536,7 +537,7 @@
                 var transprops = d3this.select("." + graphClass).attr("transform").match(/[0-9]+( [0-9]+)?/g),
                     otrans = transprops[2].split(" ").map(Number),
                     // front-and-center the key node if present
-                    keyNode = this.model.get("keyNode");
+                    keyNode = this.model.get("aux").get("depRoot");
                 if (keyNode) {
                     var keyNodeLoc = AGFK.utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
                         swx = window.innerWidth,
@@ -694,6 +695,7 @@
              */
             collToDot: function(args){ //depth, graphOrient, nodeWidth, nodeSep) {
                 var thisView = this,
+		    thisModel = thisView.model,
                     viewConsts = pvt.viewConsts,
                     dgArr,
                     args = args || {},
@@ -701,10 +703,10 @@
                     graphOrient = args.graphOrient || viewConsts.defaultGraphOrient,
                     nodeSep = args.nodeSep || viewConsts.defaultNodeSepDist,
                     nodeWidth = args.nodeWidth || viewConsts.defaultNodeWidth,
-                    keyNode = args.keyNode || thisView.model.get("nodes").get(thisView.model.get("keyNode")),
+                    keyNode = args.keyNode || thisModel.get("nodes").get(thisModel.get("aux").get("depRoot")),
                     remVisible = args.remVisible || false; // TODO describe these params
 
-                if (thisView.model.get("keyNode")) {
+                if (keyNode) {
                     dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible);
                 } else {
                     dgArr = pvt.getFullDSArr.call(this);
@@ -712,7 +714,7 @@
 
                 // include digraph options
                 dgArr.unshift("rankdir=" + graphOrient);
-                dgArr.unshift("nodesep=" + nodeSep); // encourage node separation TODO add as option        
+                dgArr.unshift("nodesep=" + nodeSep); 
                 dgArr.unshift("node [shape=circle, fixedsize=true, width=" + nodeWidth + "];");
 
                 return "digraph G{\n" + dgArr.join("\n") + "}";

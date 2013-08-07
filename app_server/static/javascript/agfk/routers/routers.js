@@ -127,7 +127,7 @@
             },
 
             /**
-             * Main router for a given node
+             * Main router for a given node TODO currently only works for one dependency
              */
             nodeRoute: function(nodeId, paramsObj) {
                 var thisRoute = this,
@@ -136,7 +136,7 @@
                     qnodeName = routeConsts.qnodeName,
                     pexploreMode = routeConsts.pexploreMode,
                     plearnMode = routeConsts.plearnMode,
-                    keyNodeChanged = nodeId !== pvt.prevNodeId,
+                    keyNodeChanged = nodeId !== pvt.prevNodeId, // TODO fix keynode dep CR-Restruct
                     doRender = true;
 
                 // need to load just the given node and deps...
@@ -151,7 +151,8 @@
                     // clean up the old views
                     pvt.cleanUpViews.call(thisRoute);
                     // fetch the new data
-                    thisRoute.cnodesContn = new AGFK.CSData({keyNode: nodeId, userData: thisRoute.cnodesContn ?  thisRoute.cnodesContn.get("userData") : new AGFK.UserData()}); // this is hacky TODO reconsider the model structure
+                    thisRoute.cnodesContn = new AGFK.AppData({ userData: thisRoute.cnodesContn ?  thisRoute.cnodesContn.get("userData") : new AGFK.UserData()}); // this is hacky TODO reconsider the model structure
+		    thisRoute.cnodesContn.setGraphData({depRoot: nodeId});
                     thisRoute.cnodesContn.fetch({success: postNodePop});
                 }
 
@@ -159,7 +160,7 @@
                 // -- necessary because of possible AJAX calls to obtain new data
                 function postNodePop() {
                     // set the document title to be the searched node
-                    document.title = thisRoute.cnodesContn.get("nodes").get(thisRoute.cnodesContn.get("keyNode")).get("title") + " - Metacademy";
+                    document.title =  " - Metacademy"; // TODO CR-Restruct
                     
                     // set default to explore mode
                     paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;
@@ -168,7 +169,7 @@
                     switch (paramsObj[qviewMode]){
                     case plearnMode:
                             if (keyNodeChanged || typeof thisRoute.lview === "undefined"){
-                                thisRoute.lview = new AGFK.LearnView({model: thisRoute.cnodesContn});
+                                thisRoute.lview = new AGFK.LearnView({model: thisRoute.cnodesContn.get("graphData")});
                                 doRender = true;
                             }
                             else{
@@ -178,7 +179,7 @@
                         break;
                     default:
                             if (keyNodeChanged || typeof thisRoute.eview === "undefined"){
-                                thisRoute.eview = new AGFK.ExploreView({model: thisRoute.cnodesContn});
+                                thisRoute.eview = new AGFK.ExploreView({model: thisRoute.cnodesContn.get("graphData")});
                                 doRender = true;
                             }
                             else{

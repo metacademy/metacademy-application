@@ -82,24 +82,7 @@
             else{
                 return "";
             }
-        },
-
-        /**
-         *
-         */
-        getFromTitle: function(){
-            var fromTag = this.get("from_tag");
-            return AGFK.titles[fromTag] ? AGFK.titles[fromTag] : AGFK.utils.getTitleGuessFromTag(fromTag);
-        },
-
-        /**
-         *
-         */
-        getToTitle: function(){
-	    var toTag = this.get("to_tag");
-            return AGFK.titles[toTag] ? AGFK.titles[toTag] : AGFK.utils.getTitleGuessFromTag(toTag);
         }
-
     });
 
 
@@ -340,6 +323,51 @@
     }
                 )();
 
+    /**
+     * GraphAuxModel: model to store all auxiliary graph information
+     **/
+    AGFK.GraphAuxModel = (function(){
+	var pvt = {};
+	return Backbone.Model.extend({
+	    defaults: {
+		depRoot: undefined,
+		titles: {}
+	    },
+
+	    /**
+	     * Get node display title from id
+	     */
+	    getTitleFromId: function(nid){
+		return this.get("titles")[nid]; // TODO post CR-Restruct add error handling
+	    }
+	})
+    })();
+
+    /**
+     * GraphData: model to store all graph related data (nodes, edges, aux data)
+     */
+    AGFK.GraphData = (function(){
+	var pvt = {};
+	return Backbone.Model.extend({
+            /**
+             * default user states
+             */
+	    defaults: function(){
+		return {
+		    nodes: new AGFK.GraphNodeCollection(),
+		    edges: new AGFK.GraphEdgeCollection(),
+		    aux: new AGFK.GraphAuxModel()
+		}
+	    },
+
+	    initialize: function(){
+		this.get("nodes").parentModel = this;
+		this.get("edges").parentModel = this;
+		this.get("aux").parentModel = this;
+	    }
+	});
+    })();
+
     /** 
      * UserData: model to store user data -- will eventually communicate with server for registered users
      */
@@ -409,21 +437,17 @@
         });
     })();
 
-    /**
-     * Model to maintain both client and server data
-     */
-    AGFK.CSData = Backbone.Model.extend({
-        collVals : ["nodes", "userData", "titles"],
-        chvals : ["change", "change:learnStatus", "change:visibleStatus"],
 
+    /**
+     * Wrapper model for all application data (i.e. user and graph data)
+     */
+    AGFK.AppData = Backbone.Model.extend({
         /**
          * Default model attributes
          */
         defaults: function(){
             return {
-                nodes: new AGFK.NodeCollection(),
-                titles: {},
-                keyNode: null, // TODO this should be an array to handle multiple key nodes
+                graphData: new AGFK.GraphData(),
                 userData: new AGFK.UserData()
             };
         },
@@ -432,22 +456,61 @@
          * Initialize the model by binding the appropriate callback functions
          */
         initialize: function(){
-            var thisModel = this;
-            // TODO more elegant way to handle this?
-            thisModel.get("userData").listenTo(thisModel.get("nodes"), "change:learnStatus",thisModel.get("userData").updateLearnedNodes);
-            thisModel.get("userData").listenTo(thisModel.get("nodes"), "change:implicitLearnStatus",thisModel.get("userData").updateImplicitLearnedNodes);
-            thisModel.get("userData").listenTo(thisModel.get("nodes"), "change:visibleStatus",thisModel.get("userData").updateVisibleNodes);
+            var thisModel = this,
+	    userData = thisModel.get("userData"),
+	    graphData = thisModel.get("graphData"),
+	    nodes = graphData.get("nodes");
+
+	    // set parentModel for userData and graphData
+	    graphData.parentModel = thisModel;
+	    userData.parentModel = thisModel;
+
+	    // Update user data when aux node data changes TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph (there may be a better way to do this, but aux fields on the nodes themselves, such as "learnStatus," make it easy to trigger changes in the views for the specific node rather than the entire collection 
+            userData.listenTo(nodes, "change:learnStatus", userData.updateLearnedNodes);
+            userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
+            userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
         },
+	
+        /**
+         * Aux function to set graph data from wrapper model (TODO this function may not be necessary)
+         */
+	setGraphData: function(gdataObj){
+	    // TODO make this function more general (if we keep it)
+	    if (gdataObj.hasOwnProperty("depRoot")){
+		this.get("graphData").get("aux").set("depRoot", gdataObj.depRoot);
+	    }
+	},
 
         /**
          * parse incoming json data
          */
         parse: function(response){
+	    // TODO we should also parse/obtain user-data here CR-Restruct
             // TODO check for extending the nodes vs resetting
-            this.get("nodes").add(response.nodes, {parse: true});
-            this.get("nodes").applyUserData(this.get("userData"));
+	    var thisModel = this,
+	    graphData = thisModel.get("graphData"),
+	    nodes = graphData.get("nodes"),
+	    edges = graphData.get("edges"),
+	    aux = graphData.get("aux");
+
+	    aux.set("titles", response.titles); // TODO: change this to response.aux.titles?
+
+	    // build node set
+            nodes.add(response.nodes, {parse: true});
+            nodes.applyUserData(thisModel.get("userData"));
+
+	    // build edge set from nodes
+	    nodes.each(function(node){
+		// add all edges from nodes
+		["dependencies", "outlinks"].forEach(function(edgeType){
+		    node.get(edgeType).each(function(edge){
+			edges.add(edge);
+			edge.graphEdgeCollection = edges;
+		    });
+		});
+	    });
+	    
             delete response.nodes;
-            AGFK.titles = response.titles;     // TODO: better way to make titles available to DirectedEdge?
             return response;
         },
 
@@ -455,7 +518,11 @@
          * Specify URL for HTTP verbs (GET/POST/etc)
          */
         url: function(){
-            return window.CONTENT_SERVER + "/nodes" + (this.get("keyNode") ? "/" + this.get("keyNode") + '?set=map' : "");
+	    var thisModel = this,
+	    depNode = thisModel.get("graphData").get("aux").get("depRoot");
+	    // AGFK.ErrorHandler.assertDefined(depNode, "dependency is not defined in backbone URL request'); // TODO post CR-Restruct 
+	    // TODO post CR-Restruct handle different types of input (aggregated graphs)
+	    return window.CONTENT_SERVER + "/dependencies?concepts=" + depNode;
         }
     });
 })(typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window._);

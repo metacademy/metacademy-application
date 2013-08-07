@@ -35,7 +35,7 @@
 
 
     /**
-     * Collection of directed edge models
+     * Collection of directed edge models TODO post CR-Restruct consider using subets of GraphEdgeCollections -- this will be problematic when adding new data
      */
     AGFK.DirectedEdgeCollection = Backbone.Collection.extend({
         model:AGFK.DirectedEdge
@@ -49,11 +49,17 @@
         model:AGFK.Question
     });
 
-
     /**
-     * Collection of node models
+     * Collection of all edge models in graph
      */
-    AGFK.NodeCollection = Backbone.Collection.extend({
+    AGFK.GraphEdgeCollection = Backbone.Collection.extend({
+	model: AGFK.DirectedEdge
+    });
+    
+    /**
+     * Collection of all node models in graph
+     */
+    AGFK.GraphNodeCollection = Backbone.Collection.extend({
         model: AGFK.Node,
 
         initialize: function(){

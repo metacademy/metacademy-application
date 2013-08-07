@@ -204,8 +204,11 @@
              * Render the learning view given the supplied model
              */
             render: function(){
-                var thisView = this;
-                thisView.$el.html(thisView.template(_.extend(thisView.model.toJSON(), {fromTitle: thisView.model.getFromTitle()})));
+                var thisView = this,
+		thisModel = thisView.model;
+		// TODO this seems awkward
+                thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), 
+							     {fromTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("from_tag"))}))); 
                 return thisView;
             }
 
@@ -268,8 +271,9 @@
              * Render the learning view given the supplied model
              */
             render: function(){
-                var thisView = this;
-                thisView.$el.html(thisView.template(_.extend(thisView.model.toJSON(), {toTitle: thisView.model.getToTitle()})));
+                var thisView = this,
+		thisModel = thisView.model;
+                thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("to_tag"))})));
                 return thisView;
             }
 
@@ -591,7 +595,7 @@
             },
 
             /**
-             * Render the learning view titles TODO allow for rerendering of only titles
+             * Render the learning view titles 
              */
             renderTitles: function(){
 		var thisView = this,
@@ -603,20 +607,11 @@
                 nliview,
                 $el = thisView.$el,
                 thisModel = thisView.model,
-                nodes = thisModel.get("nodes"),
-                userData = thisModel.get("userData"),
-                learnedNodes = userData.get("learnedNodes"),
-                implicitLearnedNodes = userData.get("implicitLearnedNodes");
+                nodes = thisModel.get("nodes");
                 
                 for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
                     curNode = nodes.get(nodeOrdering[inum]);
                     nid = curNode.get("id");
-                    //   simpleModel = {
-                    //       title: curNode.get("title"),
-                    //       id: nid,
-                    //       learned: learnedNodes.hasOwnProperty(nid),
-                    //       implicitLearned: implicitLearnedNodes.hasOwnProperty(nid)
-                    //   };
                     nliview = new AGFK.NodeListItemView({model: curNode});
                     nliview.setParentView(thisView);
                     $el.append(nliview.render().el); 
@@ -648,7 +643,7 @@
              */
             getTopoSortedConcepts: function(){
 		var thisView = this,
-		keyTag = thisView.model.get("keyNode"),
+		keyTag = thisView.model.get("aux").get("depRoot") || "",
                 nodes = thisView.model.get("nodes"),
 		traversedNodes = {}, // keep track of traversed nodes
 		startRootNodes; // nodes already added to the list

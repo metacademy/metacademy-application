@@ -136,7 +136,7 @@
                     qnodeName = routeConsts.qnodeName,
                     pexploreMode = routeConsts.pexploreMode,
                     plearnMode = routeConsts.plearnMode,
-                    keyNodeChanged = nodeId !== pvt.prevNodeId, // TODO fix keynode dep CR-Restruct
+                    keyNodeChanged = nodeId !== pvt.prevNodeId, 
                     doRender = true;
 
                 // need to load just the given node and deps...
@@ -160,7 +160,7 @@
                 // -- necessary because of possible AJAX calls to obtain new data
                 function postNodePop() {
                     // set the document title to be the searched node
-                    document.title =  " - Metacademy"; // TODO CR-Restruct
+                    document.title = thisRoute.cnodesContn.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
                     
                     // set default to explore mode
                     paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;

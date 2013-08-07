@@ -489,7 +489,7 @@
             },
 
             /**
-             * Clean up the view properly
+             * Clean Up the view properly
              */
             close: function(){
                 this.unbind();

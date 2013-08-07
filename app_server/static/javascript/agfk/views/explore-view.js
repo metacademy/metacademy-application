@@ -300,19 +300,14 @@
                             else{
                                 d3Node.attr(ilCtProp, 1);
                                 d3Node.classed(ilClass, true);
-//                                userData.updateImplicitLearnedNodes(dt, true);
-				// TODO CR-Restruct update implicit learned
                                 thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true);
                             }
                         }
                         else{
-                            // TODO assert ilct is a number
                             ilct = Number(ilct) - 1;
                             d3Node.attr(ilCtProp, ilct);
                             if (ilct === 0){
                                 d3Node.classed(ilClass, false);
-				// TODO CR-Restruct update implicit learned
-//                                userData.updateImplicitLearnedNodes(dt, false);
                                 thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false);
                             }
                         }

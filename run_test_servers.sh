@@ -10,7 +10,7 @@ fp=$@
 
 python content_server/server.py $cp &
 cserver_id=$!
-python client_server/manage.py runserver $fp
+python app_server/manage.py runserver $fp
 
 # stop both servers on exit (this may not be desirable)
 kill $cserver_id

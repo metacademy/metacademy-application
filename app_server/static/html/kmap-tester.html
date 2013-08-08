@@ -22,13 +22,15 @@
 
       <div id="learn-view-wrapper"></div>
       <div id="explore-view-wrapper"></div>
-
+      <div id="load-view-wrapper"></div>
+      
       {% include "node-title-view.html" %}
       {% include "node-detail-view.html" %}
       {% include "resource-view.html" %}
       {% include "dependency-view.html" %}
       {% include "pointers-view.html" %}
       {% include "outlink-view.html" %}
+      {% include "loading-view.html" %}
 
       {% endblock %}
 
@@ -43,6 +45,7 @@
     <script type="text/javascript" src="{% static "javascript/agfk/utils/errors.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/agfk/models/models.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/agfk/collections/collections.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/agfk/views/loading-view.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/agfk/views/explore-view.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/agfk/views/learning-view.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/agfk/routers/routers.js" %}"></script>

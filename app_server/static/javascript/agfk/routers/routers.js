@@ -20,8 +20,9 @@
       plearnMode: "learn",
       leftPanelId: "leftpanel,",
       rightPanelId: "rightpanel",
-      lviewId: "learn-view-wrapper", // id for main learn view div
-      eviewId: "explore-view-wrapper" // id for main explore view div
+      lViewId: "learn-view-wrapper", // id for main learn view div
+      eViewId: "explore-view-wrapper", // id for main explore view div
+      loadViewId: "load-view-wrapper"
     };
 
     pvt.prevUrlParams = {}; // url parameters
@@ -142,11 +143,17 @@
             pexploreMode = routeConsts.pexploreMode,
             plearnMode = routeConsts.plearnMode,
             keyNodeChanged = nodeId !== pvt.prevNodeId, 
-            doRender = true;
+            doRender = true,
+	    loadViewRender = false;
 
-        // need to load just the given node and deps...
-        window.console.log("nodeRoute for: " + nodeId);
-
+	// show loading view while new view is processed TODO don't show loading view if view state did not change
+	
+	if (typeof thisRoute.loadingView === "undefined"){
+	  thisRoute.loadingView =new AGFK.LoadingView();
+	  loadViewRender = true;
+	}
+	thisRoute.showView("#" + routeConsts.loadViewId, thisRoute.loadingView, loadViewRender);
+	
         // check if/how we need to acquire more data from the server
         // TODO make this more general/extendable
         if(!keyNodeChanged){
@@ -155,45 +162,46 @@
         else{
           // clean up the old views
           pvt.cleanUpViews.call(thisRoute);
-          // fetch the new data
+         
+	  // fetch the new data 
           // TODO replace this technique for user data once we have the server/offline storage fleshed out
-          thisRoute.cnodesContn = new AGFK.AppData({ userData: thisRoute.cnodesContn ?  thisRoute.cnodesContn.get("userData") : new AGFK.UserData()}); // this is hacky TODO reconsider the model structure
-	  thisRoute.cnodesContn.setGraphData({depRoot: nodeId});
-          thisRoute.cnodesContn.fetch({success: postNodePop});
+          thisRoute.appData = new AGFK.AppData({ userData: thisRoute.appData ?  thisRoute.appData.get("userData") : new AGFK.UserData()});
+	  thisRoute.appData.setGraphData({depRoot: nodeId});
+          thisRoute.appData.fetch({success: postNodePop});
         }
 
         // helper function to route change parameters appropriately
         // -- necessary because of possible AJAX calls to obtain new data
         function postNodePop() {
           // set the document title to be the searched node
-          document.title = thisRoute.cnodesContn.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
+          document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
 
-	  AGFK.errorHandler.assert(thisRoute.cnodesContn.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
+	  AGFK.errorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
 	  
           // set default to explore mode
           paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;
           pvt.viewMode = paramsObj[qviewMode];
           
           switch (paramsObj[qviewMode]){
-          case plearnMode:
+	  case plearnMode:
             if (keyNodeChanged || typeof thisRoute.lview === "undefined"){
-              thisRoute.lview = new AGFK.LearnView({model: thisRoute.cnodesContn.get("graphData")});
+              thisRoute.lview = new AGFK.LearnView({model: thisRoute.appData.get("graphData")});
               doRender = true;
             }
             else{
               doRender = false;
             }
-            thisRoute.showView("#" + routeConsts.lviewId, thisRoute.lview, doRender);
+            thisRoute.showView("#" + routeConsts.lViewId, thisRoute.lview, doRender);
             break;
           default:
             if (keyNodeChanged || typeof thisRoute.eview === "undefined"){
-              thisRoute.eview = new AGFK.ExploreView({model: thisRoute.cnodesContn.get("graphData")});
+              thisRoute.eview = new AGFK.ExploreView({model: thisRoute.appData.get("graphData")});
               doRender = true;
             }
             else{
               doRender = false;
             }
-            thisRoute.showView("#" + routeConsts.eviewId, thisRoute.eview, doRender);
+            thisRoute.showView("#" + routeConsts.eViewId, thisRoute.eview, doRender);
           }
           pvt.prevUrlParams = $.extend({}, paramsObj);
 	  pvt.prevNodeId = nodeId;

@@ -1,12 +1,13 @@
 /* 
  This file contains the main instructions for the AGFK exploration, learning, and editing views
- Constructors are prefixed with a 'C' to avoid naming collisions ('C' for 'Constructor')
  */
 
 /**
  * Main function
  */
 (function(AGFK, Backbone, d3, undefined){
+    "use strict";
+  
     AGFK.utils.scaleWindowSize("header", "main");
     AGFK.appRouter = new AGFK.AppRouter();
     Backbone.history.start();

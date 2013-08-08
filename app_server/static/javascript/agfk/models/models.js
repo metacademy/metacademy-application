@@ -4,7 +4,8 @@
 
 (function(AGFK, Backbone, _, undefined){
     "use strict";
-
+    AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
+  
     /**
      * Comprehension question model
      */
@@ -48,6 +49,7 @@
             };
         }
     });
+
 
     /**
      * general directed edge model
@@ -130,6 +132,7 @@
                         output[tv] = resp[tv];
                     }
                 }
+
                 // ---- parse the collection values ---- //
                 i = pvt.collFields.length;
                 while (i--) {
@@ -166,14 +169,12 @@
                 nodePvt.implicitLearnCt = 0;
                 nodePvt.implicitLearn = false;
                 nodePvt.learned = false;
-                /**
-                 * Increment the implicit learn count by ival (deafault 1)
-                 */
+                
+                // * Increment the implicit learn count by ival (default 1)
                 this.incrementILCt = function(ival){
                     ival = ival || 1;
                     this.setImplicitLearnCt(nodePvt.implicitLearnCt + ival);
                 };
-
                 
                 this.setLearnedStatus = function(status){
                     if (status !== nodePvt.learned){
@@ -223,7 +224,7 @@
                 this.getTxtFields = function(){
                     return nodePvt.txtFields;
                 };
-                                
+                
                 this.getLearnedStatus = function(){
                     return nodePvt.learned;
                 };
@@ -242,8 +243,8 @@
             },
 
             /**
-              * Returns the title to be displayed in the learning view
-              */
+             * Returns the title to be displayed in the learning view
+             */
             getLearnViewTitle: function(){
                 return this.get("is_shortcut") ? this.get("title") + " (shortcut)" : this.get("title");
             },
@@ -265,11 +266,11 @@
              */
             getAncestors: function(noReturn){
                 if (!this.ancestors){
-                    var ancests = {};
-                    var coll = this.collection;
+                    var ancests = {},
+			coll = this.collection;
                     this.get("dependencies").each(function(dep){
-                        var depNode = coll.get(dep.get("from_tag"));
-                        var dAncests = depNode.getAncestors();
+                        var depNode = coll.get(dep.get("from_tag")),
+                            dAncests = depNode.getAncestors();
                         for (var dAn in dAncests){
                             if(dAncests.hasOwnProperty(dAn)){
                                 ancests[dAn] = 1;
@@ -278,9 +279,10 @@
                     });
 
                     // create list of unique dependencies
-                    var uniqueDeps = {};
+                    var uniqueDeps = {},
+			dtag;
                     this.get("dependencies").each(function(dep){
-                        var dtag = dep.get("from_tag");
+                        dtag = dep.get("from_tag");
                         if (!ancests.hasOwnProperty(dtag)){
                             uniqueDeps[dtag] = 1;
                         }
@@ -320,14 +322,17 @@
                 return this.uniqueDeps.hasOwnProperty(depID);
             }
         });
-    }
-                )();
+    })();
+
 
     /**
      * GraphAuxModel: model to store all auxiliary graph information
      **/
     AGFK.GraphAuxModel = (function(){
+
+	// private data (not currently used)
 	var pvt = {};
+
 	return Backbone.Model.extend({
 	    defaults: {
 		depRoot: undefined,
@@ -340,9 +345,10 @@
 	    getTitleFromId: function(nid){
 		return this.get("titles")[nid]; // TODO post CR-Restruct add error handling
 	    }
-	})
+	});
     })();
 
+    
     /**
      * GraphData: model to store all graph related data (nodes, edges, aux data)
      */
@@ -357,9 +363,12 @@
 		    nodes: new AGFK.GraphNodeCollection(),
 		    edges: new AGFK.GraphEdgeCollection(),
 		    aux: new AGFK.GraphAuxModel()
-		}
+		};
 	    },
 
+	    /**
+	     * initialize graph data (place parentModel field in child models)
+	     */
 	    initialize: function(){
 		this.get("nodes").parentModel = this;
 		this.get("edges").parentModel = this;
@@ -367,6 +376,7 @@
 	    }
 	});
     })();
+
 
     /** 
      * UserData: model to store user data -- will eventually communicate with server for registered users
@@ -457,15 +467,18 @@
          */
         initialize: function(){
             var thisModel = this,
-	    userData = thisModel.get("userData"),
-	    graphData = thisModel.get("graphData"),
-	    nodes = graphData.get("nodes");
+		userData = thisModel.get("userData"),
+		graphData = thisModel.get("graphData"),
+		nodes = graphData.get("nodes");
 
 	    // set parentModel for userData and graphData
 	    graphData.parentModel = thisModel;
 	    userData.parentModel = thisModel;
 
-	    // Update user data when aux node data changes TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph (there may be a better way to do this, but aux fields on the nodes themselves, such as "learnStatus," make it easy to trigger changes in the views for the specific node rather than the entire collection 
+	    // Update user data when aux node data changes 
+	    // TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph 
+	    // (there may be a better way to do this, but aux fields on the nodes themselves, such as "learnStatus,"
+	    // make it easy to trigger changes in the views for the specific node rather than the entire collection 
             userData.listenTo(nodes, "change:learnStatus", userData.updateLearnedNodes);
             userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
             userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
@@ -488,10 +501,10 @@
 	    // TODO we should also parse/obtain user-data here CR-Restruct
             // TODO check for extending the nodes vs resetting
 	    var thisModel = this,
-	    graphData = thisModel.get("graphData"),
-	    nodes = graphData.get("nodes"),
-	    edges = graphData.get("edges"),
-	    aux = graphData.get("aux");
+		graphData = thisModel.get("graphData"),
+		nodes = graphData.get("nodes"),
+		edges = graphData.get("edges"),
+		aux = graphData.get("aux");
 
 	    aux.set("titles", response.titles); // TODO: change this to response.aux.titles?
 
@@ -518,8 +531,8 @@
          * Specify URL for HTTP verbs (GET/POST/etc)
          */
         url: function(){
-	    var thisModel = this,
-	    depNode = thisModel.get("graphData").get("aux").get("depRoot");
+	    var thisModel = this, 
+		depNode = thisModel.get("graphData").get("aux").get("depRoot");
 	    // AGFK.ErrorHandler.assertDefined(depNode, "dependency is not defined in backbone URL request'); // TODO post CR-Restruct 
 	    // TODO post CR-Restruct handle different types of input (aggregated graphs)
 	    return window.CONTENT_SERVER + "/dependencies?concepts=" + depNode;

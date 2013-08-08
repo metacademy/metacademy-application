@@ -4,7 +4,6 @@
 
 (function(AGFK, Backbone, _, undefined){
     "use strict";
-    AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
   
     /**
      * Comprehension question model

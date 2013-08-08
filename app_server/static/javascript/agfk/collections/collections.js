@@ -3,7 +3,6 @@
  */
 (function(AGFK, Backbone, _, $, undefined){
   "use strict";
-  AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
 
   /**
    * collection of resource models

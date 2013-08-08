@@ -3,7 +3,6 @@
  */
 (function(AGFK, Backbone, $, undefined){
   "use strict";
-  AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
   
   /**
    * Central router to control URL state

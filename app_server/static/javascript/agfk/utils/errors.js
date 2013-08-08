@@ -16,4 +16,4 @@
       throw new Error(msg);
     }
   };
-})(window.AGFK);
+})(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {});

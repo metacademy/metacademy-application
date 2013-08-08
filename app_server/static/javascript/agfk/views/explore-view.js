@@ -9,7 +9,6 @@
 
 (function(AGFK, Backbone, d3, $, Viz, _, undefined){
   "use strict";
-  AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
 
   /*
    * View for knowledge map in exploration mode

@@ -4,7 +4,6 @@
 
 (function(AGFK, $, undefined){
   "use strict";
-  AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
   AGFK.utils = {};
 
   /**

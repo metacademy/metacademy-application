@@ -343,7 +343,7 @@
 	     * Get node display title from id
 	     */
 	    getTitleFromId: function(nid){
-		return this.get("titles")[nid]; // TODO post CR-Restruct add error handling
+		return this.get("titles")[nid]; 
 	    }
 	});
     })();
@@ -532,10 +532,10 @@
          */
         url: function(){
 	    var thisModel = this, 
-		depNode = thisModel.get("graphData").get("aux").get("depRoot");
-	    // AGFK.ErrorHandler.assertDefined(depNode, "dependency is not defined in backbone URL request'); // TODO post CR-Restruct 
-	    // TODO post CR-Restruct handle different types of input (aggregated graphs)
-	    return window.CONTENT_SERVER + "/dependencies?concepts=" + depNode;
+		depTag = thisModel.get("graphData").get("aux").get("depRoot");
+	    // TODO post CR-Restruct handle different types of input (aggregated graphs) based on url
+	    AGFK.errorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request"); 
+	    return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;
         }
     });
 })(typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window._);

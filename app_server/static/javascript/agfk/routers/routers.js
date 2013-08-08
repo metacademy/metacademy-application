@@ -168,7 +168,9 @@
         function postNodePop() {
           // set the document title to be the searched node
           document.title = thisRoute.cnodesContn.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
-          
+
+	  AGFK.errorHandler.assert(thisRoute.cnodesContn.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
+	  
           // set default to explore mode
           paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;
           pvt.viewMode = paramsObj[qviewMode];

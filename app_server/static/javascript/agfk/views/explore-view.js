@@ -7,7 +7,7 @@
 // -move summaries with node on translations
 // -fully separate graph generation logic from view
 
-(function(AGFK, Backbone, d3, $, Viz, _, undefined){
+(function(AGFK, Backbone, d3, $, _, undefined){
   "use strict";
 
   /*
@@ -850,7 +850,25 @@
        * Return an SVG representation of graph given a dot string
        */
       createSvgGV: function(dotStr) {
-        return Viz(dotStr, 'svg');
+        var vizRes;
+        // dynamically load Viz since it's a large file
+        if (typeof window.Viz === "undefined"){
+          $.ajax({
+            url: window.STATIC_PATH + "javascript/lib/viz.js",
+            dataType: "script",
+            cache: true,
+            async: false,
+            type: "GET",
+            success: function(data, textStatus, xhr){
+              vizRes = window.Viz(dotStr, 'svg');
+            },
+            error: AGFK.errorHandler.reportAjaxError 
+          });
+        }
+        else{
+          vizRes = window.Viz(dotStr, 'svg');
+        }
+        return vizRes;
       },
 
       /**
@@ -877,4 +895,4 @@
       }
     });
   })();
-})(window.AGFK = window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.d3, window.jQuery, window.Viz, window._);
+})(window.AGFK = window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.d3, window.jQuery, window._);

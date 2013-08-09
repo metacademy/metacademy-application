@@ -335,11 +335,13 @@
 
     /**
      * Parse the tags in the pointer string
+     * TODO check if pointer links exists
      */
     pvt.parsePtrStr = function(ptrStr){
       return ptrStr.replace(new RegExp("\\[([^\\s]+)\\]", "g"),
                             function(all, text, ch){
-                              return '[<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + text.replace(/[-]/g,"_") + '">' + text.replace(/[-_]/g," ") + '</a>]'; // TODO fix hardcoded urls
+                              var tag =  text.replace(/[-]/g,"_");
+                              return '[<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + tag + '#lfocus=' + tag + '">' + text.replace(/[-_]/g," ") + '</a>]'; // TODO fix hardcoded urls
                             });
     };
 
@@ -512,6 +514,8 @@
     // keep track of expanded nodes: key: title node id, value: expanded view object
     pvt.expandedNodes = {};
 
+    pvt.idToTitleView = {};
+    
     pvt.nodeOrdering = null;
 
     pvt.viewConsts = {
@@ -535,39 +539,82 @@
       },
 
       /**
-       * Display the given nodes details from the given event
-       * and store the currentTarget.id:subview in pvt.expandedNodes
+       * Expand/collapse the clicked concept title
        */
       showNodeDetailsFromEvt: function(evt){
-        var thisView = this,
-            clkEl = evt.currentTarget,
-            clkElClassList = clkEl.classList,
+	this.toggleConceptDetails(evt.currentTarget);	    
+      },
+
+      /**
+       * Expand/collapse the given concept title
+       */
+      toggleConceptDetails: function(titleEl){
+	var titleElClassList = titleEl.classList,
             nid,
-            clickedItmClass = pvt.viewConsts.clickedItmClass;
-        clkElClassList.toggle(clickedItmClass);
-        if (clkElClassList.contains(clickedItmClass)){ 
-          nid = clkEl.id.split("-").pop();
-          var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), clkEl);
-          pvt.expandedNodes[clkEl.id] = dnode;
+            clickedItmClass = pvt.viewConsts.clickedItmClass,
+	    thisView = this;
+        titleElClassList.toggle(clickedItmClass);
+	
+        if (titleElClassList.contains(clickedItmClass)){ 
+          nid = titleEl.id.split("-").pop();
+          var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), titleEl);
+          pvt.expandedNodes[titleEl.id] = dnode;
         }
         else{
-          if (pvt.expandedNodes.hasOwnProperty(clkEl.id)){
-            var expView = pvt.expandedNodes[clkEl.id];
+          if (pvt.expandedNodes.hasOwnProperty(titleEl.id)){
+            var expView = pvt.expandedNodes[titleEl.id];
             expView.close();
-            delete pvt.expandedNodes[clkEl.id];
+            delete pvt.expandedNodes[titleEl.id];
           }
-        }
+        }	
       },
 
       /**
        * Append detailed node view to given element id that is a child of thisView
-       * Returns the view object for the appended node
+       * Returns the view object for the appended concept
        */
       appendDetailedNodeAfter: function(nodeModel, domNode){
         var thisView = this,
             dNodeView = new AGFK.DetailedNodeView({model: nodeModel});
         pvt.insertSubViewAfter(dNodeView, domNode);
         return dNodeView;
+      },
+
+      /**
+       * Set the scroll bar so that the top of domEl aligns with the top of the page (if possible)
+       * NB the view must be rendered before this function will work TODO workarounds?
+       */
+      setScrollTop: function(domEl){
+        try{
+          var parentNode = this.$el.parent(),
+              $domEl = $(domEl),
+              scrollPos;
+          AGFK.errorHandler.assert(parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
+          parentNode.scrollTop(0); // reset the scroll position
+          scrollPos = $domEl.position().top - $domEl.outerHeight()/2;
+          parentNode.scrollTop(scrollPos);
+        }
+        catch(err){
+          window.console.warn("Error in setScrollTop (make sure view is rendered before calling): " + err.message);
+        }
+      },
+
+      /**
+       * Scroll the learning view so that the top of the input concept is 
+       * aligned with the top of the view and expand the concept
+       */
+      scrollExpandToConcept: function(conceptTag){
+        // get the dom el for the given concept tag
+        var thisView = this,
+            titleView = pvt.idToTitleView[conceptTag];
+        if (titleView instanceof AGFK.NodeListItemView){
+          var titleEl = titleView.el;
+          // expand dom el
+          thisView.toggleConceptDetails(titleEl);
+          // scroll to dom el
+          thisView.setScrollTop(titleEl);
+          
+        }
       },
       
       /**
@@ -583,16 +630,21 @@
         $el.html(""); // TODO we shouldn't be doing this -- handle the subviews better
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
         thisView.renderTitles();
-        
+
+	// // default render expands and centers on root dependency
+	// var rootTitleEl = thisView.$el.children().last()[0];
+	// thisView.toggleConceptDetails(rootTitleEl);
+	// thisView.setScrollTop(rootTitleEl);
+
         // recapture previous expand/collapse state TODO is this desirable behavior?
-        for (var expN in expandedNodes){
-          if (expandedNodes.hasOwnProperty(expN)){
-            var domEl = document.getElementById(expN);
-            pvt.insertSubViewAfter(expandedNodes[expN], domEl);
-            domEl.classList.add(clkItmClass);
+        // for (var expN in expandedNodes){
+        //   if (expandedNodes.hasOwnProperty(expN)){
+        //     var domEl = document.getElementById(expN);
+        //     pvt.insertSubViewAfter(expandedNodes[expN], domEl);
+        //     domEl.classList.add(clkItmClass);
             
-          }
-        }
+        //   }
+        // }
         thisView.delegateEvents();
         return thisView;
       },
@@ -606,7 +658,6 @@
 	    noLen,
 	    nodeOrdering = pvt.nodeOrdering || thisView.getTopoSortedConcepts(),
 	    curNode,
-	    nid,
 	    nliview,
 	    $el = thisView.$el,
 	    thisModel = thisView.model,
@@ -614,9 +665,9 @@
         
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
-          nid = curNode.get("id");
           nliview = new AGFK.NodeListItemView({model: curNode});
           nliview.setParentView(thisView);
+          pvt.idToTitleView[curNode.get("id")] = nliview;
           $el.append(nliview.render().el); 
         }
       },

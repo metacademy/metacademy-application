@@ -14,10 +14,10 @@
 
     // constants
     pvt.routeConsts = {
-      qnodeName: "node", // key name for node in the query parameters
-      qviewMode: "mode",
-      pexploreMode: "explore",
-      plearnMode: "learn",
+      qViewMode: "mode",
+      qLearnScrollConcept: "lfocus",
+      pExploreMode: "explore",
+      pLearnMode: "learn",
       leftPanelId: "leftpanel,",
       rightPanelId: "rightpanel",
       lViewId: "learn-view-wrapper", // id for main learn view div
@@ -138,21 +138,31 @@
       nodeRoute: function(nodeId, paramsObj) {
         var thisRoute = this,
             routeConsts = pvt.routeConsts,
-            qviewMode = routeConsts.qviewMode,
-            qnodeName = routeConsts.qnodeName,
-            pexploreMode = routeConsts.pexploreMode,
-            plearnMode = routeConsts.plearnMode,
+            qViewMode = routeConsts.qViewMode,
+            qLearnScrollConcept = routeConsts.qLearnScrollConcept,
+            pExploreMode = routeConsts.pExploreMode,
+            pLearnMode = routeConsts.pLearnMode,
             keyNodeChanged = nodeId !== pvt.prevNodeId, 
-            doRender = true,
-	    loadViewRender = false;
-
-	// show loading view while new view is processed TODO don't show loading view if view state did not change
+	    loadViewRender = false,
+	    doRender;
 	
+        // set view-mode (defaults to learn view)
+        paramsObj[qViewMode] = paramsObj[qViewMode] || routeConsts.plearnView;
+        pvt.viewMode = paramsObj[qViewMode];
+
+	// should we re-render the view?
+	doRender = keyNodeChanged
+	  || (pvt.viewMode === pLearnMode && typeof thisRoute.lview === "undefined")
+	  || (pvt.viewMode === pExploreMode && typeof thisRoute.eview === "undefined");
+
 	if (typeof thisRoute.loadingView === "undefined"){
-	  thisRoute.loadingView =new AGFK.LoadingView();
+	  thisRoute.loadingView = new AGFK.LoadingView();
 	  loadViewRender = true;
 	}
-	thisRoute.showView("#" + routeConsts.loadViewId, thisRoute.loadingView, loadViewRender);
+	// show loading view if new view is rendered
+	if (doRender){
+	  thisRoute.showView("#" + routeConsts.loadViewId, thisRoute.loadingView, loadViewRender);
+	}
 	
         // check if/how we need to acquire more data from the server
         // TODO make this more general/extendable
@@ -162,7 +172,7 @@
         else{
           // clean up the old views
           pvt.cleanUpViews.call(thisRoute);
-         
+          
 	  // fetch the new data 
           // TODO replace this technique for user data once we have the server/offline storage fleshed out
           thisRoute.appData = new AGFK.AppData({ userData: thisRoute.appData ?  thisRoute.appData.get("userData") : new AGFK.UserData()});
@@ -177,32 +187,27 @@
           document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
 
 	  AGFK.errorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
-	  
-          // set default to explore mode
-          paramsObj[qviewMode] = paramsObj[qviewMode] || routeConsts.pexploreMode;
-          pvt.viewMode = paramsObj[qviewMode];
+	 
+          switch (paramsObj[qViewMode]){
+            case pExploreMode:
+              if (doRender){
+                thisRoute.eview = new AGFK.ExploreView({model: thisRoute.appData.get("graphData")});
+	      }
+              thisRoute.showView("#" + routeConsts.eViewId, thisRoute.eview, doRender);
           
-          switch (paramsObj[qviewMode]){
-	  case plearnMode:
-            if (keyNodeChanged || typeof thisRoute.lview === "undefined"){
-              thisRoute.lview = new AGFK.LearnView({model: thisRoute.appData.get("graphData")});
-              doRender = true;
-            }
-            else{
-              doRender = false;
-            }
-            thisRoute.showView("#" + routeConsts.lViewId, thisRoute.lview, doRender);
-            break;
-          default:
-            if (keyNodeChanged || typeof thisRoute.eview === "undefined"){
-              thisRoute.eview = new AGFK.ExploreView({model: thisRoute.appData.get("graphData")});
-              doRender = true;
-            }
-            else{
-              doRender = false;
-            }
-            thisRoute.showView("#" + routeConsts.eViewId, thisRoute.eview, doRender);
-          }
+	      break;
+	    default:
+              if (doRender){
+                thisRoute.lview = new AGFK.LearnView({model: thisRoute.appData.get("graphData")});
+              }
+              thisRoute.showView("#" + routeConsts.lViewId, thisRoute.lview, doRender);
+              // only scroll to intended node on when lview is rerendered,
+              // so that the user's scroll state is maintained when jumping between learn and explore view
+              var paramQLearnScrollConcept = paramsObj[qLearnScrollConcept];
+              if (paramQLearnScrollConcept && paramQLearnScrollConcept !== pvt.prevUrlParams[qLearnScrollConcept]){ 
+                thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
+              }
+	  }
           pvt.prevUrlParams = $.extend({}, paramsObj);
 	  pvt.prevNodeId = nodeId;
         }

@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * Main function
  */
@@ -17,7 +16,7 @@
   function addLearnExploreButtonLogic(){
     var elnavs = d3.selectAll(".el-nav-button"),
 	activeClass = "active", // TODO move this somewhere else
-	prevMode = document.URL.match("(learn|explore)") || ["explore"];
+	prevMode = document.URL.match("(learn|explore)") || ["learn"];
     prevMode = prevMode[0];
     d3.select("#" + prevMode + "-button").classed(activeClass, true);
     elnavs.on("click", function(){
@@ -32,7 +31,7 @@
 
   addLearnExploreButtonLogic();
   
-  AGFK.utils.scaleWindowSize("header", "main");
+  AGFK.utils.scaleWindowSize("header", "main"); // automatically resize when window is resized
   AGFK.appRouter = new AGFK.AppRouter();
   Backbone.history.start();
   

@@ -73,6 +73,7 @@
     pvt.summaryDisplays = {};
     pvt.summaryTOKillList = {};
     pvt.summaryTOStartList = {};
+
     /**
      * Get summary box placement (top left) given node placement
      */

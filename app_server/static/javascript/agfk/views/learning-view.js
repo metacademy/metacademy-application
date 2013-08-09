@@ -610,7 +610,9 @@
         if (titleView instanceof AGFK.NodeListItemView){
           var titleEl = titleView.el;
           // expand dom el
-          thisView.toggleConceptDetails(titleEl);
+          if (!titleEl.classList.contains(pvt.viewConsts.clickedItmClass)){
+            thisView.toggleConceptDetails(titleEl);
+          }
           // scroll to dom el
           thisView.setScrollTop(titleEl);
           

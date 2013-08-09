@@ -46,6 +46,10 @@
       summaryRightClass: "tright",
       locElemId: "invis-loc-elem", // invisible location element
       locElemClass: "invis-loc",
+      learnIconName: "glasses-icon.svg",
+      dataConceptTagProp: "data-concept",
+      eToLLinkClass: "e-to-l-summary-link", // NOTE must change class in events attribute as well
+      eToLText: "→", // explore to learning text display
       // ----- rendering options ----- //
       defaultGraphDepth: 200, // default depth of graph
       defaultExpandDepth: 1, // default number of dependencies to show on expand
@@ -227,7 +231,7 @@
       var relTarget = d3.event.relatedTarget;
 	  
       // check if we're in a semantically related el
-      if (!relTarget ||nodeEl.contains(relTarget) || relTarget.id.match(nodeEl.id)){
+      if (!relTarget ||nodeEl.contains(relTarget) || (relTarget.id&& relTarget.id.match(nodeEl.id))){
         return;
       }
 
@@ -447,6 +451,12 @@
     return Backbone.View.extend({
       // id of view element (div unless tagName is specified)
       id: pvt.viewConsts.viewId,
+
+      // most events are handled via d3; this is awkward for backbone, but jQuery isn't as reliable/east for SVG events
+      // TODO try to be consistent with event handling
+      events: {
+        "click .e-to-l-summary-link": "handleEToLConceptClick"
+      },
 
       /**
        * Obtain initial kmap coordinates and render results
@@ -797,20 +807,49 @@
         var d3els = d3.selectAll("." + newElClass);
         d3els.classed(newElClass, false);
         thisView.addGraphProps(d3els, true);
+      },
 
-        // TODO do we need to update the d3this?
+      /**
+       * Handle explore-to-learn view event that focuses on the clicked concept
+       */
+      handleEToLConceptClick: function(evt){
+        var imgEl = evt.currentTarget,
+        conceptTag = imgEl.getAttribute(pvt.viewConsts.dataConceptTagProp);
+        this.transferToLearnViewForConcept(conceptTag);
+        // simulate mouseout for explore-view consistency
+        AGFK.utils.simulate(imgEl.parentNode, "mouseout", {
+          relatedTarget: document
+        }); 
+      },
+
+      /**
+       * Trigger transfer from explore view to learn view and focus on conceptTag
+       */
+      transferToLearnViewForConcept: function(conceptTag){
+        AGFK.appRouter.changeUrlParams({mode: "learn", lfocus: conceptTag});
       },
       
       /**
        * Show the node summary in "hover box" next to the node
+       * TODO consider making this a view that monitors the nodes (i.e. event driven)
        */  
       showNodeSummary: function(node) {
         var thisView = this,
             viewConsts = pvt.viewConsts,
             // add content div
             div = document.createElement("div"),
-            nodeId = node.attr("id");
-        div.textContent = this.model.get("nodes").get(nodeId).get("summary");
+            nodeId = node.attr("id"),
+            learnLink = document.createElement("a"),
+            summaryP = document.createElement("p");
+
+        // build explore-to-learn image
+        learnLink.setAttribute(viewConsts.dataConceptTagProp, nodeId);
+        learnLink.textContent = viewConsts.eToLText;
+        learnLink.classList.add(viewConsts.eToLLinkClass);
+        // add summary
+        summaryP.textContent = this.model.get("nodes").get(nodeId).get("summary");
+        div.appendChild(learnLink);
+        div.appendChild(summaryP);
         div.id = pvt.getSummaryIdForDivTxt.call(thisView, node);
         var d3div = d3.select(div);
         d3div.classed(viewConsts.summaryTextClass, true);

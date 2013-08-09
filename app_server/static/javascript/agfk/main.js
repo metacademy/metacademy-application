@@ -9,27 +9,6 @@
  */
 (function(AGFK, Backbone, d3, undefined){
   "use strict";
-
-  /*
-   * add dynamic properties to button explore/learn, TODO this is hacky, for now
-   */
-  function addLearnExploreButtonLogic(){
-    var elnavs = d3.selectAll(".el-nav-button"),
-	activeClass = "active", // TODO move this somewhere else
-	prevMode = document.URL.match("(learn|explore)") || ["learn"];
-    prevMode = prevMode[0];
-    d3.select("#" + prevMode + "-button").classed(activeClass, true);
-    elnavs.on("click", function(){
-      var clkMode = this.id.split("-")[0];
-      if (clkMode === prevMode) {return;}
-      elnavs.classed(activeClass, false);
-      d3.select(this).classed(activeClass, true);
-      AGFK.appRouter.changeUrlParams({mode: clkMode});
-      prevMode = clkMode;
-    });
-  }
-
-  addLearnExploreButtonLogic();
   
   AGFK.utils.scaleWindowSize("header", "main"); // automatically resize when window is resized
   AGFK.appRouter = new AGFK.AppRouter();

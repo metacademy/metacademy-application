@@ -145,10 +145,15 @@
             keyNodeChanged = nodeId !== pvt.prevNodeId, 
 	    loadViewRender = false,
 	    doRender;
-	
+        
         // set view-mode (defaults to learn view)
-        paramsObj[qViewMode] = paramsObj[qViewMode] || routeConsts.plearnView;
+        paramsObj[qViewMode] = paramsObj[qViewMode] || pLearnMode;
         pvt.viewMode = paramsObj[qViewMode];
+        
+        // show ELToggleView
+        thisRoute.elToggleView = thisRoute.elToggleView || new AGFK.ELToggleView();
+        thisRoute.elToggleView.changeActiveELButtonFromName(pvt.viewMode);
+
 
 	// should we re-render the view?
 	doRender = keyNodeChanged

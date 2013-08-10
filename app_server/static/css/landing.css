@@ -1,8 +1,9 @@
 .main-search-wrap{
-    position:absolute;  
-    top: 30%; /* todo look for a better solution */  
-    left: 50%;  
-    margin:-68.5px 0 0 -298.5px;  /* dependent on logo image size*/
+    position:absolute;
+    margin: 5em 0 0 50%;
+    padding-bottom: 5em;
+    left: -298.5px;
+    /* margin:-68.5px 0 0 -298.5px;  /\* dependent on logo image size*\/ */
 }
 
 #main-search-input{

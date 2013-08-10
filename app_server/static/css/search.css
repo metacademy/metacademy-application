@@ -54,7 +54,6 @@
 }
 
 .search-res-wrapper{
-    overflow: scroll;
     height: 100%;
     width: 100%;
     background: white;
@@ -64,6 +63,7 @@
 .search-res{
     margin-left: 20%;
     margin-right: 20%;
+    padding-bottom: 3em;
 }
 .search-res-list{
     line-height: 1.1em;

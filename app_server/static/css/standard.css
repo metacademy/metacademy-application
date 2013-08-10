@@ -10,7 +10,6 @@ body {
     height: 100%;
     font-family: Arial, sans-serif;
     font-size: 1.0em;
-    overflow: hidden;
 }
 
 h1 {
@@ -78,7 +77,6 @@ a.expand-collapse-link:hover{
     width: 100%;
     background: #333;
     overflow: hidden;
-    border-bottom: 0.1em #333 solid;
     font-size: 1.1em;
     position: relative;
     z-index: 1000;
@@ -92,10 +90,12 @@ a.expand-collapse-link:hover{
 #header-search-input{
     outline: none;
     display: inline-block;
+    padding: 0.2ex 0.3ex;
+    margin-top: 0.3ex;
     border: 1px solid #999999;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
     background-color: white;
-    border-radius: 3px;
+    border-radius: 2px;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
@@ -114,11 +114,11 @@ a.expand-collapse-link:hover{
     display: table-cell;
     vertical-align: middle;
     margin: 0 1em;
-    padding: 0 0.2em;
+    padding: 0 0.15em;
 }
 
 .header-img{
-    vertical-align: middle;
+    padding-top: 0.2ex;
 }
 /* /\* so element within the header can be vertically centered *\/ */
 /* .header-inner-wrap{ */
@@ -131,7 +131,6 @@ a.expand-collapse-link:hover{
     clear: both;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     background: white;
     color: #333;
 }

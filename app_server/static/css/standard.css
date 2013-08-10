@@ -80,10 +80,11 @@ a.expand-collapse-link:hover{
     font-size: 1.1em;
     position: relative;
     z-index: 1000;
+    display: table;
 }
 
 .header-content-wrapper{
-    display: table;
+    display: table-row;
     height: 100%;
 }
 
@@ -118,7 +119,11 @@ a.expand-collapse-link:hover{
 }
 
 .header-img{
-    padding-top: 0.2ex;
+    vertical-align: middle;
+}
+
+#header-search-img-el{
+    min-width: 14em;
 }
 /* /\* so element within the header can be vertically centered *\/ */
 /* .header-inner-wrap{ */

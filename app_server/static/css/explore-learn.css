@@ -12,6 +12,46 @@ body {
     overflow: hidden;
 }
 
+/* App header tools */
+#app-header-tools{
+   min-width: 26em;
+   cursor: default;
+}
+
+.app-header-tools-button{
+    display: inline;
+    width: 10em;
+    border: solid 2px;
+    border-color: transparent;
+    background-color: #416685;
+    color: white;
+    padding: 2px;
+    margin: 0;
+    font-size: 0.62em;
+    cursor: default;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
+}
+.app-header-tools-button:hover{
+    background-color: steelblue;
+}
+
+/* middle, left and right buttons */
+.button-left{
+    border-width: 2px 1px 2px 2px;
+    border-radius: 0.3em 0 0 0.3em;
+    padding-right: 3px;
+    margin-right: 0;
+}
+.button-right{
+    border-width: 2px 2px 2px 1px;
+    border-radius: 0 0.3em 0.3em 0;
+    padding-left: 3px;
+    margin-left: 0;
+}
+
 /* Explore-Learn Navigation Button */
 .el-nav-button{
     display: inline;
@@ -30,22 +70,10 @@ body {
     box-sizing: border-box;
 }
 .el-nav-button.active{
-    background-color: #416685;
-}
-.el-nav-button:hover{
     background-color: steelblue;
 }
-.el-nav-button.button-left{
-    border-width: 3px 1px 3px 3px;
-    border-radius: 0.3em 0 0 0.3em;
-    padding-right: 3px;
-    margin-right: 0;
-}
-.el-nav-button.button-right{
-    border-width: 3px 3px 3px 1px;
-    border-radius: 0 0.3em 0.3em 0;
-    padding-left: 3px;
-    margin-left: 0;
+.el-nav-button:hover{
+    background-color: #70a0c7;
 }
 
 #explore-learn-button-wrapper{

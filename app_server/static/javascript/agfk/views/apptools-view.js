@@ -4,21 +4,53 @@
   /**
    * Simple explore-learn button toggle view
    */
-  AGFK.ELToggleView = (function(){
+  AGFK.AppToolsView = (function(){
     var pvt = {};
     pvt.prevButtonEl = null;
     pvt.viewConsts = {
       activeClass: "active",
       elNameAppend: "-button",
       elNavButtonClass: "el-nav-button",
-      elId: "explore-learn-button-wrapper"
+      elId: "meta-app"
     };
     
     return Backbone.View.extend({
       el: document.getElementById(pvt.viewConsts.elId),
       
       events: {
-        "click button": "handleELButtonClick"
+        "click .el-nav-button": "handleELButtonClick",
+        "click #button-clear-learned": "handleClearLearnedClick",
+        "click #button-show-learned": "handleShowLearnedClick",
+        "click #button-add-concept": "handleAddConceptClick",
+        "click #button-remove-concept": "handleRemoveConceptClick"
+      },
+
+      /**
+       * Handle click event for clearing the [implicitly] learned nodes
+       */
+      handleClearLearnedClick: function(evt){
+        alert("not yet implemented");
+      },
+
+      /**
+       * Handle click event for showing the [implicitly] learned nodes
+       */
+      handleShowLearnedClick: function(evt){
+        alert("not yet implemented");
+      },
+
+      /**
+       * Handle click event for adding a given concept
+       */
+      handleAddConceptClick: function(evt){
+        alert("not yet implemented");
+      },
+
+      /**
+       * Handle click event for removing a given concept
+       */
+      handleRemoveConceptClick: function(evt){
+        alert("not yet implemented");
       },
 
       /**

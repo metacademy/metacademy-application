@@ -149,11 +149,15 @@
         // set view-mode (defaults to learn view)
         paramsObj[qViewMode] = paramsObj[qViewMode] || pLearnMode;
         pvt.viewMode = paramsObj[qViewMode];
-        
-        // show ELToggleView
-        thisRoute.elToggleView = thisRoute.elToggleView || new AGFK.ELToggleView();
-        thisRoute.elToggleView.changeActiveELButtonFromName(pvt.viewMode);
 
+        // init main app model
+        // TODO replace this technique for user data once we have the server/offline storage fleshed out
+        thisRoute.appData = thisRoute.appData || new AGFK.AppData({ userData: thisRoute.appData ?  thisRoute.appData.get("userData") : new AGFK.UserData()});
+        thisRoute.appData.setGraphData({depRoot: nodeId});
+        
+        // show app tools
+        thisRoute.appToolsView = thisRoute.appToolsView || new AGFK.AppToolsView({model: thisRoute.appData});
+        thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
 
 	// should we re-render the view?
 	doRender = keyNodeChanged
@@ -170,19 +174,11 @@
 	}
 	
         // check if/how we need to acquire more data from the server
-        // TODO make this more general/extendable
-        if(!keyNodeChanged){
-          postNodePop();
+        if(thisRoute.appData.get("graphData").get("nodes").length === 0){
+          thisRoute.appData.fetch({success: postNodePop});
         }
         else{
-          // clean up the old views
-          pvt.cleanUpViews.call(thisRoute);
-          
-	  // fetch the new data 
-          // TODO replace this technique for user data once we have the server/offline storage fleshed out
-          thisRoute.appData = new AGFK.AppData({ userData: thisRoute.appData ?  thisRoute.appData.get("userData") : new AGFK.UserData()});
-	  thisRoute.appData.setGraphData({depRoot: nodeId});
-          thisRoute.appData.fetch({success: postNodePop});
+          postNodePop();
         }
 
         // helper function to route change parameters appropriately

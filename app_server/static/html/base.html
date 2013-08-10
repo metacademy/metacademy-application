@@ -21,6 +21,15 @@
     {% block extra-css %}
     {% endblock %}
 
+    {% block hackscript %}
+    <script type="text/javascript">
+      // current hack for multiple development environments will change for server
+      window.CONTENT_SERVER = "{{ content_server }}";
+      window.STATIC_PATH = "{% static "" %}";
+      window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
+    </script>
+    {% endblock %}
+
     <title> {% block title %}Metacademy{% endblock %}</title>
 
     {% endblock %}
@@ -32,15 +41,7 @@
     <div class="header-bar">
       <div class="header-content-wrapper">
 	{% block header %}
-	<div class="header-el">
-	  <a href="/" target="_self">
-	    <img class="header-img" src="{% static "images/metacademy-toolbar-icon1.png" %}" alt="metacademy logo link">
-	  </a>
-	</div>
 
-	<div class="header-el">
-	  <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
-	</div>
 
 	{% endblock %}
       </div>
@@ -52,15 +53,6 @@
 
       {% endblock %}
     </div>
-
-    {% block hackscript %}
-    <script type="text/javascript">
-      // current hack for multiple development environments will change for server
-      window.CONTENT_SERVER = "{{ content_server }}";
-      window.STATIC_PATH = "{% static "" %}";
-      window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
-    </script>
-    {% endblock %}
 
     {% block jscript %}
     {% endblock %}

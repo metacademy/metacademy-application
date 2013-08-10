@@ -1,57 +1,83 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-    {% block css %}
-    <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
-    <link rel="stylesheet" href="{% static "css/standard.css" %}"/>
-    <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
-    {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static "css/reset.css" %}"/>
+<link rel="stylesheet" href="{% static "css/standard.css" %}"/>
+<link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
+{% endblock %}
 
-  </head>
+</head>
 
-      {% block main %}
-      
-      <div id="explore-learn-button-wrapper">
-        <button class="el-nav-button button-left" id="explore-button">
-	  Explore
-        </button>	
-        <button class="el-nav-button button-right" id="learn-button">
-	  Learn
-        </button>	
+{% block body %}
+
+<div id="meta-app">
+
+  <div class="header-bar">
+    <div class="header-content-wrapper">
+      {% include "header-search-logo.html" %}
+      <div id="app-header-tools" class="header-el">
+          <button class="app-header-tools-button button-left" id="button-clear-learned">
+            clear learned
+          </button>
+          <button class="app-header-tools-button"id="button-show-learned">
+            show learned
+          </button>
+          <button class="app-header-tools-button"id="button-add-concept">
+            add concept
+          </button>
+          <button class="app-header-tools-button button-right"id="button-remove-concept">
+            remove concept
+          </button>
       </div>
+    </div>
+  </div>
 
-      <div id="learn-view-wrapper"></div>
-      <div id="explore-view-wrapper"></div>
-      <div id="load-view-wrapper"></div>
-      
-      {% include "node-title-view.html" %}
-      {% include "node-detail-view.html" %}
-      {% include "resource-view.html" %}
-      {% include "dependency-view.html" %}
-      {% include "pointers-view.html" %}
-      {% include "outlink-view.html" %}
-      {% include "loading-view.html" %}
 
-      {% endblock %}
+<div id="main">
+    
+    <div id="explore-learn-button-wrapper">
+      <button class="el-nav-button button-left" id="explore-button">
+        Explore
+      </button>	
+      <button class="el-nav-button button-right" id="learn-button">
+        Learn
+      </button>	
+  </div>
 
-    {% block jscript %}
-    <script type="text/javascript" src="{% static "javascript/lib/d3.v2.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/lib/jquery-latest.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/lib/backbone.js" %}"></script>
+  <div id="learn-view-wrapper"></div>
+  <div id="explore-view-wrapper"></div>
+  <div id="load-view-wrapper"></div>
+  
+  {% include "node-title-view.html" %}
+  {% include "node-detail-view.html" %}
+  {% include "resource-view.html" %}
+  {% include "dependency-view.html" %}
+  {% include "pointers-view.html" %}
+  {% include "outlink-view.html" %}
+  {% include "loading-view.html" %}
 
-    <script type="text/javascript" src="{% static "javascript/agfk/utils/utils.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/utils/errors.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/models/models.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/collections/collections.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/views/loading-view.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/views/explore-view.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/views/learning-view.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/views/el-toggle-view.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/routers/routers.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/agfk/main.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
-    {% endblock %}
+</div>
+</div>
+
+
+  <script type="text/javascript" src="{% static "javascript/lib/d3.v2.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/jquery-latest.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/backbone.js" %}"></script>
+
+  <script type="text/javascript" src="{% static "javascript/agfk/utils/utils.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/utils/errors.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/models/models.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/collections/collections.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/views/loading-view.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/views/explore-view.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/views/learning-view.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/views/apptools-view.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/routers/routers.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/agfk/main.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
+  {% endblock %}
 
 
 

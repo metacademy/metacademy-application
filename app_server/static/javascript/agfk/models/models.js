@@ -1,6 +1,7 @@
 /*
- * This file contains the models and must be loaded after Backbone, jQuery, and d3
- */
+ This file contains the models and must be loaded after Backbone, jQuery, and d3
+ TODO: separate this file into multiple files for the major models
+*/
 
 (function(AGFK, Backbone, _, undefined){
     "use strict";
@@ -88,7 +89,7 @@
 
 
     /**
-     * CNode: node model that encompasses several collections and sub-models
+     * Node: node model that encompasses several collections and sub-models
      */
     AGFK.Node = (function(){
         // maintain ancillary/user-specific info and fields in a private object
@@ -228,6 +229,10 @@
                     return nodePvt.learned;
                 };
 
+                this.isLearnedOrImplicitLearned = function(){
+                  return nodePvt.learned || nodePvt.implicitLearn;
+                };
+
             },
 
             /**
@@ -323,10 +328,34 @@
         });
     })();
 
+    /**
+     * GraphOptionsModel: model to store graph display/interaction options
+     */
+    AGFK.GraphOptionsModel = (function(){
+      return Backbone.Model.extend({
+        defaults:{
+          showLearnedConcepts: true
+        },
+
+        /**
+         * helper function to set the showLearnedConcepts and fire appropriate change events when "changing" from false to false
+         * (i.e. clearing the newly learned concepts)
+         */
+       setLearnedConceptsState: function(state){
+         if (state === this.get("showLearnedConcepts") && state === false){
+           this.trigger("change");
+           this.trigger("change:showLearnedConcepts");
+         }
+         else{
+           this.set("showLearnedConcepts", state);
+         }
+       }
+      });
+    })();
 
     /**
      * GraphAuxModel: model to store all auxiliary graph information
-     **/
+     */
     AGFK.GraphAuxModel = (function(){
 
 	// private data (not currently used)
@@ -361,7 +390,8 @@
 		return {
 		    nodes: new AGFK.GraphNodeCollection(),
 		    edges: new AGFK.GraphEdgeCollection(),
-		    aux: new AGFK.GraphAuxModel()
+		    aux: new AGFK.GraphAuxModel(),
+                    options: new AGFK.GraphOptionsModel()
 		};
 	    },
 
@@ -372,6 +402,7 @@
 		this.get("nodes").parentModel = this;
 		this.get("edges").parentModel = this;
 		this.get("aux").parentModel = this;
+                this.get("options").parentModel = this;
 	    }
 	});
     })();
@@ -456,8 +487,8 @@
          */
         defaults: function(){
             return {
-                graphData: new AGFK.GraphData(),
-                userData: new AGFK.UserData()
+              graphData: new AGFK.GraphData(),
+              userData: new AGFK.UserData()
             };
         },
 

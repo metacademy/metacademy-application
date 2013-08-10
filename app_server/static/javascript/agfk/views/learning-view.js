@@ -618,6 +618,11 @@
           
         }
       },
+
+
+      initialize: function(){
+        this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
+      },
       
       /**
        * Render the learning view given the supplied collection
@@ -629,24 +634,20 @@
             expandedNodes = pvt.expandedNodes,
             clkItmClass = pvt.viewConsts.clickedItmClass;
 
-        $el.html(""); // TODO we shouldn't be doing this -- handle the subviews better
+        $el.html("");
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
         thisView.renderTitles();
 
-	// // default render expands and centers on root dependency
-	// var rootTitleEl = thisView.$el.children().last()[0];
-	// thisView.toggleConceptDetails(rootTitleEl);
-	// thisView.setScrollTop(rootTitleEl);
-
         // recapture previous expand/collapse state TODO is this desirable behavior?
-        // for (var expN in expandedNodes){
-        //   if (expandedNodes.hasOwnProperty(expN)){
-        //     var domEl = document.getElementById(expN);
-        //     pvt.insertSubViewAfter(expandedNodes[expN], domEl);
-        //     domEl.classList.add(clkItmClass);
-            
-        //   }
-        // }
+        for (var expN in expandedNodes){
+          if (expandedNodes.hasOwnProperty(expN)){
+            var domEl = document.getElementById(expN);
+            if (domEl !== null){
+              pvt.insertSubViewAfter(expandedNodes[expN], domEl);
+              domEl.classList.add(clkItmClass);
+            }
+          }
+        }
         thisView.delegateEvents();
         return thisView;
       },
@@ -699,22 +700,27 @@
        */
       getTopoSortedConcepts: function(){
 	var thisView = this,
-	    keyTag = thisView.model.get("aux").get("depRoot") || "",
-	    nodes = thisView.model.get("nodes"),
+            thisModel = thisView.model,
+	    keyTag = thisModel.get("aux").get("depRoot") || "",
+	    nodes = thisModel.get("nodes"),
 	    traversedNodes = {}, // keep track of traversed nodes
-	    startRootNodes; // nodes already added to the list
+	    startRootNodes,
+            includeLearned = thisModel.get("options").get("showLearnedConcepts"); // nodes already added to the list
 
         if (keyTag === ""){
           // init: obtain node tags with 0 outlinks (root nodes)
           startRootNodes = _.map(nodes.filter(function(mdl){
-            return mdl.get("outlinks").length == 0;
+            return mdl.get("outlinks").length == 0 && (!includeLearned || mdl.isLearnedOrImplicitLearned());
           }), function(itm){
             return itm.get("id");
           });
         }
-        else{
+        else if(includeLearned || !nodes.get(keyTag).isLearnedOrImplicitLearned()){
 	  // root node is the keyTag
           startRootNodes = [keyTag];
+        }
+        else{
+          return [];
         }
 
 	// recursive dfs topological sort
@@ -723,14 +729,15 @@
 	      returnArr = [],
 	      rootNodeRoundArr = [],
 	      curRootNodeTag,
-	      unqDepTags;
+	      unqDepTags,
+              curNode;
 
 	  // recurse on the input root node tags
 	  for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
-	    curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
-	    if (!traversedNodes.hasOwnProperty(curRootNodeTag)){
-	      unqDepTags = nodes.get(curRootNodeTag);
-	      unqDepTags = unqDepTags ? unqDepTags.getUniqueDependencies() : [];
+            curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
+            curNode = nodes.get(curRootNodeTag);
+	    if (!traversedNodes.hasOwnProperty(curRootNodeTag) && (includeLearned || (curNode && !curNode.isLearnedOrImplicitLearned()))){
+	      unqDepTags = curNode.getUniqueDependencies();
 	      if (unqDepTags.length > 0){
 		returnArr = returnArr.concat(dfsTopSort(unqDepTags));
 	      }

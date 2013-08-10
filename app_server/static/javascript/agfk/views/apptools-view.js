@@ -29,14 +29,15 @@
        * Handle click event for clearing the [implicitly] learned nodes
        */
       handleClearLearnedClick: function(evt){
-        alert("not yet implemented");
+        // TODO: check that learned concepts have changed
+        this.model.get("options").setLearnedConceptsState(false);
       },
 
       /**
        * Handle click event for showing the [implicitly] learned nodes
        */
       handleShowLearnedClick: function(evt){
-        alert("not yet implemented");
+        this.model.get("options").setLearnedConceptsState(true);
       },
 
       /**

@@ -327,37 +327,22 @@
     };
     
     /**
-     * Return a dot string array from the entire model
-     */
-    pvt.getFullDSArr = function() {
-      var dgArr = [],
-          thisView = this;
-      // add all node properties & edges
-      this.model.get("nodes").each(function(node) {
-        dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
-        node.get("dependencies").each(function(inlink) {
-          if (node.isUniqueDependency(inlink.get("from_tag"))) {
-            dgArr.push(inlink.getDotStr());
-          }
-        });
-      });
-      return dgArr;
-    };
-
-    /**
      * Return a dot string array from the specified keyNode 
      * depth: desired depth of dot string
      * keyNode: root keynode, defaults to graph keynode (if exists, otherwise throws an error)
      * checkVisible: true will only add nodes that are not already visible, defaults to false
      */
-    pvt.getDSFromKeyArr = function(depth, keyNode, checkVisible) {
+    pvt.getDSFromKeyArr = function(depth, keyNode, checkVisible, showLearned) {
       var dgArr = [],
           thisView = this,
           thisModel = thisView.model,
           thisNodes = thisModel.get("nodes"),
-          curEndNodes = [keyNode]; // this should generalize easily to multiple end nodes
+          curEndNodes = [keyNode], // this should generalize easily to multiple end nodes
+          curNode;
+      
       _.each(curEndNodes, function(node) {
-        if (!checkVisible || thisNodes.get(node.get("id")).getVisibleStatus()){
+         curNode = thisNodes.get(node.get("id"));
+        if ((showLearned || !curNode.isLearnedOrImplicitLearned() ) && (!checkVisible || curNode.getVisibleStatus())){
           dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
         }
       });
@@ -381,7 +366,7 @@
             // grab the dependency node
             depNode = thisNodes.get(depNodeId);
 
-            if (!checkVisible || depNode.getVisibleStatus()){
+            if ((showLearned || !depNode.isLearnedOrImplicitLearned() ) && (!checkVisible || depNode.getVisibleStatus())){
               // add node strings to the front of the dgArr
               dgArr.unshift(pvt.fullGraphVizStr.call(thisView, depNode));
               // add edge string to the end
@@ -464,17 +449,28 @@
       initialize: function() {
         // build initial graph based on input collection
         var thisView = this,
-            dotStr = thisView.collToDot(),
-            d3this = thisView.getd3El();
-        thisView.svgGraph = thisView.createSvgGV(dotStr);
-        thisView.initialSvg = true;
+          d3this = thisView.getd3El(),
+          nodes = thisView.model.get("nodes");
+
+        // TODO this initialization won't work when expanding graphs
         
-        thisView.listenTo(thisView.model.get("nodes"), "change:learnStatus", function(nodeId, status){
-          thisView.toggleNodeProps(d3this.select("#" + nodeId), status, "learned", d3this);
+        // dim nodes that are [implicitly] learned
+        thisView.listenTo(nodes, "change:learnStatus", function(nodeId, status){
+          var d3El = d3this.select("#" + nodeId);
+          if (d3El.node() !== null){
+            thisView.toggleNodeProps(d3El, status, "learned", d3this);
+          }
         });
-        thisView.listenTo(thisView.model.get("nodes"), "change:implicitLearnStatus", function(nodeId, status){
-          thisView.toggleNodeProps(d3this.select("#" + nodeId), status, "implicitLearned", d3this);
+        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, status){
+          var d3El = d3this.select("#" + nodeId);
+          if (d3El.node() !== null){
+            thisView.toggleNodeProps(d3El, status, "implicitLearned", d3this);
+          }
         });
+
+        // rerender graph (for now) when clearing learned nodes
+        // TODO do we need to clean up this view to avoid zombies?
+        thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.render);
         
       },
       
@@ -494,10 +490,19 @@
             // other needed vars
             d3this = thisView.getd3El(),
             gelems = d3this.selectAll("." + nodeClass + ", ." + edgeClass);
+
+
+        // remove unneeded background polygon from graphviz TODO make sure this is the correct polygon
+        d3this.select("polygon").remove();
+
         // sort the svg such that the edges come before the nodes so mouseover on node doesn't activate edge
         var gdata = gelems[0].map(function(itm) {
           return d3.select(itm).classed(nodeClass);
         });
+          // return if graph is empty (e.g. clear nodes after all nodes were learned)
+        if (gdata.length === 0){
+          return false;
+        }
         gelems.data(gdata).sort();
         // change id to title, remove title, then
         pvt.preprocessNodesEdges(gelems);
@@ -509,9 +514,6 @@
           .attr('height', '100%')
           .attr('id', exploreSvgId);
 
-        // remove unneeded background polygon from graphviz TODO make sure this is the correct polygon
-        d3this.select("polygon").remove();
-        
         // add reusable svg elements //
         // points to make a cross of width  exPlusWidth
         var plusPts = "0,0 " +
@@ -537,7 +539,7 @@
           .classed(viewConsts.expCrossClass, true);
 
         // add node properties
-        this.addGraphProps(d3this);
+        thisView.addGraphProps(d3this);
 
         // -- post processing of initial SVG -- //
 
@@ -545,7 +547,7 @@
         var transprops = d3this.select("." + graphClass).attr("transform").match(/[0-9]+( [0-9]+)?/g),
             otrans = transprops[2].split(" ").map(Number),
             // front-and-center the key node if present
-            keyNode = this.model.get("aux").get("depRoot");
+            keyNode = thisView.model.get("aux").get("depRoot");
         if (keyNode) {
           var keyNodeLoc = AGFK.utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
               swx = window.innerWidth,
@@ -584,6 +586,7 @@
             val.$wrapDiv.css(nodeLoc);
           });
         }
+        return true;
       },
 
       /**
@@ -679,16 +682,14 @@
        * Renders the explore view using the supplied collection
        */
       render: function() {
-        var thisView = this;
-        if (thisView.initialSvg) {
-          //initial render
-          thisView.$el.html(thisView.svgGraph);
-          thisView.initialRender();
-          thisView.initialSvg = false;
-        } else {
-          // TODO handle graph updates
-        }
-
+        var thisView = this,
+            dotStr = thisView.collToDot(),
+            d3this = thisView.getd3El();
+        thisView.svgGraph = thisView.createSvgGV(dotStr);
+        thisView.initialSvg = true;
+        thisView.$el.html(thisView.svgGraph);
+        thisView.initialRender();
+        
         return thisView;
       },
 
@@ -699,10 +700,11 @@
        * nodeWidth: width of node
        * nodeSep: node separation
        */
-      collToDot: function(args){ //depth, graphOrient, nodeWidth, nodeSep) {
+      collToDot: function(args){ 
         var thisView = this,
 	    thisModel = thisView.model,
             viewConsts = pvt.viewConsts,
+            showLearned = thisModel.get("options").get("showLearnedConcepts"),
             dgArr,
             args = args || {},
             depth = args.depth || viewConsts.defaultGraphDepth,
@@ -712,12 +714,7 @@
             keyNode = args.keyNode || thisModel.get("nodes").get(thisModel.get("aux").get("depRoot")),
             remVisible = args.remVisible || false; // TODO describe these params
 
-        if (keyNode) {
-          dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible);
-        } else {
-          dgArr = pvt.getFullDSArr.call(this);
-        }
-
+        dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible, showLearned);
         // include digraph options
         dgArr.unshift("rankdir=" + graphOrient);
         dgArr.unshift("nodesep=" + nodeSep); 

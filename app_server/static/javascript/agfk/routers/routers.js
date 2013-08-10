@@ -156,7 +156,7 @@
         thisRoute.appData.setGraphData({depRoot: nodeId});
         
         // show app tools
-        thisRoute.appToolsView = thisRoute.appToolsView || new AGFK.AppToolsView({model: thisRoute.appData});
+        thisRoute.appToolsView = thisRoute.appToolsView || new AGFK.AppToolsView({model: thisRoute.appData.get("graphData")});
         thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
 
 	// should we re-render the view?

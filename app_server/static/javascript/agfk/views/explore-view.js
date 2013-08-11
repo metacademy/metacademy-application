@@ -1,19 +1,18 @@
 /**
- * This file contains the views and must be loaded after the models and collections
+ * This file contains the explore view
  */
 
 // Global TODOS
 // carefully refactor variables to distinguish nodes from tags
-// -move summaries with node on translations
 // -fully separate graph generation logic from view
 
-(function(AGFK, Backbone, d3, $, _, undefined){
+define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
   "use strict";
 
   /*
    * View for knowledge map in exploration mode
    */
-  AGFK.ExploreView = (function(){
+  var ExploreView = (function(){
 
     /**
      * Private methods and variables
@@ -118,7 +117,7 @@
       // add listener to node summary so mouseouts trigger mouseout on node
       $wrapDiv.on("mouseleave", function(evt) {
         $(this).removeClass(hoveredClass);
-        AGFK.utils.simulate(d3node.node(), "mouseout", {
+        Utils.simulate(d3node.node(), "mouseout", {
           relatedTarget: evt.relatedTarget
         }); 
       });
@@ -134,7 +133,7 @@
           nodeId = d3node.attr("id"),
           mnode = thisView.model.get("nodes").get(nodeId),
           nodeLearnedClass = viewConsts.nodeLearnedClass;
-      svgSpatialInfo = svgSpatialInfo || AGFK.utils.getSpatialNodeInfo(d3node.node());
+      svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
 
       var chkG = d3node.append("g")
             .attr("class", viewConsts.checkClass)
@@ -202,7 +201,7 @@
         if (d3node.select("." + viewConsts.checkClass).node() === null){
           pvt.addCheckMark.call(this, d3node, svgSpatialInfo);
         }
-        var svgSpatialInfo = AGFK.utils.getSpatialNodeInfo(nodeEl),
+        var svgSpatialInfo = Utils.getSpatialNodeInfo(nodeEl),
             // display expand shape if not expanded
             expX = svgSpatialInfo.cx - viewConsts.exPlusWidth / 2,
             expY = svgSpatialInfo.cy + svgSpatialInfo.ry - viewConsts.edgePlusW;
@@ -443,15 +442,20 @@
         "click .e-to-l-summary-link": "handleEToLConceptClick"
       },
 
+      // hack to call appRouter from view (must pass in approuter)
+      appRouter: null,
+      
       /**
        * Obtain initial kmap coordinates and render results
        */
-      initialize: function() {
+      initialize: function(inp) {
         // build initial graph based on input collection
         var thisView = this,
           d3this = thisView.getd3El(),
           nodes = thisView.model.get("nodes");
 
+        this.appRouter = inp.appRouter;
+        
         // TODO this initialization won't work when expanding graphs
         
         // dim nodes that are [implicitly] learned
@@ -474,7 +478,7 @@
         
       },
       
-      /**
+      /** 
        * Initial rendering for view (necessary because of particular d3 use case)
        */
       initialRender: function() {
@@ -549,7 +553,7 @@
             // front-and-center the key node if present
             keyNode = thisView.model.get("aux").get("depRoot");
         if (keyNode) {
-          var keyNodeLoc = AGFK.utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
+          var keyNodeLoc = Utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
               swx = window.innerWidth,
               swy = window.innerHeight;
           // set x coordinate so key node is centered on screen
@@ -814,7 +818,7 @@
         conceptTag = imgEl.getAttribute(pvt.viewConsts.dataConceptTagProp);
         this.transferToLearnViewForConcept(conceptTag);
         // simulate mouseout for explore-view consistency
-        AGFK.utils.simulate(imgEl.parentNode, "mouseout", {
+        Utils.simulate(imgEl.parentNode, "mouseout", {
           relatedTarget: document
         }); 
       },
@@ -823,7 +827,7 @@
        * Trigger transfer from explore view to learn view and focus on conceptTag
        */
       transferToLearnViewForConcept: function(conceptTag){
-        AGFK.appRouter.changeUrlParams({mode: "learn", lfocus: conceptTag});
+        this.appRouter.changeUrlParams({mode: "learn", lfocus: conceptTag});
       },
       
       /**
@@ -888,6 +892,7 @@
       createSvgGV: function(dotStr) {
         var vizRes;
         // dynamically load Viz since it's a large file
+        // TODO can we optimize this more with require.js?
         if (typeof window.Viz === "undefined"){
           $.ajax({
             url: window.STATIC_PATH + "javascript/lib/viz.js",
@@ -898,7 +903,7 @@
             success: function(data, textStatus, xhr){
               vizRes = window.Viz(dotStr, 'svg');
             },
-            error: AGFK.errorHandler.reportAjaxError 
+            error: ErrorHandler.reportAjaxError 
           });
         }
         else{
@@ -931,4 +936,7 @@
       }
     });
   })();
-})(window.AGFK = window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.d3, window.jQuery, window._);
+
+  // return for require.js 
+  return ExploreView;
+});

@@ -4,13 +4,13 @@
  */
 
 
-(function(AGFK, Backbone, _, $, undefined){
+define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backbone, _, $, ErrorHandler){
   "use strict";
     
   /**
    * Display the model as an item in the node list
    */
-  AGFK.NodeListItemView = (function(){
+  var NodeListItemView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -109,7 +109,7 @@
   /**
    * View to display detailed resource information
    */
-  AGFK.ResourceView = (function(){
+  var ResourceView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -151,7 +151,7 @@
   /**
    * Wrapper view to display all dependencies
    */
-  AGFK.ResourcesSectionView = (function(){
+  var ResourcesSectionView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -172,7 +172,7 @@
         var thisView = this;
         thisView.$el.html("");
         thisView.model.each(function(itm){
-          thisView.$el.append(new AGFK.ResourceView({model: itm}).render().el);
+          thisView.$el.append(new ResourceView({model: itm}).render().el);
         });
         thisView.delegateEvents();
         return thisView;
@@ -185,7 +185,7 @@
   /**
    * View to display details of all provided resources (wrapper view)
    */
-  AGFK.DependencyView = (function(){
+  var DependencyView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -220,7 +220,7 @@
   /**
    * Wrapper view to display all dependencies
    */
-  AGFK.DependencySectionView = (function(){
+  var DependencySectionView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -241,7 +241,7 @@
         var thisView = this;
         thisView.$el.html("");
         thisView.model.each(function(itm){
-          thisView.$el.append(new AGFK.DependencyView({model: itm}).render().el);
+          thisView.$el.append(new DependencyView({model: itm}).render().el);
         });
         thisView.delegateEvents();
         return thisView;
@@ -254,7 +254,7 @@
   /**
    * View to display details of all provided resources (wrapper view)
    */
-  AGFK.OutlinkView = (function(){
+  var OutlinkView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -287,7 +287,7 @@
   /**
    * Wrapper view to display all outlinks
    */
-  AGFK.OutlinkSectionView = (function(){
+  var OutlinkSectionView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -308,7 +308,7 @@
         var thisView = this;
         thisView.$el.html("");
         thisView.model.each(function(itm){
-          thisView.$el.append(new AGFK.OutlinkView({model: itm}).render().el);
+          thisView.$el.append(new OutlinkView({model: itm}).render().el);
         });
         thisView.delegateEvents();
         return thisView;
@@ -322,7 +322,7 @@
    * View to display additional notes/pointers
    * NOTE: expects a javascript model as input (for now) with one field: text
    */
-  AGFK.PointersView = (function(){
+  var PointersView = (function(){
     // define private variables and methods
     var pvt = {
     };
@@ -410,7 +410,7 @@
   /**
    * Displays detailed node information
    */
-  AGFK.DetailedNodeView = (function(){
+  var DetailedNodeView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -448,11 +448,11 @@
             ptrLocClass = "." + viewConsts.ptrLocClass;
         
         thisView.$el.html(thisView.template(thisView.model.toJSON()));
-        thisView.fresources = thisView.fresource || new AGFK.ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
-        thisView.presources = thisView.presources || new AGFK.ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
-        thisView.dependencies = thisView.dependencies || new AGFK.DependencySectionView({model: thisView.model.get("dependencies")});
-        thisView.outlinks = thisView.outlinks || new AGFK.OutlinkSectionView({model: thisView.model.get("outlinks")});
-        thisView.pointers = thisView.pointers || new AGFK.PointersView({model: {text: thisView.model.get("pointers")}});
+        thisView.fresources = thisView.fresource || new ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
+        thisView.presources = thisView.presources || new ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
+        thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
+        thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.get("outlinks")});
+        thisView.pointers = thisView.pointers || new PointersView({model: {text: thisView.model.get("pointers")}});
         if (thisView.fresources.model.length > 0){
           assignObj[freeResourcesLocClass] = thisView.fresources;
         }
@@ -507,7 +507,7 @@
   /**
    * Main learning view
    */
-  AGFK.LearnView = (function(){
+  var LearnView = (function(){
     // define private variables and methods
     var pvt = {};
 
@@ -575,7 +575,7 @@
        */
       appendDetailedNodeAfter: function(nodeModel, domNode){
         var thisView = this,
-            dNodeView = new AGFK.DetailedNodeView({model: nodeModel});
+            dNodeView = new DetailedNodeView({model: nodeModel});
         pvt.insertSubViewAfter(dNodeView, domNode);
         return dNodeView;
       },
@@ -589,7 +589,7 @@
           var parentNode = this.$el.parent(),
               $domEl = $(domEl),
               scrollPos;
-          AGFK.errorHandler.assert(parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
+          ErrorHandler.assert(parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
           parentNode.scrollTop(0); // reset the scroll position
           scrollPos = $domEl.position().top - $domEl.outerHeight()/2;
           parentNode.scrollTop(scrollPos);
@@ -607,7 +607,7 @@
         // get the dom el for the given concept tag
         var thisView = this,
             titleView = pvt.idToTitleView[conceptTag];
-        if (titleView instanceof AGFK.NodeListItemView){
+        if (titleView instanceof NodeListItemView){
           var titleEl = titleView.el;
           // expand dom el
           if (!titleEl.classList.contains(pvt.viewConsts.clickedItmClass)){
@@ -668,7 +668,7 @@
         
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
-          nliview = new AGFK.NodeListItemView({model: curNode});
+          nliview = new NodeListItemView({model: curNode});
           nliview.setParentView(thisView);
           pvt.idToTitleView[curNode.get("id")] = nliview;
           $el.append(nliview.render().el); 
@@ -753,4 +753,6 @@
     });
   })();
 
-})(window.AGFK = typeof window.AGFK == "object"? window.AGFK : {}, window.Backbone, window._, window.jQuery);
+  // return require.js object:
+  return LearnView;
+});

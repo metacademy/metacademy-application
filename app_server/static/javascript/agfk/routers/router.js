@@ -1,13 +1,15 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
-(function(AGFK, Backbone, $, undefined){
+define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view",
+  "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors"],
+  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData, ErrorHandler){
   "use strict";
   
   /**
    * Central router to control URL state
    */
-  AGFK.AppRouter = (function(){
+  return (function(){
 
     // define private methods and variables
     var pvt = {};
@@ -36,11 +38,11 @@
      */
     pvt.cleanUpViews = function(){
       var thisRoute = this;
-      if (thisRoute.eview instanceof AGFK.ExploreView){
+      if (thisRoute.eview instanceof ExploreView){
         thisRoute.eview.close();
         thisRoute.eview = undefined;
       }
-      if (thisRoute.lview instanceof AGFK.LearnView){
+      if (thisRoute.lview instanceof LearnView){
         thisRoute.lview.close();
         thisRoute.lview = undefined;
       }
@@ -152,11 +154,11 @@
 
         // init main app model
         // TODO replace this technique for user data once we have the server/offline storage fleshed out
-        thisRoute.appData = thisRoute.appData || new AGFK.AppData({ userData: thisRoute.appData ?  thisRoute.appData.get("userData") : new AGFK.UserData()});
+        thisRoute.appData = thisRoute.appData || new AppData();
         thisRoute.appData.setGraphData({depRoot: nodeId});
         
         // show app tools
-        thisRoute.appToolsView = thisRoute.appToolsView || new AGFK.AppToolsView({model: thisRoute.appData.get("graphData")});
+        thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
         thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
 
 	// should we re-render the view?
@@ -165,7 +167,7 @@
 	  || (pvt.viewMode === pExploreMode && typeof thisRoute.eview === "undefined");
 
 	if (typeof thisRoute.loadingView === "undefined"){
-	  thisRoute.loadingView = new AGFK.LoadingView();
+	  thisRoute.loadingView = new LoadingView();
 	  loadViewRender = true;
 	}
 	// show loading view if new view is rendered
@@ -187,19 +189,19 @@
           // set the document title to be the searched node
           document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
 
-	  AGFK.errorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
+	  ErrorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
 	 
           switch (paramsObj[qViewMode]){
             case pExploreMode:
               if (doRender){
-                thisRoute.eview = new AGFK.ExploreView({model: thisRoute.appData.get("graphData")});
+                thisRoute.eview = new ExploreView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
 	      }
               thisRoute.showView("#" + routeConsts.eViewId, thisRoute.eview, doRender);
           
 	      break;
 	    default:
               if (doRender){
-                thisRoute.lview = new AGFK.LearnView({model: thisRoute.appData.get("graphData")});
+                thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
               }
               thisRoute.showView("#" + routeConsts.lViewId, thisRoute.lview, doRender);
               // only scroll to intended node on when lview is rerendered,
@@ -215,4 +217,5 @@
       }
     });
   })();
-})(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window.jQuery);
+
+});

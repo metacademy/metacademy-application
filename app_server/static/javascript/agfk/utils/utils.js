@@ -2,16 +2,16 @@
  * This file contains general purpose utility functions TODO create a namespace e.g. CUtil.function_name, etc
  */
 
-(function(AGFK, $, undefined){
+define(["jquery"], function($){
   "use strict";
-  AGFK.utils = {};
-
+  
+  var utils = {};
   /**
    * Simple function that guesses a node title from a given tag
    * (currently replaces underscores with spaces)
    * TODO: this function may be unnecessary
    */
-  AGFK.utils.getTitleGuessFromTag = function(tag){
+  utils.getTitleGuessFromTag = function(tag){
     return tag.replace(/_/g," "); 
   };
 
@@ -19,7 +19,7 @@
   /**
    * Get spatial information about input dom element that contains an svg ellipse
    */
-  AGFK.utils.getSpatialNodeInfo = function(inNode) {
+  utils.getSpatialNodeInfo = function(inNode) {
     var ellp = inNode.getElementsByTagName("ellipse")[0];
     return {
       cx: Number(ellp.getAttribute("cx")),
@@ -35,7 +35,7 @@
    * NOTE: this function only works with absolute paths in the graphviz output
    * TODO also take into account relative paths
    */
-  AGFK.utils.translateSvgPath = function(pathstr, tx, ty){
+  utils.translateSvgPath = function(pathstr, tx, ty){
     throw new Error("translateSvgPath is not yet implemented");
   };
 
@@ -44,7 +44,7 @@
    * Simulate html/mouse events
    * modified code from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
    */
-  AGFK.utils.simulate = (function(){
+  utils.simulate = (function(){
     var pvt = {};
     pvt.eventMatchers = {
       'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
@@ -110,7 +110,7 @@
    * str: string to be potentially hyphenated
    * num: longest accecptable length -1 (single letters will not be broken)
    */
-  AGFK.utils.wbr = function(str, num) {  
+  utils.wbr = function(str, num) {  
     return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
       return text + "-\\n" + ch;
     });
@@ -120,7 +120,7 @@
   /**
    * Wrap a long string to avoid elongated graph nodes. Translated/modified from server technique
    */
-  AGFK.utils.wrapNodeText = function(s, width) {
+  utils.wrapNodeText = function(s, width) {
     if (!s) {
       return '';
     }
@@ -136,7 +136,7 @@
         result = [];
         total = 0;
       }
-      result.push(AGFK.utils.wbr(parts[i], width));
+      result.push(utils.wbr(parts[i], width));
       total += parts[i].length + 1;
     }
     resArr.push(result.join(" "));
@@ -147,7 +147,7 @@
   /**
    * Check if input is a url
    */
-  AGFK.utils.isUrl = function(inStr) {
+  utils.isUrl = function(inStr) {
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
     return regexp.test(inStr);
   };
@@ -156,7 +156,7 @@
   /**
    * agfk specific helper function to control right panel width TODO BAD hardcoded css embeded
    */
-  AGFK.utils.setRightPanelWidth = function(rp_width, rp_lmarg, rp_rmarg) {
+  utils.setRightPanelWidth = function(rp_width, rp_lmarg, rp_rmarg) {
     /*
      Changes display size of the right margin
      See corresponding CSS entries for description of values
@@ -179,7 +179,7 @@
    * Controls window/svg/div sizes in two panel display when resizing the window
    * NB: has jQuery dependency for x-browser support
    */
-  AGFK.utils.scaleWindowSize = function(header_id, main_id) {
+  utils.scaleWindowSize = function(header_id, main_id) {
     var windowSize = {
       height: 0,
       mainHeight: 0,
@@ -205,4 +205,6 @@
     windowSize.init();
   };
 
-})(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.jQuery);
+  // return require.js object
+  return utils;
+});

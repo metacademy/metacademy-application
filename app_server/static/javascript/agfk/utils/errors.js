@@ -1,17 +1,17 @@
 /*
  Utils for handling errors
-*/
+ */
 
-(function(AGFK, undefined){
+define([], function(){
   "use strict";
-  AGFK = typeof AGFK == "object" ? AGFK : {}; // namespace
-  AGFK.errorHandler = {};
+
+  var errorHandler = {};
 
   /**
    * Assert stmt is true, else throw error with msg
    * TODO log errors to the server
    */
-  AGFK.errorHandler.assert = function (stmt, msg){
+  errorHandler.assert = function (stmt, msg){
     if (!stmt){
       throw new Error(msg);
     }
@@ -20,7 +20,7 @@
   /**
    * Report jquery AJAX errors
    */
-  AGFK.reportAjaxError = function(xhr, textStatus, errorThrown){
+  errorHandler.reportAjaxError = function(xhr, textStatus, errorThrown){
     console.error(textStatus, errorThrown);
     if (xhr.status === 0) {
       console.error('Could not connect.\n Verify Network.');
@@ -38,5 +38,7 @@
       console.error('Uncaught Error.\n' + xhr.responseText);
     }
   };
-  
-})(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {});
+
+  // return require.js obj
+  return errorHandler;
+});

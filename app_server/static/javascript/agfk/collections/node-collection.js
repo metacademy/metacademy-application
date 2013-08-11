@@ -1,65 +1,14 @@
 /*
- * This file contains the model collections and must load after the models
+ * This file contains the node collection
  */
-(function(AGFK, Backbone, _, $, undefined){
+define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(Backbone, _, $, NodeModel){
   "use strict";
-
-  /**
-   * collection of resource models
-   */
-  AGFK.ResourceCollection = Backbone.Collection.extend({
-    model:AGFK.Resource,
-
-    /**
-     * Returns a backbone collection of the free resources TODO does this maintain the cid correctly?
-     */
-    getFreeResources: function(){
-      return new AGFK.ResourceCollection(this.where({free: 1}));
-    },
-
-    /**
-     * Returns a backbone collection of the paid resources TODO does this maintain the cid correctly?
-     */
-    getPaidResources: function(){
-      return new AGFK.ResourceCollection(this.where({free: 0}));
-    },
-
-    /**
-     * Keep the resource sorted by mark !== 'star'
-     */
-    comparator: function(rsrc){
-      return rsrc.get("mark").indexOf("star") === -1;
-    }
-  });
-
-
-  /**
-   * Collection of directed edge models TODO post CR-Restruct consider using subets of GraphEdgeCollections -- this will be problematic when adding new data
-   */
-  AGFK.DirectedEdgeCollection = Backbone.Collection.extend({
-    model:AGFK.DirectedEdge
-  });
-
-
-  /**
-   * Collection of question models
-   */
-  AGFK.QuestionCollection = Backbone.Collection.extend({
-    model:AGFK.Question
-  });
-
-  /**
-   * Collection of all edge models in graph
-   */
-  AGFK.GraphEdgeCollection = Backbone.Collection.extend({
-    model: AGFK.DirectedEdge
-  });
   
   /**
    * Collection of all node models in graph
    */
-  AGFK.GraphNodeCollection = Backbone.Collection.extend({
-    model: AGFK.Node,
+  return Backbone.Collection.extend({
+    model: NodeModel,
 
     initialize: function(){
       var thisColl = this;
@@ -113,7 +62,6 @@
           }
         });
       }
-
     }
   });
-})(window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.Backbone, window._, window.$);
+});

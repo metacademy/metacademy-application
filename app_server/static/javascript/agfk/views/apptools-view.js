@@ -1,10 +1,10 @@
-(function(AGFK, $, undefined){
+define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**
    * Simple explore-learn button toggle view
    */
-  AGFK.AppToolsView = (function(){
+  var AppToolsView = (function(){
     var pvt = {};
     pvt.prevButtonEl = null;
     pvt.viewConsts = {
@@ -23,6 +23,12 @@
         "click #button-show-learned": "handleShowLearnedClick",
         "click #button-add-concept": "handleAddConceptClick",
         "click #button-remove-concept": "handleRemoveConceptClick"
+      },
+
+      appRouter: null,
+
+      initialize: function(inp){
+        this.appRouter = inp.appRouter;
       },
 
       /**
@@ -50,7 +56,7 @@
       /**
        * Handle click event for removing a given concept
        */
-      handleRemoveConceptClick: function(evt){
+     handleRemoveConceptClick: function(evt){
         alert("not yet implemented");
       },
 
@@ -60,7 +66,7 @@
       handleELButtonClick: function(evt){
         var buttonEl = evt.currentTarget;
         this.changeActiveELButtonFromDomEl(buttonEl);
-        AGFK.appRouter.changeUrlParams({mode: buttonEl.id.split("-")[0]});
+        this.appRouter.changeUrlParams({mode: buttonEl.id.split("-")[0]});
       },
 
       /**
@@ -68,7 +74,7 @@
        */
       changeActiveELButtonFromName: function(name){
         var domEl = document.getElementById(name + pvt.viewConsts.elNameAppend);
-          AGFK.errorHandler.assert(domEl && domEl.classList && domEl.classList.contains(pvt.viewConsts.elNavButtonClass),
+          ErrorHandler.assert(domEl && domEl.classList && domEl.classList.contains(pvt.viewConsts.elNavButtonClass),
           "changeActiveELButtonFromName did not obtain the correct dom element from name:" + name);
         this.changeActiveELButtonFromDomEl(domEl);
       },
@@ -91,4 +97,6 @@
     });
   })();
 
-})(window.AGFK = window.AGFK = typeof window.AGFK == "object" ? window.AGFK : {}, window.$);
+  // return require.js object
+  return AppToolsView;
+});

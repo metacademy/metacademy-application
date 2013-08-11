@@ -114,16 +114,23 @@ a.expand-collapse-link:hover{
 .header-el{
     display: table-cell;
     vertical-align: middle;
-    margin: 0 1em;
-    padding: 0 0.15em;
 }
 
 .header-img{
     vertical-align: middle;
+    padding-left: 0.1em;
 }
 
 #header-search-img-el{
     min-width: 14em;
+    width: 30%;
+}
+
+#header-user-tools{
+    minwidth: 14em;
+    width: 30%;
+    text-align: right;
+    font-size: 0.72em;
 }
 /* /\* so element within the header can be vertically centered *\/ */
 /* .header-inner-wrap{ */

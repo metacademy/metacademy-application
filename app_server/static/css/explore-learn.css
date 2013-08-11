@@ -15,7 +15,9 @@ body {
 /* App header tools */
 #app-header-tools{
    min-width: 26em;
+   width: 40%;
    cursor: default;
+   text-align: center;
 }
 
 .app-header-tools-button{
@@ -73,7 +75,7 @@ body {
     background-color: steelblue;
 }
 .el-nav-button:hover{
-    background-color: #70a0c7;
+    background-color: #5098D3;
 }
 
 #explore-learn-button-wrapper{
@@ -86,6 +88,9 @@ body {
     margin-right: 1em;
 }
 
+.horz-center-wrapper{
+    margin: 0 auto;
+}
 /* ---------------------------------------------------*/
 /* ---------->>> Load View Styles <<<-----------------*/
 /* ---------------------------------------------------*/

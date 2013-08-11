@@ -54,8 +54,8 @@
       defaultGraphDepth: 200, // default depth of graph
       defaultExpandDepth: 1, // default number of dependencies to show on expand
       defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
-      defaultNodeSepDist: 1.5, // separation of graph nodes
-      defaultNodeWidth: 2.5, // diameter of graph nodes
+      defaultNodeSepDist: 1.7, // separation of graph nodes
+      defaultNodeWidth: 2.7, // diameter of graph nodes
       numCharLineDisplayNode: 11, // max number of characters to display per title line of graph nodes
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
@@ -69,7 +69,7 @@
       maxZoomScale: 5, // maximum zoom-in level for graph
       minZoomScale: 0.05, //maximum zoom-out level for graph
       checkCircleR: 16, // radius of circle around "completed" check
-      checkXOffset: 20, // px offset of checkmark from longest text element
+      checkXOffset: 17, // px offset of checkmark from longest text element
       checkPath: "M -12,4 L -5,10 L 13,-6", // svg path to create check mark
       checkGScale: 0.7, // relative size of "completed" check group
       defaultCheckDist: 90 // default px offset if exact position cannnot be computed

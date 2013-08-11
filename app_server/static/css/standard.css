@@ -127,7 +127,7 @@ a.expand-collapse-link:hover{
 }
 
 #header-user-tools{
-    minwidth: 14em;
+    min-width: 14em;
     width: 30%;
     text-align: right;
     font-size: 0.72em;

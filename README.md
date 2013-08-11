@@ -5,7 +5,7 @@ An apt-get for knowledge.
                              
 Current testing instructions (April 11, 2013):
 
-1. Install [django](https://www.djangoproject.com/download/) 1.4+ and [Whoosh](https://pypi.python.org/pypi/Whoosh) 2.5+.
+1. Install [django](https://www.djangoproject.com/download/) 1.5+ and [Whoosh](https://pypi.python.org/pypi/Whoosh) 2.5+.
 2. Clone/checkout/download the [agfk content](https://github.com/agfk/agfk-content) to an appropriate external directory 
 3. Copy config-template.py to config.py, set the appropriate paths in this directory.
 4. Add the `agfk` project directory to your PYTHONPATH

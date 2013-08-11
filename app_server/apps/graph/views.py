@@ -6,4 +6,4 @@ def graph_browser(request):
     """
     Returns the knowledge-map browser (learning/explore view)
     """
-    return render_to_response('kmap-tester.html', {'content_server':CONTENT_SERVER}, context_instance=RequestContext(request))
+    return render_to_response('agfk-app.html', {'content_server':CONTENT_SERVER}, context_instance=RequestContext(request))

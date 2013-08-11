@@ -3,7 +3,7 @@
  */
 
 // configure require.js
-requirejs.config({
+window.requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
     jquery: "lib/jquery-latest",
@@ -25,11 +25,12 @@ requirejs.config({
   },
   waitSeconds: 15
 });
-
-
-
-requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router"], function(Backbone, Utils, AppRouter){
+  
+// agfk app & gen-utils
+window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils"], function(Backbone, Utils, AppRouter, GenPageUtils){
   "use strict";
+
+  GenPageUtils.prep();
   
   // automatically resize window when viewport changes
   Utils.scaleWindowSize("header", "main");

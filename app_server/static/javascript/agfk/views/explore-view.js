@@ -548,24 +548,27 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         // -- post processing of initial SVG -- //
 
         // obtain orginal transformation since graphviz produces unnormalized coordinates
-        var transprops = d3this.select("." + graphClass).attr("transform").match(/[0-9]+( [0-9]+)?/g),
-            otrans = transprops[2].split(" ").map(Number),
-            // front-and-center the key node if present
-            keyNode = thisView.model.get("aux").get("depRoot");
+        var d3graph =  d3this.select("." + graphClass),
+            scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : 1;
+
+            var keyNode = thisView.model.get("aux").get("depRoot"),
+                newtrans = new Array(2);
         if (keyNode) {
           var keyNodeLoc = Utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
-              swx = window.innerWidth,
-              swy = window.innerHeight;
+              swx = window.innerWidth/scaleVal,
+              swy = window.innerHeight/scaleVal;
           // set x coordinate so key node is centered on screen
-          otrans[0] = swx / 2 - keyNodeLoc.cx;
-          otrans[1] = keyNodeLoc.ry + 5 - keyNodeLoc.cy;
-          d3this.select("." + graphClass)
-            .attr("transform", "translate(" + otrans[0] + "," + otrans[1] + ")");
-        }
+          newtrans[0] = (swx / 2 - keyNodeLoc.cx)*scaleVal;
+          newtrans[1] = (keyNodeLoc.ry + 5 - keyNodeLoc.cy)*scaleVal;
+	  // maintain the scale of the previous graph (helps transitions feel more fluid)
+	  var scale = thisView.prevScale || 0.2;
+           d3this.select("." + graphClass)
+            .attr("transform", "translate(" + newtrans[0] + "," + newtrans[1] + ") scale(" + scaleVal + ")");
 
-        // add original transformation to the zoom behavior
-        var dzoom = d3.behavior.zoom();
-        dzoom.translate(otrans);
+          // add original transformation to the zoom behavior
+          var dzoom = d3.behavior.zoom();
+          dzoom.translate(newtrans).scale(scaleVal);
+        }
 
         // make graph zoomable/translatable
         var vis = d3this.select("svg")
@@ -578,12 +581,15 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
         var summaryDisplays = pvt.summaryDisplays,
             nodeLoc,
-            d3event;
+            d3event,
+	    currentScale;
         // helper function to redraw svg graph with correct coordinates
         function redraw() {
           // transform the graph
           d3event = d3.event;
-          vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + d3event.scale + ")");
+	  currentScale = d3event.scale;
+	  thisView.prevScale = currentScale;
+          vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + currentScale + ")");
           // move the summary divs if needed
           $.each(summaryDisplays, function(key, val){
             nodeLoc = pvt.getSummaryBoxPlacement(val.d3node.node().getBoundingClientRect(), val.placeLeft);

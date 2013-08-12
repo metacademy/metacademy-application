@@ -14,7 +14,7 @@ body {
 
 /* App header tools */
 #app-header-tools{
-   min-width: 26em;
+   min-width: 500px;
    width: 40%;
    cursor: default;
    text-align: center;

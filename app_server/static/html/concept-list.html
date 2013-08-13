@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block targetblank %}
+{% endblock %}
+
+{% block title %}
+Concepts - Metacademy
+{% endblock %}
+
+{% block header %}
+{% include "header-search-logo.html" %}
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/list.css" %}"> </rel>
+{% endblock %}
+
+{% block jscript %}
+<script type="text/javascript" src="{% static "javascript/lib/jquery-latest.js" %}"></script>
+<script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
+<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
+<script type="text/javascript" src="{% static "javascript/show-concepts-list.js" %}"></script>
+{% endblock %}
+
+{% block main%}
+
+<div class="list-concepts-wrapper">
+  
+</div>
+
+{% include "concept-list-item.html" %}
+
+{% endblock %}

@@ -1,7 +1,7 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
-define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view",
+window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view",
   "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors"],
   function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData, ErrorHandler){
   "use strict";

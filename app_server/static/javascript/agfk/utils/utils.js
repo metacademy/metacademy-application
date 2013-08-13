@@ -2,7 +2,7 @@
  * This file contains general purpose utility functions TODO create a namespace e.g. CUtil.function_name, etc
  */
 
-define(["jquery"], function($){
+window.define(["jquery"], function($){
   "use strict";
   
   var utils = {};

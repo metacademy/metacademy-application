@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block title %}
-{{search_query}} - Meta Search
+{{search_query}} - Metacademy Search
 {% endblock %}
 
 {% block extra-css %}
@@ -38,6 +38,15 @@
   </div>
   <div class="search-res">
     <ol class="search-res-list">
+    {% if not search_data|length %}
+
+    <div class="nosearch-message">
+      Perhaps check out our <a href="/list" class="internal-link">full list of concepts</a>
+      </div>
+      <div class="sidenote"> (note: we're a young project and currently focus on machine learning and statistics)</span> <!-- TODO add "contribute content" link here -->
+      <div>
+    {% endif %}
+
       {% for sobj in search_data %}
       <li class="search-res-li">
         <h3 class="search-res-title">

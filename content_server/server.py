@@ -146,6 +146,22 @@ def do_concept(node_name=None):
 
     return make_response(text, 'json')    
 
+@app.route('/list')
+def do_list():
+    load_graph()
+    args = flask.request.args
+    results = {}
+    if 'course' in args:
+        pass
+        # setval = args['course']
+        # TODO load course list
+    else:
+        results = [{'tag': tag, 'title': db.nodes[tag].title} for tag in db.nodes]
+
+    text = json.dumps(results)
+    return make_response(text, 'json')
+    
+        
 @app.route('/search')
 def do_search():
     args = flask.request.args

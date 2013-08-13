@@ -19,6 +19,7 @@ def landing_page(request):
 def get_search_view(request):
     """
     Returns the search (list) view for a given query
+    TODO only return a search template -- parse the content server clientside
     """
     qstring = request.GET['q']
     if len(qstring) == 0:
@@ -28,3 +29,9 @@ def get_search_view(request):
         search_data = get_search_json(qstring)
     
     return render_to_response('search-results.html', {'content_server': CONTENT_SERVER, 'search_data': search_data, 'search_query': qstring}, context_instance=RequestContext(request))
+
+def get_list_view(request):
+    """
+    Return a template for listing the specified concepts
+    """
+    return render_to_response('concept-list.html',  {'content_server': CONTENT_SERVER}, context_instance=RequestContext(request)) 

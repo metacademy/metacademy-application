@@ -1,0 +1,7 @@
+<script type="text/template" id="list-concept-item-template">
+  <li class="list-concepts-li">
+    <h3 class="list-concepts-title">
+      <a class="list-concepts-link internal-link" href="<%= '{% url 'graphs:concepts'%}' + tag + '#lfocus=' + tag %>"> <%= title || tag %> </a>
+    </h3>
+  </li>
+</script>

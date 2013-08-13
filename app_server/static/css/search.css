@@ -37,6 +37,16 @@
     vertical-align: middle;
 }
 
+.nosearch-message{
+    line-height: 1.3em;
+    font-size: 1.2em;
+}
+
+.sidenote{
+    font-style: italic;
+    font-size: 0.95em;
+}
+
 .search-els{
     display: table-cell;
     vertical-align: middle;

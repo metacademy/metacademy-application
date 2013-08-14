@@ -32,3 +32,13 @@
 #main-search-logo{
     display: block;
 }
+
+.dev-note{
+    margin-top: 3em;
+    line-height: 1.2em;
+    font-size: 0.9em;
+    text-align: center;
+    font-style: italic;
+    color: #512161;
+    margin-left: -53px;
+}

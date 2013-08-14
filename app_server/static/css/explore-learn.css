@@ -55,6 +55,13 @@ body {
 }
 
 /* Explore-Learn Navigation Button */
+.e-to-l-summary-link{
+    color: blueviolet;
+    margin-right: 0.5em;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .el-nav-button{
     display: inline;
     float: left;
@@ -296,17 +303,6 @@ body {
 
 .summary-text p{
     display: inline;
-}
-
-.summary-text a{
-    margin-right: 1ex;
-    text-decoration: none;
-    cursor: pointer;
-    color: #493A5C;
-}
-.summary-text a:hover{
-    color: #241494;
-    text-decoration: underline;
 }
 
 .summary-wrap{

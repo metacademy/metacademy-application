@@ -9,7 +9,7 @@ window.requirejs.config({
     jquery: "lib/jquery-latest",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
-    d3: "lib/d3-v3"
+    d3: "lib/d3-v3-min"
   },
   shim: {
     d3: {

@@ -1,7 +1,8 @@
 import os
 from whoosh import index
 from whoosh.fields import Schema, TEXT, ID
-from whoosh.qparser import MultifieldParser
+from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
+import pdb
 
 import config
 import database
@@ -33,8 +34,12 @@ def load_main_index():
 
 def answer_query(query):
     with main_index.searcher() as searcher:
-        query = MultifieldParser(['title', 'summary'], main_index.schema).parse(unicode(query))
-        results = searcher.search(query)
+        parser = MultifieldParser(['title', 'summary'], main_index.schema, fieldboosts={'title': 5.0, 'summary': 0.2})
+        parser.add_plugin(FuzzyTermPlugin())
+        # tilde adds fuzzy parsing for 1 character and /1 requires the first letter to match
+        query = parser.parse(unicode(query) + '~/1') 
+        
+        results = searcher.search(query, limit=100)
         tags = [r['tag'] for r in results]
         print list(results)
     return tags

@@ -6,7 +6,7 @@
 // need to load jquery and requirejs in the main html page
 jQuery.noConflict();
 
-var BENCHMARK_PREFIX_URL = "/benchmark";
+var BENCHMARK_PREFIX_URL = "/dev/benchmarktest";
   
 (function($) {
   /**

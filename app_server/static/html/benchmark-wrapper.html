@@ -1,0 +1,8 @@
+{% extends "agfk-app.html" %}
+{% load staticfiles %}
+
+{% block appjs %}
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js"> </script>
+<script type="text/javascript" src="{% static "javascript/benchmark-agfk.js" %}"></script>
+{% endblock %}

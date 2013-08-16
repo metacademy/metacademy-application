@@ -511,6 +511,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
     // define private variables and methods
     var pvt = {};
 
+    pvt.isRendered = false;
+
     // keep track of expanded nodes: key: title node id, value: expanded view object
     pvt.expandedNodes = {};
 
@@ -629,6 +631,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        * TODO rerender (the appropriate section) when the model changes
        */
       render: function(){
+        pvt.isRendered = false;
         var thisView = this,
             $el = thisView.$el,
             expandedNodes = pvt.expandedNodes,
@@ -649,6 +652,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
           }
         }
         thisView.delegateEvents();
+        pvt.isRendered = true;
         return thisView;
       },
 
@@ -749,6 +753,13 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
 	};
 	
         return dfsTopSort(startRootNodes);
+      },
+
+      /**
+       * Return true if the view has been rendered
+       */
+      isRendered: function(){
+        return pvt.isRendered;
       }
     });
   })();

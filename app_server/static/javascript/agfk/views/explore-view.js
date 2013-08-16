@@ -76,6 +76,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
     pvt.summaryDisplays = {};
     pvt.summaryTOKillList = {};
     pvt.summaryTOStartList = {};
+    pvt.isRendered = false;
 
     /**
      * Get summary box placement (top left) given node placement
@@ -193,7 +194,6 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         delete pvt.summaryTOKillList[nodeId];
       }
       pvt.attachNodeSummary.call(thisView, d3node);
-
 
       // add node-hoverables if not already present
       if (!d3node.attr(viewConsts.dataHoveredProp)) {
@@ -695,11 +695,10 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         var thisView = this,
             dotStr = thisView.collToDot(),
             d3this = thisView.getd3El();
-        thisView.svgGraph = thisView.createSvgGV(dotStr);
+        pvt.isRendered = false; // do async rendering to accomodate big Viz.js file
         thisView.initialSvg = true;
-        thisView.$el.html(thisView.svgGraph);
-        thisView.initialRender();
-        
+        thisView.createSvgGV(dotStr);
+                
         return thisView;
       },
 
@@ -731,89 +730,6 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         dgArr.unshift("node [shape=circle, fixedsize=true, width=" + nodeWidth + "];");
 
         return "digraph G{\n" + dgArr.join("\n") + "}";
-      },
-      
-      /**
-       * Append dependencies of the given node to the main graph
-       */
-      appendDepsToGraph: function(conNodeId, depth){
-        var thisView = this,
-            viewConsts = pvt.viewConsts,
-            edgeClass = viewConsts.edgeClass,
-            nodeClass = viewConsts.nodeClass,
-            newElClass = "newel-class-tmp", // temporary class so d3 can find ndew elements
-            depth = depth || pvt.viewConsts.defaultExpandDepth,
-            args = {depth: depth || 1,
-                    keyNode: thisView.model.get("nodes").get(conNodeId),
-                    remVisible: true};
-
-        var dotStr = thisView.collToDot(args);
-
-        // generate dependency subgraph with connecting node
-        var svgStr = thisView.createSvgGV(dotStr);
-        var $newNEs = $(svgStr).find("." + edgeClass +  ", ." + nodeClass);
-        // uses jquery to replace the preprocessNodesEdges function since d3 won't take existing content as input TODO think about a different structure
-        var newnum = -1;
-        $newNEs.each(function(num){
-          var $this = $(this);
-          $(this).attr("id", function(){
-            var $title = $(this.getElementsByTagName("title")[0]),
-                txtContent = $title.text();
-            $title.remove();
-            return txtContent;
-          });
-          newnum = $this.attr("id") === conNodeId ? num : newnum;
-        });
-        // assert(newnum > -1, "Could not find new element in jquery collection");
-        // obtain transformation coordinates from connecting node
-        var newConNode = $($newNEs[newnum]).find("ellipse"),
-            newCx = Number(newConNode.attr("cx")),
-            newCy = Number(newConNode.attr("cy"));
-
-        var oldConNode = thisView.getd3El().select("#" + conNodeId).select("ellipse"),
-            oldCx = Number(oldConNode.attr("cx")),
-            oldCy = Number(oldConNode.attr("cy"));
-
-        var transX = oldCx - newCx,
-            transY = oldCy - newCy;
-
-        // translate the new elements appropriately and add them to the graph
-        var $graphEl = $("." + viewConsts.graphClass);
-        $newNEs.each(function(){
-          var $this = $(this);
-
-          if ($this.attr("id") !== conNodeId){
-            
-            // hack if-statement since jquery doesn't play nice with svg elements
-            if($this.attr("class") === edgeClass){
-              $this.find("path").attr("transform", "translate(" + transX + "," +  transY + ")"); // TODO we may want to actually change the coordinates
-              $this.find("polygon").attr("transform", "translate(" + transX + "," +  transY + ")"); // TODO we may want to actually change the coordinates
-              //$this.attr("class", $this.attr("class") + " " + newElClass);
-              $graphEl.prepend($this);
-            }
-            else if($this.attr("class") === nodeClass){
-              
-              $this.find("ellipse").attr("cx", function(){
-                return Number(this.getAttribute("cx")) + transX;
-              })
-                .attr("cy", function(){
-                  return Number(this.getAttribute("cy")) + transY;
-                });
-              $this.find("text").each(function(){
-                var $thisText = $(this);
-                $thisText.attr("x", Number($thisText.attr("x")) + transX)
-                  .attr("y", Number($thisText.attr("y")) + transY);
-              });
-              $this.attr("class", $this.attr("class") + " " + newElClass);                       
-              $graphEl.append($this);
-            }
-          }
-        });
-        
-        // add node properties to new subgraph
-        var d3els = d3.selectAll("." + newElClass);
-        d3els.classed(newElClass, false);
-        thisView.addGraphProps(d3els, true);
       },
 
       /**
@@ -893,31 +809,46 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       },
 
       /**
+       * Finish rendering the view after obtaining the svg output from graphviz
+       */
+      finishRender: function(dot){
+        var thisView = this;
+        thisView.$el.html(thisView.svgGraph);
+        thisView.initialRender();
+        // trigger an event for the listening router
+        pvt.isRendered = true;
+        $(window).trigger("viewRendered"); // todo: this feels hacky, better way?
+      },
+      
+      /**
        * Return an SVG representation of graph given a dot string
+       * this function uses relies on the asynchronous loading
+       * of Viz within router.js
        */
       createSvgGV: function(dotStr) {
-        var vizRes;
-        // dynamically load Viz since it's a large file
-        // TODO can we optimize this more with require.js?
-        if (typeof window.Viz === "undefined"){
-          $.ajax({
-            url: window.STATIC_PATH + "javascript/lib/viz.js",
-            dataType: "script",
-            cache: true,
-            async: false,
-            type: "GET",
-            success: function(data, textStatus, xhr){
-              vizRes = window.Viz(dotStr, 'svg');
-            },
-            error: ErrorHandler.reportAjaxError 
-          });
+        var thisView = this;
+        
+        function vizStr(){
+          thisView.svgGraph = window.Viz(dotStr, "svg");
+          thisView.finishRender();
+        }
+        
+        if (typeof window.Viz === "function"){
+            vizStr();
         }
         else{
-          vizRes = window.Viz(dotStr, 'svg');
+          ErrorHandler.assert(window.vizPromise !== undefined, "vizPromise was not initalized before createSvgGv");
+          window.vizPromise.done(vizStr);
         }
-        return vizRes;
       },
 
+      /**
+       * Return true if the view has been rendered
+       */
+      isRendered: function(){
+        return pvt.isRendered;
+      },
+      
       /**
        * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
        */

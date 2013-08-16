@@ -13,6 +13,8 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       elNavButtonClass: "el-nav-button",
       elId: "meta-app"
     };
+
+    pvt.isRendered = true; // view is prerendered 
     
     return Backbone.View.extend({
       el: document.getElementById(pvt.viewConsts.elId),
@@ -29,6 +31,13 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
 
       initialize: function(inp){
         this.appRouter = inp.appRouter;
+      },
+
+      /**
+       * Return true if the view has been rendered
+       */
+      isRendered: function(){
+        return pvt.isRendered();
       },
 
       /**
@@ -92,6 +101,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       },
       
       render: function(){
+        pvt.viewRendered = true;
         return this;
       }
     });

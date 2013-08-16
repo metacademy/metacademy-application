@@ -49,6 +49,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       dataConceptTagProp: "data-concept",
       eToLLinkClass: "e-to-l-summary-link", // NOTE must change class in events attribute as well
       eToLText: "→", // explore to learning text display
+      renderEvt: "viewRendered",
       // ----- rendering options ----- //
       defaultGraphDepth: 200, // default depth of graph
       defaultExpandDepth: 1, // default number of dependencies to show on expand
@@ -695,10 +696,12 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         var thisView = this,
             dotStr = thisView.collToDot(),
             d3this = thisView.getd3El();
+        thisView.$el.empty();
         pvt.isRendered = false; // do async rendering to accomodate big Viz.js file
         thisView.initialSvg = true;
         thisView.createSvgGV(dotStr);
-                
+        thisView.delegateEvents();
+
         return thisView;
       },
 
@@ -737,7 +740,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
        */
       handleEToLConceptClick: function(evt){
         var imgEl = evt.currentTarget,
-        conceptTag = imgEl.getAttribute(pvt.viewConsts.dataConceptTagProp);
+            conceptTag = imgEl.getAttribute(pvt.viewConsts.dataConceptTagProp);
         this.transferToLearnViewForConcept(conceptTag);
         // simulate mouseout for explore-view consistency
         Utils.simulate(imgEl.parentNode, "mouseout", {
@@ -817,7 +820,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         thisView.initialRender();
         // trigger an event for the listening router
         pvt.isRendered = true;
-        $(window).trigger("viewRendered"); // todo: this feels hacky, better way?
+        $(window).trigger(pvt.viewConsts.renderEvt); // todo: this feels hacky, better way?
       },
       
       /**

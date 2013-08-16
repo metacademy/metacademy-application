@@ -820,7 +820,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         thisView.initialRender();
         // trigger an event for the listening router
         pvt.isRendered = true;
-        $(window).trigger(pvt.viewConsts.renderEvt); // todo: this feels hacky, better way?
+        thisView.$el.trigger(pvt.viewConsts.renderEvt); // todo: this feels hacky, better way?
       },
       
       /**

@@ -120,7 +120,11 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
           view = view.render();
         }
 
-        view.isRendered() ? swapViews() : $(window).on("viewRendered", swapViews);
+        // TODO don't use window object -- breaks with multiple async views
+        view.isRendered() ? swapViews() : view.$el.on("viewRendered", function(){
+          view.$el.off("viewRendered");
+          swapViews();
+        });
 
         return view;
       },

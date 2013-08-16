@@ -56,20 +56,6 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       },
 
       /**
-       * Handle click event for adding a given concept
-       */
-      handleAddConceptClick: function(evt){
-        alert("not yet implemented");
-      },
-
-      /**
-       * Handle click event for removing a given concept
-       */
-     handleRemoveConceptClick: function(evt){
-        alert("not yet implemented");
-      },
-
-      /**
        * Handle click event by passing relevant event info to changeActiveELButton
        */
       handleELButtonClick: function(evt){
@@ -99,11 +85,23 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
           pvt.prevButtonEl = buttonEl;
         }
       },
-      
+
+      /**
+       * Render the apptools view
+       */
       render: function(){
         pvt.viewRendered = true;
         return this;
+      },
+
+      /**
+       * Close and unbind views to avoid memory leaks 
+       */
+      close: function() {
+        this.remove();
+        this.unbind();
       }
+      
     });
   })();
 

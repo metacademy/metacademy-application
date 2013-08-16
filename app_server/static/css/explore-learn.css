@@ -98,6 +98,11 @@ body {
 .horz-center-wrapper{
     margin: 0 auto;
 }
+
+.underline{
+    text-decoration: underline;
+}
+
 /* ---------------------------------------------------*/
 /* ---------->>> Load View Styles <<<-----------------*/
 /* ---------------------------------------------------*/
@@ -115,6 +120,30 @@ body {
     vertical-align: middle;
 }
 
+/* ---------------------------------------------------*/
+/* ---------->>> Error View Styles <<<----------------*/
+/* ---------------------------------------------------*/
+.app-error-wrapper{
+    position: absolute;
+    top: 6em;
+    width: 100%;
+    background-color: rgba(255, 255, 211, 0.53);
+    text-align: center;
+    padding: 2em 0;
+}
+
+.app-error-wrapper p{
+    margin: 2em auto;
+    font-size: 1.3em;
+    line-height: 1.3em;
+    width: 60%;
+}
+
+.app-error-wrapper button{
+    background: white;
+    border: 1px saddlebrown solid;
+    padding: 0.7em;
+}
 /* ---------------------------------------------------*/
 /* ---------->>> Learn Mode Styles <<<----------------*/
 /* ---------------------------------------------------*/
@@ -390,7 +419,6 @@ ellipse{
 .clicked ellipse{
     fill: #f1f3f9;
 }
-
 
 .node {
     cursor: default;

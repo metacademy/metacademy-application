@@ -2,8 +2,8 @@
  * This file contains the router and must be loaded after the models, collections, and views
  */
 window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view",
-  "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors"],
-  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData, ErrorHandler){
+  "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors", "agfk/views/error-view"],
+  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData, ErrorHandler, ErrorMessageView){
   "use strict";
   
   /**
@@ -24,7 +24,9 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       rightPanelId: "rightpanel",
       lViewId: "learn-view-wrapper", // id for main learn view div
       eViewId: "explore-view-wrapper", // id for main explore view div
-      loadViewId: "load-view-wrapper"
+      loadViewId: "load-view-wrapper",
+      noContentErrorKey: "nocontent",
+      ajaxErrorKey: "ajax"
     };
 
     pvt.prevUrlParams = {}; // url parameters
@@ -64,7 +66,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
         thisRoute.lview = undefined;
       }
     };
-    
+
     /**
      * Get key/value parameter object from string with key1=val1&key2=val2 format
      */
@@ -99,7 +101,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       /**
        * Show the input view in the input selector and maintain a reference for correct clean up
        */
-      showView: function (selector, view, doRender) {
+      showView: function (view, doRender, selector) {
         var thisRoute = this;
 
         // helper function for async rendering views
@@ -108,9 +110,12 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
             thisRoute.currentView.$el.parent().hide();
           }
           if (doRender){
-            $(selector).html(view.$el).show();
-          }
-          else{
+            if (typeof selector === "string"){
+              $(selector).html(view.$el).show();
+            } else{
+              window.document.body.appendChild(view.el);
+            }
+          } else{
             view.$el.parent().show();
           }
           thisRoute.currentView = view;
@@ -166,6 +171,17 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       },
 
       /**
+       * Show the error message view
+       * key: the key for the given error message
+       * extra: extra information for the error message
+       */
+      showErrorMessageView: function(key, extra){
+        var thisRoute = this;
+        // remove the app tools if there is no current view
+        this.showView(new ErrorMessageView({errorType: key, extra: extra}), true, false);
+      },
+
+      /**
        * Main router for a given node TODO currently only works for one dependency
        */
       nodeRoute: function(nodeId, paramsObj) {
@@ -203,7 +219,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
 	}
 	// show loading view if new view is rendered
 	if (doRender){
-	  thisRoute.showView("#" + routeConsts.loadViewId, thisRoute.loadingView, loadViewRender);
+	  thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + routeConsts.loadViewId);
 	}
 
         var loadViz = typeof window.Viz === "undefined" && window.vizPromise === undefined,
@@ -215,33 +231,47 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
         
         // check if/how we need to acquire more data from the server
         if(thisRoute.appData.get("graphData").get("nodes").length === 0){
-          thisRoute.appData.fetch({success: postNodePop});
+          thisRoute.appData.fetch({
+            success: postNodePop,
+            error: function(jxhr){
+              thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
+              ErrorHandler.reportAjaxError(jxhr);
+            }
+          });
         }
         else{
           postNodePop();
         }
 
         // helper function to route change parameters appropriately
-        // -- necessary because of possible AJAX calls to obtain new data
+        // necessary because of possible AJAX calls to obtain new data
         function postNodePop() {
-          // set the document title to be the searched node
-          document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
+          try{
+            ErrorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0,
+            "Fetch did not populate graph nodes for fetch: " + nodeId);
+          }
+          catch(err){ 
+            thisRoute.showErrorMessageView(pvt.routeConsts.noContentErrorKey, nodeId);
+            return;
+          }
 
-	  ErrorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0, "Fetch did not populate graph nodes");
+          // set the document title to be the searched node
+          document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId)
+            + " - Metacademy";
 	 
           switch (paramsObj[qViewMode]){
             case pExploreMode:
               if (doRender){
                 thisRoute.eview = new ExploreView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
 	      }
-              thisRoute.showView("#" + routeConsts.eViewId, thisRoute.eview, doRender);
+              thisRoute.showView(thisRoute.eview, doRender, "#" + routeConsts.eViewId);
           
 	      break;
 	    default:
               if (doRender){
                 thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
               }
-              thisRoute.showView("#" + routeConsts.lViewId, thisRoute.lview, doRender);
+              thisRoute.showView(thisRoute.lview, doRender, "#" + routeConsts.lViewId);
               // only scroll to intended node on when lview is rerendered,
               // so that the user's scroll state is maintained when jumping between learn and explore view
               var paramQLearnScrollConcept = paramsObj[qLearnScrollConcept];

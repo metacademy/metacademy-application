@@ -1,4 +1,4 @@
-define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection"], function(Backbone, NodePropertyCollections, NodeCollection){
+window.define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection"], function(Backbone, NodePropertyCollections, NodeCollection){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options

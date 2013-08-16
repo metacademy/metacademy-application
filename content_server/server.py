@@ -126,7 +126,7 @@ def do_dependencies():
         query_ids = args.getlist('ids')
         tags.update([db.id2tag[i] for i in query_ids if i in db.id2tag])
     if len(tags) == 0:
-        flask.abort(NOT_FOUND)
+        return make_response('{}', 'json')
 
     full, shortcut = compute_dependencies(tags)
     text = format_graph(full, shortcut, 'json')
@@ -138,7 +138,7 @@ def do_concept(node_name=None):
     args = flask.request.args
     load_graph()
     if node_name not in db.nodes:
-        flask.abort(NOT_FOUND)
+        return make_response('{}', 'json')
 
     shortcut = ('shortcut' in args and args['shortcut'] != '0')
 

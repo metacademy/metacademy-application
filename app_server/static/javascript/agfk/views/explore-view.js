@@ -771,7 +771,7 @@ window.define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "ag
         // build explore-to-learn image
         learnLink.setAttribute(viewConsts.dataConceptTagProp, nodeId);
         learnLink.textContent = viewConsts.eToLText;
-        learnLink.classList.add(viewConsts.eToLLinkClass);
+        learnLink.className = viewConsts.eToLLinkClass;
         // add summary
         summaryP.textContent = this.model.get("nodes").get(nodeId).get("summary");
         div.appendChild(learnLink);

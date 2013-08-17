@@ -550,23 +550,25 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
       /**
        * Expand/collapse the given concept title
        */
-      toggleConceptDetails: function(titleEl){
-        var titleElClassList = titleEl.classList,
-            nid,
+      toggleConceptDetails: function(titleEl, $titleEl){
+          var nid,
             clickedItmClass = pvt.viewConsts.clickedItmClass,
-            thisView = this;
-        titleElClassList.toggle(clickedItmClass);
+            thisView = this,
+            titleId;
+        $titleEl = $titleEl || $(titleEl);
+        $titleEl.toggleClass(clickedItmClass);
+        titleId = $titleEl.attr("id");
         
-        if (titleElClassList.contains(clickedItmClass)){ 
-          nid = titleEl.id.split("-").pop();
-          var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), titleEl);
-          pvt.expandedNodes[titleEl.id] = dnode;
+        if ($titleEl.hasClass(clickedItmClass)){ 
+          nid = titleId.split("-").pop();
+          var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), $titleEl.get(0));
+          pvt.expandedNodes[titleId] = dnode;
         }
         else{
-          if (pvt.expandedNodes.hasOwnProperty(titleEl.id)){
-            var expView = pvt.expandedNodes[titleEl.id];
+          if (pvt.expandedNodes.hasOwnProperty(titleId)){
+            var expView = pvt.expandedNodes[titleId];
             expView.close();
-            delete pvt.expandedNodes[titleEl.id];
+            delete pvt.expandedNodes[titleId];
           }
         }       
       },
@@ -586,11 +588,12 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        * Set the scroll bar so that the top of domEl aligns with the top of the page (if possible)
        * NB the view must be rendered before this function will work TODO workarounds?
        */
-      setScrollTop: function(domEl){
+      setScrollTop: function(domEl, $domEl){
         try{
           var parentNode = this.$el.parent(),
-              $domEl = $(domEl),
               scrollPos;
+          $domEl = $domEl || $(domEl);
+
           ErrorHandler.assert(parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
           parentNode.scrollTop(0); // reset the scroll position
           scrollPos = $domEl.position().top - $domEl.outerHeight()/2;
@@ -610,13 +613,13 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
         var thisView = this,
             titleView = pvt.idToTitleView[conceptTag];
         if (titleView instanceof NodeListItemView){
-          var titleEl = titleView.el;
+          var $titleEl = $(titleView.el);
           // expand dom el
-          if (!titleEl.classList.contains(pvt.viewConsts.clickedItmClass)){
-            thisView.toggleConceptDetails(titleEl);
+          if (!$titleEl.hasClass(pvt.viewConsts.clickedItmClass)){
+            thisView.toggleConceptDetails(null, $titleEl);
           }
           // scroll to dom el
-          thisView.setScrollTop(titleEl);
+          thisView.setScrollTop(null, $titleEl);
           
         }
       },
@@ -647,7 +650,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
             var domEl = document.getElementById(expN);
             if (domEl !== null){
               pvt.insertSubViewAfter(expandedNodes[expN], domEl);
-              domEl.classList.add(clkItmClass);
+              domEl.className = clkItmClass;
             }
           }
         }

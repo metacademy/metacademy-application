@@ -70,10 +70,10 @@ window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone,
        * Change the active button to the input name: "explore" or "learn"
        */
       changeActiveELButtonFromName: function(name){
-        var domEl = document.getElementById(name + pvt.viewConsts.elNameAppend);
-        ErrorHandler.assert(domEl && domEl.classList && domEl.classList.contains(pvt.viewConsts.elNavButtonClass),
+        var $domEl = $("#" + name + pvt.viewConsts.elNameAppend);
+        ErrorHandler.assert($domEl.hasClass(pvt.viewConsts.elNavButtonClass),
                             "changeActiveELButtonFromName did not obtain the correct dom element from name:" + name);
-        this.changeActiveELButtonFromDomEl(domEl);
+        this.changeActiveELButtonFromDomEl($domEl.get(0));
       },
       
       /**

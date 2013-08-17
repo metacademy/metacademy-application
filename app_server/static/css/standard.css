@@ -24,7 +24,7 @@ h2 {
 }
 
 p {
-    margin: 0.1em 0;
+   padding: 0.1em 0;
 }
 
 /* ---------------------------------------------------*/
@@ -66,6 +66,14 @@ a.expand-collapse-link:hover{
 /* ---------------------------------------------------*/
 /* ---------->>> Layout Styles <<<--------------------*/
 /* ---------------------------------------------------*/
+.noscript-alert{
+    width: 100%;
+    height: 100%;
+    background-color: #EAF05B;
+    line-height: 1.5em;
+    text-align: center;
+    font-size: 1.1em;
+}
 
 .header-bar {
     height: 1.6em;		 
@@ -97,6 +105,7 @@ a.expand-collapse-link:hover{
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
     box-sizing: border-box;
+    width: 15em;
 }
 #header-search-input:focus{
     border-color: #501644;

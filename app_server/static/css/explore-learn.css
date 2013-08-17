@@ -92,7 +92,7 @@ body {
     display: inline-block;
     z-index: 1;
     margin-top: 0.2em;
-    margin-right: 1em;
+    margin-right: 1.2em;
 }
 
 .horz-center-wrapper{
@@ -170,6 +170,7 @@ body {
     padding-left: 1ex;
     line-height: 1.5em;
     font-size: 1.1em;
+    margin-left: -2em; /* offset checkmark so text appears centered */
     border-bottom: 0.3ex solid #CCCCCC;
 }
 .learn-title-display:hover, .learn-title-display.clicked-title:hover {

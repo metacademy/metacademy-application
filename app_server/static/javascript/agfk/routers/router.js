@@ -42,7 +42,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
     pvt.loadViz = function(){
       var thisRoute = this;
       // Viz.js requires types arrays; no available for IE < 10
-      if (Int32Array === undefined){
+      if (typeof Int32Array === undefined){
         // we're dealing with IE < 10 or an early mobile browser
         if (pvt.viewMode === pvt.routeConsts.pExploreMode){
           // only show the error for the explore mode

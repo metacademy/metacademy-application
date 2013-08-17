@@ -650,7 +650,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
             var domEl = document.getElementById(expN);
             if (domEl !== null){
               pvt.insertSubViewAfter(expandedNodes[expN], domEl);
-              domEl.className = clkItmClass;
+              domEl.className += " " + clkItmClass;
             }
           }
         }

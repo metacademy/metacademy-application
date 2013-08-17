@@ -27,6 +27,7 @@
       window.CONTENT_SERVER = "{{ content_server }}";
       window.STATIC_PATH = "{% static "" %}";
       window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
+      window.PRODUCTION = window.location.href.match('metacademy') !== null;
     </script>
     {% endblock %}
 
@@ -34,7 +35,7 @@
     
     <script type="text/javascript">
       if(!document.createElement('canvas').getContext){ 
-        alert("Sorry, Metacademy does not work for your browser (IE < 9 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
+        alert("Sorry, Metacademy does not work for your browser (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
       }
       </script>
     {% endblock %}

@@ -1,6 +1,6 @@
-/**
- * This file contains general purpose utility functions TODO create a namespace e.g. CUtil.function_name, etc
- */
+/*
+This file contains general purpose utility functions 
+*/
 
 window.define(["jquery"], function($){
   "use strict";
@@ -28,17 +28,6 @@ window.define(["jquery"], function($){
       rx: Number(ellp.getAttribute("rx"))
     };
   };
-
-
-  /**
-   * Returns an x/y translated path of the input path;
-   * NOTE: this function only works with absolute paths in the graphviz output
-   * TODO also take into account relative paths
-   */
-  utils.translateSvgPath = function(pathstr, tx, ty){
-    throw new Error("translateSvgPath is not yet implemented");
-  };
-
 
   /**
    * Simulate html/mouse events
@@ -126,9 +115,9 @@ window.define(["jquery"], function($){
     }
 
     var parts = s.split(" "),
-	result = [],
-	resArr = [],
-	total = 0;
+        result = [],
+        resArr = [],
+        total = 0;
 
     for (var i = 0; i < parts.length; i++) {
       if (total + parts[i].length + 1 > width && total !== 0) {

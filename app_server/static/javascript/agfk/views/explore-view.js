@@ -6,7 +6,7 @@
 // carefully refactor variables to distinguish nodes from tags
 // -fully separate graph generation logic from view
 
-define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
+window.define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
   "use strict";
 
   /*
@@ -229,7 +229,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
      */
     pvt.nodeMouseOut = function(nodeEl) {
       var relTarget = d3.event.relatedTarget;
-	  
+      
       // check if we're in a semantically related el
       if (!relTarget ||nodeEl.contains(relTarget) || (relTarget.id&& relTarget.id.match(nodeEl.id))){
         return;
@@ -341,7 +341,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           curNode;
       
       _.each(curEndNodes, function(node) {
-         curNode = thisNodes.get(node.get("id"));
+        curNode = thisNodes.get(node.get("id"));
         if ((showLearned || !curNode.isLearnedOrImplicitLearned() ) && (!checkVisible || curNode.getVisibleStatus())){
           dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
         }
@@ -452,8 +452,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       initialize: function(inp) {
         // build initial graph based on input collection
         var thisView = this,
-          d3this = thisView.getd3El(),
-          nodes = thisView.model.get("nodes");
+            d3this = thisView.getd3El(),
+            nodes = thisView.model.get("nodes");
 
         this.appRouter = inp.appRouter;
         
@@ -504,7 +504,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         var gdata = gelems[0].map(function(itm) {
           return d3.select(itm).classed(nodeClass);
         });
-          // return if graph is empty (e.g. clear nodes after all nodes were learned)
+        // return if graph is empty (e.g. clear nodes after all nodes were learned)
         if (gdata.length === 0){
           return false;
         }
@@ -552,8 +552,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         var d3graph =  d3this.select("." + graphClass),
             scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : 1;
 
-            var keyNode = thisView.model.get("aux").get("depRoot"),
-                newtrans = new Array(2);
+        var keyNode = thisView.model.get("aux").get("depRoot"),
+            newtrans = new Array(2);
         if (keyNode) {
           var keyNodeLoc = Utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
               swx = window.innerWidth/scaleVal,
@@ -561,9 +561,9 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           // set x coordinate so key node is centered on screen
           newtrans[0] = (swx / 2 - keyNodeLoc.cx)*scaleVal;
           newtrans[1] = (keyNodeLoc.ry + 5 - keyNodeLoc.cy)*scaleVal;
-	  // maintain the scale of the previous graph (helps transitions feel more fluid)
-	  var scale = thisView.prevScale || 0.2;
-           d3this.select("." + graphClass)
+          // maintain the scale of the previous graph (helps transitions feel more fluid)
+          var scale = thisView.prevScale || 0.2;
+          d3this.select("." + graphClass)
             .attr("transform", "translate(" + newtrans[0] + "," + newtrans[1] + ") scale(" + scaleVal + ")");
 
           // add original transformation to the zoom behavior
@@ -583,13 +583,13 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         var summaryDisplays = pvt.summaryDisplays,
             nodeLoc,
             d3event,
-	    currentScale;
+            currentScale;
         // helper function to redraw svg graph with correct coordinates
         function redraw() {
           // transform the graph
           d3event = d3.event;
-	  currentScale = d3event.scale;
-	  thisView.prevScale = currentScale;
+          currentScale = d3event.scale;
+          thisView.prevScale = currentScale;
           vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + currentScale + ")");
           // move the summary divs if needed
           $.each(summaryDisplays, function(key, val){
@@ -609,7 +609,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             d3this = d3selection || this.getd3El(),
             d3Nodes = d3this.selectAll("." + viewConsts.nodeClass),
             thisNodes = thisView.model.get("nodes");
-	
+        
         // add nodes to observed list TODO move this somewhere else
         d3Nodes.each(function(){
           thisNodes.get(this.id).setVisibleStatus(true);
@@ -629,8 +629,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         // short helper function only needed below
         var addPropFunction = function(nid, prop){
           var d3node = d3this.select("#" + nid);
-	  
-	  if (d3node.node() !== null){
+          
+          if (d3node.node() !== null){
             thisView.toggleNodeProps(d3node, true, prop, d3this);
           } 
         };
@@ -676,9 +676,9 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
        * addClass: true to add class, false to remove
        */
       changeEdgesClass: function(edgeCollections, className, addClass, d3Sel){
-	var d3edge,
-	    edgeId;
-	d3Sel = d3Sel || d3.select("." + pvt.viewConsts.graphClass);
+        var d3edge,
+            edgeId;
+        d3Sel = d3Sel || d3.select("." + pvt.viewConsts.graphClass);
         edgeCollections.each(function(edge){
           edgeId = edge.get("from_tag") + "TO" + edge.get("to_tag");
           d3edge = d3Sel.select("#" + edgeId);
@@ -714,7 +714,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
        */
       collToDot: function(args){ 
         var thisView = this,
-	    thisModel = thisView.model,
+            thisModel = thisView.model,
             viewConsts = pvt.viewConsts,
             showLearned = thisModel.get("options").get("showLearnedConcepts"),
             dgArr,
@@ -837,7 +837,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         }
         
         if (typeof window.Viz === "function"){
-            vizStr();
+          vizStr();
         }
         else{
           ErrorHandler.assert(window.vizPromise !== undefined, "vizPromise was not initalized before createSvgGv");

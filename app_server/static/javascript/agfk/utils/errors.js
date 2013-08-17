@@ -1,6 +1,6 @@
 /*
  Utils for handling errors
- */
+*/
 
 window.define([], function(){
   "use strict";

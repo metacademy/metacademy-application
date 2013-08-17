@@ -47,12 +47,12 @@ window.requirejs.onError = function(err){
 // agfk app & gen-utils
 window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils"], function(Backbone, Utils, AppRouter, GenPageUtils){
   "use strict";
-
   GenPageUtils.prep();
   
   // automatically resize window when viewport changes
   Utils.scaleWindowSize("header", "main");
 
+  // start the AGFK app
   var appRouter = new AppRouter();
   Backbone.history.start();
 });

@@ -1,4 +1,9 @@
-define(["backbone"], function(Backbone){
+/*
+This file contains the user data model, which contains the user-specific data that synces with the app server
+*/
+
+
+window.define(["backbone"], function(Backbone){
   /** 
    * UserData: model to store user data -- will eventually communicate with server for registered users
    */

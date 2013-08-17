@@ -1,3 +1,7 @@
+/*
+ This file contains the graph-data model, which is a wrapper model for the nodes, edges, and auxiliary models
+ */
+
 window.define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection"], function(Backbone, NodePropertyCollections, NodeCollection){
 
   /**
@@ -35,15 +39,15 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/c
 
     return Backbone.Model.extend({
       defaults: {
-	depRoot: undefined,
-	titles: {}
+        depRoot: undefined,
+        titles: {}
       },
 
       /**
        * Get node display title from id
        */
       getTitleFromId: function(nid){
-	return this.get("titles")[nid]; 
+        return this.get("titles")[nid]; 
       }
     });
   })();
@@ -58,21 +62,21 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/c
        * default user states
        */
       defaults: function(){
-	return {
-	  nodes: new NodeCollection(),
-	  edges: new NodePropertyCollections.GraphEdgeCollection(),
-	  aux: new GraphAuxModel(),
+        return {
+          nodes: new NodeCollection(),
+          edges: new NodePropertyCollections.GraphEdgeCollection(),
+          aux: new GraphAuxModel(),
           options: new GraphOptionsModel()
-	};
+        };
       },
 
       /**
        * initialize graph data (place parentModel field in child models)
        */
       initialize: function(){
-	this.get("nodes").parentModel = this;
-	this.get("edges").parentModel = this;
-	this.get("aux").parentModel = this;
+        this.get("nodes").parentModel = this;
+        this.get("edges").parentModel = this;
+        this.get("aux").parentModel = this;
         this.get("options").parentModel = this;
       }
     });

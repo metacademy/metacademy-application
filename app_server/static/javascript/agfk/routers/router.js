@@ -1,8 +1,7 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
-window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view",
-  "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors", "agfk/views/error-view"],
+window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors", "agfk/views/error-view"],
   function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData, ErrorHandler, ErrorMessageView){
   "use strict";
   
@@ -100,7 +99,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
     return Backbone.Router.extend({
       routes: {
         ":params": "routeParams",
-	"": "routeParams"
+        "": "routeParams"
       },
 
       /**
@@ -149,7 +148,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
        */
       routeParams: function( params){
         var routeConsts = pvt.routeConsts,
-	    nodeName = window.location.href.split('/').pop().split('#').shift(), // TODO replace this hack when rewriting the router
+            nodeName = window.location.href.split('/').pop().split('#').shift(), // TODO replace this hack when rewriting the router
             paramsObj = pvt.getParamsFromStr(params || "");
         this.nodeRoute(nodeName, paramsObj);
       },
@@ -202,8 +201,8 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
             pExploreMode = routeConsts.pExploreMode,
             pLearnMode = routeConsts.pLearnMode,
             keyNodeChanged = nodeId !== pvt.prevNodeId, 
-	    loadViewRender = false,
-	    doRender;
+            loadViewRender = false,
+            doRender;
         
         // set view-mode (defaults to learn view)
         paramsObj[qViewMode] = paramsObj[qViewMode] || pLearnMode;
@@ -218,19 +217,19 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
         thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
         thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
 
-	// should we re-render the view?
-	doRender = keyNodeChanged
-	  || (pvt.viewMode === pLearnMode && typeof thisRoute.lview === "undefined")
-	  || (pvt.viewMode === pExploreMode && typeof thisRoute.eview === "undefined");
+        // should we re-render the view?
+        doRender = keyNodeChanged
+          || (pvt.viewMode === pLearnMode && typeof thisRoute.lview === "undefined")
+          || (pvt.viewMode === pExploreMode && typeof thisRoute.eview === "undefined");
 
-	if (typeof thisRoute.loadingView === "undefined"){
-	  thisRoute.loadingView = new LoadingView();
-	  loadViewRender = true;
-	}
-	// show loading view if new view is rendered
-	if (doRender){
-	  thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + routeConsts.loadViewId);
-	}
+        if (typeof thisRoute.loadingView === "undefined"){
+          thisRoute.loadingView = new LoadingView();
+          loadViewRender = true;
+        }
+        // show loading view if new view is rendered
+        if (doRender){
+          thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + routeConsts.loadViewId);
+        }
 
         var loadViz = typeof window.Viz === "undefined" && window.vizPromise === undefined,
             preLoadViz = paramsObj[qViewMode] === pExploreMode; // async start loading Viz before the view, else load after the view
@@ -268,16 +267,16 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
           // set the document title to be the searched node
           document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId)
             + " - Metacademy";
-	 
+         
           switch (paramsObj[qViewMode]){
             case pExploreMode:
               if (doRender){
                 thisRoute.eview = new ExploreView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
-	      }
+              }
               thisRoute.showView(thisRoute.eview, doRender, "#" + routeConsts.eViewId);
           
-	      break;
-	    default:
+              break;
+            default:
               if (doRender){
                 thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
               }
@@ -288,7 +287,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
               if (paramQLearnScrollConcept && paramQLearnScrollConcept !== pvt.prevUrlParams[qLearnScrollConcept]){ 
                 thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
               }
-	  }
+          }
           pvt.prevUrlParams = $.extend({}, paramsObj);
           pvt.prevNodeId = nodeId;
           if (loadViz && !preLoadViz && window.vizPromise === undefined){

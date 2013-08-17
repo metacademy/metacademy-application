@@ -4,7 +4,6 @@
 
 define(["backbone", "agfk/models/node-property-models"], function(Backbone, NodePropertyModels){
 
-
   /**
    * collection of resource models
    */
@@ -49,12 +48,14 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
     model: NodePropertyModels.Question
   });
 
+
   /**
    * Collection of all edge models in graph
    */
   var GraphEdgeCollection = Backbone.Collection.extend({
     model: NodePropertyModels.DirectedEdge
   });
+
 
   return {
     DirectedEdgeCollection: DirectedEdgeCollection,

@@ -4,9 +4,9 @@
  */
 
 
-define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backbone, _, $, ErrorHandler){
+window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backbone, _, $, ErrorHandler){
   "use strict";
-    
+  
   /**
    * Display the model as an item in the node list
    */
@@ -206,10 +206,10 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        */
       render: function(){
         var thisView = this,
-	    thisModel = thisView.model;
-	// TODO this seems awkward
+            thisModel = thisView.model;
+        // TODO this seems awkward
         thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), 
-						     {fromTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("from_tag"))}))); 
+                                                     {fromTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("from_tag"))}))); 
         return thisView;
       }
 
@@ -275,7 +275,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        */
       render: function(){
         var thisView = this,
-	    thisModel = thisView.model;
+            thisModel = thisView.model;
         thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("to_tag"))})));
         return thisView;
       }
@@ -544,19 +544,19 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        * Expand/collapse the clicked concept title
        */
       showNodeDetailsFromEvt: function(evt){
-	this.toggleConceptDetails(evt.currentTarget);	    
+        this.toggleConceptDetails(evt.currentTarget);       
       },
 
       /**
        * Expand/collapse the given concept title
        */
       toggleConceptDetails: function(titleEl){
-	var titleElClassList = titleEl.classList,
+        var titleElClassList = titleEl.classList,
             nid,
             clickedItmClass = pvt.viewConsts.clickedItmClass,
-	    thisView = this;
+            thisView = this;
         titleElClassList.toggle(clickedItmClass);
-	
+        
         if (titleElClassList.contains(clickedItmClass)){ 
           nid = titleEl.id.split("-").pop();
           var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), titleEl);
@@ -568,7 +568,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             expView.close();
             delete pvt.expandedNodes[titleEl.id];
           }
-        }	
+        }       
       },
 
       /**
@@ -660,15 +660,15 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        * Render the learning view titles 
        */
       renderTitles: function(){
-	var thisView = this,
-	    inum,
-	    noLen,
-	    nodeOrdering = pvt.nodeOrdering || thisView.getTopoSortedConcepts(),
-	    curNode,
-	    nliview,
-	    $el = thisView.$el,
-	    thisModel = thisView.model,
-	    nodes = thisModel.get("nodes");
+        var thisView = this,
+            inum,
+            noLen,
+            nodeOrdering = pvt.nodeOrdering || thisView.getTopoSortedConcepts(),
+            curNode,
+            nliview,
+            $el = thisView.$el,
+            thisModel = thisView.model,
+            nodes = thisModel.get("nodes");
         
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
@@ -683,9 +683,9 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        * Clean up the view
        */
       close: function(){
-	var expN,
-	    expandedNodes = pvt.expandedNodes,
-	    domeEl;
+        var expN,
+            expandedNodes = pvt.expandedNodes,
+            domeEl;
         for (expN in expandedNodes){
           if (expandedNodes.hasOwnProperty(expN)){
             var domEl = document.getElementById(expN);
@@ -703,12 +703,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        * if the view ordering is user-dependent
        */
       getTopoSortedConcepts: function(){
-	var thisView = this,
+        var thisView = this,
             thisModel = thisView.model,
-	    keyTag = thisModel.get("aux").get("depRoot") || "",
-	    nodes = thisModel.get("nodes"),
-	    traversedNodes = {}, // keep track of traversed nodes
-	    startRootNodes,
+            keyTag = thisModel.get("aux").get("depRoot") || "",
+            nodes = thisModel.get("nodes"),
+            traversedNodes = {}, // keep track of traversed nodes
+            startRootNodes,
             includeLearned = thisModel.get("options").get("showLearnedConcepts"); // nodes already added to the list
 
         if (keyTag === ""){
@@ -720,38 +720,38 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
           });
         }
         else if(includeLearned || !nodes.get(keyTag).isLearnedOrImplicitLearned()){
-	  // root node is the keyTag
+          // root node is the keyTag
           startRootNodes = [keyTag];
         }
         else{
           return [];
         }
 
-	// recursive dfs topological sort
-	function dfsTopSort (rootNodeTags){
-	  var curRootNodeTagDepth,
-	      returnArr = [],
-	      rootNodeRoundArr = [],
-	      curRootNodeTag,
-	      unqDepTags,
+        // recursive dfs topological sort
+        function dfsTopSort (rootNodeTags){
+          var curRootNodeTagDepth,
+              returnArr = [],
+              rootNodeRoundArr = [],
+              curRootNodeTag,
+              unqDepTags,
               curNode;
 
-	  // recurse on the input root node tags
-	  for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
+          // recurse on the input root node tags
+          for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
             curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
             curNode = nodes.get(curRootNodeTag);
-	    if (!traversedNodes.hasOwnProperty(curRootNodeTag) && (includeLearned || (curNode && !curNode.isLearnedOrImplicitLearned()))){
-	      unqDepTags = curNode.getUniqueDependencies();
-	      if (unqDepTags.length > 0){
-		returnArr = returnArr.concat(dfsTopSort(unqDepTags));
-	      }
-	      returnArr.push(curRootNodeTag);
-	      traversedNodes[curRootNodeTag] = 1;
-	    }
-	  }
-	  return returnArr;
-	};
-	
+            if (!traversedNodes.hasOwnProperty(curRootNodeTag) && (includeLearned || (curNode && !curNode.isLearnedOrImplicitLearned()))){
+              unqDepTags = curNode.getUniqueDependencies();
+              if (unqDepTags.length > 0){
+                returnArr = returnArr.concat(dfsTopSort(unqDepTags));
+              }
+              returnArr.push(curRootNodeTag);
+              traversedNodes[curRootNodeTag] = 1;
+            }
+          }
+          return returnArr;
+        };
+        
         return dfsTopSort(startRootNodes);
       },
 

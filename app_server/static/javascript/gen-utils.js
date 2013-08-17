@@ -21,10 +21,10 @@ function genFun($){
        */
       $('.searchbox').bind('keyup', function(event){
         if (event.which === 13 || event.keyCode === 13){
-	  var cval = event.currentTarget.value;
-	  if (cval.length > 0){
-	    window.location.href = "/search?q=" + window.encodeURI(event.currentTarget.value);
-	  }
+          var cval = event.currentTarget.value;
+          if (cval.length > 0){
+            window.location.href = "/search?q=" + window.encodeURI(event.currentTarget.value);
+          }
         }
       });
       // IE placehold hack from http://www.hagenburger.net/BLOG/HTML5-Input-Placeholder-Fix-With-jQuery.html

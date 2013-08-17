@@ -1,4 +1,8 @@
-define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model", "agfk/utils/errors"], function(Backbone, GraphData, UserData, ErrorHandler){
+/*
+ This file contains the central application model, which is a wrapper model for the other models in the agfk application
+ */
+
+window.define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model", "agfk/utils/errors"], function(Backbone, GraphData, UserData, ErrorHandler){
   "use strict";
 
   /**
@@ -20,9 +24,9 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      */
     initialize: function(){
       var thisModel = this,
-	  userData = thisModel.get("userData"),
-	  graphData = thisModel.get("graphData"),
-	  nodes = graphData.get("nodes");
+          userData = thisModel.get("userData"),
+          graphData = thisModel.get("graphData"),
+          nodes = graphData.get("nodes");
 
       // set parentModel for userData and graphData
       graphData.parentModel = thisModel;
@@ -43,7 +47,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
     setGraphData: function(gdataObj){
       // TODO make this function more general (if we keep it)
       if (gdataObj.hasOwnProperty("depRoot")){
-	this.get("graphData").get("aux").set("depRoot", gdataObj.depRoot);
+        this.get("graphData").get("aux").set("depRoot", gdataObj.depRoot);
       }
     },
 
@@ -54,10 +58,10 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       // TODO we should also parse/obtain user-data here CR-Restruct
       // TODO check for extending the nodes vs resetting
       var thisModel = this,
-	  graphData = thisModel.get("graphData"),
-	  nodes = graphData.get("nodes"),
-	  edges = graphData.get("edges"),
-	  aux = graphData.get("aux");
+          graphData = thisModel.get("graphData"),
+          nodes = graphData.get("nodes"),
+          edges = graphData.get("edges"),
+          aux = graphData.get("aux");
 
       aux.set("titles", response.titles); // TODO: change this to response.aux.titles?
 
@@ -67,13 +71,13 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
 
       // build edge set from nodes
       nodes.each(function(node){
-	// add all edges from nodes
-	["dependencies", "outlinks"].forEach(function(edgeType){
-	  node.get(edgeType).each(function(edge){
-	    edges.add(edge);
-	    edge.graphEdgeCollection = edges;
-	  });
-	});
+        // add all edges from nodes
+        ["dependencies", "outlinks"].forEach(function(edgeType){
+          node.get(edgeType).each(function(edge){
+            edges.add(edge);
+            edge.graphEdgeCollection = edges;
+          });
+        });
       });
       
       delete response.nodes;
@@ -85,7 +89,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      */
     url: function(){
       var thisModel = this, 
-	  depTag = thisModel.get("graphData").get("aux").get("depRoot");
+          depTag = thisModel.get("graphData").get("aux").get("depRoot");
       // TODO post CR-Restruct handle different types of input (aggregated graphs) based on url
       ErrorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request"); 
       return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;

@@ -62,7 +62,7 @@ window.define(["backbone"], function(Backbone){
       switch (thisView.errorType){
       case viewConsts.noContentErrorKey:
         errorMessage = "Unfortuneately, it appears that this concept does not exist yet. "
-        + "Perhaps search for a different concept or check out our " + '<a href="/list" class="internal-link underline" target="_self">list of concepts</a>.';
+          + "Perhaps search for a different concept or check out our " + '<a href="/list" class="internal-link underline" target="_self">list of concepts</a>.';
         break;
       case viewConsts.ajaxErrorKey:
         errorMessage = "Sorry: We encountered a problem trying to load content from "

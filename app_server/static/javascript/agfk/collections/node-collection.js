@@ -1,7 +1,7 @@
 /*
  * This file contains the node collection
  */
-define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(Backbone, _, $, NodeModel){
+window.define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(Backbone, _, $, NodeModel){
   "use strict";
   
   /**

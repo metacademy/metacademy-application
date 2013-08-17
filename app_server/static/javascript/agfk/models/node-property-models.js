@@ -1,4 +1,8 @@
-define(["backbone"], function(Backbone){
+/*
+ This file contains the submodels of node-model.js
+ */
+
+window.define(["backbone"], function(Backbone){
   /**
    * Comprehension question model
    */
@@ -84,6 +88,5 @@ define(["backbone"], function(Backbone){
     Resource: Resource,
     DirectedEdge: DirectedEdge
   };
-
 
 });

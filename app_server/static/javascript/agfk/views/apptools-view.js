@@ -1,4 +1,4 @@
-define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorHandler){
+window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**
@@ -22,9 +22,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       events: {
         "click .el-nav-button": "handleELButtonClick",
         "click #button-clear-learned": "handleClearLearnedClick",
-        "click #button-show-learned": "handleShowLearnedClick",
-        "click #button-add-concept": "handleAddConceptClick",
-        "click #button-remove-concept": "handleRemoveConceptClick"
+        "click #button-show-learned": "handleShowLearnedClick"
       },
 
       appRouter: null,
@@ -69,8 +67,8 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
        */
       changeActiveELButtonFromName: function(name){
         var domEl = document.getElementById(name + pvt.viewConsts.elNameAppend);
-          ErrorHandler.assert(domEl && domEl.classList && domEl.classList.contains(pvt.viewConsts.elNavButtonClass),
-          "changeActiveELButtonFromName did not obtain the correct dom element from name:" + name);
+        ErrorHandler.assert(domEl && domEl.classList && domEl.classList.contains(pvt.viewConsts.elNavButtonClass),
+                            "changeActiveELButtonFromName did not obtain the correct dom element from name:" + name);
         this.changeActiveELButtonFromDomEl(domEl);
       },
       

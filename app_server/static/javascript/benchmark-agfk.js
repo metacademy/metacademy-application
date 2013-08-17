@@ -7,7 +7,7 @@
 jQuery.noConflict();
 
 var BENCHMARK_PREFIX_URL = "/dev/benchmarktest";
-  
+
 (function($) {
   /**
    * @property {object} jQuery plugin which runs handler function once specified element is inserted into the DOM
@@ -15,21 +15,21 @@ var BENCHMARK_PREFIX_URL = "/dev/benchmarktest";
    * @param {bool} shouldRunHandlerOnce Optional: if true, handler is unbound after its first invocation
    * @example $(selector).waitUntilExists(function);
    */
- window.waitUntilExists = function(handler, shouldRunHandlerOnce, isChild) {
-    var found	= 'found';
-    var $this	= $(this.selector);
-    var $elements	= $this.not(function () { return $(this).data(found); }).each(handler).data(found, true);
+  window.waitUntilExists = function(handler, shouldRunHandlerOnce, isChild) {
+    var found   = 'found';
+    var $this   = $(this.selector);
+    var $elements       = $this.not(function () { return $(this).data(found); }).each(handler).data(found, true);
     
     if (!isChild)
     {
       (window.waitUntilExists_Intervals = window.waitUntilExists_Intervals || {})[this.selector] =
-	window.setInterval(function () { window.waitUntilExists.call($this, handler, shouldRunHandlerOnce, true); }, 500)
+        window.setInterval(function () { window.waitUntilExists.call($this, handler, shouldRunHandlerOnce, true); }, 500)
       ;
     }
     else if (shouldRunHandlerOnce && $elements.length)
     {
       window.clearInterval(window.waitUntilExists_Intervals[this.selector]);
-    }	
+    }   
     return $this;
   };
 })(window.jQuery);
@@ -42,8 +42,8 @@ function log(msg){
   // set the URLs here
   var urlTest1 = "hierarchical_dirichlet_process#lfocus=hierarchical_dirichlet_process&mode=learn";
   window.history.pushState("", "", window.BENCHMARK_PREFIX_URL + '/' + urlTest1);
-  var parseCompleteId = "node-detail-view-hierarchical_dirichlet_process";
-  var lrStartTime = new Date().getTime();
+  var parseCompleteId = "node-detail-view-hierarchical_dirichlet_process",
+      lrStartTime = new Date().getTime();
   jQuery.getScript(window.STATIC_PATH + "javascript/agfk/main.js");
   waitUntilExists.call(jQuery("#" + parseCompleteId), function(){
     var finTime = new Date().getTime();
@@ -56,6 +56,7 @@ function log(msg){
 function secondTest(){
   var urlTest1 = "hierarchical_dirichlet_process#mode=explore",
       parseCompleteId = "graph1";
+  
   waitUntilExists.call(  jQuery("#" + parseCompleteId), function(){
     var finTime = new Date().getTime();
     log("Logistic regression explore generation took: " + (finTime - lrStartTime)); 

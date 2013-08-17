@@ -1,7 +1,7 @@
 // Create simple event liseners and utility functions for headers -- this may eventually be tied in with an MVC framework but it's pretty simple and universal at the moment
 // requires: jQuery
 
-if (typeof $ !== "undefined"){
+if (typeof window.define === "undefined"){
   var genutil = genFun($);
   genutil.prep();
 }

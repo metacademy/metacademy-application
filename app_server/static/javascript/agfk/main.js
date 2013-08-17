@@ -31,18 +31,18 @@ window.requirejs.config({
  * TODO: anyway to reduce code repetition with other js files, considering the other js files won't be loaded?
  * perhaps define a global namespace of css classes and ids?
  */
-// window.requirejs.onError = function(err){
-//   var errorId = "error-message";
-//   if (document.getElementById(errorId) === null){
-//     var div = document.createElement("div");
-//     div.id = errorId;
-//     div.className = "app-error-wrapper"; // must also change in error-view.js
-//     div.textContent = "Sorry, it looks like we encountered a problem trying to " +
-//       "initialize the application. Refreshing your browser may solve the problem.";
-//     document.body.appendChild(div);
-//   }
-//   throw new Error(err.message);
-// };
+window.requirejs.onError = function(err){
+  var errorId = "error-message";
+  if (document.getElementById(errorId) === null){
+    var div = document.createElement("div");
+    div.id = errorId;
+    div.className = "app-error-wrapper"; // must also change in error-view.js
+    div.textContent = "Sorry, it looks like we encountered a problem trying to " +
+      "initialize the application. Refreshing your browser may solve the problem.";
+    document.body.appendChild(div);
+  }
+  throw new Error(err.message);
+};
 
 // agfk app & gen-utils
 window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils"], function(Backbone, Utils, AppRouter, GenPageUtils){

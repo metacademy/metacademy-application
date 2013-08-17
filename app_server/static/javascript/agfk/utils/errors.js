@@ -2,7 +2,7 @@
  Utils for handling errors
  */
 
-define([], function(){
+window.define([], function(){
   "use strict";
 
   var errorHandler = {};
@@ -20,20 +20,19 @@ define([], function(){
   /**
    * Report jquery AJAX errors
    */
-  errorHandler.reportAjaxError = function(xhr, textStatus, errorThrown){
-    console.error(textStatus, errorThrown);
+  errorHandler.reportAjaxError = function(xhr, ajaxOptions, errorThrown){
     if (xhr.status === 0) {
-      console.error('Could not connect.\n Verify Network.');
+      console.error('Ajax error: Could not connect.\n Verify Network.');
     } else if (xhr.status == 404) {
-      console.error('Requested page not found. [404]');
+      console.error('Ajax error: Requested page not found. [404]');
     } else if (xhr.status == 500) {
-      console.error('Internal Server Error [500].');
-    } else if (exception === 'parsererror') {
-      console.error('Requested JSON parse failed.');
-    } else if (exception === 'timeout') {
-      console.error('Time out error.');
-    } else if (exception === 'abort') {
-      console.error('Ajax request aborted.');
+      console.error('Ajax error: Internal Server Error [500].');
+    } else if (xhr.statusText === 'parsererror') {
+      console.error('Ajax error: Requested JSON parse failed.');
+    } else if (xhr.statusText === 'timeout') {
+      console.error('Ajax error: Time out error.');
+    } else if (xhr.statusText === 'abort') {
+      console.error('Ajax error: request aborted.');
     } else {
       console.error('Uncaught Error.\n' + xhr.responseText);
     }

@@ -37,17 +37,22 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
 
     /**
      * Asynchronously load Viz.js
-     * TODO move this function to utils if we need to call it from another script
+     * Note: must call with "this = router instance"
      */
     pvt.loadViz = function(){
-      if(typeof Viz === "undefined" && window.VizPromise === undefined){
+      var thisRoute = this;
+      if(typeof Viz === "undefined" && window.vizPromise === undefined){
           window.vizPromise = $.ajax({
             url: window.STATIC_PATH + "javascript/lib/viz.js",
             dataType: "script",
             cache: true,
             async: true,
             type: "GET",
-            error: ErrorHandler.reportAjaxError 
+            error: function(jxhr, opts, errorThrown){
+              window.vizPromise = undefined;
+              thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
+              ErrorHandler.reportAjaxError(jxhr, opts, errorThrown);
+            }
           });
       }
     };
@@ -101,14 +106,16 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       /**
        * Show the input view in the input selector and maintain a reference for correct clean up
        */
-      showView: function (view, doRender, selector) {
+      showView: function (view, doRender, selector, removeOldView) {
         var thisRoute = this;
+        removeOldView = removeOldView === undefined ? true : removeOldView;
 
         // helper function for async rendering views
         function swapViews(){
-          if (thisRoute.currentView) {
+          if (thisRoute.currentView && removeOldView) {
             thisRoute.currentView.$el.parent().hide();
           }
+
           if (doRender){
             if (typeof selector === "string"){
               $(selector).html(view.$el).show();
@@ -118,7 +125,10 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
           } else{
             view.$el.parent().show();
           }
-          thisRoute.currentView = view;
+
+          if (removeOldView){
+            thisRoute.currentView = view;
+          }
         }
 
         if (doRender){
@@ -178,7 +188,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       showErrorMessageView: function(key, extra){
         var thisRoute = this;
         // remove the app tools if there is no current view
-        this.showView(new ErrorMessageView({errorType: key, extra: extra}), true, false);
+        this.showView(new ErrorMessageView({errorType: key, extra: extra}), true, false, false);
       },
 
       /**
@@ -226,16 +236,16 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
             preLoadViz = paramsObj[qViewMode] === pExploreMode; // async start loading Viz before the view, else load after the view
 
         if (loadViz && preLoadViz){
-          pvt.loadViz();
+          pvt.loadViz.call(thisRoute);
         }
         
         // check if/how we need to acquire more data from the server
         if(thisRoute.appData.get("graphData").get("nodes").length === 0){
           thisRoute.appData.fetch({
             success: postNodePop,
-            error: function(jxhr){
+            error: function(emodel, eresp, eoptions){
               thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
-              ErrorHandler.reportAjaxError(jxhr);
+              ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
             }
           });
         }
@@ -244,7 +254,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
         }
 
         // helper function to route change parameters appropriately
-        // necessary because of possible AJAX calls to obtain new data
+        // necessary because of AJAX calls to obtain new data
         function postNodePop() {
           try{
             ErrorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0,
@@ -280,9 +290,9 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
               }
 	  }
           pvt.prevUrlParams = $.extend({}, paramsObj);
-	  pvt.prevNodeId = nodeId;
-          if (loadViz && !preLoadViz && !window.vizPromise === undefined){
-            pvt.loadViz();
+          pvt.prevNodeId = nodeId;
+          if (loadViz && !preLoadViz && window.vizPromise === undefined){
+            pvt.loadViz.call(thisRoute);
           }
         }
       }

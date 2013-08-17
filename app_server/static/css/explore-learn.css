@@ -125,9 +125,9 @@ body {
 /* ---------------------------------------------------*/
 .app-error-wrapper{
     position: absolute;
-    top: 6em;
+    top: 4em;
     width: 100%;
-    background-color: rgba(255, 255, 211, 0.53);
+    background-color: rgba(255, 255, 211, 0.97);
     text-align: center;
     padding: 2em 0;
 }

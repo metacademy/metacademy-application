@@ -24,8 +24,9 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       lViewId: "learn-view-wrapper", // id for main learn view div
       eViewId: "explore-view-wrapper", // id for main explore view div
       loadViewId: "load-view-wrapper",
-      noContentErrorKey: "nocontent",
-      ajaxErrorKey: "ajax"
+      noContentErrorKey: "nocontent", // must also change in error-view.js
+      ajaxErrorKey: "ajax", // must also change in error-view.js
+      unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
     };
 
     pvt.prevUrlParams = {}; // url parameters
@@ -40,7 +41,17 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
      */
     pvt.loadViz = function(){
       var thisRoute = this;
-      if(typeof Viz === "undefined" && window.vizPromise === undefined){
+      // Viz.js requires types arrays; no available for IE < 10
+      if (Int32Array === undefined){
+        // we're dealing with IE < 10 or an early mobile browser
+        if (pvt.viewMode === pvt.routeConsts.pExploreMode){
+          // only show the error for the explore mode
+          // learn mode should work with IE 9 and popups will notify IE < 9
+          thisRoute.showErrorMessageView(pvt.routeConsts.unsupportedBrowserKey); 
+        }
+      } else{
+
+        if(typeof Viz === "undefined" && window.vizPromise === undefined){
           window.vizPromise = $.ajax({
             url: window.STATIC_PATH + "javascript/lib/viz.js",
             dataType: "script",
@@ -53,6 +64,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
               ErrorHandler.reportAjaxError(jxhr, opts, errorThrown);
             }
           });
+        }
       }
     };
 

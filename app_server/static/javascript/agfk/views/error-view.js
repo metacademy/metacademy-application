@@ -7,8 +7,9 @@ window.define(["backbone"], function(Backbone){
   var pvt = {};
   pvt.viewConsts = {
     errorWrapClass: "app-error-wrapper", // must also change in main.js
-    noContentErrorKey: "nocontent",
-    ajaxErrorKey: "ajax",
+    noContentErrorKey: "nocontent", // musst also change in router.js
+    ajaxErrorKey: "ajax", // musst also change in router.js
+    unsupportedBrowserKey: "unsupportedbrowser", // musst also change in router.js
     closeMessageClass: "close-error-message" // must also change in events definition
   };
 
@@ -63,6 +64,9 @@ window.define(["backbone"], function(Backbone){
       case viewConsts.noContentErrorKey:
         errorMessage = "Unfortuneately, it appears that this concept does not exist yet. "
           + "Perhaps search for a different concept or check out our " + '<a href="/list" class="internal-link underline" target="_self">list of concepts</a>.';
+        break;
+      case viewConsts.unsupportedBrowserKey:
+        errorMessage = "Sorry, Your browser is currently not supported for this application. Consider updating your browser (IE 10 works, if you want to use IE) or switching to Firefox/Chrome/Opera/Safari when using Metacademy.org.";
         break;
       case viewConsts.ajaxErrorKey:
         errorMessage = "Sorry: We encountered a problem trying to load content from "

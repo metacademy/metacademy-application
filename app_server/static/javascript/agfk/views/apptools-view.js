@@ -57,9 +57,13 @@ window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone,
        * Handle click event by passing relevant event info to changeActiveELButton
        */
       handleELButtonClick: function(evt){
+        var thisView = this;
         var buttonEl = evt.currentTarget;
-        this.changeActiveELButtonFromDomEl(buttonEl);
-        this.appRouter.changeUrlParams({mode: buttonEl.id.split("-")[0]});
+        thisView.changeActiveELButtonFromDomEl(buttonEl);
+        // 10 ms delay to let the UI update (looks smoother)
+        window.setTimeout(function(){
+            thisView.appRouter.changeUrlParams({mode: buttonEl.id.split("-")[0]});
+        }, 10);
       },
 
       /**

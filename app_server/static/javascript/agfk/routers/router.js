@@ -249,7 +249,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
           });
         }
         else{
-          postNodePop();
+          window.setTimeout(postNodePop, 10); // 10 ms delay for UI to update with loading view
         }
 
         // helper function to route change parameters appropriately

@@ -6,7 +6,7 @@
 window.requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
-    jquery: "lib/jquery-latest",
+    jquery: ["//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min", window.STATIC_PATH + "javascript/lib/jquery-2.0.3.min"],
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3-v3-min"

@@ -3,16 +3,12 @@
 # Django settings for django_agfk project.
 import os
 import config
-# in config, set: SECRET_KEY;
 
-CONTENT_SERVER = 'http://localhost:' + str(config.CONTENT_SERVER_PORT)
+
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
 CLIENT_SERVER_PATH = SETTINGS_PATH
 AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../'))
 
-
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -23,7 +19,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': config.DB_PATH,                      # Or path to database file if using sqlite3.
+        'NAME': config.DB_PATH,                 # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -90,12 +86,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
-# Make this unique, and don't share it with anybody.
-if hasattr(config, 'SECRET_KEY'):
-    SECRET_KEY = config.SECRET_KEY
-else:
-    SECRET_KEY = '1234' # set the secret key in the config file
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -169,4 +159,7 @@ LOGGING = {
     }
 }
 
+# default URL to redirect to after login
 LOGIN_REDIRECT_URL = '/user'
+
+from settings_local import *

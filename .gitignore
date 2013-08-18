@@ -44,7 +44,7 @@ tmp
 
 # local configuration
 config.py
-settings.py
+settings_local.py
 
 # local copies
 media

@@ -15,6 +15,7 @@ see simple_server for valid content requests
 urlpatterns = patterns('',
                        url(r'^', include('apps.content_search.urls') ),
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),
+                       url(r'^user/', include('apps.user_management.urls', namespace='user') ),
                        url(r'^dev/benchmarktest', benchmark_viewer),
 )
 

@@ -11,24 +11,28 @@ window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone,
       activeClass: "active",
       elNameAppend: "-button",
       elNavButtonClass: "el-nav-button",
-      elId: "meta-app"
+      clearLearnedId: "button-clear-learned",
+      showLearnedId: "button-show-learned"
     };
 
     pvt.isRendered = true; // view is prerendered 
     
     return Backbone.View.extend({
-      el: document.getElementById(pvt.viewConsts.elId),
-      
-      events: {
-        "click .el-nav-button": "handleELButtonClick",
-        "click #button-clear-learned": "handleClearLearnedClick",
-        "click #button-show-learned": "handleShowLearnedClick"
-      },
-
       appRouter: null,
 
       initialize: function(inp){
-        this.appRouter = inp.appRouter;
+        var thisView = this,
+            viewConsts = pvt.viewConsts;
+        thisView.appRouter = inp.appRouter;
+        $('.' + viewConsts.elNavButtonClass).on("click", function(evt){
+          thisView.handleELButtonClick.call(thisView, evt);
+        });
+        $('#' + viewConsts.clearLearnedId).on("click", function(evt){
+          thisView.handleClearLearnedClick.call(thisView, evt);
+        });
+        $('#' + viewConsts.showLearnedId).on("click", function(evt){
+          thisView.handleShowLearnedClick.call(thisView, evt);
+        });
       },
 
       /**
@@ -39,7 +43,7 @@ window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone,
       },
 
       /**
-       * Handle click event for clearing the [implicitly] learned nodes
+       * Handle click event for showing the [implicitly] learned nodes
        */
       handleClearLearnedClick: function(evt){
         // TODO: check that learned concepts have changed

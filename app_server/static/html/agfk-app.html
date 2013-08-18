@@ -7,14 +7,9 @@
 <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
 {% endblock %}
 
-</head>
 
-{% block body %}
 
-<div id="meta-app">
-
-  <div class="header-bar">
-    <div class="header-content-wrapper">
+{% block header %}
       {% include "header-search-logo.html" %}
       <div id="app-header-tools" class="header-el">
           <button class="app-header-tools-button button-left" id="button-clear-learned">
@@ -35,13 +30,11 @@
 	  <a href="{% url 'user:register' %}"> Sign up </a>
 	{% endif %}
       </div>
-    </div>
-  </div>
+{% endblock %}
 
 
 
-<div id="main">
-    
+{% block main %}
     <div id="explore-learn-button-wrapper">
       <button class="el-nav-button button-left" id="explore-button">
         Explore
@@ -63,9 +56,9 @@
   {% include "outlink-view.html" %}
   {% include "loading-view.html" %}
 
-</div>
-</div>
-  {% block appjs %}
+{% endblock %}
+  
+  {% block jscript %}
   <script data-main="{% static "javascript/agfk/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
   {% endblock %}
-  {% endblock %}
+

@@ -1,11 +1,25 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-{% block header %}
+{% block targetblank %}
 {% endblock %}
 
 {% block extra-css %}
     <link rel="stylesheet" href="{% static "css/landing.css" %}"/>
+{% endblock %}
+
+{% block pre-standard-header-content %}
+    <ul class="header-el">
+      <li>
+        <a href="/list">Concept list</a>
+      </li>
+      <li>
+        <a href="/about">About</a>
+      </li>
+      <li>
+        <a href="/contribute">Contribute</a>
+      </li>
+    </ul>
 {% endblock %}
 
 {% block main %}

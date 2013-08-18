@@ -79,17 +79,10 @@ a.expand-collapse-link:hover{
     height: 1.6em;		 
     width: 100%;
     background: #333;
-    overflow: hidden;
-    font-size: 1.1em;
     position: relative;
     z-index: 10;
-    display: table;
-    overflow: scroll;
-}
-
-.header-content-wrapper{
-    display: table-row;
-    height: 100%;
+    text-align: right;
+    min-width: 600px;
 }
 
 #header-search-input{
@@ -117,31 +110,53 @@ a.expand-collapse-link:hover{
 }
 
 .header-el{
-    display: table-cell;
-    vertical-align: middle;
+    line-height: 1.6em;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+
+.header-el li{
+    display: inline;
+    padding: 0 1em;
+}
+
+.header-el a{
+    color: white;
+    font-size: 0.8em;
+    text-decoration: none;
+}
+.header-el a:hover{
+    text-decoration: underline;
 }
 
 .header-img{
     vertical-align: middle;
     padding-left: 0.1em;
+    padding-bottom: 0.2em;
 }
 
 #header-search-img-el{
-    min-width: 370px;
-    width: 30%;
+    text-align: left;
+    float: left;
+    padding-left: 0.2em;
 }
 
 #header-user-tools{
-    min-width: 14em;
-    width: 30%;
     text-align: right;
-    font-size: 0.72em;
     color: white;
+    margin-left: 1.5em;
 }
 
 #header-user-tools a{
     color: white;
+    text-decoration: none;
+    padding: 0 0.7em;
 }
+
+#header-user-tools a:hover{
+    text-decoration: underline;
+}
+
 
 #main {
     clear: both;

@@ -35,9 +35,10 @@
     
     <script type="text/javascript">
       if(!document.createElement('canvas').getContext){ 
-        alert("Sorry, Metacademy does not work for your browser (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
+        alert("Sorry, Metacademy does not work for your browser" +
+        " (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
       }
-      </script>
+   </script>
     {% endblock %}
     <title> {% block title %}Metacademy{% endblock %}</title>
 
@@ -48,12 +49,12 @@
     {% block noscript %}
     <noscript>
       <div class="noscript-alert">
-      <p>
-        It looks like you have javascript disabled.
-     </p>
-      <p>
-        You must have javascript enabled on a modern browser in order to use metacademy.org
-      </p>
+        <p>
+          It looks like you have javascript disabled.
+        </p>
+        <p>
+          You must have javascript enabled on a modern browser in order to use metacademy.org
+        </p>
       </div>
     </noscript>
     {% endblock %}
@@ -61,14 +62,31 @@
     {% block body %}
 
     <div class="header-bar">
-      <div class="header-content-wrapper">
 	{% block header %}
+        
+        {% block pre-standard-header-content %}
+        {% endblock %}
 
-
-	{% endblock %}
-      </div>
+        {% block standard-header-content %}
+        <ul id="header-user-tools" class="header-el">
+          {% if user.is_authenticated %}
+          <li>
+            <a href="{% url 'user:user_main' %}">{{ user.username }}</a>
+          &#124;
+	    <a href="{% url 'user:logout' %}">Sign out</a>
+          </li>
+	  {% else %}
+          <li>
+	    <a href="{% url 'user:login' %}">Sign in</a>
+          &#124;
+	    <a href="{% url 'user:register' %}">Sign up</a>
+          </li>
+	  {% endif %}
+          {% endblock %}
+          
+	  {% endblock %}
+        </ul>
     </div>
-
 
     <div id="main">
       {% block main %}
@@ -84,16 +102,16 @@
     <script type="text/javascript">
       // piwik server-side tracking
       if (window.PRODUCTION){
-        var _paq = _paq || [];
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-          var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
-          _paq.push(['setTrackerUrl', u+'piwik.php']);
-          _paq.push(['setSiteId', 1]);
-          var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-          g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-        })();
+      var _paq = _paq || [];
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+      var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', 1]);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+      g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
       }
     </script>
   </body>

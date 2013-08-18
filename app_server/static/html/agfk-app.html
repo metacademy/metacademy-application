@@ -9,7 +9,7 @@
 
 
 
-{% block header %}
+{% block pre-standard-header-content %}
       {% include "header-search-logo.html" %}
       <div id="app-header-tools" class="header-el">
           <button class="app-header-tools-button button-left" id="button-clear-learned">
@@ -18,17 +18,6 @@
           <button class="app-header-tools-button button-right"id="button-show-learned">
             show learned
           </button>
-      </div>
-      <div id="header-user-tools" class="header-el">
-        {% if user.is_authenticated %}
-	  Signed in as {{ user.username }}.
-          <a href="{% url 'user:user_main' %}"> Home </a> |
-	  <a href="{% url 'user:logout' %}"> Sign out </a>
-	{% else %}
-          Not signed in.
-	  <a href="{% url 'user:login' %}"> Sign in </a> |
-	  <a href="{% url 'user:register' %}"> Sign up </a>
-	{% endif %}
       </div>
 {% endblock %}
 

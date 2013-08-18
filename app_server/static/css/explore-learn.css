@@ -14,10 +14,11 @@ body {
 
 /* App header tools */
 #app-header-tools{
-   min-width: 500px;
-   width: 40%;
    cursor: default;
    text-align: center;
+   width: 20em;
+   float: left;
+   margin-left: -10em;
 }
 
 .app-header-tools-button{
@@ -28,8 +29,9 @@ body {
     background-color: #416685;
     color: white;
     padding: 2px;
+    padding-bottom: 1px;
     margin: 0;
-    font-size: 0.62em;
+    font-size: 0.75em;
     cursor: default;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
@@ -473,4 +475,14 @@ ellipse{
 
 .implicit-learned{
     opacity: 0.6;
+}
+
+
+/* Override Properties */
+#header-search-img-el{
+    width: 50%;
+    min-width: 27em;
+}
+.header-bar{
+ min-width: 825px;
 }

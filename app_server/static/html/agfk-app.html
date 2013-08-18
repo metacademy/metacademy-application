@@ -25,7 +25,15 @@
           </button>
       </div>
       <div id="header-user-tools" class="header-el">
-        placeholder
+        {% if user.is_authenticated %}
+	  Signed in as {{ user.username }}.
+          <a href="{% url 'user:user_main' %}"> Home </a> |
+	  <a href="{% url 'user:logout' %}"> Sign out </a>
+	{% else %}
+          Not signed in.
+	  <a href="{% url 'user:login' %}"> Sign in </a> |
+	  <a href="{% url 'user:register' %}"> Sign up </a>
+	{% endif %}
       </div>
     </div>
   </div>

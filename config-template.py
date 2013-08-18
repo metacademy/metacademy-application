@@ -1,5 +1,6 @@
 CONTENT_PATH = '/path/to/agfk-content'
 TEMP_PATH = '/path/to/tmp-area'
+DB_PATH = '/path/to/agfk.db'
 HASH = 'randomLettersAndNumbers'
 CONTENT_SERVER_PORT = 9090
 FRONTEND_SERVER_PORT = 8080

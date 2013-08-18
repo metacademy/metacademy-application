@@ -11,6 +11,8 @@ Current testing instructions (April 11, 2013):
 4. Add the `agfk` project directory to your PYTHONPATH
 5. From `agfk` project directory:
 
+        python manage.py syncdb
+
         python manage.py collectstatic
 
         run_test_servers.sh

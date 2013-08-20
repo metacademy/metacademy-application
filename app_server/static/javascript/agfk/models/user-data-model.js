@@ -10,6 +10,7 @@ window.define(["backbone"], function(Backbone){
   return  (function(){
     // define private methods and variables
     var pvt = {};
+
     /**
      * Internal function to change dictionary objects 
      * objName: name of object property
@@ -53,22 +54,22 @@ window.define(["backbone"], function(Backbone){
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateLearnedNodes: function(nodeName, status){
-        return pvt.updateObjProp.call(this, "learnedNodes", nodeName, status);
+      updateLearnedNodes: function(nodeTag, status, nodeSid){
+        return pvt.updateObjProp.call(this, "learnedNodes", nodeSid, status);
       },
 
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateImplicitLearnedNodes: function(nodeName, status){
-        return pvt.updateObjProp.call(this, "implicitLearnedNodes", nodeName, status);
+      updateImplicitLearnedNodes: function(nodeTag, status, nodeSid){
+        return pvt.updateObjProp.call(this, "implicitLearnedNodes", nodeSid, status);
       },
 
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateVisibleNodes: function(nodeName, status){
-        return pvt.updateObjProp.call(this, "visibleNodes", nodeName, status);
+      updateVisibleNodes: function(nodeTag, status, nodeSid){
+        return pvt.updateObjProp.call(this, "visibleNodes", nodeSid, status);
       }
     });
   })();

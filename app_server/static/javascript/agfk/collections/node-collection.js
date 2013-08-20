@@ -20,7 +20,8 @@ window.define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], fu
     parse: function(response){
       var ents = [];
       for (var key in response) {
-        ents.push(_.extend(response[key],{id: key})); // TODO change once id is generated server-side
+        // place the server id in "sid" since all deps are returned in terms of the tag
+        ents.push(_.extend(response[key],{sid: response[key].id, id: key})); 
       }
       return ents;
     },
@@ -32,9 +33,9 @@ window.define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], fu
       var thisColl = this,
           collNode;
       _.each(userModel.get("learnedNodes"), function(val, key){
-        collNode = thisColl.get(key);
+        collNode = thisColl.findWhere({sid: key});
         if (collNode !== undefined){
-          thisColl.get(key).setLearnedStatus(true);
+          collNode.setLearnedStatus(true);
         }
       });
     },

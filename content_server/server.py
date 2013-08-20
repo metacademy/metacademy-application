@@ -62,16 +62,17 @@ def format_graph(full_tags, shortcut_tags, fmt):
         f = cStringIO.StringIO()
         formats.write_graph_json(db, full_tags, shortcut_tags, f)
         return f.getvalue()
-    elif fmt == 'dot':
-        f = cStringIO.StringIO()
-        formats.write_graph_dot(db, full_tags, shortcut_tags, f, bottom_up=True)
-        return f.getvalue()
-    elif fmt == 'svg':
-        dotfile = os.path.join(config.TEMP_PATH, 'graph.dot')
-        svgfile = os.path.join(config.TEMP_PATH, 'graph.svg')
-        formats.write_graph_dot(db, full_tags, shortcut_tags, open(dotfile, 'w'), bottom_up=True)
-        os.system('dot -Tsvg %s -o %s' % (dotfile, svgfile))
-        return open(svgfile, 'rb').read()
+    # TODO these have been deprecated
+    # elif fmt == 'dot':
+    #     f = cStringIO.StringIO()
+    #     formats.write_graph_dot(db, full_tags, shortcut_tags, f, bottom_up=True)
+    #     return f.getvalue()
+    # elif fmt == 'svg':
+    #     dotfile = os.path.join(config.TEMP_PATH, 'graph.dot')
+    #     svgfile = os.path.join(config.TEMP_PATH, 'graph.svg')
+    #     formats.write_graph_dot(db, full_tags, shortcut_tags, open(dotfile, 'w'), bottom_up=True)
+    #     os.system('dot -Tsvg %s -o %s' % (dotfile, svgfile))
+    #     return open(svgfile, 'rb').read()
     else:
         raise RuntimeError('Unknown format: %s' % fmt)
 

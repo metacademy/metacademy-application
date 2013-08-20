@@ -10,7 +10,7 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
     // maintain ancillary/user-specific info and fields in a private object
     var pvt = {};
     pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
-    pvt.txtFields = ["id", "title", "summary", "pointers", "is_shortcut"];
+    pvt.txtFields = ["id", "sid", "title", "summary", "pointers", "is_shortcut"];
     
     return Backbone.Model.extend({
       /**
@@ -20,6 +20,7 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
         return {
           title: "",
           id: "",
+          sid: "",
           summary: "",
           pointers: "",
           is_shortcut: 0,
@@ -94,7 +95,7 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
         this.setLearnedStatus = function(status){
           if (status !== nodePvt.learned){
             nodePvt.learned = status;
-            this.trigger("change:learnStatus", this.get("id"), status);
+            this.trigger("change:learnStatus", this.get("id"), status, this.get("sid"));
           }
         };
 
@@ -116,7 +117,7 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
         this.setImplicitLearnStatus = function(status){
           if (nodePvt.implicitLearn !== status){
             nodePvt.implicitLearn = status;
-            this.trigger("change:implicitLearnStatus", this.get("id"), status);
+            this.trigger("change:implicitLearnStatus", this.get("id"), status, this.get("sid"));
           }
         };
 

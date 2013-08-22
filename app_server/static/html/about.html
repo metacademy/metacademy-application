@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+    <link rel="stylesheet" href="{% static "css/about.css" %}"/>
+{% endblock %}
+
+{% block main %}
+<h3>About Metacademy</h3>
+<div class="about-meta">
+<p>
+Imagine a super-smart futuristic machine, where you can tell the machine, "I want to learn what an artificial neural network is." The machine then scans your brain and gives you a carefully constructed ordered list of resources that you should consult in order to understand artificial neural networks:
+<p>
+<ol>
+<li> read chapter 7 of textbook X </li>
+<li> watch video lecture Y </li>
+<li> work through problems 7-9 found at website Z</li>
+</ol>
+<p>
+This list is <em>your list</em>, it wouldn't really help anyone else because the machine formulated the list based on your knowledge (that's why it scanned your brain, afterall&mdash;at least that's what Google will tell you). The super-smart futuristic machine can produce a similar list for any person about any concept. It makes learning new concepts efficient. You no longer have to spend hours skimming various websites/textbooks/etc trying to find the resources that appeal to your knowledge base.
+</p>
+
+<p>
+Okay, so it will probably be a while before we have this super-smart futuristic machine. But we think these lists could be incredibly helpful when trying to learn new concepts, so let's make them without using the futuristic machine! To do this, Metacademy provides an <a class="external-link underline" target="_blank" href="https://github.com/agfk">open-source platform</a> where experts from various disciplines (mathematics, computer science, medicine, music, etc) can contribute <em> structured knowledge</em>. This structure comes as a dependency graph of concepts. This graph structure lets a Metacademy user say, "I know concept X," and then when this user wants to learn a new concept, Metacademy can remove concept X and all of the concepts the user had to know in order to understand concept X. The learning list itself then contains an expertly-chosen selection of resources to help the user learn each concept. 
+</p>
+
+
+<h3>Contributing to Metacademy</h3>
+<p>
+  Metacademy is young, and our online system for content submission is not quite ready. We'll update this section soon.
+</p>
+
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+p{
+   margin:  0.5em 0;
+}
+
+h3{
+    font-size: 1.6em;
+    text-align: center;
+    margin: 1em 0;
+    color: #50094A;
+    font-weight: bold;
+}
+
+.about-meta{
+    width: 70%;
+    min-width: 500px;
+    margin: 0 auto;
+    line-height: 1.4em;
+    padding-bottom: 5em;
+    font-size: 1.2em;
+}
+
+ol{
+    list-style-type: decimal;
+    padding: 0 0 0 3em;
+    line-height: 1.5em;
+}

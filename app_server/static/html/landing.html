@@ -8,20 +8,9 @@
     <link rel="stylesheet" href="{% static "css/landing.css" %}"/>
 {% endblock %}
 
-{% block pre-standard-header-content %}
-    <ul class="header-el">
-      <li>
-        <a href="/list">Concept list</a>
-      </li>
-      <li>
-        <a href="/about">About</a>
-      </li>
-      <li>
-        <a href="/contribute">Contribute</a>
-      </li>
-    </ul>
+{% block header-search %}    
 {% endblock %}
-
+    
 {% block main %}
 <div class="main-search-wrap">
   <img id="main-search-logo" class="mlogo" src="{% static "images/banner2-meta.png" %}" />

@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+
+{% block targetblank %}
+<base target="_blank">
+{% endblock %}
+
 {% block css %}
 <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
 <link rel="stylesheet" href="{% static "css/standard.css" %}"/>

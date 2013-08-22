@@ -85,7 +85,7 @@ a.expand-collapse-link:hover{
     min-width: 600px;
 }
 
-#header-search-input{
+#header-search-input, user-form-field input{
     outline: none;
     display: inline-block;
     padding: 0.2ex 0.4ex;
@@ -100,12 +100,12 @@ a.expand-collapse-link:hover{
     box-sizing: border-box;
     width: 15em;
 }
-#header-search-input:focus{
+#header-search-input:focus, .user-form-field input:focus{
     border-color: #501644;
     box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
 
-#header-search-input:hover{
+#header-search-input:hover, .user-form-field input:hover{
     box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
 

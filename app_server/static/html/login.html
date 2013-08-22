@@ -1,26 +1,52 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/user-form.css" %}" />
+{% endblock %}
 
 {% block main %}
 
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
 
+<div class="form-wrapper">
 <form method="post" action="">
 {% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
 
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+<h3> {% block headtitle %} Metacademy Login {% endblock %}</h3>
+
+{% if form.errors %}
+<div class="form-errors">
+  Errors:
+{% for key, value in form.errors.items %}
+<p>
+  {{ value }}
+<p>
+{% endfor %}
+</div>
+{% endif %}
+
+{% block form-content %}
+
+<div class="user-form-field">
+  {{ form.username.label_tag }}
+  {{ form.username }}
+</div>
+
+<div class="user-form-field">
+  {{ form.password.label_tag }}
+  {{ form.password }}
+</div>
+
+<div class="submit-field">
+  <input type="submit" value="login" />
+</div>
 
 {% endblock %}
+
+</form>
+
+
+</div>
+
+{% endblock %}
+

@@ -10,7 +10,7 @@
     {% endblock %}
 
     {% block targetblank %}
-    <base target="_blank">
+
     {% endblock %}
 
     {% block css %}
@@ -36,10 +36,10 @@
     
     <script type="text/javascript">
       if(!document.createElement('canvas').getContext){ 
-        alert("Sorry, Metacademy does not work for your browser" +
-        " (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
-      }
-   </script>
+      alert("Sorry, Metacademy does not work for your browser" +
+      " (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
+                                                                                              }
+                                                                                              </script>
     {% endblock %}
     <title> {% block title %}Metacademy{% endblock %}</title>
 
@@ -63,30 +63,45 @@
     {% block body %}
 
     <div class="header-bar">
-	{% block header %}
-        
-        {% block pre-standard-header-content %}
-        {% endblock %}
+      {% block header %}
 
-        {% block standard-header-content %}
-        <ul id="header-user-tools" class="header-el">
-          {% if user.is_authenticated %}
-          <li>
-            <a href="{% url 'user:user_main' %}">{{ user.username }}</a>
+      {% block pre-standard-header-content %}
+      {% block header-search %}
+      {% include "header-search-logo.html" %}
+      {% endblock %}
+      <ul class="header-el">
+        <li>
+          <a href="/list">Concept list</a>
+        </li>
+        <li>
+          <a href="/about">About</a>
+        </li>
+        <li>
+          <a href="/contribute">Contribute</a>
+        </li>
+      </ul>
+      {% endblock %}
+      
+
+      {% block standard-header-content %}
+      <ul id="header-user-tools" class="header-el">
+        {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'user:user_main' %}">{{ user.username }}</a>
           &#124;
-	    <a href="{% url 'user:logout' %}">Sign out</a>
-          </li>
-	  {% else %}
-          <li>
-	    <a href="{% url 'user:login' %}">Sign in</a>
+	  <a href="{% url 'user:logout' %}">Sign out</a>
+        </li>
+	{% else %}
+        <li>
+	  <a href="{% url 'user:login' %}">Sign in</a>
           &#124;
-	    <a href="{% url 'user:register' %}">Sign up</a>
-          </li>
-	  {% endif %}
-          {% endblock %}
-          
-	  {% endblock %}
-        </ul>
+	  <a href="{% url 'user:register' %}">Sign up</a>
+        </li>
+	{% endif %}
+        {% endblock %}
+        
+	{% endblock %}
+      </ul>
     </div>
 
     <div id="main">

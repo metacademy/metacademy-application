@@ -1,11 +1,25 @@
-{% extends "base.html" %}
+{% extends "login.html" %}
 
-{% block main %}
+ {% block headtitle %} Metacademy Registration {% endblock %}
 
-<form method="post" action="">
-{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Create the account">
-</form>
+{% block form-content %}
+<div class="user-form-field">
+  {{ form.username.label_tag }}
+  {{ form.username }}
+</div>
 
-{% endblock %}
+<div class="user-form-field">
+  {{ form.password1.label_tag }}
+  {{ form.password1 }}
+</div>
+
+<div class="user-form-field">
+  {{ form.password2.label_tag }}
+  {{ form.password2 }}
+</div>
+
+<div class="submit-field">
+  <input type="submit" value="Create Account" />
+</div>
+{% endblock %}    
+

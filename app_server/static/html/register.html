@@ -9,6 +9,11 @@
 </div>
 
 <div class="user-form-field">
+  {{ form.email.label_tag }}
+  {{ form.email }}
+</div>
+
+<div class="user-form-field">
   {{ form.password1.label_tag }}
   {{ form.password1 }}
 </div>
@@ -16,6 +21,13 @@
 <div class="user-form-field">
   {{ form.password2.label_tag }}
   {{ form.password2 }}
+</div>
+
+<div class="user-form-field">
+  <label for="id_captcha_1"> Solve this problem</label>
+  <div class="captcha-wrapper">
+    {{ form.captcha }}
+  </div>
 </div>
 
 <div class="submit-field">

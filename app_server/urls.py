@@ -17,6 +17,7 @@ urlpatterns = patterns('',
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),
                        url(r'^user/', include('apps.user_management.urls', namespace='user') ),
                        url(r'^dev/benchmarktest', benchmark_viewer),
+                       url(r'^captcha/', include('captcha.urls')),
 )
 
 urlpatterns += staticfiles_urlpatterns()

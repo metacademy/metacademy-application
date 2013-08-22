@@ -19,7 +19,8 @@ form{
     margin-bottom: 1.5em;
 }
 .user-form-field label{
-    display: inline-block;
+    display: block;
+    margin: auto;
     font-size: 0.9em;
     font-weight: bold;
     color: #333;
@@ -63,4 +64,12 @@ h3{
     padding: 1em;
     margin: 0 auto 1em auto;
     width: 70%;
+}
+.captcha-wrapper{
+    text-align: left;
+    margin-left: 10%;
+    margin-top: 0.5em;
+}
+.captcha-wrapper input{
+    width: 3em;
 }

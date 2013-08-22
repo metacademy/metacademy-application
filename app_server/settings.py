@@ -124,11 +124,17 @@ INSTALLED_APPS = (
     'apps.graph',
     'apps.content_search',
     'apps.user_management',
+    'captcha',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+CAPTCHA_NOISE_FUNCTIONS = ()
+CAPTCHA_LETTER_ROTATION = (-10,10)
+CAPTCHA_FONT_SIZE = 24
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

@@ -1,10 +1,9 @@
 import json
 
 from django.shortcuts import render_to_response, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from apps.user_management.models import LearnedConcept, Profile
+from apps.user_management.models import LearnedConcept, Profile, UserCreateForm
 
 
 def user_main(request):
@@ -14,14 +13,14 @@ def user_main(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserCreateForm(request.POST)
         if form.is_valid():
             user = form.save()
             prof = Profile(user=user)
             prof.save()
             return HttpResponseRedirect("/user")
     else:
-        form = UserCreationForm()
+        form = UserCreateForm()
     return render(request, "register.html", {
         'form': form,
     })

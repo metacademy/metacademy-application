@@ -49,6 +49,18 @@ if (window.PRODUCTION){
 // agfk app & gen-utils
 window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils"], function(Backbone, Utils, AppRouter, GenPageUtils){
   "use strict";
+
+  // shim for CSRF token integration with backbone and django
+  var oldSync = Backbone.sync;
+  Backbone.sync = function(method, model, options){
+    options.beforeSend = function(xhr){
+      if (model.get("useCsrf")){
+        xhr.setRequestHeader('X-CSRFToken', window.CSRF_TOKEN);
+      }
+    };
+    return oldSync(method, model, options);
+  };
+  
   GenPageUtils.prep();
   
   // automatically resize window when viewport changes

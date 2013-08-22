@@ -28,6 +28,7 @@
       window.STATIC_PATH = "{% static "" %}";
       window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
       window.PRODUCTION = window.location.href.match('metacademy') !== null;
+      window.CSRF_TOKEN = "{{ csrf_token }}";
     </script>
     {% endblock %}
 

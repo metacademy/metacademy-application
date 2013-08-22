@@ -222,7 +222,15 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
 
         // init main app model
         // TODO replace this technique for user data once we have the server/offline storage fleshed out
-        thisRoute.appData = thisRoute.appData || new AppData();
+        if (!thisRoute.appData){
+          thisRoute.appData = new AppData();
+          thisRoute.appData.get("userData").get("learnedConcepts").fetch({
+              reset: true,
+              error: function(emodel, eresp, eoptions){
+              ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
+            }
+          });
+        }
         thisRoute.appData.setGraphData({depRoot: nodeId});
         
         // show app tools
@@ -261,7 +269,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
           });
         }
         else{
-          window.setTimeout(postNodePop, 10); // 10 ms delay for UI to update with loading view
+          window.setTimeout(postNodePop, 10); // 10 ms delay for UI to update the loading view
         }
 
         // helper function to route change parameters appropriately
@@ -276,9 +284,9 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
             return;
           }
 
-          // set the document title to be the searched node
-          document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId)
-            + " - Metacademy";
+
+          // set the document title to be the key concept
+          document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
          
           switch (paramsObj[qViewMode]){
             case pExploreMode:
@@ -300,11 +308,15 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
                 thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
               }
           }
+
           pvt.prevUrlParams = $.extend({}, paramsObj);
           pvt.prevNodeId = nodeId;
           if (loadViz && !preLoadViz && window.vizPromise === undefined){
             pvt.loadViz.call(thisRoute);
           }
+          
+          // apply user data
+          thisRoute.appData.applyUserDataToGraph();
         }
       }
     });

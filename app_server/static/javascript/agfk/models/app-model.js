@@ -52,10 +52,31 @@ window.define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-dat
     },
 
     /**
+     * Apply the user data obtained from the server to the graph
+     * This function should be called after successfully fetching
+     * data from the content server
+     */
+    applyUserDataToGraph: function(){
+      var thisModel = this,
+      userData = thisModel.get("userData");
+      if (userData.areLearnedConceptsPopulated()){
+        applyLearnedConcepts();
+      } else{
+        thisModel.listenTo(userData.get("learnedConcepts"), "reset", applyLearnedConcepts);
+      }
+
+      function applyLearnedConcepts(){
+        var learnedConcepts = userData.get("learnedConcepts");
+        if (learnedConcepts.length > 0){
+          thisModel.get("graphData").get("nodes").applyLearnedConcepts(learnedConcepts);
+        }
+      }
+    },
+
+    /**
      * parse incoming json data
      */
     parse: function(response){
-      // TODO we should also parse/obtain user-data here CR-Restruct
       // TODO check for extending the nodes vs resetting
       var thisModel = this,
           graphData = thisModel.get("graphData"),
@@ -67,7 +88,6 @@ window.define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-dat
 
       // build node set
       nodes.add(response.nodes, {parse: true});
-      nodes.applyUserData(thisModel.get("userData"));
 
       // build edge set from nodes
       nodes.each(function(node){

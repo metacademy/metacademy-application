@@ -4,6 +4,7 @@ app = flask.Flask(__name__)
 import json
 import os
 import sys
+import pdb
 
 import config
 import database
@@ -117,7 +118,6 @@ def make_response(text, fmt):
 @app.route('/dependencies')
 def do_dependencies():
     args = flask.request.args
-
     load_graph()
     tags = set()
     if 'concepts' in args:

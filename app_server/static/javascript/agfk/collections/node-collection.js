@@ -29,11 +29,11 @@ window.define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], fu
     /**
      * Apply the user data to the given node collection
      */
-    applyUserData: function(userModel){
+    applyLearnedConcepts: function(learnedConcepts){
       var thisColl = this,
           collNode;
-      _.each(userModel.get("learnedNodes"), function(val, key){
-        collNode = thisColl.findWhere({sid: key});
+      learnedConcepts.each(function(lcModel){
+        collNode = thisColl.findWhere({sid: lcModel.get("id")});
         if (collNode !== undefined){
           collNode.setLearnedStatus(true);
         }

@@ -200,8 +200,9 @@ body {
 .node-detail-view{
    background-color: white;
    color: #23240D;
-    border-bottom:  0.3ex solid #CCCCCC;
-    padding: 0.3em 1.5em 1em 1.5em;
+   border-bottom:  0.3ex solid #CCCCCC;
+   padding: 0.3em 1.5em 1em 1.5em;
+   line-height: 1.2em;
 }
 
 .node-detail-title{
@@ -211,6 +212,11 @@ body {
     font-weight: bold;
     padding: 1em 0 .7em 0;
     margin: 1em 0 0 0;
+}
+
+.node-detail-summary-text{
+    line-height: 1.3em;
+    padding-right: 3em;
 }
 
 .learned-concept-title, .implicit-learned-concept-title{

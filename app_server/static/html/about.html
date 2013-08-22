@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block jscript %}
+{% include "load-jquery-snippet.html" %}
+<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></scrip>
+{% endblock %}
+
 {% block extra-css %}
     <link rel="stylesheet" href="{% static "css/about.css" %}"/>
 {% endblock %}
@@ -27,7 +32,7 @@ Okay, so it will probably be a while before we have this super-smart futuristic 
 
 <h3>Contributing to Metacademy</h3>
 <p>
-  Metacademy is young, and our online system for content submission is not quite ready. We'll update this section soon.
+  Metacademy is young, and our online system for content submission is not quite ready. We'll update this section in the coming week (August 25 2013).
 </p>
 
 </div>

@@ -35,12 +35,12 @@ p {
 }
 
 .internal-link{
-    color: #5C1F63;
+    color: #A01F70;
     text-decoration: none;
 }
 .internal-link:hover{
     text-decoration: underline;
-    color: #241494;
+    color: #2414B0;
 }
 
 a.expand-collapse-link{

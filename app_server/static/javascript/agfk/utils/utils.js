@@ -99,7 +99,7 @@ window.define(["jquery"], function($){
    * str: string to be potentially hyphenated
    * num: longest accecptable length -1 (single letters will not be broken)
    */
-  utils.wbr = function(str, num) {  
+  utils.wbr = function(str, num) {
     return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
       return text + "-\\n" + ch;
     });
@@ -113,7 +113,7 @@ window.define(["jquery"], function($){
     if (!s) {
       return '';
     }
-
+    s = s.replace(/-/g, " ");
     var parts = s.split(" "),
         result = [],
         resArr = [],

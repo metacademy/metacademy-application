@@ -146,7 +146,7 @@ def read_see_also(f):
     return remove_comments(f.read())
 
 def mark_wiki(summary):
-    return '%s%s' % ('*Wiki*', summary)
+    return '%s%s' % ("Wikipedia's first sentence: ", summary)
 
 
 

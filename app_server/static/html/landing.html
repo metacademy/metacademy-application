@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-{% block targetblank %}
-{% endblock %}
-
 {% block extra-css %}
     <link rel="stylesheet" href="{% static "css/landing.css" %}"/>
 {% endblock %}
@@ -14,7 +11,7 @@
 {% block main %}
 <div class="main-search-wrap">
   <img id="main-search-logo" class="mlogo" src="{% static "images/banner2-meta.png" %}" />
-  <input type="text" class="searchbox" id="main-search-input" placeholder="I want to learn about..." value="{% block search-text %}{% endblock %}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
+  <input type="text" class="searchbox" id="main-search-input" placeholder="I want to learn about..." value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
   <div class="dev-note">
 <p>
     metacademy.org is currently under active development

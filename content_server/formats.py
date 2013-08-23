@@ -194,8 +194,8 @@ class SeeAlsoOldLink:
             return None
 
 class SeeAlsoLine:
-    re_depth = re.compile(r'(\**)\W*(.*)')
-    re_old_link = re.compile(r'(.*)\[([^\]]+)\]\W*$')
+    re_depth = re.compile(r'(\**)\s*(.*)')
+    re_old_link = re.compile(r'(.*)\[([^\]]+)\]\s*$')
     re_link = re.compile(r'([^"]*)"([^"]*)":(\w*)(.*)')
     
     def __init__(self, depth, items):

@@ -263,7 +263,7 @@ body {
     cursor: pointer;
 }
 
-.resource-location, .resource-edition, .extra-resource-details{
+.resource-location, .resource-edition, .resource-level, .extra-resource-details{
     font-size: 0.9em
 }
 

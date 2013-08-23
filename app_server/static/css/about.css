@@ -24,3 +24,11 @@ ol{
     padding: 0 0 0 3em;
     line-height: 1.5em;
 }
+
+i{
+    font-style:italic;
+}
+
+em{
+    font-style:italic;
+}

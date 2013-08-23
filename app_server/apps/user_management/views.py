@@ -2,14 +2,20 @@ import json
 
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template import RequestContext
 from django.shortcuts import render
 from apps.user_management.models import LearnedConcept, Profile, UserCreateForm
+
+from settings import CONTENT_SERVER
 
 
 def user_main(request):
     if not request.user.is_authenticated():
         return redirect('/user/login?next=%s' % request.path)
-    return render_to_response('user.html')
+    # obtain an array of learned concept ids for the user
+    uprof, created = Profile.objects.get_or_create(pk=request.user)
+    lconcepts = [ l.id for l in uprof.learnedconcept_set.all()]
+    return render_to_response('user.html', {"lconcepts": json.dumps(lconcepts), "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
 
 def register(request):
     if request.method == 'POST':
@@ -24,7 +30,6 @@ def register(request):
     return render(request, "register.html", {
         'form': form,
     })
-
 
 # we may want to consider using a more structured approach like tastypi as we
 # increase the complexity of the project

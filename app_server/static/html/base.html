@@ -84,15 +84,15 @@
       <ul id="header-user-tools" class="header-el">
         {% if user.is_authenticated %}
         <li>
-          <a href="{% url 'user:user_main' %}">{{ user.username }}</a>
+          <a target="_self" href="{% url 'user:user_main' %}">{{ user.username }}</a>
           &#124;
-	  <a href="{% url 'user:logout' %}">Sign out</a>
+	  <a target="_self" href="{% url 'user:logout' %}">Sign out</a>
         </li>
 	{% else %}
         <li>
-	  <a href="{% url 'user:login' %}">Sign in</a>
+	  <a target="_self" href="{% url 'user:login' %}">Sign in</a>
           &#124;
-	  <a href="{% url 'user:register' %}">Sign up</a>
+	  <a target="_self" href="{% url 'user:register' %}">Sign up</a>
         </li>
 	{% endif %}
         {% endblock %}

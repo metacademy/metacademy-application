@@ -153,12 +153,18 @@ def do_list():
     args = flask.request.args
     results = {}
     if 'course' in args:
-        pass
+        tags = []
         # setval = args['course']
         # TODO load course list
+    elif 'ids' in args:
+        # TODO should this functionality go under /concepts? (ids to titles, essentially)
+        # TODO this is problematic, what if we want to request 500 ids at once? The URL will be too long 
+        query_ids = args.getlist('ids')
+        tags = [db.id2tag[i] for i in query_ids if i in db.id2tag]
     else:
-        results = [{'tag': tag, 'title': db.nodes[tag].title} for tag in db.nodes]
-
+        tags = [tag for tag in db.nodes]
+    
+    results = [{'tag': tag, 'id': db.tag2id[tag], 'title': db.nodes[tag].title} for tag in tags]    
     text = json.dumps(results)
     return make_response(text, 'json')
     
@@ -181,7 +187,7 @@ def do_search():
 
     # TODO: for security reasons, make the response an object rather than an array
     return make_response(text, 'json')
-
+    
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:

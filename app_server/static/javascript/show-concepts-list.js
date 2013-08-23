@@ -2,13 +2,13 @@
  This file obtains a list of all concepts from the content server and displays them to the user
  */
 window.onload = (function($, _, undefined){
-  // parse window parameters
+  // parse window parameters -- TODO or we could insert this information serverside
   var paramStr = window.location.href.split('?').pop(),
       courseName = "";
   if (paramStr.length > 0){
     var cmatch;
     _.forEach(paramStr.split("&"), function(pval){
-      if((cmatch = pval.match(/course=(\S)/i))){
+      if ((cmatch = pval.match(/course=(\S)/i))){
         courseName = cmatch.pop();
       }
     });

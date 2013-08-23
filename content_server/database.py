@@ -10,12 +10,13 @@ class DatabaseFormatError(RuntimeError):
     pass
 
 class Database:
-    def __init__(self, nodes, shortcuts, graph, resources, id2tag):
+    def __init__(self, nodes, shortcuts, graph, resources, id2tag, tag2id):
         self.nodes = nodes
         self.shortcuts = shortcuts
         self.graph = graph
         self.resources = resources
         self.id2tag = id2tag
+        self.tag2id = tag2id
 
     @staticmethod
     def load(content_dir):
@@ -26,7 +27,9 @@ class Database:
         resource_dict = resources.read_resources_file(resources.resource_db_path())
         id2tag = dict([(node.id, tag) for tag, node in nodes.items()
                        if node.id is not None])
-        return Database(nodes, shortcuts, graph, resource_dict, id2tag)
+        tag2id = dict([(tag, node.id) for tag, node in nodes.items()
+                       if node.id is not None])
+        return Database(nodes, shortcuts, graph, resource_dict, id2tag, tag2id)
 
         
 

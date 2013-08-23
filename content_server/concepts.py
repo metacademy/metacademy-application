@@ -33,25 +33,27 @@ class Concept:
         self.questions = questions
 
     def copy(self):
-        return Concept(self.tag, self.id, self.title, self.summary, list(self.dependencies), self.pointers,
+        return Concept(self.tag, self.id, self.title, self.summary, list(self.dependencies), [p.copy() for p in self.pointers],
                        list(self.resources), list(self.questions))
 
-    def json_repr(self, resource_dict, graph=None):
-        res = [resources.add_defaults(r, resource_dict) for r in self.resources]
+    def json_repr(self, db):
+        res = [resources.add_defaults(r, db.resources) for r in self.resources]
         
-        if graph is not None and ('concept', self.tag) in graph.outgoing:
+        if db.graph is not None and ('concept', self.tag) in db.graph.outgoing:
             outlinks = [{'from_tag': self.tag, 'to_tag': t}
-                        for _, t in graph.outgoing['concept', self.tag]]
+                        for _, t in db.graph.outgoing['concept', self.tag]]
         else:
             outlinks = []
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.tag, 'reason': dep.reason}
                         for dep in self.dependencies]
 
+        pointers = [p.json_repr(db.nodes) for p in self.pointers]
+
         d = {'title': self.title,
              'id': self.id,
              'summary': self.summary,
-             'pointers': self.pointers,
+             'pointers': pointers,
              'dependencies': dependencies,
              'resources': res,
              'questions': self.questions,
@@ -89,22 +91,24 @@ class Shortcut:
         return Shortcut(self.concept.copy(), list(self.dependencies), list(self.resources))
 
 
-    def json_repr(self, resource_dict, graph=None):
-        res = [resources.add_defaults(r, resource_dict) for r in self.resources]
+    def json_repr(self, db):
+        res = [resources.add_defaults(r, db.resources) for r in self.resources]
         
-        if graph is not None and ('shortcut', self.concept.tag) in graph.outgoing:
+        if db.graph is not None and ('shortcut', self.concept.tag) in db.graph.outgoing:
             outlinks = [{'from_tag': self.concept.tag, 'to_tag': t}
-                        for _, t in graph.outgoing['shortcut', self.concept.tag]]
+                        for _, t in db.graph.outgoing['shortcut', self.concept.tag]]
         else:
             outlinks = []
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.concept.tag, 'reason': dep.reason}
                         for dep in self.dependencies]
+
+        pointers = [p.json_repr(db.nodes) for p in self.concept.pointers]
         
         d = {'title': self.concept.title,
              'id': self.concept.id,
              'summary': self.concept.summary,
-             'pointers': self.concept.pointers,
+             'pointers': pointers,
              'dependencies': dependencies,
              'resources': res,
              'questions': self.questions,

@@ -333,17 +333,23 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
       viewIdPrefix: "pointers-view-"
     };
 
-    /**
-     * Parse the tags in the pointer string
-     * TODO check if pointer links exists
-     */
-    pvt.parsePtrStr = function(ptrStr){
-      return ptrStr.replace(new RegExp("\\[([^\\s]+)\\]", "g"),
-                            function(all, text, ch){
-                              var tag =  text.replace(/[-]/g,"_");
-                              return '[<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + tag + '#lfocus=' + tag + '">' + text.replace(/[-_]/g," ") + '</a>]'; // TODO fix hardcoded urls
-                            });
-    };
+    pvt.itemToStr = function(item){
+      if (item.link) {
+        return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '#lfocus=' + item.link + '">' + item.text + '</a>';
+      } else {
+        return item.text
+      }
+    }
+
+    pvt.lineToStr = function(parts){
+      var i, result = '';
+      for (i = 0; i < parts.length; i++){
+        result += pvt.itemToStr(parts[i]);
+      }
+      return result;
+    }
+
+    
 
     // return public object
     return Backbone.View.extend({
@@ -364,38 +370,33 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        * Parse the markup-style pointer text to html list
        * TODO separate HTML generation better
        */
-      parsePtrTextToHtml: function(ptrText){
-        var ptrArr = ptrText.split(/(?=\*)/),
-            i,
-            depth = 0,
+      parsePtrTextToHtml: function(lines){
+        var i,
             prevDepth = 0,
-            tmpDepth,
             htmlStr = "<ul>",
             liStr;
 
         // array depth corresponds to list depth
-        for (i = 0; i < ptrArr.length; i++){
-          if (ptrArr[i] === "*"){
+        for (i = 0; i < lines.length; i++){
+          var line = lines[i];
+          
+          var depth = line.depth;
+          while (depth < prevDepth){
+            htmlStr += '</ul>\n';
             depth++;
           }
-          else{
-            tmpDepth = depth;
-            while (depth < prevDepth){
-              htmlStr += '</ul>\n';
-              depth++;
-            }
 
-            while (depth > prevDepth){
-              htmlStr += '<ul>';
-              depth--;
-            }
-            liStr = pvt.parsePtrStr(ptrArr[i].substring(1));
-            htmlStr += "<li>" + liStr + "</li>\n";
-            
-            prevDepth = tmpDepth;
-            depth = 0;
+          while (depth > prevDepth){
+            htmlStr += '<ul>';
+            depth--;
           }
+          liStr = pvt.lineToStr(line.items);
+          htmlStr += "<li>" + liStr + "</li>\n";
+            
+          prevDepth = line.depth;
+          
         }
+
         while (prevDepth--){
           htmlStr += '</ul>\n';
         }

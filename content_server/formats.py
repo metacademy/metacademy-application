@@ -28,6 +28,11 @@ def remove_comments(text):
     lines = filter(lambda l: not is_comment(l), lines)
     return '\n'.join(lines)
 
+def remove_comments_stream(instr):
+    for line in instr:
+        if not is_comment(line):
+            yield line
+
 def read_text_db(instr, fields, list_fields={}, require_all=True):
     items = []
     new_item = True
@@ -142,8 +147,116 @@ def read_dependencies(f):
     return [concepts.Dependency(d['tag'], d['reason'], d['shortcut'])
             for d in dependencies_dicts]
 
+class SeeAlsoText:
+    def __init__(self, text):
+        self.text = text
+
+    def copy(self):
+        return SeeAlsoText(self.text)
+
+    def __repr__(self):
+        return 'SeeAlsoText(%r)' % self.text
+
+    def json_repr(self, nodes):
+        return {'text': self.text}
+
+class SeeAlsoLink:
+    def __init__(self, text, link):
+        self.text = text
+        self.link = link
+
+    def copy(self):
+        return SeeAlsoLink(self.text, self.link)
+
+    def __repr__(self):
+        return 'SeeAlsoLink(%r, %r)' % (self.text, self.link)
+
+    def json_repr(self, nodes):
+        if self.link in nodes:
+            return {'text': self.text, 'link': self.link}
+        else:
+            return {'text': self.text}
+
+class SeeAlsoOldLink:
+    def __init__(self, link):
+        self.link = link
+
+    def copy(self):
+        return SeeAlsoOldLink(self.link)
+
+    def __repr__(self):
+        return 'SeeAlsoOldLink(%r)' % self.link
+
+    def json_repr(self, nodes):
+        if self.link in nodes:
+            return {'text': ' (go to concept)', 'link': self.link}
+        else:
+            return None
+
+class SeeAlsoLine:
+    re_depth = re.compile(r'(\**)\W*(.*)')
+    re_old_link = re.compile(r'(.*)\[([^\]]+)\]\W*$')
+    re_link = re.compile(r'([^"]*)"([^"]*)":(\w*)(.*)')
+    
+    def __init__(self, depth, items):
+        self.depth = depth
+        self.items = items
+
+    def copy(self):
+        return SeeAlsoLine(self.depth, [item.copy() for item in self.items])
+
+    @staticmethod
+    def parse(line):
+        if line.strip() == '':
+            return None
+        
+        # compute depth
+        m = SeeAlsoLine.re_depth.match(line)
+        if not m:
+            return None
+        stars, rest = m.groups()
+        depth = len(stars)
+
+        # process old-style links
+        m = SeeAlsoLine.re_old_link.match(rest)
+        if m:
+            rest, old_link = m.groups()
+        else:
+            old_link = None
+
+        items = []
+
+        # process new-style links
+        while True:
+            m = SeeAlsoLine.re_link.match(rest)
+            if not m:
+                break
+
+            text, link_text, link, rest = m.groups()
+            items.append(SeeAlsoText(text))
+            items.append(SeeAlsoLink(link_text, normalize_input_tag(link)))
+
+        if rest:
+            items.append(SeeAlsoText(rest))
+        if old_link:
+            items.append(SeeAlsoOldLink(normalize_input_tag(old_link)))
+
+        return SeeAlsoLine(depth, items)
+
+    def __repr__(self):
+        return 'SeeAlsoLine(%r, %r)' % (self.depth, self.items)
+
+    def json_repr(self, nodes):
+        item_list = [item.json_repr(nodes) for item in self.items]
+        item_list = [item for item in item_list if item is not None]
+        return {'depth': self.depth, 'items': item_list}
+        
+        
+
 def read_see_also(f):
-    return remove_comments(f.read())
+    lines = [SeeAlsoLine.parse(line) for line in remove_comments_stream(f)]
+    return [line for line in lines if line is not None]
+
 
 def mark_wiki(summary):
     return '%s%s' % ("Wikipedia's first sentence: ", summary)
@@ -206,9 +319,9 @@ def write_graph_dot(db, full_tags, shortcut_tags, outstr=None, bottom_up=False):
 
 def node_to_json(db, tag, shortcut=False):
     if shortcut and tag in db.shortcuts:
-        return json.dumps(db.shortcuts[tag].json_repr(db.resources))
+        return json.dumps(db.shortcuts[tag].json_repr(db))
     else:
-        return json.dumps(db.nodes[tag].json_repr(db.resources))
+        return json.dumps(db.nodes[tag].json_repr(db))
 
 def write_graph_json(db, full_tags, shortcut_tags, outstr=None):
     if outstr is None:
@@ -216,9 +329,9 @@ def write_graph_json(db, full_tags, shortcut_tags, outstr=None):
 
     node_items = {}
     for tag in full_tags:
-        node_items[tag] = db.nodes[tag].json_repr(db.resources, db.graph)
+        node_items[tag] = db.nodes[tag].json_repr(db)
     for tag in shortcut_tags:
-        node_items[tag] = db.shortcuts[tag].json_repr(db.resources, db.graph)
+        node_items[tag] = db.shortcuts[tag].json_repr(db)
 
     titles = {node.tag: node.title for node in db.nodes.values()}
     

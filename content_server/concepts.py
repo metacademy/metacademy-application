@@ -50,7 +50,8 @@ class Concept:
 
         pointers = [p.json_repr(db.nodes) for p in self.pointers]
 
-        d = {'title': self.title,
+        d = {'tag': self.tag,
+             'title': self.title,
              'id': self.id,
              'summary': self.summary,
              'pointers': pointers,
@@ -105,7 +106,8 @@ class Shortcut:
 
         pointers = [p.json_repr(db.nodes) for p in self.concept.pointers]
         
-        d = {'title': self.concept.title,
+        d = {'tag': self.concept.tag,
+             'title': self.concept.title,
              'id': self.concept.id,
              'summary': self.concept.summary,
              'pointers': pointers,

@@ -9,6 +9,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     {% endblock %}
 
+    {% block favicon %}
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "images/favicon.ico"%}">
+    {% endblock %}
+    
     {% block targetblank %}
 
     {% endblock %}
@@ -112,7 +116,7 @@
 
     {% endblock %}
 
-    <script type="text/javascript">
+    <script>
       // piwik server-side tracking
       if (window.PRODUCTION){
       var _paq = _paq || [];

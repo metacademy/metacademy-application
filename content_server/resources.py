@@ -3,7 +3,7 @@ import config
 import formats
 
 RESOURCE_FIELDS = {'title': str,
-                   'location': str,
+                   'location': lambda s: formats.parse_list(s, ';'),
                    'resource_type': str,
                    'free': int,
                    'edition': str,
@@ -68,3 +68,19 @@ def add_defaults(node_resource, defaults, check=False):
         del node_resource['source']
     return node_resource
 
+def json_repr(resource, db):
+    resource = dict(resource)
+
+    # note is a deprecated synonym for extra
+    if 'note' in resource:
+        if 'extra' in resource:
+            resource['extra'] = resource['extra'] + resource['note']
+        else:
+            resource['extra'] = resource['note']
+
+    if 'dependencies' in resource:
+        resource['dependencies'] = [{'title': db.nodes[dep].title, 'link': dep}
+                                    for dep in resource['dependencies']
+                                    if dep in db.nodes]
+
+    return resource

@@ -248,10 +248,9 @@ body {
     color: #252313;
     padding: 0.5em 0;
     line-height: 1.1em;
-    width: 80%;
+    width: 55%;
     display: inline-block;
     overflow: auto;
-    max-height: 10em;
 }
 
 .resource-title a{
@@ -263,8 +262,31 @@ body {
     cursor: pointer;
 }
 
-.resource-location, .resource-edition, .resource-level, .extra-resource-details{
+.resource-location-display, .resource-dependencies-display{
+    margin-top: 0.1em;
+}
+
+.resource-location-display ul{
+    list-style-type: disc;
+    margin-left: 1em;
+}
+
+.resource-dependencies-display ul{
+    list-style-type: disc;
+    margin-left: 1em;
+}
+
+.resource-extra-display ul{
+    list-style-type: disc;
+    margin-left: 1em;
+}
+
+.resource-location, .resource-edition, .resource-level, .resource-author, .resource-dependencies, .resource-extra{
     font-size: 0.9em
+}
+
+.resource-location-item, .resource-dependencies-item, .resource-extra-item{
+    font-size: 0.8em;
 }
 
 .dependency-view, .outlink-view{

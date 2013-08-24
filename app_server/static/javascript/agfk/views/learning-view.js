@@ -135,7 +135,8 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        */
       render: function(){
         var thisView = this;
-        thisView.$el.html(thisView.template(thisView.model.toJSON()));
+        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH})
+        thisView.$el.html(thisView.template(temp));
         return thisView;
       },
 

@@ -37,7 +37,7 @@ class Concept:
                        list(self.resources), list(self.questions))
 
     def json_repr(self, db):
-        res = [resources.add_defaults(r, db.resources) for r in self.resources]
+        res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
         
         if db.graph is not None and ('concept', self.tag) in db.graph.outgoing:
             outlinks = [{'from_tag': self.tag, 'to_tag': t}
@@ -92,7 +92,7 @@ class Shortcut:
 
 
     def json_repr(self, db):
-        res = [resources.add_defaults(r, db.resources) for r in self.resources]
+        res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
         
         if db.graph is not None and ('shortcut', self.concept.tag) in db.graph.outgoing:
             outlinks = [{'from_tag': self.concept.tag, 'to_tag': t}

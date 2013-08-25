@@ -9,7 +9,7 @@ RESOURCE_FIELDS = {'title': str,
                    'edition': str,
                    'url': str,
                    'level': str,
-                   'authors': lambda s: formats.parse_list(s, 'and'),
+                   'authors': lambda s: formats.parse_list(s, ' and '),
                    'dependencies': lambda s: formats.parse_list(s, ','),
                    }
 

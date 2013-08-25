@@ -22,7 +22,7 @@ class Concept:
     dependencies -- a list of Dependency objects giving the immediate dependencies
     pointers -- a list of Pointer objects representing the see-also links
     """
-    def __init__(self, tag, id, title, summary, dependencies, pointers, resources, questions):
+    def __init__(self, tag, id, title, summary, dependencies, pointers, resources, questions, flags):
         self.tag = tag
         self.id = id
         self.title = title
@@ -31,10 +31,11 @@ class Concept:
         self.pointers = pointers
         self.resources = resources
         self.questions = questions
+        self.flags = flags
 
     def copy(self):
         return Concept(self.tag, self.id, self.title, self.summary, list(self.dependencies), [p.copy() for p in self.pointers],
-                       list(self.resources), list(self.questions))
+                       list(self.resources), list(self.questions), list(self.flags))
 
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
@@ -50,6 +51,8 @@ class Concept:
 
         pointers = [p.json_repr(db.nodes) for p in self.pointers]
 
+        flags = [db.flags[f] for f in self.flags if f in db.flags]
+
         d = {'tag': self.tag,
              'title': self.title,
              'id': self.id,
@@ -60,6 +63,7 @@ class Concept:
              'questions': self.questions,
              'outlinks': outlinks,
              'is_shortcut': 0,
+             'flags': flags,
              }
 
         return d
@@ -105,6 +109,8 @@ class Shortcut:
                         for dep in self.dependencies]
 
         pointers = [p.json_repr(db.nodes) for p in self.concept.pointers]
+
+        flags = [db.flags[f] for f in self.concept.flags if f in db.flags]
         
         d = {'tag': self.concept.tag,
              'title': self.concept.title,
@@ -116,6 +122,7 @@ class Shortcut:
              'questions': self.questions,
              'outlinks': outlinks,
              'is_shortcut': 1,
+             'flags': flags,
              }
 
         return d

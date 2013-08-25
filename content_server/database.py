@@ -10,13 +10,14 @@ class DatabaseFormatError(RuntimeError):
     pass
 
 class Database:
-    def __init__(self, nodes, shortcuts, graph, resources, id2tag, tag2id):
+    def __init__(self, nodes, shortcuts, graph, resources, id2tag, tag2id, flags):
         self.nodes = nodes
         self.shortcuts = shortcuts
         self.graph = graph
         self.resources = resources
         self.id2tag = id2tag
         self.tag2id = tag2id
+        self.flags = flags
 
     @staticmethod
     def load(content_dir):
@@ -29,10 +30,13 @@ class Database:
                        if node.id is not None])
         tag2id = dict([(tag, node.id) for tag, node in nodes.items()
                        if node.id is not None])
-        return Database(nodes, shortcuts, graph, resource_dict, id2tag, tag2id)
+        flags = read_flags(content_dir)
+        return Database(nodes, shortcuts, graph, resource_dict, id2tag, tag2id, flags)
 
         
 
+def global_flags_file(content_path):
+    return os.path.join(content_path, 'flags.txt')
 
 def node_dir(content_path, tag):
     return os.path.join(content_path, 'nodes', tag)
@@ -60,6 +64,9 @@ def dependencies_file(content_path, tag):
 
 def see_also_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'see-also.txt')
+
+def node_flags_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'flags.txt')
 
 def shortcut_dir(content_path, tag):
     return os.path.join(content_path, 'shortcuts', tag)
@@ -133,7 +140,13 @@ def read_node(content_path, tag):
     if os.path.exists(see_also_file(content_path, tag)):
         pointers = formats.read_see_also(open(see_also_file(content_path, tag)))
 
-    return concepts.Concept(tag, node_id, title, summary, dependencies, pointers, node_resources, questions)
+    ### process flags
+    if os.path.exists(node_flags_file(content_path, tag)):
+        flags = formats.read_node_flags(open(node_flags_file(content_path, tag)))
+    else:
+        flags = []
+
+    return concepts.Concept(tag, node_id, title, summary, dependencies, pointers, node_resources, questions, flags)
 
 def read_shortcut(content_path, tag, concept_node):
     """Read a Shortcut object from a directory which contains dependencies.txt and resources.txt,
@@ -246,4 +259,13 @@ def concepts_without_ids(content_path):
 
     return [t for t in tags if not os.path.exists(id_file(content_path, t))]
 
+
+def read_flags(content_path):
+    fname = global_flags_file(content_path)
+    if os.path.exists(fname):
+        fields = {'key': str, 'text': str}
+        items = formats.read_text_db(open(fname), fields)
+        return {item['key']: item['text'] for item in items}
+    else:
+        return {}
 

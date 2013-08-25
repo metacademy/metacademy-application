@@ -257,6 +257,9 @@ def read_see_also(f):
     lines = [SeeAlsoLine.parse(line) for line in remove_comments_stream(f)]
     return [line for line in lines if line is not None]
 
+def read_node_flags(f):
+    return [line.strip() for line in f.readlines() if line.strip() != '']
+
 
 def mark_wiki(summary):
     return '%s%s' % ("Wikipedia's first sentence: ", summary)

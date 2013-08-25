@@ -9,6 +9,13 @@
         <p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="<%= id + '#lfocus=' + id %>">here</a>.</p>
       <% } %>
     </div>
+    <div class="node-detail-comp-wrap node-detail-flags">
+      <% if (flags){ %>
+        <% for (var i = 0; i < flags.length; i++){ %>
+          <p> <%- flags[i] %> </p>
+        <% } %>
+      <% } %>
+    </div>
 
 
     <h2 class="node-detail-title">Free Resources</h2>

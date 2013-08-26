@@ -126,6 +126,11 @@ def read_node_resources(f):
     fields['source'] = str
     list_fields = dict(resources.RESOURCE_LIST_FIELDS)
     node_resources = read_text_db(f, fields, list_fields, require_all=False)
+
+    for r in node_resources:
+        if 'location' in r and len(r['location']) > 0 and type(r['location'][0]) == list:
+            r['location'] = reduce(list.__add__, r['location'])
+    
     return map(remove_empty_keys, node_resources)
 
 def read_questions(f):

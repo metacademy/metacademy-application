@@ -33,7 +33,13 @@
       <% } %>
       <ul>
         <% for (var i = 0; i < location.length; i++) { %>
-          <li><span class="resource-location-item"> <%- location[i] %> </span></li>
+	  <% if (location[i].link) { %>
+            <li><span class="resource-location-item">
+	      <a class="external-link" href="<%- location[i].link %>"> <%- location[i].text %> </a>
+	    </span></li>
+	  <% } else { %>
+            <li><span class="resource-location-item"> <%- location[i].text %> </span></li>
+	  <% } %>
         <% } %>
       </ul>
     </div>

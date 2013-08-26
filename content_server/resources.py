@@ -1,9 +1,34 @@
 import os
 import config
 import formats
+import re
+
+class Location:
+    def __init__(self, text, link=None):
+        self.text = text
+        self.link = link
+
+    def json_repr(self):
+        if self.link is not None:
+            return {'text': self.text, 'link': self.link}
+        else:
+            return {'text': self.text}
+        
+
+re_link = re.compile(r'(.*)\[([^\]]+)\]\s*$')
+
+def parse_location(line):
+    m = re_link.match(line)
+    if m:
+        text, link = m.groups()
+        return [Location(text, link)]
+    else:
+        parts = line.split(';')
+        return [Location(p) for p in parts]
+
+    
 
 RESOURCE_FIELDS = {'title': str,
-                   'location': lambda s: formats.parse_list(s, ';'),
                    'resource_type': str,
                    'free': int,
                    'edition': str,
@@ -13,13 +38,16 @@ RESOURCE_FIELDS = {'title': str,
                    'dependencies': lambda s: formats.parse_list(s, ','),
                    }
 
-RESOURCE_LIST_FIELDS = {'mark': str,
+RESOURCE_LIST_FIELDS = {'location': parse_location,
+                        'mark': str,
                         'extra': str,
                         'note': str
                         }
 
 RESOURCE_DEFAULTS = {'free': 0,
                      }
+
+
 
 def resource_db_path(content_path=config.CONTENT_PATH):
     return os.path.join(content_path, 'resources.txt')
@@ -82,5 +110,8 @@ def json_repr(resource, db):
         resource['dependencies'] = [{'title': db.nodes[dep].title, 'link': dep}
                                     for dep in resource['dependencies']
                                     if dep in db.nodes]
+
+    if 'location' in resource:
+        resource['location'] = [item.json_repr() for item in resource['location']]
 
     return resource

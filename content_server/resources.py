@@ -89,7 +89,7 @@ def add_defaults(node_resource, defaults, check=False):
                 elif field in RESOURCE_LIST_FIELDS:
                     if field not in node_resource:
                         node_resource[field] = []
-                    node_resource[field] += value
+                    node_resource[field] = node_resource[field] + value
                 else:
                     if check:
                         raise RuntimeError('Unknown field: %s' % field)

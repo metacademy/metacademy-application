@@ -338,7 +338,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
       if (item.link) {
         return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '#lfocus=' + item.link + '">' + item.text + '</a>';
       } else {
-        return item.text
+        return item.text;
       }
     }
 
@@ -402,7 +402,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
           htmlStr += '</ul>\n';
         }
         htmlStr += "</ul>";
-        
+
         return htmlStr;
       }
     });
@@ -449,7 +449,8 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
             outlinkLocClass = "." + viewConsts.outlinkLocClass,
             ptrLocClass = "." + viewConsts.ptrLocClass;
         
-        thisView.$el.html(thisView.template(thisView.model.toJSON()));
+        var templateVars = _.extend(thisView.model.toJSON(), {"resourcesMsg": thisView.model.get("resources").getMessage()});
+        thisView.$el.html(thisView.template(templateVars));
         thisView.fresources = thisView.fresource || new ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
         thisView.presources = thisView.presources || new ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
@@ -470,7 +471,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
         if (thisView.pointers.model.text.length > 1){
           assignObj[ptrLocClass] = thisView.pointers;
         }
-        
+
         thisView.assign(assignObj);
         thisView.delegateEvents();
         return thisView;

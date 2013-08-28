@@ -244,6 +244,11 @@ body {
 .node-detail-comp-wrap{
     margin: 0 0 0.7em 1em;
 }
+
+.resources-wrap{
+    margin-left: 2em;
+}
+
 .resource-view{
     color: #252313;
     padding: 0.5em 0;

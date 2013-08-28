@@ -41,7 +41,6 @@ def answer_query(query):
         
         results = searcher.search(query, limit=100)
         tags = [r['tag'] for r in results]
-        print list(results)
     return tags
 
 

@@ -9,6 +9,16 @@
 {% endblock %}
     
 {% block main %}
+
+{% if not user.is_authenticated %}
+  <div class="login-note">
+    <p>
+      Sign up to keep track of what you've already learned!
+    </p>
+  </div>
+{% endif %}
+
+
 <div class="main-search-wrap">
   <img id="main-search-logo" class="mlogo" src="{% static "images/banner2-meta.png" %}" />
   <input type="text" class="searchbox" id="main-search-input" placeholder="I want to learn about..." value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
@@ -18,14 +28,6 @@
     Currently, our content focuses on machine learning and probabilistic AI.
 </p>
   </div>
-   
-{% if not user.is_authenticated %}
-  <div class="dev-note">
-    <p>
-      <a target="_self" href="{% url 'user:register' %}">Sign up</a> to keep track of what you've already learned!
-    </p>
-  </div>
-{% endif %}
   
   <div class="dev-note">
 <p>

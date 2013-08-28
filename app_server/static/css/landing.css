@@ -42,3 +42,43 @@
     color: #512161;
     margin-left: -53px;
 }
+
+.login-note{
+    padding: 1em;
+    position: absolute;
+    right: 1em;
+    top: 3.2em;
+    width: 15em;
+    border: 2px solid #333;
+    text-align: center;
+    border-radius: 10px;
+    background-color: #FCF7FB;
+    line-height: 1.3em;
+    font-size: 0.8em;
+}
+/* creates the larger triangle that points to the top > */
+.login-note:before {
+    content: "";
+    border: solid;
+    border-width: 0 8px 16px 8px;
+    border-color: #333 transparent;
+    position: absolute;
+    right: 15px;
+    top: -16px;
+    display: block;
+    width: 0;
+    -moz-transform: scale(.9999);
+}
+/* creates the smaller  triangle that points to the top > */
+.login-note:after {
+    content: "";
+    border-style: solid;
+    border-width: 0 7px 14px 7px; /* larger triangle - border width */
+    border-color: #FCF7FB transparent;
+    position: absolute;
+    top: -13px; /* position of larger triangle + border width */
+    right: 16px; /* value = - small triangle width + border-right-width */
+    display: block;
+    width: 0;
+    -moz-transform: scale(.9999);
+}

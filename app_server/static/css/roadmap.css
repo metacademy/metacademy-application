@@ -57,3 +57,31 @@
 .roadmap-content li {
     margin-top: 0.2em;
 }
+
+
+.roadmap-form-wrapper {
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 2em;
+    padding-bottom: 3em;
+}
+
+.roadmap-form-title {
+    font-size: 1.8em;
+    padding-bottom: 0.5em;
+}
+
+.roadmap-form-field{
+    margin-bottom: 1.5em;
+}
+.roadmap-form-field label{
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #333;
+}
+.roadmap-form-field input{
+    height: 1.4em;
+    padding-left: 0.3em;
+    font-size: 1em;
+    width: 40%;
+}

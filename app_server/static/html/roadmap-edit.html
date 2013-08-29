@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+  <link rel="stylesheet" href="{% static "css/roadmap.css" %}" />
+{% endblock %}
+  
+{% block main %}
+
+  <div class="roadmap-form-wrapper">
+    <form method="post" action="">
+      <div class="roadmap-form-title">Editing roadmap</div>
+      
+      {% if form.errors %}
+	<div class="form-errors">
+	  {% for key, value in form.errors.items %}
+	    <p>
+	      {{ value }}
+	    </p>
+	  {% endfor %}
+	</div>
+      {% endif %}
+	
+      {% block form-content %}
+	
+	<div class="roadmap-form-field">
+	  {{ form.title.label_tag }}
+	  {{ form.title }}
+	</div>
+
+	<div class="roadmap-form-field">
+	  {{ form.author.label_tag }}
+	  {{ form.author }}
+	</div>
+	
+	<div class="roadmap-form-body">
+	  {{ form.body }}
+	</div>
+	
+      {% endblock %}
+      
+    </form>
+  </div>
+  
+{% endblock %}
+

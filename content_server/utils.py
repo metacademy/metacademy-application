@@ -50,4 +50,43 @@ def list_missing_dependencies():
             if dep.tag not in nodes:
                 print tag, 'depends on', dep.tag
 
+def errors_nonempty(errors):
+    if type(errors) == str:
+        return True
+    elif type(errors) == list:
+        for elt in errors:
+            if errors_nonempty(elt):
+                return True
+        return False
+    elif type(errors) == dict:
+        for k, v in errors.items():
+            if errors_nonempty(v):
+                return True
+        return False
+    else:
+        raise RuntimeError('Invalid type %s' % type(errors))
+
+def print_errors(errors, indent=0):
+    if type(errors) == str:
+        print ' ' * indent + errors
+    elif type(errors) == list:
+        for e in errors:
+            print_errors(e, indent=indent)
+    elif type(errors) == dict:
+        for k, v in errors.items():
+            if errors_nonempty(v):
+                print_errors(k, indent)
+                print_errors(v, indent + 4)
+    else:
+        raise RuntimeError('Invalid type %s' % type(errors))
+
+
+def check_db():
+    global db
+    if db is None:
+        load_db()
+
+    print_errors(database.check_all_node_formats(config.CONTENT_PATH))
+    print_errors(db.check())
+
 

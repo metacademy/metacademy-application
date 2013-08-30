@@ -8,9 +8,12 @@ class Location:
         self.text = text
         self.link = link
 
-    def json_repr(self):
+    def json_repr(self, base_url=None):
         if self.link is not None:
-            return {'text': self.text, 'link': self.link}
+            if base_url is not None and self.link[:4] != 'http':
+                return {'text': self.text, 'link': base_url + self.link}
+            else:
+                return {'text': self.text, 'link': self.link}
         else:
             return {'text': self.text}
         
@@ -33,6 +36,7 @@ RESOURCE_FIELDS = {'title': str,
                    'free': int,
                    'edition': str,
                    'url': str,
+                   'specific_url_base': str,
                    'level': str,
                    'authors': lambda s: formats.parse_list(s, ' and '),
                    'dependencies': lambda s: formats.parse_list(s, ','),
@@ -112,6 +116,11 @@ def json_repr(resource, db):
                                     if dep in db.nodes]
 
     if 'location' in resource:
-        resource['location'] = [item.json_repr() for item in resource['location']]
+        if 'specific_url_base' in resource:
+            base_url = resource['specific_url_base']
+        else:
+            base_url = None
+        
+        resource['location'] = [item.json_repr(base_url) for item in resource['location']]
 
     return resource

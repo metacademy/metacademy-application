@@ -6,6 +6,8 @@ import formats
 import graphs
 import resources
 
+
+
 class DatabaseFormatError(RuntimeError):
     pass
 
@@ -33,7 +35,48 @@ class Database:
         flags = read_flags(content_dir)
         return Database(nodes, shortcuts, graph, resource_dict, id2tag, tag2id, flags)
 
-        
+    def check(self):
+        all_errors = {}
+
+        for tag in self.nodes:
+            curr_errors = []
+            all_errors[tag] = curr_errors
+
+            # shortcut dependencies should be a strict subset of concept dependencies
+            if tag in self.shortcuts:
+                for sdep in self.shortcuts[tag].dependencies:
+                    found = False
+                    for ndep in self.nodes[tag].dependencies:
+                        if ndep.tag == sdep.tag:
+                            found = True
+                            if ndep.shortcut and not sdep.shortcut:
+                                curr_errors.append('Shortcut allowed for dependency %s in full concept, but not in shortcut'
+                                                   % sdep.tag)
+                    if not found:
+                        curr_errors.append('Dependency %s required for shortcut, but not full concept' % sdep.tag)
+
+            # resources should have the required fields
+            for r in self.nodes[tag].resources:
+                if 'source' in r and r['source'] not in self.resources:
+                    curr_errors.append('Resource with unknown source %s' % r['source'])
+                r_with_defaults = resources.add_defaults(r, self.resources)
+
+                if 'source' in r:
+                    name = r['source']
+                elif 'title' in r:
+                    name = '"' + r['title'] + '"'
+                else:
+                    name = '???'
+
+                REQUIRED_FIELDS = ['title', 'resource_type', 'url']
+                for field in REQUIRED_FIELDS:
+                    if field not in r_with_defaults:
+                        curr_errors.append('Resource %s missing %s' % (name, field))
+
+        return all_errors
+                
+            
+
 
 def global_flags_file(content_path):
     return os.path.join(content_path, 'flags.txt')
@@ -174,13 +217,50 @@ def read_shortcut(content_path, tag, concept_node):
     
 
 def check_required_files(content_path, node_tag):
+    errors = []
     if not os.path.exists(title_file(content_path, node_tag)):
-        raise RuntimeError('No title for %s' % node_tag)
+        errors.append('Missing title')
     if not os.path.exists(dependencies_file(content_path, node_tag)):
-        raise RuntimeError('No dependencies for %s' % node_tag)
-    if not os.path.exists(see_also_file(content_path, node_tag)):
-        raise RuntimeError('No see-also for %s' % node_tag)
+        errors.append('Missing dependencies')
+    if not os.path.exists(id_file(content_path, node_tag)):
+        errors.append('Missing machine-readable ID')
 
+    if os.path.exists(shortcut_dir(content_path, node_tag)):
+        if not os.path.exists(shortcut_dependencies_file(content_path, node_tag)):
+            errors.append('Missing dependencies for shortcut')
+        if not os.path.exists(shortcut_resources_file(content_path, node_tag)):
+            errors.append('Missing resources for shortcut')
+        
+    return errors
+
+def check_node_format(content_path, tag):
+    errors = check_required_files(content_path, tag)
+    
+    fname = node_resources_file(content_path, tag)
+    if os.path.exists(fname):
+        errors.append({'resources.txt': formats.check_resources_format(open(fname))})
+        
+    fname = dependencies_file(content_path, tag)
+    if os.path.exists(fname):
+        errors.append({'dependencies.txt': formats.check_dependencies_format(open(fname))})
+
+    fname = shortcut_resources_file(content_path, tag)
+    if os.path.exists(fname):
+        errors.append({'shortcut resources.txt': formats.check_resources_format(open(fname))})
+
+    fname = shortcut_dependencies_file(content_path, tag)
+    if os.path.exists(fname):
+        errors.append({'shortcut dependencies.txt': formats.check_dependencies_format(open(fname))})
+
+    return errors
+    
+def check_all_node_formats(content_path):
+    tags = os.listdir(os.path.join(content_path, 'nodes'))
+    errors = {}
+    for tag in tags:
+        errors[tag] = check_node_format(content_path, tag)
+    return errors
+    
 
 def read_nodes(content_path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Concept objects."""

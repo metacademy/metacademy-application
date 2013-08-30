@@ -33,10 +33,11 @@ def remove_comments_stream(instr):
         if not is_comment(line):
             yield line
 
-def read_text_db(instr, fields, list_fields={}, require_all=True):
+def read_text_db(instr, fields, list_fields={}, require_all=True, check=False):
     items = []
     new_item = True
     curr = {}
+    errors = []
 
     # Fields without default values indicate required fields
     fields = dict(fields)
@@ -55,13 +56,13 @@ def read_text_db(instr, fields, list_fields={}, require_all=True):
 
         pos = line.find(':')
         if pos == -1:
-            raise RuntimeError('Error reading line: %s' % line)
+            errors.append('Not a valid field/value pair: %s' % line)
+            continue
         field = line[:pos]
         value = line[pos+1:].strip()
 
         if new_item:
             curr = {}
-            items.append(curr)
             for field_name, (tp, default) in fields.items():
                 curr[field_name] = default
 
@@ -74,7 +75,11 @@ def read_text_db(instr, fields, list_fields={}, require_all=True):
                 curr[field] = []
             curr[field].append(tp(value))
         else:
-            raise RuntimeError('Unknown field: %s ' % field)
+            errors.append('Unknown field: %s' % field)
+            continue
+
+        if new_item:
+            items.append(curr)
 
         new_item = False
 
@@ -83,11 +88,17 @@ def read_text_db(instr, fields, list_fields={}, require_all=True):
         for field, value in item.items():
             if value is Missing:
                 if require_all:
-                    raise RuntimeError('Missing field %s for item %r' % (field, item))
-                else:
-                    del item[field]
+                    errors.append('Missing field %s for item %r' % (field, item))
+                del item[field]
 
-    return items
+    if check:
+        return items, errors
+    else:
+        return items
+
+def check_text_db_format(instr, fields, list_fields={}, require_all=True):
+    _, errors = read_text_db(instr, fields, list_fields, require_all, True)
+    return errors
 
 
 def normalize_input_tag(itag):
@@ -121,6 +132,13 @@ def read_id(f):
 def read_summary(f):
     return remove_comments(unicode(f.read(), 'utf-8'))
 
+def check_resources_format(f):
+    fields = dict(resources.RESOURCE_FIELDS)
+    fields['source'] = str
+    list_fields = dict(resources.RESOURCE_LIST_FIELDS)
+    return check_text_db_format(f, fields, list_fields, require_all=False)
+    
+
 def read_node_resources(f):
     fields = dict(resources.RESOURCE_FIELDS)
     fields['source'] = str
@@ -130,7 +148,7 @@ def read_node_resources(f):
     for r in node_resources:
         if 'location' in r and len(r['location']) > 0 and type(r['location'][0]) == list:
             r['location'] = reduce(list.__add__, r['location'])
-    
+
     return map(remove_empty_keys, node_resources)
 
 def read_questions(f):
@@ -142,6 +160,13 @@ def read_questions(f):
         if len(line) > 0:
             questions.append({"text":line})
     return questions
+
+def check_dependencies_format(f):
+    fields = {'tag': normalize_input_tag,
+              'reason': (str, None),
+              'shortcut': (int, 0),
+              }
+    return check_text_db_format(f, fields)
 
 def read_dependencies(f):
     fields = {'tag': normalize_input_tag,

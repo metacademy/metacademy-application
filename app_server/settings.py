@@ -126,6 +126,7 @@ INSTALLED_APPS = (
     'apps.user_management',
     'apps.roadmaps',
     'captcha',
+    'south'
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

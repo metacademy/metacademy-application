@@ -502,6 +502,9 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        */
       notesList: function() {
         var notes = [];
+        if (this.model.get("is_shortcut")) {
+          notes.push(this.shortcutNote());
+        }
         if (this.model.get("flags")) {
           notes = notes.concat(this.model.get("flags"));
         }
@@ -509,6 +512,14 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
           notes.push("This concept is still under construction.");
         }
         return notes;
+      },
+
+      /**
+       * The note telling the user the node is a shortcut.
+       */
+      shortcutNote: function() {
+        var link = this.model.get("id") + '#lfocus=' + this.model.get("id");
+        return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>'
       },
 
       /**

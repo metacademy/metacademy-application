@@ -4,17 +4,12 @@
     <div class="node-detail-comp-wrap node-detail-summary-text">
       <%= summary.length ? summary : '<span class="no-content-msg">-No Summary-</span>'%>
     </div>
-    <div class="node-detail-comp-wrap node-detail-shortcut-note">
-      <% if (is_shortcut){ %>
-        <p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="<%= id + '#lfocus=' + id %>">here</a>.</p>
-      <% } %>
-    </div>
 
     <% if (notes.length > 0){ %>
       <h2 class="node-detail-title">Notes</h2>
       <div class="node-detail-comp-wrap node-detail-flags">
         <% for (var i = 0; i < notes.length; i++){ %>
-          <p> <%- notes[i] %> </p>
+          <p> <%= notes[i] %> </p>
         <% } %>
       </div>
     <% } %>

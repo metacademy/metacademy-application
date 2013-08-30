@@ -115,7 +115,7 @@ class Shortcut:
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
         
-        outlinks = compute_outlinks(self.tag, db)
+        outlinks = compute_outlinks(self.concept.tag, db)
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.concept.tag, 'reason': dep.reason}
                         for dep in self.dependencies]

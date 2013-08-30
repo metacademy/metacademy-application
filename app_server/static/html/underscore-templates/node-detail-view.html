@@ -9,13 +9,15 @@
         <p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="<%= id + '#lfocus=' + id %>">here</a>.</p>
       <% } %>
     </div>
-    <div class="node-detail-comp-wrap node-detail-flags">
-      <% if (flags){ %>
-        <% for (var i = 0; i < flags.length; i++){ %>
-          <p> <%- flags[i] %> </p>
+
+    <% if (notes.length > 0){ %>
+      <h2 class="node-detail-title">Notes</h2>
+      <div class="node-detail-comp-wrap node-detail-flags">
+        <% for (var i = 0; i < notes.length; i++){ %>
+          <p> <%- notes[i] %> </p>
         <% } %>
-      <% } %>
-    </div>
+      </div>
+    <% } %>
 
     <h2 class="node-detail-title">Context</h2>
 

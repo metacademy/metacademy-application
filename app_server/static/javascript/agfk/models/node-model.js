@@ -167,7 +167,14 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
        * Returns the title to be displayed in the learning view
        */
       getLearnViewTitle: function(){
-        return this.get("is_shortcut") ? this.get("title") + " (shortcut)" : this.get("title");
+        var title = this.get("title");
+        if (this.get("is_shortcut")) {
+          title += " (shortcut)";
+        }
+        if (!this.isFinished()) {
+          title += " (under construction)";
+        }
+        return title;
       },
 
       /**
@@ -258,7 +265,16 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
         });
 
         return new NodePropertyCollections.DirectedEdgeCollection(found);
+      },
+
+      /**
+       * Determine if the node is considered "finished," so we can give an "under"
+       # construction" message otherwise.
+       */
+      isFinished: function(){
+        return this.get("summary") && this.get("resources").length > 0;
       }
+      
      
     });
   })();

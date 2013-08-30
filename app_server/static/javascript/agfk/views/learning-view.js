@@ -450,7 +450,8 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
             ptrLocClass = "." + viewConsts.ptrLocClass;
         
         var templateVars = _.extend(thisView.model.toJSON(), {"resourcesMsg": thisView.model.get("resources").getMessage(),
-                                                              "neededFor": thisView.model.computeNeededFor()});
+                                                              "neededFor": thisView.model.computeNeededFor(),
+                                                              "notes": thisView.notesList()});
         thisView.$el.html(thisView.template(templateVars));
         thisView.fresources = thisView.fresource || new ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
         thisView.presources = thisView.presources || new ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
@@ -494,6 +495,20 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
         _.each(selectors, function (view, selector) {
           view.setElement(this.$(selector)).render();
         }, this);
+      },
+
+      /**
+       * Compute the list of notes to display.
+       */
+      notesList: function() {
+        var notes = [];
+        if (this.model.get("flags")) {
+          notes = notes.concat(this.model.get("flags"));
+        }
+        if (!this.model.isFinished()) {
+          notes.push("This concept is still under construction.");
+        }
+        return notes;
       },
 
       /**

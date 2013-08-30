@@ -303,6 +303,10 @@ body {
     color: #333;
 }
 
+.dep-wrap, .outlinks-wrap{
+    margin-left: 2em;
+}
+
 .no-content-msg{
     margin: 0.2em 0;
     display: inline-block;

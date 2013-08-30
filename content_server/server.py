@@ -164,7 +164,9 @@ def do_list():
     else:
         tags = [tag for tag in db.nodes]
     
-    results = [{'tag': tag, 'id': db.tag2id[tag], 'title': db.nodes[tag].title} for tag in tags]    
+    results = [{'tag': tag, 'id': db.tag2id[tag], 'title': db.nodes[tag].title}
+               for tag in tags
+               if tag in db.tag2id]    
     text = json.dumps(results)
     return make_response(text, 'json')
     

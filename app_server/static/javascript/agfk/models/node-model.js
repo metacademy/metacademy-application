@@ -241,7 +241,26 @@ window.define(["backbone", "agfk/collections/node-property-collections", "agfk/u
       isUniqueDependency: function(depID){
         if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
         return this.uniqueDeps.hasOwnProperty(depID);
+      },
+      
+      /**
+       * Compute the list of outlinks to be displayed in the context section
+       */
+      computeNeededFor: function(){
+        var nodes = this.collection, thisModel = this;
+
+        var found = this.get("outlinks").filter(function(item){
+          node = nodes.findWhere({"id": item.get("to_tag")});
+          if (!node) {
+            return false;
+          }
+          return node.get("dependencies").findWhere({"from_tag": thisModel.get("id")});
+        });
+
+        return new NodePropertyCollections.DirectedEdgeCollection(found);
       }
+     
     });
   })();
 });
+

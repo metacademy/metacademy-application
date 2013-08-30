@@ -449,12 +449,13 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
             outlinkLocClass = "." + viewConsts.outlinkLocClass,
             ptrLocClass = "." + viewConsts.ptrLocClass;
         
-        var templateVars = _.extend(thisView.model.toJSON(), {"resourcesMsg": thisView.model.get("resources").getMessage()});
+        var templateVars = _.extend(thisView.model.toJSON(), {"resourcesMsg": thisView.model.get("resources").getMessage(),
+                                                              "neededFor": thisView.model.computeNeededFor()});
         thisView.$el.html(thisView.template(templateVars));
         thisView.fresources = thisView.fresource || new ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
         thisView.presources = thisView.presources || new ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
-        thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.get("outlinks")});
+        thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
         thisView.pointers = thisView.pointers || new PointersView({model: {text: thisView.model.get("pointers")}});
         if (thisView.fresources.model.length > 0){
           assignObj[freeResourcesLocClass] = thisView.fresources;

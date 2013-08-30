@@ -17,6 +17,22 @@
       <% } %>
     </div>
 
+    <h2 class="node-detail-title">Context</h2>
+
+    <% if (dependencies.length > 0) { %>
+      <div class="node-detail-comp-wrap">This concept has the prerequisites:</div>
+      <div class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>"></div>
+    <% } else { %>
+      <div class="node-detail-comp-wrap">This concept has no prerequisites.</div>
+    <% } %>
+
+    <% if (neededFor.length > 0) { %>
+      <div class="node-detail-comp-wrap">This concept is needed for:</div>
+      <div class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>"></div>
+    <% } %>
+
+    
+
 
     <h2 class="node-detail-title">Resources</h2>
     <div class="node-detail-comp-wrap node-detail-resources-note" id="node-detail-resources-note-<%- id %>"> <%- resourcesMsg %> </div>
@@ -35,10 +51,6 @@
     </div>
     
 
-    <h2 class="node-detail-title">Prerequisite Concepts</h2>
-    <div class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>">
-      <%= dependencies.length == 0 ? '<span class="no-content-msg">-No Prerequisite Concepts-</span>' : "" %>
-    </div>
 
 
     <h2 class="node-detail-title">See also</h2>

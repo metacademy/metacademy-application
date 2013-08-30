@@ -12,6 +12,26 @@ class Dependency:
         assert type(shortcut) == int
         self.shortcut = shortcut
 
+def compute_outlinks(tag, db):
+    child_tags = set([t for _, t in db.graph.outgoing['concept', tag]])
+    if ('shortcut', tag) in db.graph.outgoing:
+        child_tags.update([t for _, t in db.graph.outgoing['shortcut', tag]])
+
+
+    result = []
+    for t in child_tags:
+        reason = None
+        for d in db.nodes[t].dependencies:
+            if d.tag == tag and d.reason:
+                reason = d.reason
+
+        if reason:
+            result.append({'from_tag': tag, 'to_tag': t, 'reason': reason})
+        else:
+            result.append({'from_tag': tag, 'to_tag': t})
+
+    return result
+    
 
 class Concept:
     """A struct containing the information relevant to a single concept node.
@@ -40,11 +60,7 @@ class Concept:
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
         
-        if db.graph is not None and ('concept', self.tag) in db.graph.outgoing:
-            outlinks = [{'from_tag': self.tag, 'to_tag': t}
-                        for _, t in db.graph.outgoing['concept', self.tag]]
-        else:
-            outlinks = []
+        outlinks = compute_outlinks(self.tag, db)
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.tag, 'reason': dep.reason}
                         for dep in self.dependencies]
@@ -99,11 +115,7 @@ class Shortcut:
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
         
-        if db.graph is not None and ('shortcut', self.concept.tag) in db.graph.outgoing:
-            outlinks = [{'from_tag': self.concept.tag, 'to_tag': t}
-                        for _, t in db.graph.outgoing['shortcut', self.concept.tag]]
-        else:
-            outlinks = []
+        outlinks = compute_outlinks(self.tag, db)
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.concept.tag, 'reason': dep.reason}
                         for dep in self.dependencies]

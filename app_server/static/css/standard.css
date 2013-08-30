@@ -34,11 +34,11 @@ p {
     text-decoration: underline;
 }
 
-.internal-link{
+.internal-link, .focus-link{
     color: #A01F70;
     text-decoration: none;
 }
-.internal-link:hover{
+.internal-link:hover, .focus-link:hover{
     text-decoration: underline;
     color: #2414B0;
 }

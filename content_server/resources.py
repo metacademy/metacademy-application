@@ -34,8 +34,9 @@ RESOURCE_FIELDS = {'title': str,
                    'edition': str,
                    'url': str,
                    'level': str,
+                   'specific_url_base': str,
                    'authors': lambda s: formats.parse_list(s, ' and '),
-                   'dependencies': lambda s: formats.parse_list(s, ','),
+                   'dependencies': lambda s: formats.parse_list(s, ',')
                    }
 
 RESOURCE_LIST_FIELDS = {'location': parse_location,

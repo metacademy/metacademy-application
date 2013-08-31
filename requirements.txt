@@ -1,0 +1,8 @@
+django
+whoosh
+pillow==2.0
+django-simple-captcha
+flask
+bleach
+markdown
+south

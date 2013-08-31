@@ -1,6 +1,0 @@
-Django 2.5+ https://www.djangoproject.com/
-numpy 1.4+ http://www.numpy.org/
-scipy 0.1+ http://scipy.org/
-whoosh 2.5+ https://pypi.python.org/pypi/Whoosh/
-pillow 2.0 pip install Pillow==2.0
-django-simple-captcha 0.3.8+ pip install  django-simple-captcha

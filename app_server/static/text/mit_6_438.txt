@@ -1,0 +1,119 @@
+### Lecture 1: Introduction, overview, preliminaries
+
+* Nothing specifically for this lecture, but you may want to learn about [conditional independence](http://www.metacademy.org/graphs/concepts/conditional_independence#lfocus=conditional_independence) now, since that gets used a lot early on in the course.
+
+### Lecture 2: Directed probabilistic graphical models
+
+* [Bayesian networks](http://www.metacademy.org/graphs/concepts/bayesian_networks#lfocus=bayesian_networks), or Bayes nets, known in 438-land as directed graphical models
+* [d-separation](http://www.metacademy.org/graphs/concepts/d_separation#lfocus=d_separation), a way of analyzing conditional independence structure in Bayes nets
+* [Bayes Ball](http://www.metacademy.org/graphs/concepts/bayes_ball#lfocus=bayes_ball), an efficient algorithm for computing Bayes net properties. Note that while the course uses Bayes Ball to find conditional independencies, you may find it more intuitive to think directly in terms of the d-separation rules, as in the previous item.
+
+### Lecture 3: Undirected graphs
+
+* [Markov random fields (MRFs)](http://www.metacademy.org/graphs/concepts/markov_random_fields#lfocus=markov_random_fields), also known as undirected graphical models
+
+### Lecture 4: Factor graphs; generating and converting graphs
+
+* [factor graphs](http://www.metacademy.org/graphs/concepts/factor_graphs#lfocus=factor_graphs). Note that factor graphs and undirected graphical models are two different ways to represent the structure of Boltzmann distributions, and the only real difference is that factor graphs are a more fine-grained notation.
+* [converting between graphical models](http://www.metacademy.org/graphs/concepts/converting_between_graphical_models#lfocus=converting_between_graphical_models)
+
+### Lecture 5: Perfect maps, chordal graphs, Markov chains, trees
+
+* At the moment we don't have anything to go with this lecture, sorry.
+
+### Lecture 6: Gaussian graphical models
+
+* [multivariate Gaussian distribution](http://www.metacademy.org/graphs/concepts/multivariate_gaussian_distribution#lfocus=multivariate_gaussian_distribution)
+* [information form for multivariate Gaussians](http://www.metacademy.org/graphs/concepts/multivariate_gaussians_information_form#lfocus=multivariate_gaussians_information_form)
+* [Gaussian MRFs](http://www.metacademy.org/graphs/concepts/gaussian_mrfs#lfocus=gaussian_mrfs)
+* [linear-Gaussian models](http://www.metacademy.org/graphs/concepts/linear_gaussian_models#lfocus=linear_gaussian_models), or Gaussian Bayes nets
+
+### Lecture 7: Inference on graphs: elimination algorithm
+
+* [elimination algorithm](http://www.metacademy.org/graphs/concepts/variable_elimination#lfocus=variable_elimination)
+
+### Lecture 8: Inference on trees: sum-product algorithm
+
+* [sum-product algorithm](http://www.metacademy.org/graphs/concepts/sum_product_on_trees#lfocus=sum_product_on_trees). Unfortunately, different sources differ in which version of this algorithm they present. Most of them use the factor graph version, which is covered in a later lecture. Koller and Friedman jump straight to the junction tree (clique tree) version, which is the most general, but it can be a lot to take in all at once. Start with whichever you like, and it should make the other versions easier to understand.
+
+### Lecture 9: Example: forward-backward algorithm
+
+* [hidden Markov models](http://www.metacademy.org/graphs/concepts/hidden_markov_models#lfocus=hidden_markov_models)
+* [forward-backward algorithm](http://www.metacademy.org/graphs/concepts/forward_backward_algorithm#lfocus=forward_backward_algorithm)
+* [HMM inference as a special case of belief propagation](http://www.metacademy.org/graphs/concepts/hmm_inference_as_bp#lfocus=hmm_inference_as_bp). This one covers MAP inference as well, which doesn't appear until a later lecture.
+
+### Lecture 10: Sum-product algorithm with factor graphs
+
+* See the references for lecture 8, since some of them use factor graphs.
+
+### Lecture 11: MAP estimation and min-sum algorithm
+
+* [the max-product algorithm](http://www.metacademy.org/graphs/concepts/max_product_on_trees#lfocus=max_product_on_trees)
+* [the Viterbi algorithm](http://www.metacademy.org/graphs/concepts/viterbi_algorithm#lfocus=viterbi_algorithm), the special case of max-product applied to HMMs
+* [HMM inference as a special case of belief propagation](http://www.metacademy.org/graphs/concepts/hmm_inference_as_bp#lfocus=hmm_inference_as_bp)
+* If you're feeling rusty on linear algebra, now is a good time to brush up since the Gaussian inference lectures will really pick up steam.
+
+### Lecture 12: Inference with Gaussian graphical models
+
+* [Gaussian belief propagation](http://www.metacademy.org/graphs/concepts/gaussian_bp_on_trees#lfocus=gaussian_bp_on_trees)
+* [connection between Gaussian inference and variable elimination](http://www.metacademy.org/graphs/concepts/gaussian_variable_elimination_as_gaussian_elimination#lfocus=gaussian_variable_elimination_as_gaussian_elimination)
+* Note that these nodes have quite a few linear algebra dependencies. You may want to review those before the lecture, so that the derivations will make sense.
+
+### Lecture 13: Example: Kalman filtering and smoothing
+
+* [Kalman filter](http://www.metacademy.org/graphs/concepts/kalman_filter#lfocus=kalman_filter), and [derivation](http://www.metacademy.org/graphs/concepts/kalman_filter_derivation#lfocus=kalman_filter_derivation)
+* [Kalman smoother](http://www.metacademy.org/graphs/concepts/kalman_smoother#lfocus=kalman_smoother)
+* Viewing Kalman smoothing as a [special case of forward-backward](http://www.metacademy.org/graphs/concepts/kalman_as_forward_backward#lfocus=kalman_as_forward_backward)
+
+### Lecture 14: Junction tree algorithm
+
+* [junction trees](http://www.metacademy.org/graphs/concepts/junction_trees#lfocus=junction_trees)
+
+### Lecture 15: Loopy belief propagation, part 1
+
+* [loopy BP](http://www.metacademy.org/graphs/concepts/loopy_belief_propagation#lfocus=loopy_belief_propagation)
+
+### Lecture 16: Loopy belief propagation, part 2
+
+* [basics of variational inference](http://www.metacademy.org/graphs/concepts/variational_inference#lfocus=variational_inference)
+* [variational interpretation of loopy BP](http://www.metacademy.org/graphs/concepts/loopy_bp_as_variational#lfocus=loopy_bp_as_variational)
+
+### Lecture 17: Variational inference
+
+* [mean field approximation](http://www.metacademy.org/graphs/concepts/mean_field#lfocus=mean_field)
+
+### Lecture 18: Sampling by Markov chain Monte Carlo
+
+* [Gibbs sampling](http://www.metacademy.org/graphs/concepts/gibbs_sampling#lfocus=gibbs_sampling)
+* [Metropolis-Hastings](http://www.metacademy.org/graphs/concepts/metropolis_hastings#lfocus=metropolis_hastings)
+
+### Lecture 19: Approximate inference by particle methods
+
+* [importance sampling](http://www.metacademy.org/graphs/concepts/importance_sampling#lfocus=importance_sampling)
+* particle filter (TODO)
+
+### Lecture 20: Parameter estimation in directed graphs
+
+* [maximum likelihood](http://www.metacademy.org/graphs/concepts/maximum_likelihood#lfocus=maximum_likelihood)
+* [learning Bayes net parameters](http://www.metacademy.org/graphs/concepts/bayes_net_parameter_learning#lfocus=bayes_net_parameter_learning)
+* [Bayesian parameter estimation](http://www.metacademy.org/graphs/concepts/bayesian_parameter_estimation#lfocus=bayesian_parameter_estimation)
+* [Bayesian estimation of Bayes net parameters](http://www.metacademy.org/graphs/concepts/bayesian_estimation_bayes_net_params#lfocus=bayesian_estimation_bayes_net_params)
+
+### Lecture 21: Learning structure in directed graphs
+
+* [Bayes net structure learning](http://www.metacademy.org/graphs/concepts/bayes_net_structure_learning#lfocus=bayes_net_structure_learning)
+* [Chow-Liu trees](http://www.metacademy.org/graphs/concepts/chow_liu_trees#lfocus=chow_liu_trees)
+
+### Lecture 22: Modeling from partial observations
+
+* [EM algorithm](http://www.metacademy.org/graphs/concepts/expectation_maximization#lfocus=expectation_maximization)
+* [learning Bayes nets with missing data](http://www.metacademy.org/graphs/concepts/learning_bayes_nets_missing_data#lfocus=learning_bayes_nets_missing_data)
+
+### Lecture 23: Learning undirected graphical models
+
+* [MRF parameter learning](http://www.metacademy.org/graphs/concepts/mrf_parameter_learning#lfocus=mrf_parameter_learning)
+
+### Lecture 24: Learning exponential family models
+
+* [exponential families](http://www.metacademy.org/graphs/concepts/exponential_families#lfocus=exponential_families)
+* [maximum likelihood in exponential families](http://www.metacademy.org/graphs/concepts/maximum_likelihood_in_exponential_families#lfocus=maximum_likelihood_in_exponential_families)

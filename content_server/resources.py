@@ -16,6 +16,9 @@ class Location:
                 return {'text': self.text, 'link': self.link}
         else:
             return {'text': self.text}
+
+    def __repr__(self):
+        return 'Location(%r, %r)' % (self.text, self.link)
         
 
 re_link = re.compile(r'(.*)\[([^\]]+)\]\s*$')

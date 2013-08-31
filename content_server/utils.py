@@ -50,6 +50,27 @@ def list_missing_dependencies():
             if dep.tag not in nodes:
                 print tag, 'depends on', dep.tag
 
+
+def find_resource(source):
+    global db
+    if db is None:
+        load_db()
+
+    for tag in db.nodes:
+        for r in db.nodes[tag].resources:
+            if 'source' in r and r['source'] == source:
+                print tag
+                print r
+                print
+
+
+
+
+
+
+
+##### checking the DB format #####
+
 def errors_nonempty(errors):
     if type(errors) == str:
         return True

@@ -201,6 +201,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
       className: pvt.viewConsts.viewClass,
+      tagName: "li",
       
       /**
        * Render the learning view given the supplied model
@@ -270,7 +271,8 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
       className: pvt.viewConsts.viewClass,
-      
+      tagName: "li",
+
       /**
        * Render the learning view given the supplied model
        */
@@ -374,7 +376,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
       parsePtrTextToHtml: function(lines){
         var i,
             prevDepth = 0,
-            htmlStr = "<ul>",
+            htmlStr = "",
             liStr;
 
         // array depth corresponds to list depth
@@ -401,7 +403,6 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
         while (prevDepth--){
           htmlStr += '</ul>\n';
         }
-        htmlStr += "</ul>";
 
         return htmlStr;
       }

@@ -1,5 +1,5 @@
 <script type="text/template" id="node-detail-view-template">
-  <div id = "node-detail-summary-<%- id %>">
+  <div id = "node-detail-<%- id %>">
     <h2 class="node-detail-title">Summary</h2>
     <div class="node-detail-comp-wrap node-detail-summary-text">
       <%= summary.length ? summary : '<span class="no-content-msg">-No Summary-</span>'%>
@@ -15,32 +15,29 @@
     <% } %>
 
     <h2 class="node-detail-title">Context</h2>
-
+    <div class="node-detail-comp-wrap">
     <% if (dependencies.length > 0) { %>
-      <div class="node-detail-comp-wrap">This concept has the prerequisites:</div>
-      <div class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>"></div>
+      <p>This concept has the prerequisites:</p>
+      <ul class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>"></ul>
     <% } else { %>
-      <div class="node-detail-comp-wrap">This concept has no prerequisites.</div>
+      <p class="no-content-msg">-this concept has no prerequisites-</p>
     <% } %>
 
     <% if (neededFor.length > 0) { %>
-      <div class="node-detail-comp-wrap">This concept is needed for:</div>
-      <div class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>"></div>
+      <p>This concept is needed for:</p>
+      <ul class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>"></ul>
     <% } %>
-
-    
-
+    </div>
 
     <h2 class="node-detail-title">Resources</h2>
-    <div class="node-detail-comp-wrap node-detail-resources-note" id="node-detail-resources-note-<%- id %>"> <%- resourcesMsg %> </div>
-    <div class="resources-wrap">
-      
-      <h2 class="node-detail-title">Free Resources</h2>
+    <div class="node-detail-comp-wrap">
+    <p class="info-text"> <%- resourcesMsg %> </p>      
+      <h2 class="node-detail-subtitle">Free Resources</h2>
       <div class="node-detail-comp-wrap free-resources-wrap" id="node-detail-fresources-<%- id %>">
         <span class="no-content-msg">-No Free Resources-</span>
       </div>
 
-      <h2 class="node-detail-title">Paid Resources</h2>
+      <h2 class="node-detail-subtitle">Paid Resources</h2>
       <div class="node-detail-comp-wrap paid-resources-wrap" id="node-detail-presource-<%- id %>">
         <span class="no-content-msg">-No Paid Resources-</span>
       </div>

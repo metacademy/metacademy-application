@@ -3,21 +3,23 @@ knowledge-maps
 An apt-get for knowledge.
 
                              
-Current testing instructions (April 11, 2013):
+Current testing instructions (30 Aug 2013):
 
-1. Install [django](https://www.djangoproject.com/download/) 1.5+ and [Whoosh](https://pypi.python.org/pypi/Whoosh) 2.5+.
+1. install [Numpy 1.4+](http://www.numpy.org/) and [Scipy 0.1+](http://scipy.org/)
+2. install `pip install -r requirements.txt`
 2. Clone/checkout/download the [agfk content](https://github.com/agfk/agfk-content) to an appropriate external directory 
-3. Copy config-template.py to config.py, set the appropriate paths in this directory.
+3. Copy `config-template.py` to `config.py`, set the appropriate paths in this directory.
+4. Copy `app_server/settings_local-template.py` to `app_server/settings_local.py`, set the appropriate variables
 4. Add the `agfk` project directory to your PYTHONPATH
 5. From `agfk` project directory:
 
         python manage.py syncdb
 
-        python manage.py collectstatic
-
         run_test_servers.sh
-6. Open [localhost:8080/kmap#node=node_id](http://localhost:8080/kmap#node=logistic_regression) (e.g. http://localhost:8080/kmap#node=logistic_regression) with a modern javascript-enabled browser, preferably a webkit-based browser
-Note: the initial page may take some time to load (the backend must construct the graph), but all subsequent pages should load much quicker.
+        
+6. Open [localhost:8080](http://localhost:8080) with a modern javascript-enabled browser, preferably a webkit-based browser
+
+Note: the initial page may take some time to load (the backend must load the graph into memory), but all subsequent pages should load much quicker.
 
 Basic explore-mode use:
 

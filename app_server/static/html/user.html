@@ -7,51 +7,61 @@
 
 {% block main %}
 <div class="user-profile">
-<h1>
-  {{user.username}}
-</h1>
-<hr>
+  <h1>
+    {{user.username}}
+  </h1>
+  <hr>
 
-<section id="account-section">
-<h2>
-Your Account
-</h2>
-<div class="user-account-info user-subsec">
- <ul>
-    <li> username (public): {{user.username}}</li>
-    <li> email (not public): {{user.email}}</li>
-</ul>
-</div>
-</section>
+  <section id="account-section">
+    <h2>
+      Your Account
+    </h2>
+    <div class="user-account-info user-subsec">
+      <ul>
+        <li> username (public): {{user.username}}</li>
+        <li> email (not public): {{user.email}}</li>
+      </ul>
+    </div>
+  </section>
 
-<section id="graphs-section">
-<h2>
-Your Graphs
-</h2>
-<div class="user-graphs list-wrapper user-subsec">
-    <span class="no-content-message"> you have not yet created any graphs (metacademy currently does not have this functionality)</span>
-</div>
-</section>
+  <section id="graphs-section">
+    <h2>
+      Your Graphs
+    </h2>
+    <div class="user-graphs list-wrapper user-subsec">
+      <span class="no-content-message"> you have not yet created any graphs (metacademy currently does not have this functionality)</span>
+    </div>
+  </section>
 
-<section id="contribs-section">
-<h2>
-Your Contributions
-</h2>
-<div class="user-graphs list-wrapper user-subsec">
-    <span class="no-content-message"> you have not yet contributed any content to metacademy (metacademy does not currently have this functionality)</span>
-</div>
-</section>
+  <section id="contribs-section">
+    <h2>
+      Your Contributions
+    </h2>
+    <div class="user-graphs list-wrapper user-subsec">
+      <span class="no-content-message"> you have not yet contributed any content to metacademy (metacademy does not currently have this functionality)</span>
+    </div>
+  </section>
 
-<section id="lc-section">
-<h2>
-Your Learned Concepts
-</h2>
-<div class="learned-concepts list-wrapper user-subsec">
-    <span class="no-content-message"> you have not yet learned any concepts on metacademy </span>
-</div>
-</section>
-
-{% include "concept-list-item.html" %}
+  <section id="lc-section">
+    <h2>
+      Your Learned Concepts
+    </h2>
+    <div class="learned-concepts list-wrapper user-subsec">
+      {% if lconcepts %}
+      <ul>
+        {% for entry in lconcepts %}
+        <li class="list-concepts-li">
+          <h3 class="list-concepts-title">
+            <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' %}{{entry.tag}}"> {{ entry.title }} </a>
+          </h3>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <span class="no-content-message"> you have not yet learned any concepts on metacademy </span>
+      {% endif %}
+    </div>
+  </section>
 
 </div>
 {% endblock %}
@@ -60,30 +70,4 @@ Your Learned Concepts
 {% block jscript %}
 {% include "load-jquery-snippet.html" %}
 <script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
-<script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
-<script>
-  var lIds = {{ lconcepts|safe }};
-  // TODO refactor this code with concepts-list (basically a subset)
-  if (lIds.length > 0){
-     var $lcEl = $(".learned-concepts");
-     var loadEl = document.createElement("img");
-     loadEl.src = window.STATIC_PATH + "images/ajax-loader.gif";
-     $lcEl.html(loadEl);
-    $.getJSON( window.CONTENT_SERVER + "/list?ids=" + lIds.join("&ids="),
-    function(listData, status, jqxhr){
-      // render the list titles alphabetically
-      listData.sort(function(itma, itmb){
-        return itma.title.toLowerCase().localeCompare(itmb.title.toLowerCase());
-      });
-      var template = _.template(document.getElementById("list-concept-item-template").innerHTML);
-      var innerListTxt = "";
-      _.forEach(listData, function(listItm){
-        innerListTxt += template(listItm);
-      });
-      var litemList = document.createElement("ul");
-      litemList.innerHTML = innerListTxt;
-      $lcEl.html(litemList);
-  });
-  }
-</script>
 {% endblock %}

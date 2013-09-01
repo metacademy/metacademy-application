@@ -1,5 +1,4 @@
 import pdb
-import json
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -25,13 +24,10 @@ class TestUserManagementViews(TestCase):
         self.prof.save()
 
         # create 5 learned concepts and add the previously created user to each concepts learned list
-        learned_concepts = []
-        for i in xrange(5):
-            learned_concept_id = i
-            learned_concepts.append(i)
+        learned_concepts = ['7yjmqglq', 'dvwtwwnk', '1toqv2qm']
+        for learned_concept_id in learned_concepts:
             lc, created = LearnedConcept.objects.get_or_create(id=learned_concept_id)
             lc.uprofiles.add(self.prof)
-            self.assertEqual(int(self.prof.learnedconcept_set.all()[i].pk), learned_concept_id)
 
         # check the /user page before authentication
         resp = self.client.get(reverse('user:user_main'))
@@ -43,5 +39,5 @@ class TestUserManagementViews(TestCase):
         # should not redirect
         self.assertEqual(resp.status_code, 200)
         # learned concepts should contain the added concepts
-        self.assertEqual(set([int(lc) for lc in
-                              json.loads(resp.context['lconcepts'])]), set(learned_concepts))
+        self.assertEqual(set([lc['id'] for lc in
+                              resp.context['lconcepts']]), set(learned_concepts))

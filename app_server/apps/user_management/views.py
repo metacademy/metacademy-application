@@ -7,16 +7,23 @@ from django.template import RequestContext
 from django.shortcuts import render
 from apps.user_management.models import LearnedConcept, Profile, UserCreateForm
 
+from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 from settings import CONTENT_SERVER
-
 
 def user_main(request):
     if not request.user.is_authenticated():
         return redirect('/user/login?next=%s' % request.path)
+
     # obtain an array of learned concept ids for the user
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-    lconcepts = [ l.id for l in uprof.learnedconcept_set.all()]
-    return render_to_response('user.html', {"lconcepts": json.dumps(lconcepts), "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
+    lids = [l.id for l in uprof.learnedconcept_set.all()]
+    if len(lids) > 0:
+        concepts_dict = get_id_to_concept_dict()
+        lconcepts  = [concepts_dict[idval] for idval in lids if concepts_dict.has_key(idval)]
+    else:
+        lconcepts = []
+
+    return render_to_response('user.html', {"lconcepts": lconcepts, "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
 
 def register(request):
     if request.method == 'POST':

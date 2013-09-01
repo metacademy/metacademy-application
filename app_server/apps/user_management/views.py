@@ -14,7 +14,7 @@ def user_main(request):
     if not request.user.is_authenticated():
         return redirect('/user/login?next=%s' % request.path)
     # obtain an array of learned concept ids for the user
-    uprof, created = Profile.objects.get_or_create(pk=request.user)
+    uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
     lconcepts = [ l.id for l in uprof.learnedconcept_set.all()]
     return render_to_response('user.html', {"lconcepts": json.dumps(lconcepts), "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
 
@@ -41,7 +41,7 @@ def handle_learned_concepts(request, conceptId=""):
     """
     if request.user.is_authenticated():
         # TODO: handle multiple concepts at once
-        uprof, created = Profile.objects.get_or_create(pk=request.user)
+        uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
         if not conceptId:
             if request.method == "GET":
                 lconcepts = [ l.id for l in uprof.learnedconcept_set.all()]

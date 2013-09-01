@@ -121,16 +121,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
     'apps.graph',
     'apps.content_search',
     'apps.user_management',
     'apps.roadmaps',
     'captcha',
-    'south'
-    # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'south',
 )
 
 CAPTCHA_NOISE_FUNCTIONS = ()

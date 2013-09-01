@@ -35,4 +35,6 @@ class LearnedConcept(models.Model):
     """
     id = models.CharField(max_length=10, unique=True, primary_key=True)
     uprofiles = models.ManyToManyField(Profile)
-    
+
+    def __unicode__(self):
+        return self.id

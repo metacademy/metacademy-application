@@ -1,10 +1,13 @@
 from django.conf.urls import patterns, include, url
 # handle static files locally
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib import admin
 from django.views.decorators.cache import cache_page
 from django.views.generic.base import TemplateView, RedirectView
 
 from apps.graph.views import benchmark_viewer
+
+admin.autodiscover()
 
 """
 Django urls handler
@@ -17,7 +20,8 @@ urlpatterns = patterns('',
                        url(r'^roadmaps/', include('apps.roadmaps.urls', namespace='roadmaps')),
                        # url(r'^dev/benchmarktest', benchmark_viewer),
                        url(r'^captcha/', include('captcha.urls')),
-                       url(r'^about/',  TemplateView.as_view(template_name='about.html'))
+                       url(r'^about/',  TemplateView.as_view(template_name='about.html')),
+                       url(r'^admin/', include(admin.site.urls)),
 )
 
 urlpatterns += staticfiles_urlpatterns()

@@ -49,7 +49,7 @@
       {% for sobj in search_data %}
       <li class="search-res-li">
         <h3 class="search-res-title">
-          <a class="search-res-link internal-link" href="{% url 'graphs:concepts'%}{{sobj.tag }}#lfocus={{sobj.tag}}"> {{sobj.title}} </a>
+          <a class="search-res-link internal-link" href="{% url 'graphs:concepts'%}{{sobj.tag }}"> {{sobj.title}} </a>
         </h3>
         <div class="search-res-description">
           {{sobj.summary}}

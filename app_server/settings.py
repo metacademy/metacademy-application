@@ -126,6 +126,7 @@ INSTALLED_APPS = (
     'apps.graph',
     'apps.content_search',
     'apps.user_management',
+    'apps.cserver_comm',
     'apps.roadmaps',
     'captcha',
     'south',

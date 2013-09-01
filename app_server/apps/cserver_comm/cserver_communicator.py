@@ -2,7 +2,6 @@ from settings import CONTENT_SERVER
 import urllib2
 import urllib
 import json
-import pdb
 
 def get_search_json(search_term):
     """

@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from settings import CONTENT_SERVER
-from apps.content_search.utils.cserver_communicator import get_search_json
+from apps.cserver_comm.cserver_communicator import get_search_json
 
 
 """

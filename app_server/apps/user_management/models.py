@@ -45,4 +45,3 @@ class LearnedConcept(models.Model):
             id_concept_dict = get_id_to_concept_dict()
             self.title = id_concept_dict[self.id]['title']
         return self.title
-    

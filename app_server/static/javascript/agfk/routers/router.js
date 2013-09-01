@@ -35,6 +35,9 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
 
     pvt.viewMode = -1; // current view mode
 
+    // keeps track of Explore to Learn and Learn to Explore clicks
+    pvt.transferFromSpecificConcept = false;
+
     /**
      * Asynchronously load Viz.js
      * Note: must call with "this = router instance"
@@ -192,6 +195,13 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       },
 
       /**
+       * Change transfer-click state (boolean to indicate when explore (learn) view was directly accessed from a specific concept in the learn (explore) view
+       */
+      setTransferFromSpecificConcept: function(state){
+        pvt.transferFromSpecificConcept = state;
+      },
+
+      /**
        * Show the error message view
        * key: the key for the given error message
        * extra: extra information for the error message
@@ -221,7 +231,6 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
         pvt.viewMode = paramsObj[qViewMode];
 
         // init main app model
-        // TODO replace this technique for user data once we have the server/offline storage fleshed out
         if (!thisRoute.appData){
           thisRoute.appData = new AppData();
           thisRoute.appData.get("userData").get("learnedConcepts").fetch({
@@ -301,11 +310,17 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
                 thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
               }
               thisRoute.showView(thisRoute.lview, doRender, "#" + routeConsts.lViewId);
-              // only scroll to intended node on when lview is rerendered,
+              // only scroll to intended node on when lview is rerendered or learn link is clicked,
               // so that the user's scroll state is maintained when jumping between learn and explore view
+              if (!paramsObj[qLearnScrollConcept]){
+                paramsObj[qLearnScrollConcept] = nodeId;
+              }
               var paramQLearnScrollConcept = paramsObj[qLearnScrollConcept];
-              if (paramQLearnScrollConcept && paramQLearnScrollConcept !== pvt.prevUrlParams[qLearnScrollConcept]){ 
+              if (paramsObj[qViewMode] === pLearnMode &&
+                  (paramQLearnScrollConcept !== pvt.prevUrlParams[qLearnScrollConcept]
+                   || pvt.transferFromSpecificConcept)){ 
                 thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
+                thisRoute.setTransferFromSpecificConcept(false); // reset the router state
               }
           }
 

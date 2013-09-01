@@ -752,6 +752,7 @@ window.define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "ag
        * Trigger transfer from explore view to learn view and focus on conceptTag
        */
       transferToLearnViewForConcept: function(conceptTag){
+        this.appRouter.setTransferFromSpecificConcept(true);
         this.appRouter.changeUrlParams({mode: "learn", lfocus: conceptTag});
       },
       

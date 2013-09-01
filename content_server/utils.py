@@ -56,14 +56,17 @@ def find_resource(source):
     if db is None:
         load_db()
 
+    items = []
     for tag in db.nodes:
         for r in db.nodes[tag].resources:
             if 'source' in r and r['source'] == source:
-                print tag
-                print r
-                print
+                items.append((tag, r))
 
-
+    items.sort(key=lambda (tag, r): r['location'][0].text if 'location' in r else '')
+    for tag, r in items:
+        print tag
+        print r
+        print
 
 
 

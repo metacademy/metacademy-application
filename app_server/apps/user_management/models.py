@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from captcha.fields import CaptchaField
+from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 
 class UserCreateForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -37,4 +38,11 @@ class LearnedConcept(models.Model):
     uprofiles = models.ManyToManyField(Profile)
 
     def __unicode__(self):
-        return self.id
+        return self.get_title()
+
+    def get_title(self):
+        if not hasattr(self, 'title'):
+            id_concept_dict = get_id_to_concept_dict()
+            self.title = id_concept_dict[self.id]['title']
+        return self.title
+

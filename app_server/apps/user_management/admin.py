@@ -12,10 +12,10 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(AuthUserAdmin):
     inlines = [UserProfileInline]
 
-class LearnedConceptAdmin:
-    pass
-
+class LearnedConceptAdmin(admin.ModelAdmin):
+    filter_horizontal = ('uprofiles',)
+    
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(LearnedConcept)
+admin.site.register(LearnedConcept, LearnedConceptAdmin)
 

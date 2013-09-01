@@ -8,6 +8,7 @@ from django.test.client import RequestFactory
 
 from apps.user_management.models import LearnedConcept, Profile
 from apps.user_management.views import user_main
+
 class TestUserManagementViews(TestCase):
     def test_register_index(self):
         resp = self.client.get(reverse('user:register'))
@@ -41,6 +42,6 @@ class TestUserManagementViews(TestCase):
         resp = self.client.get(reverse('user:user_main'))
         # should not redirect
         self.assertEqual(resp.status_code, 200)
-        # learned concepts should contain the added concepts#
+        # learned concepts should contain the added concepts
         self.assertEqual(set([int(lc) for lc in
                               json.loads(resp.context['lconcepts'])]), set(learned_concepts))

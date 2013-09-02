@@ -35,8 +35,10 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
 
     pvt.viewMode = -1; // current view mode
 
+    pvt.prevPurl = -1; // previous parameter url
+
     // keeps track of Explore to Learn and Learn to Explore clicks
-    pvt.transferFromSpecificConcept = false;
+    pvt.elTransition = false;
 
     /**
      * Asynchronously load Viz.js
@@ -161,7 +163,7 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
       /**
        * Parse the URL parameters
        */
-      routeParams: function( params){
+      routeParams: function(params){
         var routeConsts = pvt.routeConsts,
             nodeName = window.location.href.split('/').pop().split('#').shift(), // TODO replace this hack when rewriting the router
             paramsObj = pvt.getParamsFromStr(params || "");
@@ -191,14 +193,19 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
         }
         parr.sort();
         purl = parr.join("&");
-        this.navigate(purl, true);
+        if (purl === pvt.prevPurl){
+          this.routeParams(purl);
+        } else {
+          this.navigate(purl, {trigger: true, replace: true});
+          pvt.prevPurl = purl;
+        }
       },
 
       /**
        * Change transfer-click state (boolean to indicate when explore (learn) view was directly accessed from a specific concept in the learn (explore) view
        */
-      setTransferFromSpecificConcept: function(state){
-        pvt.transferFromSpecificConcept = state;
+      setELTransition: function(state){
+        pvt.elTransition = state;
       },
 
       /**
@@ -293,48 +300,44 @@ window.define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/lear
             return;
           }
 
-
           // set the document title to be the key concept
           document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
          
           switch (paramsObj[qViewMode]){
-            case pExploreMode:
-              if (doRender){
-                thisRoute.eview = new ExploreView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
-              }
-              thisRoute.showView(thisRoute.eview, doRender, "#" + routeConsts.eViewId);
-          
-              break;
-            default:
-              if (doRender){
-                thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
-              }
-              thisRoute.showView(thisRoute.lview, doRender, "#" + routeConsts.lViewId);
-              // only scroll to intended node on when lview is rerendered or learn link is clicked,
-              // so that the user's scroll state is maintained when jumping between learn and explore view
-              if (!paramsObj[qLearnScrollConcept]){
-                paramsObj[qLearnScrollConcept] = nodeId;
-              }
-              var paramQLearnScrollConcept = paramsObj[qLearnScrollConcept];
-              if (paramsObj[qViewMode] === pLearnMode &&
-                  (paramQLearnScrollConcept !== pvt.prevUrlParams[qLearnScrollConcept]
-                   || pvt.transferFromSpecificConcept)){ 
-                thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
-                thisRoute.setTransferFromSpecificConcept(false); // reset the router state
-              }
+          case pExploreMode:
+            if (doRender){
+              thisRoute.eview = new ExploreView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
+            }
+            thisRoute.showView(thisRoute.eview, doRender, "#" + routeConsts.eViewId);
+            break;
+          default:
+            if (doRender){
+              thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
+            }
+            thisRoute.showView(thisRoute.lview, doRender, "#" + routeConsts.lViewId);
+          }
+          // only scroll to intended node on when lview is rerendered or learn link is clicked,
+          // so that the user's scroll state is maintained when jumping between learn and explore view
+          var paramQLearnScrollConcept = paramsObj[qLearnScrollConcept];
+          if (!paramQLearnScrollConcept){
+            paramsObj[qLearnScrollConcept] = nodeId;
+            paramQLearnScrollConcept = nodeId;
           }
 
+          if (paramsObj[qViewMode] === pLearnMode && !pvt.elTransition){ 
+            thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
+          }
+          thisRoute.setELTransition(false); // reset the router state
           pvt.prevUrlParams = $.extend({}, paramsObj);
           pvt.prevNodeId = nodeId;
+
           if (loadViz && !preLoadViz && window.vizPromise === undefined){
             pvt.loadViz.call(thisRoute);
           }
-          
           // apply user data
           thisRoute.appData.applyUserDataToGraph();
         }
       }
     });
   })();
-
 });

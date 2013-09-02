@@ -64,6 +64,7 @@ window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone,
         var thisView = this;
         var buttonEl = evt.currentTarget;
         thisView.changeActiveELButtonFromDomEl(buttonEl);
+        thisView.appRouter.setELTransition(true);
         // 10 ms delay to let the UI update (looks smoother)
         window.setTimeout(function(){
             thisView.appRouter.changeUrlParams({mode: buttonEl.id.split("-")[0]});

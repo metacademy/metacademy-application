@@ -33,7 +33,9 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
         var viewConsts = pvt.viewConsts,
             thisView = this,
             thisModel = thisView.model;
-        return pvt.viewConsts.viewClass + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnCt() > 0 ? " " + viewConsts.implicitLearnedClass : "");
+        return pvt.viewConsts.viewClass + (thisModel.getLearnedStatus() ?
+                                           " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnCt() > 0 ?
+                                                                                  " " + viewConsts.implicitLearnedClass : "");
       },
 
       events: {
@@ -135,7 +137,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        */
       render: function(){
         var thisView = this;
-        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH})
+        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH});
         thisView.$el.html(thisView.template(temp));
         return thisView;
       },
@@ -338,11 +340,11 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
 
     pvt.itemToStr = function(item){
       if (item.link) {
-        return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '#lfocus=' + item.link + '">' + item.text + '</a>';
+        return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '">' + item.text + '</a>';
       } else {
         return item.text;
       }
-    }
+    };
 
     pvt.lineToStr = function(parts){
       var i, result = '';
@@ -350,7 +352,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
         result += pvt.itemToStr(parts[i]);
       }
       return result;
-    }
+    };
 
     
 
@@ -519,8 +521,8 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        * The note telling the user the node is a shortcut.
        */
       shortcutNote: function() {
-        var link = this.model.get("id") + '#lfocus=' + this.model.get("id");
-        return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>'
+        var link = this.model.get("id");
+        return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>';
       },
 
       /**
@@ -575,7 +577,15 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        * Expand/collapse the clicked concept title
        */
       showNodeDetailsFromEvt: function(evt){
-        this.toggleConceptDetails(evt.currentTarget);       
+        var $curTarget = $(evt.currentTarget),
+            clickedItmClass = pvt.viewConsts.clickedItmClass;
+        if (this.appRouter && !$curTarget.hasClass(clickedItmClass)){
+          var titleId = $curTarget.attr("id"),
+              nid = titleId.split("-").pop();
+          this.appRouter.changeUrlParams({lfocus: nid});
+        } else{
+          this.toggleConceptDetails(null, $curTarget);
+        }
       },
 
       /**
@@ -621,14 +631,14 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
        */
       setScrollTop: function(domEl, $domEl){
         try{
-          var parentNode = this.$el.parent(),
+          var $parentNode = this.$el.parent(),
               scrollPos;
           $domEl = $domEl || $(domEl);
 
-          ErrorHandler.assert(parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
-          parentNode.scrollTop(0); // reset the scroll position
-          scrollPos = $domEl.position().top - $domEl.outerHeight()/2;
-          parentNode.scrollTop(scrollPos);
+          ErrorHandler.assert($parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
+          // $parentNode.scrollTop(0); // reset the scroll position
+          scrollPos = $domEl.position().top - $domEl.outerHeight()/2 + $parentNode.scrollTop();
+          $parentNode.animate({scrollTop:scrollPos}, 500);
         }
         catch(err){
           window.console.warn("Error in setScrollTop (make sure view is rendered before calling): " + err.message);
@@ -645,18 +655,18 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
             titleView = pvt.idToTitleView[conceptTag];
         if (titleView instanceof NodeListItemView){
           var $titleEl = $(titleView.el);
+          // scroll to dom el
+          thisView.setScrollTop(null, $titleEl);
           // expand dom el
           if (!$titleEl.hasClass(pvt.viewConsts.clickedItmClass)){
             thisView.toggleConceptDetails(null, $titleEl);
           }
-          // scroll to dom el
-          thisView.setScrollTop(null, $titleEl);
-          
         }
       },
 
 
-      initialize: function(){
+      initialize: function(inp){
+        this.appRouter = inp.appRouter;
         this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
       },
       

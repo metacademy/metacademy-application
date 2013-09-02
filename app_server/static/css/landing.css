@@ -73,11 +73,11 @@
 .login-note:after {
     content: "";
     border-style: solid;
-    border-width: 0 7px 14px 7px; /* larger triangle - border width */
+    border-width: 0 6px 12px 6px;
     border-color: #FCF7FB transparent;
     position: absolute;
-    top: -13px; /* position of larger triangle + border width */
-    right: 16px; /* value = - small triangle width + border-right-width */
+    top: -12px;
+    right: 17px;
     display: block;
     width: 0;
     -moz-transform: scale(.9999);

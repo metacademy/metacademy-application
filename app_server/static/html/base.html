@@ -33,6 +33,11 @@
       window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
       window.PRODUCTION = window.location.href.match('metacademy') !== null;
       window.CSRF_TOKEN = "{{ csrf_token }}";
+      {% if user.is_authenticated %}
+      window.isAuth = true;
+      {% else %}
+      window.isAuth = false;
+      {% endif %}
     </script>
     {% endblock %}
 

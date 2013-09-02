@@ -7,6 +7,7 @@ window.requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
     jquery: ["//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min", window.STATIC_PATH + "javascript/lib/jquery-2.0.3.min"],
+    "jquery.cookie": "lib/jquery.cookie",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3-v3-min"
@@ -21,6 +22,9 @@ window.requirejs.config({
     backbone: {
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
+    },
+    "jquery.cookie"  : {
+      deps: ["jquery"]
     }
   },
   waitSeconds: 15
@@ -47,7 +51,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils"], function(Backbone, Utils, AppRouter, GenPageUtils){
+window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "jquery", "jquery.cookie"], function(Backbone, Utils, AppRouter, GenPageUtils, $){
   "use strict";
 
   // shim for CSRF token integration with backbone and django
@@ -69,4 +73,21 @@ window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-ut
   // start the AGFK app
   var appRouter = new AppRouter();
   Backbone.history.start();
+
+  // play tutorial content if user is new
+  if (!$.cookie("sawModesArrow") && !window.isAuth){
+    window.setTimeout(function(){
+      var $el_button_wrap = $("#explore-learn-button-wrapper"),
+          el_pos = $el_button_wrap.offset(),
+          el_height = $el_button_wrap.height(),
+          $modes_tutorial = $("#tutorial-modes-content");
+      $modes_tutorial.offset({
+        top: el_pos.top + el_height + 2,
+        left: el_pos.left
+      });
+      $modes_tutorial.fadeIn(500).delay(2000).fadeOut(500);
+      $.cookie("sawModesArrow", true);
+    }, 900);
+}
+
 });

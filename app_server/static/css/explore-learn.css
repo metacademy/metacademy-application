@@ -12,6 +12,13 @@ body {
     overflow: hidden;
 }
 
+/* Tutorial elements */
+#tutorial-modes-content{
+    position: absolute;
+    z-index: 10;
+    display: none;
+}
+
 /* App header tools */
 #app-header-tools{
    cursor: default;
@@ -203,7 +210,7 @@ body {
 }
 
 .node-detail-view{
-   background-color: white;
+   background-color: white; 
    color: #23240D;
    border-bottom:  0.3ex solid #CCCCCC;
    padding: 0.3em 8em 1em 1.5em;
@@ -348,6 +355,7 @@ body {
     display: inline-block;
     margin-right: 0.25em;
 }
+
 /* --------------------------------------------------------*/
 /* ---------->>> Explore View non-SVG Style <<<-----------*/
 /* ------------------------------------------------------*/

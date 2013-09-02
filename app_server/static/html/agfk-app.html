@@ -17,10 +17,10 @@
 {% block pre-standard-header-content %}
       {% include "header-search-logo.html" %}
       <div id="app-header-tools" class="header-el">
-          <button class="app-header-tools-button button-left" id="button-clear-learned">
+          <button class="app-header-tools-button button-left flat-bottom-left" id="button-clear-learned">
             clear learned
           </button>
-          <button class="app-header-tools-button button-right"id="button-show-learned">
+          <button class="app-header-tools-button button-right flat-bottom-right"id="button-show-learned">
             show learned
           </button>
       </div>
@@ -49,6 +49,11 @@
   {% include "pointers-view.html" %}
   {% include "outlink-view.html" %}
   {% include "loading-view.html" %}
+
+<!-- if user is not logged in and they do not have a tutorial-complete cookie -->
+<div id="scroll-up-tutorial-arrow">
+  <img src="" alt="scroll up to view prereqs">
+</div>
 
 {% endblock %}
   

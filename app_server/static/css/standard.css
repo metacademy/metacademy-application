@@ -80,6 +80,7 @@ a.expand-collapse-link:hover{
     z-index: 10;
     text-align: right;
     min-width: 600px;
+    overflow: hidden;
 }
 
 #header-search-input, user-form-field input{

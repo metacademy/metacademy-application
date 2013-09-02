@@ -16,22 +16,19 @@ body {
 #app-header-tools{
    cursor: default;
    text-align: center;
-   width: 20em;
+   width: 22em;
    float: left;
-   margin-left: -10em;
+   margin-left: -11em;
 }
 
 .app-header-tools-button{
-    display: inline;
-    width: 10em;
+    width: 11em;
     border: solid 2px;
     border-color: transparent;
     background-color: #416685;
     color: white;
-    padding: 2px;
-    padding-bottom: 1px;
-    margin: 0;
     font-size: 0.75em;
+    letter-spacing: 0;
     cursor: default;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
@@ -54,6 +51,14 @@ body {
     border-radius: 0 0.3em 0.3em 0;
     padding-left: 3px;
     margin-left: 0;
+}
+
+.flat-bottom-left{
+    border-radius: 0.3em 0 0 0;
+}
+
+.flat-bottom-right{
+    border-radius: 0 0.3em 0 0;
 }
 
 /* Explore-Learn Navigation Button */
@@ -201,7 +206,7 @@ body {
    background-color: white;
    color: #23240D;
    border-bottom:  0.3ex solid #CCCCCC;
-   padding: 0.3em 1.5em 1em 1.5em;
+   padding: 0.3em 8em 1em 1.5em;
    margin: 0.3em 0;
    line-height: 1.2em;
 }
@@ -296,7 +301,7 @@ body {
     margin: 0.1em 0 0.4em;
 }
 
-.dependency-reason{
+.dependency-reason, .outlink-reason{
     color: #333;
     font-size: 0.9em;
 }

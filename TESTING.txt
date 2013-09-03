@@ -2,4 +2,5 @@
 (2) python app_server/manage.py collectstatic
 (3) python app_server/manage.py test user_management
 (4) python app_server/manage.py runserver 8080 --insecure # so static files are served
-(4) run selenium tests in firefox
+(5) run selenium tests in firefox
+(6) push changes, update server, then run server selenium tests 

@@ -6,6 +6,8 @@ from django.forms import CharField, Form, Textarea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
+from django.views.decorators.csrf import csrf_exempt
+
 
 import settings
 
@@ -30,6 +32,10 @@ def load_roadmap(username, roadmap_name):
 
     return title, author, markdown_text
 
+def markdown_to_html(markdown_text):
+    roadmap_html = markdown.markdown(markdown_text, safe_mode=True)
+    return bleach.clean(roadmap_html, tags=BLEACH_TAG_WHITELIST)
+
     
 
 def get_roadmap(request, username, roadmap_name):
@@ -38,13 +44,13 @@ def get_roadmap(request, username, roadmap_name):
         return HttpResponse(status=404)
     title, author, markdown_text = result
 
-    roadmap_html = markdown.markdown(markdown_text, safe_mode=True)
-    roadmap_html = bleach.clean(roadmap_html, tags=BLEACH_TAG_WHITELIST)
+    roadmap_html = markdown_to_html(markdown_text)
     
     return render(request, 'roadmap.html', {
         'roadmap_html': safestring.mark_safe(roadmap_html),
         'title': title,
         'author': author,
+        'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 
 
@@ -73,5 +79,26 @@ def edit_roadmap(request, username, roadmap_name):
     
     return render(request, 'roadmap-edit.html', {
         'form': form,
+        'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 
+@csrf_exempt  # this is a POST request because it contains data, but there are no side effects
+def preview_roadmap(request):
+    if request.method != 'POST':
+        return HttpResponse(status=404)
+
+    title = request.POST['title'] if 'title' in request.POST else ''
+    author = request.POST['author'] if 'author' in request.POST else ''
+    body = request.POST['body'] if 'body' in request.POST else ''
+
+    roadmap_html = markdown_to_html(body)
+    
+    return render(request, 'roadmap-content.html', {
+        'title': title,
+        'author': author,
+        'roadmap_html': safestring.mark_safe(roadmap_html),
+        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        })
+
+
+    

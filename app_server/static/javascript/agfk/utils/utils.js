@@ -2,7 +2,7 @@
 This file contains general purpose utility functions 
 */
 
-window.define(["jquery"], function($){
+define(["jquery"], function($){
   "use strict";
   
   var utils = {};

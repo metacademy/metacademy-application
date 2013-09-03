@@ -6,7 +6,7 @@ if (typeof window.define === "undefined"){
   genutil.prep();
 }
 else{
-  window.define(["jquery"], function($){
+  define(["jquery"], function($){
     return genFun($);
   } );
 }

@@ -2,7 +2,7 @@
  This file contains the submodels of node-model.js
  */
 
-window.define(["backbone"], function(Backbone){
+define(["backbone"], function(Backbone){
   /**
    * Comprehension question model
    */

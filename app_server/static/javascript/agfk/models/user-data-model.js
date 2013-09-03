@@ -1,7 +1,7 @@
 /*
 This file contains the user data model, which contains the user-specific data that synces with the app server
 */
-window.define(["backbone"], function(Backbone){
+define(["backbone"], function(Backbone){
 
   var USER_CONSTS = {
     userPath: "/user/",

@@ -6,7 +6,7 @@
 // carefully refactor variables to distinguish nodes from tags
 // -fully separate graph generation logic from view
 
-window.define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
+define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
   "use strict";
 
   /*

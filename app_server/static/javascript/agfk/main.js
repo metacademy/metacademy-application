@@ -3,10 +3,10 @@
  */
 
 // configure require.js
-window.requirejs.config({
+requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
-    jquery: ["//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min", window.STATIC_PATH + "javascript/lib/jquery-2.0.3.min"],
+    jquery: ["//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min", "lib/jquery-2.0.3.min"],
     "jquery.cookie": "lib/jquery.cookie",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
@@ -36,7 +36,7 @@ window.requirejs.config({
  * perhaps define a global namespace of css classes and ids?
  */
 if (window.PRODUCTION){
-  window.requirejs.onError = function(err){
+  requirejs.onError = function(err){
     var errorId = "error-message";
     if (document.getElementById(errorId) === null){
       var div = document.createElement("div");
@@ -51,7 +51,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-window.requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "jquery", "jquery.cookie"], function(Backbone, Utils, AppRouter, GenPageUtils, $){
+requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "jquery", "jquery.cookie"], function(Backbone, Utils, AppRouter, GenPageUtils, $){
   "use strict";
 
   // shim for CSRF token integration with backbone and django

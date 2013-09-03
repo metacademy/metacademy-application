@@ -1,4 +1,4 @@
-window.define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorHandler){
+define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**

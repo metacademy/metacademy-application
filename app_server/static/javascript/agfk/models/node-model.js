@@ -2,7 +2,7 @@
  This file contains the node model, which contains the data for each concept TODO should this be renamed "conept-model"?
  */
 
-window.define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/utils"], function(Backbone, NodePropertyCollections, Utils){
+define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/utils"], function(Backbone, NodePropertyCollections, Utils){
   /**
    * Node: node model that encompasses several collections and sub-models
    */

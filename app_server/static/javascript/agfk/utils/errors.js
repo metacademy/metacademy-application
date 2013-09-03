@@ -2,7 +2,7 @@
  Utils for handling errors
 */
 
-window.define([], function(){
+define([], function(){
   "use strict";
 
   var errorHandler = {};

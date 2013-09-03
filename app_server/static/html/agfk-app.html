@@ -56,6 +56,10 @@
 {% endblock %}
   
   {% block jscript %}
+  {% if debug %}
   <script data-main="{% static "javascript/agfk/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
+  {% else %}
+  <script data-main="{% static "javascript/agfk/main-built.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
+  {% endif %}
   {% endblock %}
 

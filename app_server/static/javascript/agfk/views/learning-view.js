@@ -4,7 +4,7 @@
  */
 
 
-window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backbone, _, $, ErrorHandler){
+define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backbone, _, $, ErrorHandler){
   "use strict";
   
   /**
@@ -638,7 +638,7 @@ window.define(["backbone", "underscore", "jquery", "agfk/utils/errors"], functio
           ErrorHandler.assert($parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
           // $parentNode.scrollTop(0); // reset the scroll position
           scrollPos = $domEl.position().top - $domEl.outerHeight()/2 + $parentNode.scrollTop();
-          $parentNode.animate({scrollTop:scrollPos}, 500);
+          $parentNode.animate({scrollTop:scrollPos}, 400);
         }
         catch(err){
           window.console.warn("Error in setScrollTop (make sure view is rendered before calling): " + err.message);

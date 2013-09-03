@@ -2,7 +2,7 @@
  This file contains the graph-data model, which is a wrapper model for the nodes, edges, and auxiliary models
  */
 
-window.define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection"], function(Backbone, NodePropertyCollections, NodeCollection){
+define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection"], function(Backbone, NodePropertyCollections, NodeCollection){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options

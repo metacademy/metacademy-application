@@ -1,6 +1,7 @@
-knowledge-maps
+Metacademy's Source
 ==============
-An apt-get for knowledge.
+
+This source is licenses under GPLv3, see LICENSE.txt (note: metacademy's content is CC BY SA 3.0).
 
                              
 Current testing instructions (30 Aug 2013):

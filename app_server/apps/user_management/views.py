@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render
 from apps.user_management.models import LearnedConcept, Profile, UserCreateForm
+from django.core.mail import EmailMultiAlternatives
 
 from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 from settings import CONTENT_SERVER
@@ -32,6 +33,44 @@ def register(request):
             user = form.save()
             prof = Profile(user=user)
             prof.save()
+            uname = form.cleaned_data['username']
+            subject, from_email, to = 'Metacademy account successfully created', 'noreply@metacademy.org', form.cleaned_data['email']
+            text_content = """Thanks for creating an account with Metacademy. For future reference, your username is: "%s". You can find more information about Metacademy at our "about page": http://metacademy.org/about. \r\n\r\n
+
+More importantly, we want to hear from you! Please send any Metacademy-related thoughts, opinions, or rants to feedback@metacademy.org.
+\r\n\r\n
+
+Sincerely, \r\n
+Metacademy admins (Roger and Colorado)
+\r\n\r\n
+
+PS) We don't like sending pointless emails, so you probably won't hear from us very often.""" % uname
+            
+            html_content = """
+<p>
+Thanks for creating an account with Metacademy. For future reference, your username is <em>%s</em>. You can find more information about Metacademy at our "about page": <a href="http://metacademy.org/about/">http://metacademy.org/about/</a>. 
+</p>
+
+<p> 
+More importantly, we want to hear from you! Please send any Metacademy-related thoughts, opinions, or rants to <a href="mailto:feedback@metacademy.org">feedback@metacademy.org</a>.
+</p>
+
+<p>
+Sincerely,<br \>
+Metacademy admins (Roger and Colorado)
+</p>
+
+<p>
+PS) We don't like sending pointless emails, so you probably won't hear from us very often.
+</p>
+""" % uname
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            try:
+                msg.send()
+            except:
+                # TODO handle incorrect emails better
+                print "Unable to send confirmation message to " + to
             return HttpResponseRedirect("/user")
     else:
         form = UserCreateForm()

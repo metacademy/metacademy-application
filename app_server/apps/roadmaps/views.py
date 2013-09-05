@@ -2,7 +2,7 @@ import bleach
 import markdown
 import os
 
-from django.forms import CharField, ChoiceField, Form, Textarea
+from django.forms import CharField, ChoiceField, Form, SlugField, Textarea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
@@ -80,6 +80,9 @@ class RoadmapForm(Form):
                                       ])
     body = CharField(widget=Textarea(attrs={'cols': 100, 'rows': 40}))
 
+class RoadmapCreateForm(RoadmapForm):
+    url_tag = SlugField(label='Tag for URL (only letters, numbers, underscores, hyphens):')
+
 def edit_roadmap(request, username, roadmap_name):
     # temporary: editing disabled on server
     if not settings.DEBUG:
@@ -107,6 +110,27 @@ def edit_roadmap(request, username, roadmap_name):
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 
+def new_roadmap(request):
+    # temporary: editing disabled on server
+    if not settings.DEBUG:
+        return HttpResponse(status=404)
+
+    if not request.user.is_authenticated():
+        return HttpResponse(status=404)
+
+    if request.method == 'POST':
+        form = RoadmapCreateForm(request.POST)
+        if form.is_valid():
+            # do stuff here
+            roadmap_name = request.POST['url_tag']
+            return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, roadmap_name))
+    else:
+        form = RoadmapCreateForm()
+        
+    return render(request, 'roadmap-new.html', {
+        'form': form,
+        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        })
 
 
 @csrf_exempt  # this is a POST request because it contains data, but there are no side effects

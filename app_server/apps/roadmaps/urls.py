@@ -6,4 +6,5 @@ urlpatterns = patterns('',
                        url(r'^([^/]+)/([^/]+)$', views.get_roadmap),
                        url(r'^([^/]+)/([^/]+)/edit$', views.edit_roadmap),
                        url(r'^preview$', views.preview_roadmap),
+                       url(r'^new$', views.new_roadmap),
                        )

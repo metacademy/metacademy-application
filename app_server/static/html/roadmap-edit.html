@@ -15,7 +15,7 @@
   <div class="roadmap-form-wrapper">
     <form method="post" action="">
       {% csrf_token %}
-      <div class="roadmap-form-title">Editing roadmap</div>
+      <div class="roadmap-form-title">{% block form_title %}Editing roadmap{% endblock %}</div>
       
       {% if form.errors %}
 	<div class="form-errors">
@@ -33,6 +33,8 @@
 	  {{ form.title.label_tag }}
 	  {{ form.title }}
 	</div>
+
+        {% block url_tag_field %} {% endblock %}
 
 	<div class="roadmap-form-field">
 	  {{ form.author.label_tag }}

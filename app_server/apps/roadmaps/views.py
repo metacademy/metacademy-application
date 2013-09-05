@@ -72,8 +72,8 @@ class RoadmapForm(Form):
     body = CharField(widget=Textarea(attrs={'cols': 100, 'rows': 40}))
 
 def edit_roadmap(request, username, roadmap_name):
-    #if not request.user.is_authenticated() or request.user.username != username:
-    #    return HttpResponse(status=404)
+    if not request.user.is_authenticated() or request.user.username != username:
+        return HttpResponse(status=404)
     
     result = load_roadmap(username, roadmap_name)
     if result is None:

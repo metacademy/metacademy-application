@@ -1,4 +1,9 @@
-<div class="roadmap-title"> {{ title }} </div>
+<div class="roadmap-title">
+  {{ title }} 
+  {% if show_edit_link %}
+    <span class="roadmap-edit-link"><a href="{{ edit_url }}">[edit]</a></span>
+  {% endif %}
+</div>
 <div class="roadmap-author"> Created by: {{ author }} </div>
 <div class="roadmap-audience"> Intended for: {{ audience }} </div>
 <div class="roadmap-content"> {{ roadmap_html }} </div>

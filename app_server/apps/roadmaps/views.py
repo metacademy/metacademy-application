@@ -45,6 +45,9 @@ def get_roadmap(request, username, roadmap_name):
         return HttpResponse(status=404)
     title, author, audience, markdown_text = result
 
+    can_edit = request.user.is_authenticated() and request.user.username == username
+    edit_url = '/roadmaps/%s/%s/edit' % (username, roadmap_name)
+
     roadmap_html = markdown_to_html(markdown_text)
     
     return render(request, 'roadmap.html', {
@@ -52,6 +55,8 @@ def get_roadmap(request, username, roadmap_name):
         'title': title,
         'author': author,
         'audience': audience,
+        'show_edit_link': can_edit,
+        'edit_url': edit_url,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 
@@ -84,7 +89,7 @@ def edit_roadmap(request, username, roadmap_name):
         form = RoadmapForm(request.POST)
         if form.is_valid():
             # do stuff here
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/roadmaps/%s/%s' % (username, roadmap_name))
 
     else:
         form = RoadmapForm(initial={'title': title, 'author': author, 'audience': audience, 'body': markdown_text})
@@ -111,6 +116,7 @@ def preview_roadmap(request):
         'author': author,
         'audience': audience,
         'roadmap_html': safestring.mark_safe(roadmap_html),
+        'show_edit_link': False,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 

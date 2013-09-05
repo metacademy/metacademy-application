@@ -11,6 +11,11 @@
     margin-bottom: 0.4em;
 }
 
+.roadmap-edit-link {
+    font-size: 0.6em;
+    font-weight: normal;
+}
+
 .roadmap-author {
     font-size: 1.4em;
 }

@@ -48,6 +48,10 @@ def get_roadmap(request, username, roadmap_name):
     can_edit = request.user.is_authenticated() and request.user.username == username
     edit_url = '/roadmaps/%s/%s/edit' % (username, roadmap_name)
 
+    # temporary: editing disabled on server
+    if not settings.DEBUG:
+        can_edit = False
+
     roadmap_html = markdown_to_html(markdown_text)
     
     return render(request, 'roadmap.html', {
@@ -77,6 +81,10 @@ class RoadmapForm(Form):
     body = CharField(widget=Textarea(attrs={'cols': 100, 'rows': 40}))
 
 def edit_roadmap(request, username, roadmap_name):
+    # temporary: editing disabled on server
+    if not settings.DEBUG:
+        return HttpResponse(status=404)
+    
     if not request.user.is_authenticated() or request.user.username != username:
         return HttpResponse(status=404)
     
@@ -98,6 +106,8 @@ def edit_roadmap(request, username, roadmap_name):
         'form': form,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
+
+
 
 @csrf_exempt  # this is a POST request because it contains data, but there are no side effects
 def preview_roadmap(request):

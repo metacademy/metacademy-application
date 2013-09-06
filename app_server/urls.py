@@ -20,8 +20,8 @@ urlpatterns = patterns('',
                        url(r'^roadmaps/', include('apps.roadmaps.urls', namespace='roadmaps')),
                        # url(r'^dev/benchmarktest', benchmark_viewer),
                        url(r'^captcha/', include('captcha.urls')),
-                       url(r'^about/$',  TemplateView.as_view(template_name='about.html')),
-                       url(r'^admin/$', include(admin.site.urls)),
+                       url(r'^about$',  TemplateView.as_view(template_name='about.html')),
+                       url(r'^admin/', include(admin.site.urls)),
 )
 
 urlpatterns += staticfiles_urlpatterns()

@@ -10,7 +10,8 @@ requirejs.config({
     "jquery.cookie": "lib/jquery.cookie",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
-    d3: "lib/d3-v3-min"
+    d3: "lib/d3-v3-min",
+    "backbone.touch": "lib/backbone.touch"
   },
   shim: {
     d3: {
@@ -25,6 +26,9 @@ requirejs.config({
     },
     "jquery.cookie"  : {
       deps: ["jquery"]
+    },
+    "backbone.touch" : {
+      deps: ["jquery", "underscore", "backbone"]
     }
   },
   waitSeconds: 15
@@ -51,7 +55,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "jquery", "jquery.cookie"], function(Backbone, Utils, AppRouter, GenPageUtils, $){
+requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "jquery", "jquery.cookie", "backbone.touch"], function(Backbone, Utils, AppRouter, GenPageUtils, $){
   "use strict";
 
   // shim for CSRF token integration with backbone and django

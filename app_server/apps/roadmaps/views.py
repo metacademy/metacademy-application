@@ -2,36 +2,19 @@ import bleach
 import markdown
 import os
 
-from django.forms import CharField, ChoiceField, Form, SlugField, Textarea
+from django.forms import ModelForm, Textarea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
 
-
+import models
 import settings
 
 MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mit_6_438.txt')
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-
-def load_roadmap(username, roadmap_name):
-    # special case hack for 6.438 roadmap
-    if username == 'rgrosse' and roadmap_name == 'mit_6_438':
-        title = 'MIT 6.438 Roadmap'
-        author = 'Roger Grosse'
-        audience = 'MIT 6.438 students'
-        if os.path.exists(MIT_6_438_FILE):
-            markdown_text = open(MIT_6_438_FILE).read()
-        else:
-            return None
-
-    else:
-        # read from database
-        return None
-
-    return title, author, audience, markdown_text
 
 def markdown_to_html(markdown_text):
     roadmap_html = markdown.markdown(markdown_text, safe_mode=True)
@@ -40,70 +23,74 @@ def markdown_to_html(markdown_text):
     
 
 def get_roadmap(request, username, roadmap_name):
-    result = load_roadmap(username, roadmap_name)
-    if result is None:
+    roadmap = models.load_roadmap(username, roadmap_name)
+    if roadmap is None:
         return HttpResponse(status=404)
-    title, author, audience, markdown_text = result
 
-    can_edit = request.user.is_authenticated() and request.user.username == username
+    if not roadmap.visible_to(request.user):
+        return HttpResponse(status=404)
+    
+    can_edit = roadmap.editable_by(request.user)
     edit_url = '/roadmaps/%s/%s/edit' % (username, roadmap_name)
 
     # temporary: editing disabled on server
     if not settings.DEBUG:
         can_edit = False
 
-    roadmap_html = markdown_to_html(markdown_text)
+    roadmap_html = markdown_to_html(roadmap.body)
     
     return render(request, 'roadmap.html', {
         'roadmap_html': safestring.mark_safe(roadmap_html),
-        'title': title,
-        'author': author,
-        'audience': audience,
+        'title': roadmap.title,
+        'author': roadmap.author,
+        'audience': roadmap.audience,
         'show_edit_link': can_edit,
         'edit_url': edit_url,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 
 
-class RoadmapForm(Form):
-    VIS_PRIVATE = 'PRIVATE'
-    VIS_PUBLIC = 'PUBLIC'
-    VIS_MAIN = 'PUB_MAIN'
-    
-    title = CharField(label='Title:')
-    author = CharField(label='Author(s):')
-    audience = CharField(label='Target audience:')
-    visibility = ChoiceField(label='Visibility:',
-                             choices=[(VIS_PRIVATE, 'Private'),
-                                      (VIS_PUBLIC, 'Public'),
-                                      (VIS_MAIN, 'Public, listed in main page'),
-                                      ])
-    body = CharField(widget=Textarea(attrs={'cols': 100, 'rows': 40}))
+class RoadmapForm(ModelForm):
+    class Meta:
+        model = models.Roadmap
+        fields = ('title', 'author', 'audience', 'visibility', 'body')
+        widgets = {
+            'body': Textarea(attrs={'cols': 100, 'rows': 40}),
+            }
 
 class RoadmapCreateForm(RoadmapForm):
-    url_tag = SlugField(label='Tag for URL (only letters, numbers, underscores, hyphens):')
+    class Meta:
+        model = models.Roadmap
+        fields = ('title', 'url_tag', 'author', 'audience', 'visibility', 'body')
+        widgets = {
+            'body': Textarea(attrs={'cols': 100, 'rows': 40}),
+            }
+        
 
 def edit_roadmap(request, username, roadmap_name):
     # temporary: editing disabled on server
     if not settings.DEBUG:
         return HttpResponse(status=404)
     
-    if not request.user.is_authenticated() or request.user.username != username:
+    if not request.user.is_authenticated():
+        return HttpResponse(status=404)
+
+    roadmap = models.load_roadmap(username, roadmap_name)
+    if roadmap is None:
+        return HttpResponse(status=404)
+    if not roadmap.editable_by(request.user):
         return HttpResponse(status=404)
     
-    result = load_roadmap(username, roadmap_name)
-    if result is None:
-        return HttpResponse(status=404)
-    title, author, audience, markdown_text = result
-
     if request.method == 'POST':
-        form = RoadmapForm(request.POST)
+        form = RoadmapForm(request.POST, instance=roadmap)
+
         if form.is_valid():
-            # do stuff here
+            form.save()
+
             return HttpResponseRedirect('/roadmaps/%s/%s' % (username, roadmap_name))
 
     else:
-        form = RoadmapForm(initial={'title': title, 'author': author, 'audience': audience, 'body': markdown_text})
+        form = RoadmapForm(instance=roadmap)
     
     return render(request, 'roadmap-edit.html', {
         'form': form,
@@ -121,9 +108,11 @@ def new_roadmap(request):
     if request.method == 'POST':
         form = RoadmapCreateForm(request.POST)
         if form.is_valid():
-            # do stuff here
-            roadmap_name = request.POST['url_tag']
-            return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, roadmap_name))
+            roadmap = form.save(commit=False)
+            roadmap.user = request.user
+            roadmap.save()
+            
+            return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, roadmap.url_tag))
     else:
         form = RoadmapCreateForm()
         

@@ -2,6 +2,7 @@ import bleach
 import markdown
 import os
 
+from django.contrib.auth.models import User
 from django.forms import ModelForm, Textarea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -144,4 +145,32 @@ def preview_roadmap(request):
         })
 
 
+def list(request):
+    roadmaps = models.Roadmap.objects.all()
+    roadmaps = filter(lambda r: r.listed_in_main(), roadmaps)
+
+    return render(request, 'roadmap-list.html', {
+        'roadmaps': roadmaps,
+        'include_create': True,
+        'empty_message': 'Nobody has made any roadmaps yet.',
+        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        })
+    
+def list_by_user(request, username):
+    try:
+        user = User.objects.get(username__exact=username)
+    except User.DoesNotExist:
+        return HttpResponse(status=404)
+
+    roadmaps = models.Roadmap.objects.filter(user__username__exact=user.username)
+    roadmaps = filter(lambda r: r.is_public(), roadmaps)
+
+    include_create = request.user.is_authenticated() and request.user.username == username
+
+    return render(request, 'roadmap-list.html', {
+        'roadmaps': roadmaps,
+        'include_create': include_create,
+        'empty_message': 'This user has not made any roadmaps.',
+        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        })
     

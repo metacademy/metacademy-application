@@ -25,8 +25,14 @@ class Roadmap(Model):
     class Meta:
         unique_together = ('user', 'url_tag')
 
+    def get_absolute_url(self):
+        return '/roadmaps/%s/%s' % (self.user.username, self.url_tag)
+
     def is_public(self):
         return self.visibility in [self.VIS_PUBLIC, self.VIS_MAIN]
+
+    def listed_in_main(self):
+        return self.visibility == self.VIS_MAIN
 
     def visible_to(self, user):
         return self.is_public() or (user.is_authenticated() and self.user.username == user.username)

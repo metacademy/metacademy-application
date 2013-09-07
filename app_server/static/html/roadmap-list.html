@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load staticfiles $}
+{% load static %}
+
+{% block title %}
+  Metacademy - Roadmaps
+{% endblock %}
+
+{% block extra-css %}
+  <link rel="stylesheet" href="{% static "css/search.css" %}" />
+{% endblock %}
+
+
+{% block main %}
+  <div class="search-res-wrapper">
+    
+
+    <div class="search-res">
+      {% if not roadmaps|length %}
+        <div class="nosearch-message">
+          {{ empty_message }}
+        </div>
+      {% endif %}
+      <ul class="search-res-list">
+        {% for roadmap in roadmaps %}
+          <li class="search-res-li">
+            <h3 class="search-res-title">
+              <a class="search-res-link internal-link" href="{{ roadmap.get_absolute_url }}"> {{ roadmap.title }} </a>
+            </h3>
+            <div class="search-res-description">
+              <p>Created by: {{ roadmap.author }}</p>
+              <p>Intended for: {{ roadmap.audience }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+{% endblock %}

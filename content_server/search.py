@@ -2,7 +2,7 @@ import os
 from whoosh import index
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
-import pdb
+from whoosh.analysis import StemmingAnalyzer
 
 import config
 import database
@@ -10,7 +10,8 @@ import database
 main_index = None
 
 def get_schema():
-    return Schema(title=TEXT(stored=True), tag=ID(stored=True), summary=TEXT)
+    stem_ana = StemmingAnalyzer()
+    return Schema(title=TEXT(stored=True, analyzer=stem_ana), tag=ID(stored=True), summary=TEXT(analyzer=stem_ana))
 
 def build_index(nodes, content_dir, index_dir):
     if not os.path.exists(index_dir):

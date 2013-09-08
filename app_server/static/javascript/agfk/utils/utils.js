@@ -141,29 +141,6 @@ define(["jquery"], function($){
     return regexp.test(inStr);
   };
 
-
-  /**
-   * agfk specific helper function to control right panel width TODO BAD hardcoded css embeded
-   */
-  utils.setRightPanelWidth = function(rp_width, rp_lmarg, rp_rmarg) {
-    /*
-     Changes display size of the right margin
-     See corresponding CSS entries for description of values
-     TODO remove hard coded CSS names
-     */
-    rp_width = rp_width || 0;
-    rp_lmarg = rp_lmarg || 0;
-    rp_rmarg = rp_rmarg || 0;
-    var rper_width = rp_width + "%";
-
-    $(".colcontainer").css("right", rper_width);
-    $("#leftpanel").css("left", rper_width)
-      .css("width", (100 - rp_width) + "%");
-    $("#rightpanel").css("width", (rp_width - rp_lmarg - rp_rmarg) + "%")
-      .css("left", (rp_width + rp_lmarg) + "%");
-  };
-
-
   /**
    * Controls window/svg/div sizes in two panel display when resizing the window
    * NB: has jQuery dependency for x-browser support

@@ -11,6 +11,7 @@ class Roadmap(Model):
     title = CharField('Title', max_length=100)
     author = CharField('Author(s)', max_length=100)
     audience = CharField('Target audience', max_length=100)
+    blurb = TextField('Blurb', blank=True)
     body = TextField()
 
     VIS_PRIVATE = 'PRIVATE'

@@ -58,16 +58,18 @@ def show(request, username, tag):
 class RoadmapForm(ModelForm):
     class Meta:
         model = models.Roadmap
-        fields = ('title', 'author', 'audience', 'visibility', 'body')
+        fields = ('title', 'author', 'audience', 'visibility', 'blurb', 'body')
         widgets = {
+            'blurb': Textarea(attrs={'cols': 50, 'rows': 3}),
             'body': Textarea(attrs={'cols': 100, 'rows': 40}),
             }
 
 class RoadmapCreateForm(RoadmapForm):
     class Meta:
         model = models.Roadmap
-        fields = ('title', 'url_tag', 'author', 'audience', 'visibility', 'body')
+        fields = ('title', 'url_tag', 'author', 'audience', 'visibility', 'blurb', 'body')
         widgets = {
+            'blurb': Textarea(attrs={'cols': 50, 'rows': 3}),
             'body': Textarea(attrs={'cols': 100, 'rows': 40}),
             }
         

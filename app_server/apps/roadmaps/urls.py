@@ -4,9 +4,9 @@ from apps.roadmaps import views
 
 urlpatterns = patterns('',
                        url(r'^$', views.list),
-                       url(r'^preview$', views.preview_roadmap),
-                       url(r'^new$', views.new_roadmap),
-                       url(r'^([^/]+)/([^/]+)$', views.get_roadmap),
-                       url(r'^([^/]+)/([^/]+)/edit$', views.edit_roadmap),
+                       url(r'^preview$', views.preview),
+                       url(r'^new$', views.new),
+                       url(r'^([^/]+)/([^/]+)$', views.show),
+                       url(r'^([^/]+)/([^/]+)/edit$', views.edit),
                        url(r'^([^/]+)$', views.list_by_user),
                        )

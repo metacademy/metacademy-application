@@ -1,94 +1,94 @@
-.roadmap-container {
+.container {
     margin-left: 20%;
     margin-right: 20%;
     margin-top: 2em;
     padding-bottom: 3em;
 }
 
-.roadmap-title {
+.title {
     font-size: 2.2em;
     font-weight: bold;
     margin-bottom: 0.4em;
 }
 
-.roadmap-edit-link {
+.edit-link {
     font-size: 0.6em;
     font-weight: normal;
 }
 
-.roadmap-author {
+.author {
     font-size: 1.4em;
 }
 
-.roadmap-audience {
+.audience {
     font-size: 1.4em;
 }
 
-.roadmap-content {
+.content {
     line-height: 1.2em;
 }
 
-.roadmap-content h1 {
+.content h1 {
     font-size: 2.2em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
 
-.roadmap-content h2 {
+.content h2 {
     font-size: 2.0em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
 
-.roadmap-content h3 {
+.content h3 {
     font-size: 1.8em;
     padding-top: 1em;
     padding-bottom: 0.5em;
 }
 
-.roadmap-content h4 {
+.content h4 {
     font-size: 1.6em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
 
-.roadmap-content h5 {
+.content h5 {
     font-size: 1.4em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
 
-.roadmap-content ul {
+.content ul {
     list-style-type: disc;
     margin-left: 1em;
 }
 
-.roadmap-content li {
+.content li {
     margin-top: 0.2em;
 }
 
 
-.roadmap-form-wrapper {
+.form-wrapper {
     margin-left: 20%;
     margin-right: 20%;
     margin-top: 2em;
     padding-bottom: 3em;
 }
 
-.roadmap-form-title {
+.form-title {
     font-size: 1.8em;
     padding-bottom: 0.5em;
 }
 
-.roadmap-form-field{
+.form-field{
     margin-bottom: 1.5em;
 }
-.roadmap-form-field label{
+.form-field label{
     font-size: 0.9em;
     font-weight: bold;
     color: #333;
 }
-.roadmap-form-field input{
+.form-field input{
     height: 1.4em;
     padding-left: 0.3em;
     font-size: 1em;

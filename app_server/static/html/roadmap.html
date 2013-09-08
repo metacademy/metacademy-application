@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block title %}
-Metacademy - {{ title|escape }}
+Metacademy - {{ roadmap.title|escape }}
 {% endblock %}
 
 {% block extra-css %}
@@ -11,7 +11,7 @@ Metacademy - {{ title|escape }}
 
 {% block main %}
 
-<div class="roadmap-container">
+<div class="container">
   {% include "roadmap-content.html" %}
 </div>
 

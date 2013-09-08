@@ -12,22 +12,25 @@ from django.views.decorators.csrf import csrf_exempt
 import models
 import settings
 
+
 MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mit_6_438.txt')
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
 # temporary: list of users who can edit
+#DEBUG = settings.DEBUG
+DEBUG = False
 EDIT_USERS = ['rgrosse', 'cjrd']
 
 def markdown_to_html(markdown_text):
-    roadmap_html = markdown.markdown(markdown_text, safe_mode=True)
-    return bleach.clean(roadmap_html, tags=BLEACH_TAG_WHITELIST)
+    body_html = markdown.markdown(markdown_text, safe_mode=True)
+    return bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST)
 
-    
 
-def get_roadmap(request, username, roadmap_name):
-    roadmap = models.load_roadmap(username, roadmap_name)
+
+def show(request, username, tag):
+    roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
 
@@ -35,19 +38,17 @@ def get_roadmap(request, username, roadmap_name):
         return HttpResponse(status=404)
     
     can_edit = roadmap.editable_by(request.user)
-    edit_url = '/roadmaps/%s/%s/edit' % (username, roadmap_name)
+    edit_url = '/roadmaps/%s/%s/edit' % (username, tag)
 
     # temporary: editing disabled on server
-    if not (settings.DEBUG or username in EDIT_USERS):
+    if not (DEBUG or username in EDIT_USERS):
         can_edit = False
 
-    roadmap_html = markdown_to_html(roadmap.body)
+    body_html = markdown_to_html(roadmap.body)
     
     return render(request, 'roadmap.html', {
-        'roadmap_html': safestring.mark_safe(roadmap_html),
-        'title': roadmap.title,
-        'author': roadmap.author,
-        'audience': roadmap.audience,
+        'body_html': safestring.mark_safe(body_html),
+        'roadmap': roadmap,
         'show_edit_link': can_edit,
         'edit_url': edit_url,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
@@ -71,15 +72,15 @@ class RoadmapCreateForm(RoadmapForm):
             }
         
 
-def edit_roadmap(request, username, roadmap_name):
+def edit(request, username, tag):
     # temporary: editing disabled on server
-    if not (settings.DEBUG or username in EDIT_USERS):
+    if not (DEBUG or username in EDIT_USERS):
         return HttpResponse(status=404)
     
     if not request.user.is_authenticated():
         return HttpResponse(status=404)
 
-    roadmap = models.load_roadmap(username, roadmap_name)
+    roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
     if not roadmap.editable_by(request.user):
@@ -91,7 +92,7 @@ def edit_roadmap(request, username, roadmap_name):
         if form.is_valid():
             form.save()
 
-            return HttpResponseRedirect('/roadmaps/%s/%s' % (username, roadmap_name))
+            return HttpResponseRedirect('/roadmaps/%s/%s' % (username, tag))
 
     else:
         form = RoadmapForm(instance=roadmap)
@@ -101,9 +102,9 @@ def edit_roadmap(request, username, roadmap_name):
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 
-def new_roadmap(request):
+def new(request):
     # temporary: editing disabled on server
-    if not (settings.DEBUG or (request.user.is_authenticated() and request.user.username in EDIT_USERS)):
+    if not (DEBUG or (request.user.is_authenticated() and request.user.username in EDIT_USERS)):
         return HttpResponse(status=404)
 
     if not request.user.is_authenticated():
@@ -127,22 +128,24 @@ def new_roadmap(request):
 
 
 @csrf_exempt  # this is a POST request because it contains data, but there are no side effects
-def preview_roadmap(request):
+def preview(request):
     if request.method != 'POST':
         return HttpResponse(status=404)
 
-    title = request.POST['title'] if 'title' in request.POST else ''
-    author = request.POST['author'] if 'author' in request.POST else ''
-    audience = request.POST['audience'] if 'audience' in request.POST else ''
+    roadmap = {
+        'title': request.POST['title'] if 'title' in request.POST else '',
+        'author': request.POST['author'] if 'author' in request.POST else '',
+        'audience': request.POST['audience'] if 'audience' in request.POST else '',
+        }
     body = request.POST['body'] if 'body' in request.POST else ''
 
-    roadmap_html = markdown_to_html(body)
+    body_html = markdown_to_html(body)
+
+
     
     return render(request, 'roadmap-content.html', {
-        'title': title,
-        'author': author,
-        'audience': audience,
-        'roadmap_html': safestring.mark_safe(roadmap_html),
+        'roadmap': roadmap,
+        'body_html': safestring.mark_safe(body_html),
         'show_edit_link': False,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })

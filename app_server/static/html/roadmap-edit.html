@@ -12,10 +12,10 @@
   
 {% block main %}
 
-  <div class="roadmap-form-wrapper">
+  <div class="form-wrapper">
     <form method="post" action="">
       {% csrf_token %}
-      <div class="roadmap-form-title">{% block form_title %}Editing roadmap{% endblock %}</div>
+      <div class="form-title">{% block form_title %}Editing roadmap{% endblock %}</div>
       
       {% if form.errors %}
 	<div class="form-errors">
@@ -29,39 +29,39 @@
 	
       {% block form-content %}
 	
-	<div class="roadmap-form-field">
+	<div class="form-field">
 	  {{ form.title.label_tag }}
 	  {{ form.title }}
 	</div>
 
         {% block url_tag_field %} {% endblock %}
 
-	<div class="roadmap-form-field">
+	<div class="form-field">
 	  {{ form.author.label_tag }}
 	  {{ form.author }}
 	</div>
 
-        <div class="roadmap-form-field">
+        <div class="form-field">
           {{ form.audience.label_tag }}
           {{ form.audience }}
         </div>
 
-        <div class="roadmap-form-field">
+        <div class="form-field">
           {{ form.visibility.label_tag }}
           {{ form.visibility }}
         </div>
 	
-	<div class="roadmap-form-body">
+	<div class="form-body">
 	  {{ form.body }}
 	</div>
 
-        <input id="roadmap-preview-button" type="button" value="Preview" />
-        <input id="roadmap-submit-button" type="submit" value="Save" />
+        <input id="preview-button" type="button" value="Preview" />
+        <input id="submit-button" type="submit" value="Save" />
 
 	
       {% endblock %}
 
-      <div id="roadmap-preview-area"></div>
+      <div id="preview-area"></div>
       
     </form>
   </div>

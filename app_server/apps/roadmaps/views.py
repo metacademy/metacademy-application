@@ -17,6 +17,9 @@ MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mi
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
+# temporary: list of users who can edit
+EDIT_USERS = ['rgrosse', 'cjrd']
+
 def markdown_to_html(markdown_text):
     roadmap_html = markdown.markdown(markdown_text, safe_mode=True)
     return bleach.clean(roadmap_html, tags=BLEACH_TAG_WHITELIST)
@@ -35,7 +38,7 @@ def get_roadmap(request, username, roadmap_name):
     edit_url = '/roadmaps/%s/%s/edit' % (username, roadmap_name)
 
     # temporary: editing disabled on server
-    if not settings.DEBUG:
+    if not (settings.DEBUG or username in EDIT_USERS):
         can_edit = False
 
     roadmap_html = markdown_to_html(roadmap.body)
@@ -70,7 +73,7 @@ class RoadmapCreateForm(RoadmapForm):
 
 def edit_roadmap(request, username, roadmap_name):
     # temporary: editing disabled on server
-    if not settings.DEBUG:
+    if not (settings.DEBUG or username in EDIT_USERS):
         return HttpResponse(status=404)
     
     if not request.user.is_authenticated():
@@ -100,7 +103,7 @@ def edit_roadmap(request, username, roadmap_name):
 
 def new_roadmap(request):
     # temporary: editing disabled on server
-    if not settings.DEBUG:
+    if not (settings.DEBUG or (request.user.is_authenticated() and request.user.username in EDIT_USERS)):
         return HttpResponse(status=404)
 
     if not request.user.is_authenticated():

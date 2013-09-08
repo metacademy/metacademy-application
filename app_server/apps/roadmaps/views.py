@@ -19,8 +19,7 @@ BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', '
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
 # temporary: list of users who can edit
-#DEBUG = settings.DEBUG
-DEBUG = False
+DEBUG = settings.DEBUG
 EDIT_USERS = ['rgrosse', 'cjrd']
 
 def markdown_to_html(markdown_text):

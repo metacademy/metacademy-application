@@ -19,7 +19,6 @@ BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', '
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
 # temporary: list of users who can edit
-DEBUG = settings.DEBUG
 EDIT_USERS = ['rgrosse', 'cjrd']
 
 def markdown_to_html(markdown_text):
@@ -40,7 +39,7 @@ def show(request, username, tag):
     edit_url = '/roadmaps/%s/%s/edit' % (username, tag)
 
     # temporary: editing disabled on server
-    if not (DEBUG or username in EDIT_USERS):
+    if username not in EDIT_USERS:
         can_edit = False
 
     body_html = markdown_to_html(roadmap.body)
@@ -75,7 +74,7 @@ class RoadmapCreateForm(RoadmapForm):
 
 def edit(request, username, tag):
     # temporary: editing disabled on server
-    if not (DEBUG or username in EDIT_USERS):
+    if username not in EDIT_USERS:
         return HttpResponse(status=404)
     
     if not request.user.is_authenticated():
@@ -106,7 +105,7 @@ def edit(request, username, tag):
 
 def new(request):
     # temporary: editing disabled on server
-    if not (DEBUG or (request.user.is_authenticated() and request.user.username in EDIT_USERS)):
+    if not (request.user.is_authenticated() and request.user.username in EDIT_USERS):
         return HttpResponse(status=404)
 
     if not request.user.is_authenticated():

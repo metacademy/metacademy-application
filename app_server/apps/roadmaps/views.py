@@ -99,6 +99,7 @@ def edit(request, username, tag):
     
     return render(request, 'roadmap-edit.html', {
         'form': form,
+        'tag': roadmap.url_tag,
         'CONTENT_SERVER': settings.CONTENT_SERVER,
         })
 

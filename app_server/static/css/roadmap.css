@@ -16,61 +16,81 @@
     font-weight: normal;
 }
 
-.author {
-    font-size: 1.4em;
-}
-
-.audience {
-    font-size: 1.4em;
+.author, .audience {
+    font-size: 1em;
+    padding-bottom: 0.3em;
 }
 
 .content {
-    line-height: 1.2em;
+    font-family: Arial, sans-serif;
+    font-size: 1.0em;
+    overflow: hidden;
+    color: #23240D;
+}
+
+.content p {
+    padding: 0.1em 0;
 }
 
 .content h1 {
     font-size: 2.2em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    margin-top: 1em;
 }
 
 .content h2 {
     font-size: 2.0em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    margin-top: 1em;
+    margin-bottom: 0.4em;
 }
 
 .content h3 {
     font-size: 1.8em;
-    padding-top: 1em;
-    padding-bottom: 0.5em;
-}
-
-.content h4 {
-    font-size: 1.6em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-}
-
-.content h5 {
-    font-size: 1.4em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    margin-top: 1em;
+    margin-bottom: 0.4em;
 }
 
 .content ul {
-    list-style-type: disc;
+    list-style: none;
     margin-left: 1em;
+    padding-left: 0;
 }
 
 .content li {
-    margin-top: 0.2em;
+    padding-left: 1em;
+    text-indent: -1em;
+    margin-bottom: 0.2em;
+}
+
+.content li:before {
+    content: "+";
+    padding-right: 5px;
+}
+
+.content ul ul {
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+.content ul ul li:before {
+    content: "-";
+    padding-right: 5px;
+}
+
+.content a{
+    color:#2B7536;
+    text-decoration: none;
+}
+
+.content a:hover{
+    text-decoration: underline;
+    color: #2414B0;
 }
 
 
 .form-wrapper {
-    margin-left: 20%;
-    margin-right: 20%;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 2em;
     padding-bottom: 3em;
 }
@@ -83,14 +103,56 @@
 .form-field{
     margin-bottom: 1.5em;
 }
+
 .form-field label{
     font-size: 0.9em;
     font-weight: bold;
     color: #333;
+    width: 20%;
+    float: left;
+    margin-top: 0.5em;
+    text-align: right;
+    margin-right: 1em;
 }
+
 .form-field input{
     height: 1.4em;
     padding-left: 0.3em;
     font-size: 1em;
     width: 40%;
+}
+
+.body-button-outer-wrapper {
+    width: 100%;
+}
+
+.body-button-wrapper{
+    float: left;
+    padding-bottom: 1em;
+}
+
+.buttons{
+    float: right;
+}
+
+#preview-button, #submit-button{
+    font-size: 1.2em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+#preview-button{
+    background-color: #009;
+    color: white;
+}
+
+#submit-button{
+    background-color: #905;
+    color: white;
+}
+
+#preview-area{
+    clear: both;
 }

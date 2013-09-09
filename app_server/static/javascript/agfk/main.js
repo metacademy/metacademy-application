@@ -77,25 +77,4 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "
   // start the AGFK app
   var appRouter = new AppRouter();
   Backbone.history.start();
-
-  // play tutorial content if user is new
-  if (!$.cookie("sawModesArrow") && !window.isAuth){
-    window.setTimeout(function(){
-      var $el_button_wrap = $("#explore-learn-button-wrapper"),
-          el_pos = $el_button_wrap.offset(),
-          el_height = $el_button_wrap.height(),
-          $modes_tutorial = $("#tutorial-modes-content"),
-          aimg = document.createElement("img");
-      aimg.src = window.STATIC_PATH + "images/red_arrow_up.png";
-      aimg.alt = "click buttons to see explore concept relationships";
-      $modes_tutorial.append(aimg);
-      $modes_tutorial.offset({
-        top: el_pos.top + el_height + 2,
-        left: el_pos.left
-      });
-      $modes_tutorial.fadeIn(500).delay(2000).fadeOut(500);
-      $.cookie("sawModesArrow", true);
-    }, 900);
-}
-
 });

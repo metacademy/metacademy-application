@@ -12,13 +12,6 @@ body {
     overflow: hidden;
 }
 
-/* Tutorial elements */
-#tutorial-modes-content{
-    position: absolute;
-    z-index: 10;
-    display: none;
-}
-
 /* App tools */
 
 #apptools{
@@ -477,13 +470,6 @@ ellipse{
     font-size: 1.2em;
     stroke-width: 0;
     fill: #333
-}
-
-/* expand node cross */
-.expand-node{
-    fill: #eaf3ec;
-    stroke: #333333;
-    stroke-width: 3;
 }
 
 /* completed checkmark for learned nodes */

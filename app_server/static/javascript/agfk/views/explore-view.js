@@ -26,8 +26,6 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       nodeClass: "node", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
       edgeClass: "edge", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
       exploreSvgId: "explore-svg",
-      expCrossClass: "expand-node",
-      expCrossID: "expand-cross",
       hoveredClass: "hovered",
       clickedClass: "clicked",
       useExpandClass: "use-expand",
@@ -66,8 +64,6 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       summaryHideDelay: 100,
       summaryFadeInTime: 50, // summary fade in time (ms)
       SQRT2DIV2: Math.sqrt(2)/2,
-      exPlusWidth: 5.5, // px width of expand cross component
-      edgePlusW: 28, // px distance of expand cross from circle edge
       maxZoomScale: 5, // maximum zoom-in level for graph
       minZoomScale: 0.05, //maximum zoom-out level for graph
       checkCircleR: 16, // radius of circle around "completed" check
@@ -202,26 +198,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       if (!d3node.attr(viewConsts.dataHoveredProp)) {
         // add checkmark if not present
         if (d3node.select("." + viewConsts.checkClass).node() === null){
-          pvt.addCheckMark.call(this, d3node, svgSpatialInfo);
+          pvt.addCheckMark.call(this, d3node, Utils.getSpatialNodeInfo(nodeEl));
         }
-        var svgSpatialInfo = Utils.getSpatialNodeInfo(nodeEl),
-            // display expand shape if not expanded
-            expX = svgSpatialInfo.cx - viewConsts.exPlusWidth / 2,
-            expY = svgSpatialInfo.cy + svgSpatialInfo.ry - viewConsts.edgePlusW;
-        if (d3node.select("." + viewConsts.checkClass).node() === null){
-          pvt.addCheckMark.call(this, d3node, svgSpatialInfo);
-        }
-        // Node expand cross TODO make an expandable/collapsable graph?
-        // d3node.append("use")
-        //     .attr("xlink:href", "#" + viewConsts.expCrossID)
-        //     .attr("x", expX)
-        //     .attr("y", expY)
-        //     .attr("class", viewConsts.useExpandClass)
-        //     .on("click", function() {
-        //         // don't propagate click to lower level objects
-        //         d3.event.stopPropagation();
-        //         thisView.appendDepsToGraph(node.attr('id'));
-        //     });
         d3node.attr(viewConsts.dataHoveredProp, true);
       }
     };
@@ -520,30 +498,6 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           .attr('width', '100%')
           .attr('height', '100%')
           .attr('id', exploreSvgId);
-
-        // add reusable svg elements //
-        // points to make a cross of width  exPlusWidth
-        var plusPts = "0,0 " +
-              exPlusWidth + ",0 " +
-              exPlusWidth + "," + exPlusWidth + " " +
-              (2 * exPlusWidth) + "," + exPlusWidth + " " +
-              (2 * exPlusWidth) + "," + (2 * exPlusWidth) + " " +
-              exPlusWidth + "," + (2 * exPlusWidth) + " " +
-              exPlusWidth + "," + (3 * exPlusWidth) + " " +
-              "0," + (3 * exPlusWidth) + " " +
-              "0," + (2 * exPlusWidth) + " " +
-              (-exPlusWidth) + "," + (2 * exPlusWidth) + " " +
-              (-exPlusWidth) + "," + exPlusWidth + " " +
-              "0," + exPlusWidth + " " +
-              "0,0";
-
-        // add reusable svg elements to defs
-        var defs = d3this.select("#" + exploreSvgId)
-              .insert("svg:defs", ":first-child");
-        defs.append("polygon")
-          .attr("points", plusPts)
-          .attr("id", viewConsts.expCrossID)
-          .classed(viewConsts.expCrossClass, true);
 
         // add node properties
         thisView.addGraphProps(d3this);

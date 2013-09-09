@@ -42,6 +42,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       summaryRightClass: "tright",
       locElemId: "invis-loc-elem", // invisible location element
       locElemClass: "invis-loc",
+      eToLConceptTxtClass: "exp-to-learn-txt",
       learnIconName: "glasses-icon.svg",
       dataConceptTagProp: "data-concept",
       eToLLinkClass: "e-to-l-summary-link", // NOTE must change class in events attribute as well
@@ -200,6 +201,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         }
         d3node.attr(viewConsts.dataHoveredProp, true);
       }
+      return 0;
     };
 
     /**
@@ -561,7 +563,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         })
           .on("mouseout", function() {
             pvt.nodeMouseOut.call(thisView, this);
-
+          });
 
             // short helper function only needed below
             var addPropFunction = function(nid, prop){
@@ -572,13 +574,13 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
               } 
             };
 
-            _.each(thisNodes.filter(function(nde){return nde.getLearnedStatus();}), function(mnode){
-              addPropFunction(mnode.get("id"), "learned");
-            });
-            _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
-              addPropFunction(mnode.get("id"), "implicitLearned");
-            });
-          });
+
+        _.each(thisNodes.filter(function(nde){return nde.getLearnedStatus();}), function(mnode){
+          addPropFunction(mnode.get("id"), "learned");
+        });
+        _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
+          addPropFunction(mnode.get("id"), "implicitLearned");
+        });
       },
       
       /**

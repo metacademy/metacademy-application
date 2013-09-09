@@ -27,7 +27,6 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       edgeClass: "edge", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
       exploreSvgId: "explore-svg",
       hoveredClass: "hovered",
-      clickedClass: "clicked",
       useExpandClass: "use-expand",
       nodeLearnedClass: "node-learned",
       nodeImplicitLearnedClass: "implicit-learned",
@@ -174,10 +173,9 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       var thisView = this,
           viewConsts = pvt.viewConsts,
           hoveredClass = viewConsts.hoveredClass,
-          clickedClass = viewConsts.clickedClass,
           d3node = d3.select(nodeEl);
 
-      if (d3node.classed(hoveredClass) || d3node.classed(clickedClass)){
+      if (d3node.classed(hoveredClass)){
         d3node.classed(hoveredClass, true);
         return false;
       }
@@ -232,26 +230,12 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         pvt.summaryTOKillList[nodeId] = window.setTimeout(function(){
           delete pvt.summaryTOKillList[nodeId];
           if (pvt.summaryDisplays[summId] && !pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass)){
-            if (!d3node.classed(viewConsts.clickedClass)){
-              d3.select("#" + summId).remove(); // use d3 remove for x-browser support
-              delete pvt.summaryDisplays[summId];
-            }
+            d3.select("#" + summId).remove(); // use d3 remove for x-browser support
+            delete pvt.summaryDisplays[summId];
             d3node.classed(hoveredClass, false);
           }
         }, viewConsts.summaryHideDelay);
       }
-    };
-
-    /**
-     * Add clicked to the node and remove the previous click state of lastNodeClicked TODO should we allow multiple clicked nodes?
-     */
-    pvt.nodeClick = function(nodeEl) {
-      var thisView = this,
-          node = d3.select(nodeEl),
-          clickedClass = pvt.viewConsts.clickedClass;
-      node.classed(clickedClass, function(){
-        return !node.classed(clickedClass);
-      });
     };
 
     /**
@@ -577,26 +561,24 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         })
           .on("mouseout", function() {
             pvt.nodeMouseOut.call(thisView, this);
-          })
-          .on("click", function() {
-            pvt.nodeClick.call(thisView, this);
+
+
+            // short helper function only needed below
+            var addPropFunction = function(nid, prop){
+              var d3node = d3this.select("#" + nid);
+              
+              if (d3node.node() !== null){
+                thisView.toggleNodeProps(d3node, true, prop, d3this);
+              } 
+            };
+
+            _.each(thisNodes.filter(function(nde){return nde.getLearnedStatus();}), function(mnode){
+              addPropFunction(mnode.get("id"), "learned");
+            });
+            _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
+              addPropFunction(mnode.get("id"), "implicitLearned");
+            });
           });
-
-        // short helper function only needed below
-        var addPropFunction = function(nid, prop){
-          var d3node = d3this.select("#" + nid);
-          
-          if (d3node.node() !== null){
-            thisView.toggleNodeProps(d3node, true, prop, d3this);
-          } 
-        };
-
-        _.each(thisNodes.filter(function(nde){return nde.getLearnedStatus();}), function(mnode){
-          addPropFunction(mnode.get("id"), "learned");
-        });
-        _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
-          addPropFunction(mnode.get("id"), "implicitLearned");
-        });
       },
       
       /**

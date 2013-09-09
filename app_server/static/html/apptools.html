@@ -1,0 +1,20 @@
+{% load staticfiles %}
+<div id="apptools">
+  <h2 class="apptools-title">Display</h2>
+  <div id="explore-learn-button-wrapper">
+      <button class="el-nav-button" id="learn-button">
+        <img src="{% static "images/list-icon.png" %}" alt="Graph">
+      </button>	
+      <button class="el-nav-button" id="explore-button">
+        <img src="{% static "images/graph-icon.png" %}" alt="Graph">
+      </button>	
+  </div>
+
+  <h2 class="apptools-title">Learned Concepts</h2>
+          <button class="toggle-lc-button" id="button-clear-learned">
+            hide
+          </button>
+          <button class="toggle-lc-button" id="button-show-learned">
+            show
+          </button>
+</div>

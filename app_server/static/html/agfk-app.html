@@ -16,27 +16,13 @@
 
 {% block pre-standard-header-content %}
       {% include "header-search-logo.html" %}
-      <div id="app-header-tools" class="header-el">
-          <button class="app-header-tools-button button-left flat-bottom-left" id="button-clear-learned">
-            clear learned
-          </button>
-          <button class="app-header-tools-button button-right flat-bottom-right"id="button-show-learned">
-            show learned
-          </button>
-      </div>
 {% endblock %}
 
 
 
 {% block main %}
-    <div id="explore-learn-button-wrapper">
-      <button class="el-nav-button button-left" id="explore-button">
-        Explore
-      </button>	
-      <button class="el-nav-button button-right" id="learn-button">
-        Learn
-      </button>	
-  </div>
+
+{% include "apptools.html" %}
 
   <div id="learn-view-wrapper"></div>
   <div id="explore-view-wrapper"></div>

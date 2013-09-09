@@ -49,6 +49,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       dataConceptTagProp: "data-concept",
       eToLLinkClass: "e-to-l-summary-link", // NOTE must change class in events attribute as well
       eToLText: "→", // explore to learning text display
+      NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
       // ----- rendering options ----- //
       defaultGraphDepth: 200, // default depth of graph
@@ -766,14 +767,17 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             div = document.createElement("div"),
             nodeId = node.attr("id"),
             learnLink = document.createElement("a"),
-            summaryP = document.createElement("p");
+            summaryP = document.createElement("p"),
+            summaryTxt;
 
         // build explore-to-learn image
         learnLink.setAttribute(viewConsts.dataConceptTagProp, nodeId);
         learnLink.textContent = viewConsts.eToLText;
         learnLink.className = viewConsts.eToLLinkClass;
         // add summary
-        summaryP.textContent = this.model.get("nodes").get(nodeId).get("summary");
+        summaryTxt = this.model.get("nodes").get(nodeId).get("summary");
+        summaryP.textContent = summaryTxt.length > 0 ? summaryTxt : viewConsts.NO_SUMMARY_MSG;
+        
         div.appendChild(learnLink);
         div.appendChild(summaryP);
         div.id = pvt.getSummaryIdForDivTxt.call(thisView, node);

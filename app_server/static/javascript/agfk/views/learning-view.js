@@ -34,8 +34,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             thisView = this,
             thisModel = thisView.model;
         return pvt.viewConsts.viewClass + (thisModel.getLearnedStatus() ?
-                                           " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnCt() > 0 ?
-                                                                                  " " + viewConsts.implicitLearnedClass : "");
+                                           " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnStatus ?
+                                                                                  "": " " + viewConsts.implicitLearnedClass);
       },
 
       events: {

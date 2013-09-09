@@ -111,7 +111,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           if (nodePvt.implicitLearnCt !== nodePvt.ilct){
             nodePvt.implicitLearnCt = ilct;
             this.trigger("change:implicitLearnCt", this.get("id"), ilct);
-            this.setImplicitLearnStatus(ilct > 0);
+            this.setImplicitLearnStatus(ilct === this.getNumberOfPresentOutlinks());
           }
         };
 
@@ -239,6 +239,29 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           return Object.keys(this.uniqueDeps);
         }
         return false;
+      },
+
+      /**
+       * Returns the number of outlinks present in the current graph
+       * TODO should we only use outlinks shown in graph?
+       */
+      getNumberOfPresentOutlinks: function(){
+        var thisModel = this;
+        if (typeof thisModel.numPresOutlinks === "undefined"){
+          thisModel.numPresOutlinks = 0;
+          var thisColl = thisModel.collection,
+              outLNode,
+              thisId = this.get("id");
+          thisModel.get("outlinks").forEach(function(outLink){
+            if ((outLNode = thisColl.get(outLink.get("to_tag")))){
+              // only count distinct outlinks
+              if (outLNode.isUniqueDependency(thisId)){
+                thisModel.numPresOutlinks++;
+              }
+            }
+          });
+        }
+        return this.numPresOutlinks;
       },
 
       /**

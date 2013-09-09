@@ -42,27 +42,35 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
 
     /**
      * DFS to change the implicit learned count of the dependencies of rootTag
+     * This method works by changing the implicitLearnCt of unique dependent concepts
+     * if the learned status of the root node changes
      */
     dfsChangeILCount: function(rootTag, ctChange){
-      var thisColl = this,
-          depNodes = [thisColl.get(rootTag)],
+        var thisColl = this,     
+            rootNode = thisColl.get(rootTag);
+          if (rootNode.getImplicitLearnStatus()){
+            return false;
+          }
+     
+      var depNodes = [rootNode],
           nextRoot,
           addDepNode,
           passedNodes = {};
       ctChange = typeof ctChange === "boolean" ? (ctChange === true ? 1 : -1) : ctChange;
-      // TODO assert ctChange is a number
 
       // DFS over the nodes
-      while ((nextRoot = depNodes.pop())){
+        while ((nextRoot = depNodes.pop())){
         $.each(nextRoot.getUniqueDependencies(), function(dct, dtag){
-          if (!passedNodes.hasOwnProperty(dtag)){
-            addDepNode = thisColl.get(dtag);
-            addDepNode.incrementILCt(ctChange);
-            passedNodes[dtag] = true;
+          addDepNode = thisColl.get(dtag);
+          var initStatus = addDepNode.isLearnedOrImplicitLearned();
+          addDepNode.incrementILCt(ctChange);
+          if (addDepNode.isLearnedOrImplicitLearned() !== initStatus && !passedNodes.hasOwnProperty(dtag)){
             depNodes.push(addDepNode);
+            passedNodes[dtag] = true;
           }
         });
       }
+      return true;
     }
   });
 });

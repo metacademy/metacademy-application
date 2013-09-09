@@ -52,6 +52,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
       // ----- rendering options ----- //
+      defaultScale: 0.54,
       defaultGraphDepth: 200, // default depth of graph
       defaultExpandDepth: 1, // default number of dependencies to show on expand
       defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
@@ -551,7 +552,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
 
         // obtain orginal transformation since graphviz produces unnormalized coordinates
         var d3graph =  d3this.select("." + graphClass),
-            scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : 1;
+            scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : viewConsts.defaultScale;
 
         var keyNode = thisView.model.get("aux").get("depRoot"),
             newtrans = new Array(2);

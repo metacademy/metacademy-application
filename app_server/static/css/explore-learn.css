@@ -203,7 +203,7 @@ body {
     font-size: 1.1em;
     font-style: normal;
     font-weight: bold;
-    padding: 1em 0 .7em 0;
+    padding: 2em 0 .7em 0;
     line-height: 0;
 }
 
@@ -322,10 +322,22 @@ body {
 
 .pointers-wrap ul ul{
     margin-left: 1em;
-    margin-bottom: 1em;
 }
 
 .pointers-wrap ul ul li:before{
+    content: "-";
+    padding-right: 5px;
+}
+
+.goals-wrap ul{
+    margin-left: 0;
+}
+
+.goals-wrap ul ul{
+    margin-left: 1em;
+}
+
+.goals-wrap ul ul li:before{
     content: "-";
     padding-right: 5px;
 }

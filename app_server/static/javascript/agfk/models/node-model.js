@@ -10,7 +10,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
     // maintain ancillary/user-specific info and fields in a private object
     var pvt = {};
     pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
-    pvt.txtFields = ["id", "sid", "title", "summary", "pointers", "is_shortcut", "flags"];
+    pvt.txtFields = ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags"];
     
     return Backbone.Model.extend({
       /**
@@ -22,6 +22,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           id: "",
           sid: "",
           summary: "",
+          goals: "",
           pointers: "",
           is_shortcut: 0,
           flags: [],

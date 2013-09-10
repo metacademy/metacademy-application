@@ -327,15 +327,13 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
    * View to display additional notes/pointers
    * NOTE: expects a javascript model as input (for now) with one field: text
    */
-  var PointersView = (function(){
+  var NestedListView = (function(){
     // define private variables and methods
     var pvt = {
     };
 
     pvt.viewConsts = {
       templateId: "pointers-view-template",
-      viewClass: "pointers-view",
-      viewIdPrefix: "pointers-view-"
     };
 
     pvt.itemToStr = function(item){
@@ -359,8 +357,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
     // return public object
     return Backbone.View.extend({
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
+      id: function(){ return this.prefix + "-view-" + this.model.cid; },
+      className: function() { return this.prefix + "-view"; },
       
       /**
        * Render the learning view given the supplied model
@@ -428,6 +426,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
       paidResourcesLocClass: 'paid-resources-wrap',
       depLocClass: 'dep-wrap',
       ptrLocClass: 'pointers-wrap',
+      goalsLocClass: 'goals-wrap',
       outlinkLocClass: 'outlinks-wrap'
     };
 
@@ -450,7 +449,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             paidResourcesLocClass = "." + viewConsts.paidResourcesLocClass,
             depLocClass = "." + viewConsts.depLocClass,
             outlinkLocClass = "." + viewConsts.outlinkLocClass,
-            ptrLocClass = "." + viewConsts.ptrLocClass;
+            ptrLocClass = "." + viewConsts.ptrLocClass,
+            goalsLocClass = "." + viewConsts.goalsLocClass;
         
         var templateVars = _.extend(thisView.model.toJSON(), {"resourcesMsg": thisView.model.get("resources").getMessage(),
                                                               "neededFor": thisView.model.computeNeededFor(),
@@ -460,7 +460,10 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
         thisView.presources = thisView.presources || new ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
         thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
-        thisView.pointers = thisView.pointers || new PointersView({model: {text: thisView.model.get("pointers")}});
+        thisView.pointers = thisView.pointers || new NestedListView({model: {text: thisView.model.get("pointers")},
+                                                                     prefix: "pointers"});
+        thisView.goals = thisView.goals || new NestedListView({model: {text: thisView.model.get("goals")},
+                                                               prefix: "goals"});
         if (thisView.fresources.model.length > 0){
           assignObj[freeResourcesLocClass] = thisView.fresources;
         }
@@ -473,8 +476,11 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
         if (thisView.outlinks.model.length > 0){
           assignObj[outlinkLocClass] = thisView.outlinks;
         }
-        if (thisView.pointers.model.text.length > 1){
+        if (thisView.pointers.model.text.length > 0){
           assignObj[ptrLocClass] = thisView.pointers;
+        }
+        if (thisView.goals.model.text.length > 0){
+          assignObj[goalsLocClass] = thisView.goals;
         }
 
         thisView.assign(assignObj);

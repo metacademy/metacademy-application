@@ -29,6 +29,12 @@
     <% } %>
     </div>
 
+    <% if (goals.length > 0) { %>
+      <h2 class="node-detail-title">Goals</h2>
+      <div class="node-detail-comp-wrap goals-wrap" id="node-detail-goals-<%- id %>">
+      </div>
+    <% } %>
+
     <h2 class="node-detail-title">Resources</h2>
     <div class="node-detail-comp-wrap">
     <p class="info-text"> <%- resourcesMsg %> </p>      
@@ -49,7 +55,7 @@
 
     <h2 class="node-detail-title">See also</h2>
     <div class="node-detail-comp-wrap pointers-wrap" id="node-detail-anotes-<%- id %>">
-      <%= pointers.length > 1 ? "" : '<span class="no-content-msg">-No Additional Notes-</span>' %>
+      <%= pointers.length > 0 ? "" : '<span class="no-content-msg">-No Additional Notes-</span>' %>
     </div>
 
     

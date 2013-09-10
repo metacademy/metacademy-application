@@ -177,29 +177,29 @@ def read_dependencies(f):
     return [concepts.Dependency(d['tag'], d['reason'], d['shortcut'])
             for d in dependencies_dicts]
 
-class SeeAlsoText:
+class Text:
     def __init__(self, text):
         self.text = text
 
     def copy(self):
-        return SeeAlsoText(self.text)
+        return Text(self.text)
 
     def __repr__(self):
-        return 'SeeAlsoText(%r)' % self.text
+        return 'Text(%r)' % self.text
 
     def json_repr(self, nodes):
         return {'text': self.text}
 
-class SeeAlsoLink:
+class Link:
     def __init__(self, text, link):
         self.text = text
         self.link = link
 
     def copy(self):
-        return SeeAlsoLink(self.text, self.link)
+        return Link(self.text, self.link)
 
     def __repr__(self):
-        return 'SeeAlsoLink(%r, %r)' % (self.text, self.link)
+        return 'Link(%r, %r)' % (self.text, self.link)
 
     def json_repr(self, nodes):
         if self.link in nodes:
@@ -207,15 +207,15 @@ class SeeAlsoLink:
         else:
             return {'text': self.text}
 
-class SeeAlsoOldLink:
+class OldLink:
     def __init__(self, link):
         self.link = link
 
     def copy(self):
-        return SeeAlsoOldLink(self.link)
+        return OldLink(self.link)
 
     def __repr__(self):
-        return 'SeeAlsoOldLink(%r)' % self.link
+        return 'OldLink(%r)' % self.link
 
     def json_repr(self, nodes):
         if self.link in nodes:
@@ -223,7 +223,7 @@ class SeeAlsoOldLink:
         else:
             return None
 
-class SeeAlsoLine:
+class Line:
     re_depth = re.compile(r'(\**)\s*(.*)')
     re_old_link = re.compile(r'(.*)\[([^\]]+)\]\s*$')
     re_link = re.compile(r'([^"]*)"([^"]*)":(\w*)(.*)')
@@ -233,7 +233,7 @@ class SeeAlsoLine:
         self.items = items
 
     def copy(self):
-        return SeeAlsoLine(self.depth, [item.copy() for item in self.items])
+        return Line(self.depth, [item.copy() for item in self.items])
 
     @staticmethod
     def parse(line):
@@ -241,14 +241,14 @@ class SeeAlsoLine:
             return None
         
         # compute depth
-        m = SeeAlsoLine.re_depth.match(line)
+        m = Line.re_depth.match(line)
         if not m:
             return None
         stars, rest = m.groups()
         depth = len(stars)
 
         # process old-style links
-        m = SeeAlsoLine.re_old_link.match(rest)
+        m = Line.re_old_link.match(rest)
         if m:
             rest, old_link = m.groups()
         else:
@@ -258,20 +258,20 @@ class SeeAlsoLine:
 
         # process new-style links
         while True:
-            m = SeeAlsoLine.re_link.match(rest)
+            m = Line.re_link.match(rest)
             if not m:
                 break
 
             text, link_text, link, rest = m.groups()
-            items.append(SeeAlsoText(text))
-            items.append(SeeAlsoLink(link_text, normalize_input_tag(link)))
+            items.append(Text(text))
+            items.append(Link(link_text, normalize_input_tag(link)))
 
         if rest:
-            items.append(SeeAlsoText(rest))
+            items.append(Text(rest))
         if old_link:
-            items.append(SeeAlsoOldLink(normalize_input_tag(old_link)))
+            items.append(OldLink(normalize_input_tag(old_link)))
 
-        return SeeAlsoLine(depth, items)
+        return Line(depth, items)
 
     def __repr__(self):
         return 'SeeAlsoLine(%r, %r)' % (self.depth, self.items)
@@ -283,8 +283,8 @@ class SeeAlsoLine:
         
         
 
-def read_see_also(f):
-    lines = [SeeAlsoLine.parse(line) for line in remove_comments_stream(f)]
+def read_nested_list(f):
+    lines = [Line.parse(line) for line in remove_comments_stream(f)]
     return [line for line in lines if line is not None]
 
 def read_node_flags(f):

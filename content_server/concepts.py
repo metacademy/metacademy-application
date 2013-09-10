@@ -42,11 +42,12 @@ class Concept:
     dependencies -- a list of Dependency objects giving the immediate dependencies
     pointers -- a list of Pointer objects representing the see-also links
     """
-    def __init__(self, tag, id, title, summary, dependencies, pointers, resources, questions, flags):
+    def __init__(self, tag, id, title, summary, goals, dependencies, pointers, resources, questions, flags):
         self.tag = tag
         self.id = id
         self.title = title
         self.summary = summary
+        self.goals = goals
         self.dependencies = dependencies
         self.pointers = pointers
         self.resources = resources
@@ -54,8 +55,8 @@ class Concept:
         self.flags = flags
 
     def copy(self):
-        return Concept(self.tag, self.id, self.title, self.summary, list(self.dependencies), [p.copy() for p in self.pointers],
-                       list(self.resources), list(self.questions), list(self.flags))
+        return Concept(self.tag, self.id, self.title, self.summary, [p.copy() for p in self.goals], list(self.dependencies),
+                       [p.copy() for p in self.pointers], list(self.resources), list(self.questions), list(self.flags))
 
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
@@ -66,6 +67,7 @@ class Concept:
                         for dep in self.dependencies]
 
         pointers = [p.json_repr(db.nodes) for p in self.pointers]
+        goals = [p.json_repr(db.nodes) for p in self.goals]
 
         flags = [db.flags[f] for f in self.flags if f in db.flags]
 
@@ -73,6 +75,7 @@ class Concept:
              'title': self.title,
              'id': self.id,
              'summary': self.summary,
+             'goals': goals,
              'pointers': pointers,
              'dependencies': dependencies,
              'resources': res,
@@ -102,14 +105,15 @@ class Shortcut:
     A requirement for the graph is that the shortcut dependencies be a subset of the
     dependencies for the node itself.
     """
-    def __init__(self, concept, dependencies, resources, questions):
+    def __init__(self, concept, goals, dependencies, resources, questions):
         self.concept = concept
+        self.goals = goals
         self.dependencies = dependencies
         self.resources = resources
         self.questions = questions
 
     def copy(self):
-        return Shortcut(self.concept.copy(), list(self.dependencies), list(self.resources))
+        return Shortcut(self.concept.copy(), [p.copy() for p in self.goals], list(self.dependencies), list(self.resources))
 
 
     def json_repr(self, db):
@@ -121,6 +125,7 @@ class Shortcut:
                         for dep in self.dependencies]
 
         pointers = [p.json_repr(db.nodes) for p in self.concept.pointers]
+        goals = [p.json_repr(db.nodes) for p in self.goals]
 
         flags = [db.flags[f] for f in self.concept.flags if f in db.flags]
         
@@ -128,6 +133,7 @@ class Shortcut:
              'title': self.concept.title,
              'id': self.concept.id,
              'summary': self.concept.summary,
+             'goals': goals,
              'pointers': pointers,
              'dependencies': dependencies,
              'resources': res,

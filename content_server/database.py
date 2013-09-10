@@ -93,6 +93,9 @@ def title_file(content_path, tag):
 def summary_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'summary.txt')
 
+def goals_file(content_path, tag):
+    return os.path.join(node_dir(content_path, tag), 'goals.txt')
+
 def wiki_summary_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'wiki-summary.txt')
 
@@ -113,6 +116,9 @@ def node_flags_file(content_path, tag):
 
 def shortcut_dir(content_path, tag):
     return os.path.join(content_path, 'shortcuts', tag)
+
+def shortcut_goals_file(content_path, tag):
+    return os.path.join(shortcut_dir(content_path, tag), 'goals.txt')
 
 def shortcut_questions_file(content_path, tag):
     return os.path.join(shortcut_dir(content_path, tag), 'questions.txt')
@@ -179,9 +185,14 @@ def read_node(content_path, tag):
         dependencies = []
     
     ### process see-also
-    pointers = ""
+    pointers = []
     if os.path.exists(see_also_file(content_path, tag)):
-        pointers = formats.read_see_also(open(see_also_file(content_path, tag)))
+        pointers = formats.read_nested_list(open(see_also_file(content_path, tag)))
+
+    ### process goals
+    goals = ""
+    if os.path.exists(goals_file(content_path, tag)):
+        goals = formats.read_nested_list(open(goals_file(content_path, tag)))
 
     ### process flags
     if os.path.exists(node_flags_file(content_path, tag)):
@@ -189,11 +200,16 @@ def read_node(content_path, tag):
     else:
         flags = []
 
-    return concepts.Concept(tag, node_id, title, summary, dependencies, pointers, node_resources, questions, flags)
+    return concepts.Concept(tag, node_id, title, summary, goals, dependencies, pointers, node_resources, questions, flags)
 
 def read_shortcut(content_path, tag, concept_node):
     """Read a Shortcut object from a directory which contains dependencies.txt and resources.txt,
     and optionally questions.txt."""
+
+    # process goals
+    goals = []
+    if os.path.exists(shortcut_goals_file(content_path, tag)):
+        goals = formats.read_nested_list(open(shortcut_goals_file(content_path, tag)))
 
     # process resources
     if not os.path.exists(shortcut_resources_file(content_path, tag)):
@@ -211,7 +227,7 @@ def read_shortcut(content_path, tag, concept_node):
     else:
         questions = []
 
-    return concepts.Shortcut(concept_node, dependencies, shortcut_resources, questions)
+    return concepts.Shortcut(concept_node, goals, dependencies, shortcut_resources, questions)
     
 
     

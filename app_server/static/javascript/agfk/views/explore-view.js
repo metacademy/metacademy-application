@@ -31,9 +31,15 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       nodeLearnedClass: "node-learned",
       nodeImplicitLearnedClass: "implicit-learned",
       dataHoveredProp: "data-hovered",
+      elIconClass: "e-to-l-icon",
+      elIconNodeIdSuffix: "-el-icon",
+      starClass: "node-star",
+      starredClass: "node-starred",
+      starHoveredClass: "node-star-hovered",
       checkClass: "checkmark",
       checkHoveredClass: "checkmark-hovered",
       checkNodeIdSuffix: "-check-g",
+      starNodeIdSuffix: "-star-g",
       summaryDivSuffix: "-summary-txt",
       summaryWrapDivSuffix: "-summary-wrap",
       summaryTextClass: "summary-text",
@@ -45,8 +51,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       eToLConceptTxtClass: "exp-to-learn-txt",
       learnIconName: "glasses-icon.svg",
       dataConceptTagProp: "data-concept",
-      eToLLinkClass: "e-to-l-summary-link", // NOTE must change class in events attribute as well
-      eToLText: "→", // explore to learning text display
+      hoverTextButtonsId: "hovertext-buttons",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
       // ----- rendering options ----- //
@@ -56,7 +61,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
       defaultNodeSepDist: 1.7, // separation of graph nodes
       defaultNodeWidth: 2.7, // diameter of graph nodes
-      numCharLineDisplayNode: 11, // max number of characters to display per title line of graph nodes
+      numCharLineDisplayNode: 14, // max number of characters to display per title line of graph nodes
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
       summaryArrowTop: 28, // top distance to triangle apex 
@@ -66,16 +71,28 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       SQRT2DIV2: Math.sqrt(2)/2,
       maxZoomScale: 5, // maximum zoom-in level for graph
       minZoomScale: 0.05, //maximum zoom-out level for graph
+      elIconScale: 1,
+      elIconHeight: 29,
+      elIconWidth: 29,
+      elIconXOffset: -54,
+      elIconYOffset: -16,
+      starPts: "350,75 379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161", // svg star path
+      starXOffset: -3,
+      starYOffset: -20,
+      starGScale: 0.11, // relative size of "completed" star group
       checkCircleR: 16, // radius of circle around "completed" check
-      checkXOffset: 17, // px offset of checkmark from longest text element
+      checkXOffset: -2, // px offset of checkmark from longest text element
       checkPath: "M -12,4 L -5,10 L 13,-6", // svg path to create check mark
-      checkGScale: 0.7, // relative size of "completed" check group
-      defaultCheckDist: 90 // default px offset if exact position cannnot be computed
+      checkGScale: 0.79, // relative size of "completed" check group
+      nodeIconsConstYOffset: 28, // constant y offset for the node icons
+      nodeIconsPerYOffset: 9 // y offset for each text element for the node icons
     };
     pvt.summaryDisplays = {};
     pvt.summaryTOKillList = {};
     pvt.summaryTOStartList = {};
     pvt.isRendered = false;
+
+    pvt.$hoverTxtButtonEl = $("#" + pvt.viewConsts.hoverTextButtonsId);
 
     /**
      * Get summary box placement (top left) given node placement
@@ -122,16 +139,80 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         }); 
       });
     };
+
+    /**
+     * Adds the explore-to-learn node icons
+     */
+    pvt.addEToLIcon = function(d3node, svgSpatialInfo){
+      var thisView = this,
+          viewConsts = pvt.viewConsts;
+          svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
+      
+      var iconG = d3node.append("svg:image")
+                  .attr("xlink:href", window.STATIC_PATH + "images/list-icon.png") // TODO move hardcoding
+                  .attr("class", viewConsts.elIconClass)
+                  .attr("id", pvt.getELIconIdForNode.call(thisView, d3node))
+                  .attr("height", viewConsts.elIconHeight + "px")
+                  .attr("width", viewConsts.elIconWidth + "px")
+                  .attr(viewConsts.dataConceptTagProp, d3node.attr("id"));
+
+      var numEls = d3node.selectAll("text")[0].length,
+          elIconX = svgSpatialInfo.cx + viewConsts.elIconXOffset,
+          elIconY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.elIconYOffset; // TODO move hardcoding
+      iconG.attr("transform", 
+                "translate(" + elIconX + "," + elIconY + ") "
+                + "scale(" + viewConsts.elIconScale + ")");      
+      
+    };
+    
+    /**
+     * Add bookmark star and associated properties to the given node
+     * TODO refactor with addCheckMark
+     */
+    pvt.addStar = function(d3node, svgSpatialInfo){
+      var thisView = this,
+          viewConsts = pvt.viewConsts,
+          nodeId = d3node.attr("id"),
+          mnode = thisView.model.get("nodes").get(nodeId),
+          starHoveredClass = viewConsts.starHoveredClass;
+      svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
+      
+      var starG = d3node.append("g")
+                  .attr("class", viewConsts.starClass)
+                  .attr("id", pvt.getStarIdForNode.call(thisView, d3node))
+                  .on("click", function(){
+                    // stop event from firing on the ellipse
+                    d3.event.stopPropagation();
+                    // change the starred status of the node model
+                    mnode.setStarStatus(!d3node.classed(viewConsts.starredClass));
+                  })
+                  .on("mouseover", function() {
+                    d3.select(this).classed(starHoveredClass, true);
+                  })
+                  .on("mouseout", function() {
+                    d3.select(this).classed(starHoveredClass, false);
+                  });
+      starG.append("polygon")
+      .attr("points", viewConsts.starPts);
+
+      var numEls = d3node.selectAll("text")[0].length,
+          starX = svgSpatialInfo.cx + viewConsts.starXOffset,
+          starY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.starYOffset; // TODO move hardcoding
+      starG.attr("transform", 
+                "translate(" + starX + "," + starY + ") "
+                + "scale(" + viewConsts.starGScale + ")");      
+    };
     
     /**
      * Add the check mark and associated properties to the given node
+     * TODO refactor with addStar
      */
     pvt.addCheckMark = function(d3node, svgSpatialInfo){
       var viewConsts = pvt.viewConsts,
-          checkHoveredClass = viewConsts.checkHoveredClass,
           thisView = this,
           nodeId = d3node.attr("id"),
           mnode = thisView.model.get("nodes").get(nodeId),
+          checkHoveredClass = viewConsts.checkHoveredClass,
           nodeLearnedClass = viewConsts.nodeLearnedClass;
       svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
 
@@ -141,7 +222,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             .on("click", function() {
               // stop the event from firing on the ellipse
               d3.event.stopPropagation();
-              // change the learned status on the node model which will fire events changing the appropriate views
+              // change the learned status on the node model
               mnode.setLearnedStatus(!d3node.classed(nodeLearnedClass));
             })
             .on("mouseover", function() {
@@ -155,16 +236,12 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       chkG.append("path")
         .attr("d", viewConsts.checkPath);
       
-      // find the max width text element in box
-      var maxTextLen = Math.max.apply(null, (d3node.selectAll("text")[0].map(function(itm){return itm.getComputedTextLength();}))),
-          // TODO figure out better soluntion for prerendering
-          maxTextLen = maxTextLen === 0 ? viewConsts.defaultCheckDist : maxTextLen;
-      var chkX = svgSpatialInfo.cx - maxTextLen/2 - viewConsts.checkXOffset,
-          chkY = svgSpatialInfo.cy;
+      var numEls = d3node.selectAll("text")[0].length,
+          chkX = svgSpatialInfo.cx + viewConsts.checkXOffset,
+          chkY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset + (numEls-1)*viewConsts.nodeIconsPerYOffset; // TODO move hardcoding
       chkG.attr("transform", 
                 "translate(" + chkX + "," + chkY + ") "
-                + "scale(" + viewConsts.checkGScale + ")");
-      
+                + "scale(" + viewConsts.checkGScale + ")");      
     };
     
     /**
@@ -193,11 +270,24 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       }
       pvt.attachNodeSummary.call(thisView, d3node);
 
+      var nodeSpatialInfo = null;
       // add node-hoverables if not already present
       if (!d3node.attr(viewConsts.dataHoveredProp)) {
         // add checkmark if not present
+        nodeSpatialInfo = nodeSpatialInfo || Utils.getSpatialNodeInfo(nodeEl);
         if (d3node.select("." + viewConsts.checkClass).node() === null){
-          pvt.addCheckMark.call(this, d3node, Utils.getSpatialNodeInfo(nodeEl));
+          pvt.addCheckMark.call(thisView, d3node, nodeSpatialInfo);
+        }
+        // add node star if not already present
+        if (d3node.select("." + viewConsts.starClass).node() === null){
+          nodeSpatialInfo = nodeSpatialInfo || Utils.getSpatialNodeInfo(nodeEl);
+          pvt.addStar.call(thisView, d3node, nodeSpatialInfo);
+        }
+
+        // add e-to-l button if not already present
+        if (d3node.select("." + viewConsts.elIconClass).node() === null){
+          nodeSpatialInfo = nodeSpatialInfo || Utils.getSpatialNodeInfo(nodeEl);
+          pvt.addEToLIcon.call(thisView, d3node, nodeSpatialInfo);
         }
         d3node.attr(viewConsts.dataHoveredProp, true);
       }
@@ -205,7 +295,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
     };
 
     /**
-     * Remove mouse over properties from the explore nodes unless the node is clicked
+     * Remove mouse over properties from the explore nodes
      */
     pvt.nodeMouseOut = function(nodeEl) {
       var relTarget = d3.event.relatedTarget;
@@ -240,58 +330,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       }
     };
 
-    /**
-     * Change the implicit learn state by performing a DFS from the rootNode
-     */
-    pvt.changeILStateDFS = function(rootTag, changeState, d3Sel){
-      var thisView = this,
-          thisModel = thisView.model,
-          thisNodes = thisModel.get("nodes"),
-          d3Node,
-          viewConsts = pvt.viewConsts,
-          ilClass = viewConsts.implicitLearnedClass,
-          nlClass = viewConsts.nodeLearnedClass,
-          depNodes = [thisNodes.get(rootTag)],
-          ilCtProp = viewConsts.implicitLearnedCtProp,
-          nextRoot,
-          ilct,
-          modelNode,
-          passedNodes = {};
-      d3Sel = d3Sel || d3.selectAll("." + pvt.viewConsts.nodeClass);
-
-      // DFS to [un]gray the appropriate nodes and edges
-      while ((nextRoot = depNodes.pop())){
-        $.each(nextRoot.getUniqueDependencies(), function(dct, dt){
-          if (!passedNodes.hasOwnProperty(dt)){
-            d3Node = d3Sel.filter(function(){return this.id === dt;});
-            modelNode = thisNodes.get(dt);
-            ilct = d3Node.attr(ilCtProp);
-            if (changeState){
-              // keep track of the number of nodes with the given dependency so we don't [un]gray a node unnecessarily
-              if (ilct && ilct > 0){
-                d3Node.attr(ilCtProp, Number(ilct) + 1);
-              }
-              else{
-                d3Node.attr(ilCtProp, 1);
-                d3Node.classed(ilClass, true);
-                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, true);
-              }
-            }
-            else{
-              ilct = Number(ilct) - 1;
-              d3Node.attr(ilCtProp, ilct);
-              if (ilct === 0){
-                d3Node.classed(ilClass, false);
-                thisView.changeEdgesClass(modelNode.get("outlinks"), ilClass, false);
-              }
-            }
-            passedNodes[dt] = true;
-            depNodes.push(modelNode);
-          }
-        });
-      }
-    };
-    
+     
     /**
      * Return a dot string array from the specified keyNode 
      * depth: desired depth of dot string
@@ -375,6 +414,20 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
     };
 
     /**
+     * Helper function to obtain el-icon element for the given node
+     */
+    pvt.getELIconIdForNode = function(node) {
+      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.elIconNodeIdSuffix;
+    };
+
+    /**
+     * Helper function to obtain checkmark element for the given node
+     */
+    pvt.getStarIdForNode = function(node) {
+      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.starNodeIdSuffix;
+    };
+
+    /**
      * Helper function to obtain id of summary txt div for a given node in the exporation view
      */
     pvt.getSummaryIdForDivTxt = function(node) {
@@ -406,7 +459,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       // most events are handled via d3; this is awkward for backbone, but jQuery isn't as reliable/east for SVG events
       // TODO try to be consistent with event handling
       events: {
-        "click .e-to-l-summary-link": "handleEToLConceptClick"
+        "click .e-to-l-icon": "handleEToLConceptClick"
       },
 
       // hack to call appRouter from view (must pass in approuter)
@@ -438,7 +491,13 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             thisView.toggleNodeProps(d3El, status, "implicitLearned", d3this);
           }
         });
-
+        thisView.listenTo(nodes, "change:starStatus", function(nodeId, status){
+          var d3El = d3this.select("#" + nodeId);
+          if (d3El.node() !== null){
+            thisView.toggleNodeProps(d3El, status, "starred", d3this);
+          }
+        });
+        
         // rerender graph (for now) when clearing learned nodes
         // TODO do we need to clean up this view to avoid zombies?
         thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.render);
@@ -587,25 +646,36 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
        * Toggle propType properties for the given explore node
        * d3node: d3 selection for the given node
        * toggleOn: whether to toggle on (true) or off (false) the learned properties
-       * propType: specify the property type: "learned" or "implicitLearned"
+       * propType: specify the property type: "learned", "implicitLearned", "starred"
        * d3sel: d3selection with graph nodes/edges as children (defaults to thisView.getd3El()
        */
       toggleNodeProps: function(d3node, toggleOn, propType, d3Sel){
         var viewConsts = pvt.viewConsts,
             thisView = this,
             mnode = thisView.model.get("nodes").get(d3node.attr("id")),
-            addLearnProps = propType === "learned",
-            propClass = addLearnProps ? viewConsts.nodeLearnedClass : viewConsts.nodeImplicitLearnedClass,
-            hasCheck = d3node.select("." + viewConsts.checkClass).node() !== null;
+            changeLearnStatus = propType === "learned" || propType === "implicitLearned";
+        var propClass = {"learned": viewConsts.nodeLearnedClass,
+                         "implicitLearned": viewConsts.nodeImplicitLearnedClass,
+                         "starred": viewConsts.starredClass
+                        }[propType];
         d3Sel = d3Sel || thisView.getd3El();
-
-        // insert checkmark if needed
-        if (addLearnProps && toggleOn && !hasCheck){
-          pvt.addCheckMark.call(thisView, d3node);
+        
+        if (changeLearnStatus){
+          var hasCheck = d3node.select("." + viewConsts.checkClass).node() !== null;
+          // insert checkmark if needed
+          if (propType === "learned" && toggleOn && !hasCheck){
+            pvt.addCheckMark.call(thisView, d3node);
+          }
+          // toggle appropriate class for outlinks
+          thisView.changeEdgesClass(mnode.get("outlinks"), propClass, toggleOn, d3Sel);
+        }
+        else{
+          var hasStar =  d3node.select("." + viewConsts.starClass).node() !== null;
+          if (toggleOn && !hasStar){
+            pvt.addStar.call(thisView, d3node);
+          }
         }
         
-        // toggle appropriate class for outlinks
-        thisView.changeEdgesClass(mnode.get("outlinks"), propClass, toggleOn, d3Sel);
         d3node.classed(propClass, toggleOn);
       },      
       
@@ -705,23 +775,17 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             // add content div
             div = document.createElement("div"),
             nodeId = node.attr("id"),
-            learnLink = document.createElement("a"),
             summaryP = document.createElement("p"),
             summaryTxt;
 
-        // build explore-to-learn image
-        learnLink.setAttribute(viewConsts.dataConceptTagProp, nodeId);
-        learnLink.textContent = viewConsts.eToLText;
-        learnLink.className = viewConsts.eToLLinkClass;
         // add summary
         summaryTxt = this.model.get("nodes").get(nodeId).get("summary");
         summaryP.textContent = summaryTxt.length > 0 ? summaryTxt : viewConsts.NO_SUMMARY_MSG;
         
-        div.appendChild(learnLink);
         div.appendChild(summaryP);
         div.id = pvt.getSummaryIdForDivTxt.call(thisView, node);
-        var d3div = d3.select(div);
-        d3div.classed(viewConsts.summaryTextClass, true);
+        var $div = $(div);
+        $div.addClass(viewConsts.summaryTextClass);
 
         // add wrapper div so we can use "overflow" pseudo elements
         var wrapDiv = document.createElement("div"),

@@ -87,6 +87,18 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         nodePvt.implicitLearnCt = 0;
         nodePvt.implicitLearn = false;
         nodePvt.learned = false;
+        nodePvt.starred = false;
+
+        this.setStarStatus = function(status){
+          if (status !== nodePvt.starred){
+            nodePvt.starred = status;
+            this.trigger("change:starStatus", this.get("id"), status);
+          }
+        };
+
+        this.getStarStatus = function(){
+          return nodePvt.starred;
+        };
         
         // * Increment the implicit learn count by ival (default 1)
         this.incrementILCt = function(ival){

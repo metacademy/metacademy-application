@@ -649,8 +649,16 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             clkItmClass = pvt.viewConsts.clickedItmClass;
 
         $el.html("");
+        var $div = $(document.createElement("div"));
+        $div.attr("id", (pvt.viewConsts.titleListId));
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
-        thisView.renderTitles();
+        var titlesTitle = document.createElement("h1");
+        titlesTitle.textContent = "Learning List"; // TODO move this to a template
+        thisView.$el.prepend(titlesTitle);
+        $div.append(titlesTitle);
+        var $titlesEl = thisView.renderTitles();
+        $div.append($titlesEl);
+        thisView.$el.append($div);
         pvt.conceptDisplayWrap = document.createElement("div");
         pvt.conceptDisplayWrap.id =  pvt.viewConsts.conceptDisplayWrapId;
         thisView.$el.append(pvt.conceptDisplayWrap);
@@ -666,7 +674,6 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             pvt.$expandedTitle = null;
             pvt.expandedNode = null;
           }
-
         }
 
         thisView.delegateEvents();
@@ -684,11 +691,10 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             nodeOrdering = pvt.nodeOrdering || thisView.getTopoSortedConcepts(),
             curNode,
             nliview,
-            $el = thisView.$el,
             $list = $(document.createElement("ol")),
             thisModel = thisView.model,
             nodes = thisModel.get("nodes");
-        $list.attr("id", (pvt.viewConsts.titleListId));
+       
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
           nliview = new NodeListItemView({model: curNode});
@@ -696,7 +702,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
           pvt.idToTitleView[curNode.get("id")] = nliview;
           $list.append(nliview.render().el); 
         }
-        $el.append($list);
+        return $list;
       },
 
       /**

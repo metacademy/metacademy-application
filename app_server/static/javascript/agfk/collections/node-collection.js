@@ -29,13 +29,17 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
     /**
      * Apply the user data to the given node collection
      */
-    applyLearnedConcepts: function(learnedConcepts){
+    applyUserConcepts: function(learnedConcepts, type){
       var thisColl = this,
           collNode;
       learnedConcepts.each(function(lcModel){
         collNode = thisColl.findWhere({sid: lcModel.get("id")});
         if (collNode !== undefined){
-          collNode.setLearnedStatus(true);
+          if (type === "starred"){
+            collNode.setStarredStatus(true);
+          } else{
+            collNode.setLearnedStatus(true);
+          }
         }
       });
     },

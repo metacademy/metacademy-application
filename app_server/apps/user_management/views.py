@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render
-from apps.user_management.models import LearnedConcept, Profile, UserCreateForm
+from apps.user_management.models import LearnedConcept, StarredConcept, Profile, UserCreateForm
 from django.core.mail import EmailMultiAlternatives
 
 from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
@@ -18,13 +18,21 @@ def user_main(request):
     # obtain an array of learned concept ids for the user
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
     lids = [l.id for l in uprof.learnedconcept_set.all()]
+    sids = [s.id for s in uprof.starredconcept_set.all()]
+    # TODO refactor
     if len(lids) > 0:
         concepts_dict = get_id_to_concept_dict()
         lconcepts  = [concepts_dict[idval] for idval in lids if concepts_dict.has_key(idval)]
     else:
         lconcepts = []
 
-    return render_to_response('user.html', {"lconcepts": lconcepts, "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
+    if len(sids) > 0:
+        concepts_dict = get_id_to_concept_dict()
+        sconcepts  = [concepts_dict[idval] for idval in sids if concepts_dict.has_key(idval)]
+    else:
+        sconcepts = []
+
+    return render_to_response('user.html', {"lconcepts": lconcepts, "sconcepts": sconcepts, "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
 
 def register(request):
     if request.method == 'POST':
@@ -85,17 +93,26 @@ def handle_learned_concepts(request, conceptId=""):
     """
     A simple REST interface for accessing a user's learned concepts
     """
+    return handle_user_concepts(request, conceptId, "learnedconcept_set", LearnedConcept)
+
+def handle_starred_concepts(request, conceptId=""):
+    """
+    A simple REST interface for accessing a user's learned concepts
+    """
+    return handle_user_concepts(request, conceptId, "starredconcept_set", StarredConcept)
+
+def handle_user_concepts(request, conceptId, set_name, InConcept):
     if request.user.is_authenticated():
         # TODO: handle multiple concepts at once
         uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
         if not conceptId:
             if request.method == "GET":
-                lconcepts = [ l.id for l in uprof.learnedconcept_set.all()]
-                return HttpResponse(json.dumps(lconcepts), mimetype='application/json')
+                concepts = [ l.id for l in getattr(uprof, set_name).all()]
+                return HttpResponse(json.dumps(concepts), mimetype='application/json')
             else:
                 return HttpResponse(status=405)
         else:
-            dbConceptObj, ucreated = LearnedConcept.objects.get_or_create(id=conceptId)
+            dbConceptObj, ucreated = InConcept.objects.get_or_create(id=conceptId)
             if request.method == "PUT":
                 dbConceptObj.uprofiles.add(uprof)
             elif request.method == "DELETE":

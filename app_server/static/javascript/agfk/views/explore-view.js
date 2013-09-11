@@ -184,7 +184,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
                     // stop event from firing on the ellipse
                     d3.event.stopPropagation();
                     // change the starred status of the node model
-                    mnode.setStarStatus(!d3node.classed(viewConsts.starredClass));
+                    mnode.setStarredStatus(!d3node.classed(viewConsts.starredClass));
                   })
                   .on("mouseover", function() {
                     d3.select(this).classed(starHoveredClass, true);
@@ -639,6 +639,9 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         });
         _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
           addPropFunction(mnode.get("id"), "implicitLearned");
+        });
+        _.each(thisNodes.filter(function(nde){return nde.getStarredStatus();}), function(mnode){
+          addPropFunction(mnode.get("id"), "starred");
         });
       },
       

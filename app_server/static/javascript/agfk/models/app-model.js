@@ -36,7 +36,8 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       // TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph 
       // (there may be a better way to do this, but aux fields on the nodes themselves, such as "learnStatus,"
       // make it easy to trigger changes in the views for the specific node rather than the entire collection 
-      userData.listenTo(nodes, "change:learnStatus", userData.updateLearnedNodes);
+      userData.listenTo(nodes, "change:learnStatus", userData.updateLearnedConcept);
+      userData.listenTo(nodes, "change:starStatus", userData.updateStarredConcept);
       userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
       userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
     },
@@ -64,11 +65,22 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       } else{
         thisModel.listenTo(userData.get("learnedConcepts"), "reset", applyLearnedConcepts);
       }
+      if (userData.areStarredConceptsPopulated()){
+        applyStarredConcepts();
+      } else{
+        thisModel.listenTo(userData.get("starredConcepts"), "reset",   applyStarredConcepts);
+      }
 
       function applyLearnedConcepts(){
         var learnedConcepts = userData.get("learnedConcepts");
         if (learnedConcepts.length > 0){
-          thisModel.get("graphData").get("nodes").applyLearnedConcepts(learnedConcepts);
+          thisModel.get("graphData").get("nodes").applyUserConcepts(learnedConcepts, "learned");
+        }
+      }
+      function applyStarredConcepts(){
+        var starredConcepts = userData.get("starredConcepts");
+        if (starredConcepts.length > 0){
+          thisModel.get("graphData").get("nodes").applyUserConcepts(starredConcepts, "starred");
         }
       }
     },

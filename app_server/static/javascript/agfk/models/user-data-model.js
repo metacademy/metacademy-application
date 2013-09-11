@@ -5,11 +5,12 @@ define(["backbone"], function(Backbone){
 
   var USER_CONSTS = {
     userPath: "/user/",
-    learnedConceptPath: "/user/learned/"
+    learnedConceptPath: "/user/learned/",
+    starredConceptPath: "/user/starred/"
   };
   
   // wrapper model for learned concepts
-  var LearnedConcept = Backbone.Model.extend({
+  var UserConcept = Backbone.Model.extend({
     
     defaults:{
       id: "",
@@ -18,9 +19,16 @@ define(["backbone"], function(Backbone){
   });
 
   // wrapper collection for learned concepts
-  var LearnedConceptsCollection = Backbone.Collection.extend({
-    model: LearnedConcept,
-    url: USER_CONSTS.learnedConceptPath,
+  var ConceptsCollection = Backbone.Collection.extend({
+    model: UserConcept,
+    url: function(){
+      return {"learned": USER_CONSTS.learnedConceptPath,
+              "starred": USER_CONSTS.starredConceptPath}[this.type || "learned"];
+    },
+    
+    initialize: function(args){
+      this.type = args.type;
+    },
     
     parse: function(resp, xhr){
       var i = resp.length,
@@ -32,6 +40,7 @@ define(["backbone"], function(Backbone){
     }
   });
 
+
   /** 
    * UserData: model to store user data -- will eventually communicate with server for registered users
    */
@@ -39,7 +48,16 @@ define(["backbone"], function(Backbone){
     // define private methods and variables
     var pvt = {};
 
+    pvt.createDestroyUserConcept = function(conceptCollection, status, nodeSid){
+      if (status && !conceptCollection.get(nodeSid)) {
+        conceptCollection.create({id: nodeSid});
+      } else if (!status) {
+        conceptCollection.get(nodeSid).destroy({id: nodeSid});
+      }
+    };
+    
     pvt.learnedConceptsPopulated = false;
+    pvt.starredConceptsPopulated = false;
 
     /**
      * Internal function to change dictionary objects 
@@ -78,7 +96,8 @@ define(["backbone"], function(Backbone){
        */
       defaults: function() {
         return {
-          learnedConcepts: new LearnedConceptsCollection(),
+          learnedConcepts: new ConceptsCollection({type: "learned"}),
+          starredConcepts: new ConceptsCollection({type: "starred"}),
           visibleNodes: {},
           implicitLearnedNodes: {}
         };
@@ -86,12 +105,20 @@ define(["backbone"], function(Backbone){
 
       initialize: function(){
         var thisModel = this,
-            lConcepts = thisModel.get("learnedConcepts");
+            lConcepts = thisModel.get("learnedConcepts"),
+            sConcepts = thisModel.get("starredConcepts");
         lConcepts.bind("change:learnStatus", function(){
           thisModel.trigger("change:learnStatus", lConcepts);
         });
+        sConcepts.bind("change:starStatus", function(){
+          thisModel.trigger("change:starStatus", sConcepts);
+        });
+        
         thisModel.listenTo(lConcepts, "reset", function(){
           pvt.learnedConceptsPopulated = true;
+        });
+        thisModel.listenTo(sConcepts, "reset", function(){
+          pvt.starredConceptsPopulated = true;
         });
       },
 
@@ -99,17 +126,19 @@ define(["backbone"], function(Backbone){
         return pvt.learnedConceptsPopulated;
       },
 
+      areStarredConceptsPopulated: function(){
+        return pvt.starredConceptsPopulated;
+      },
+
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateLearnedNodes: function(nodeTag, status, nodeSid){
-        var learnedConcepts = this.get("learnedConcepts");
-        if (status && !learnedConcepts.get(nodeSid)) {
-          learnedConcepts.create({id: nodeSid});
-        } else if (!status) {
-          learnedConcepts.get(nodeSid).destroy({id: nodeSid});
-        }
+      updateLearnedConcept: function(nodeTag, status, nodeSid){
+        pvt.createDestroyUserConcept.call(this, this.get("learnedConcepts"), status, nodeSid);
+      },
 
+      updateStarredConcept: function(nodeTag, status, nodeSid){
+        pvt.createDestroyUserConcept.call(this, this.get("starredConcepts"), status, nodeSid);
       },
 
       /**

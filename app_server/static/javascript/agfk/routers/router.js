@@ -196,7 +196,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         if (purl === pvt.prevPurl){
           this.routeParams(purl);
         } else {
-          this.navigate(purl, {trigger: true, replace: true});
+          this.navigate(purl, {trigger: true, replace: false});
           pvt.prevPurl = purl;
         }
       },
@@ -240,11 +240,14 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         // init main app model
         if (!thisRoute.appData){
           thisRoute.appData = new AppData();
-          thisRoute.appData.get("userData").get("learnedConcepts").fetch({
+          var userData = thisRoute.appData.get("userData");
+          $.each(["learnedConcepts", "starredConcepts"], function(idx, val){
+            userData.get(val).fetch({
               reset: true,
               error: function(emodel, eresp, eoptions){
-              ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
-            }
+                ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
+              }
+            });
           });
         }
         thisRoute.appData.setGraphData({depRoot: nodeId});

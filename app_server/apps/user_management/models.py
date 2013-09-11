@@ -34,8 +34,8 @@ class LearnedConcept(models.Model):
     """
     Simple class to maintain learned concepts
     """
-    id = models.CharField(max_length=10, unique=True, primary_key=True)
     uprofiles = models.ManyToManyField(Profile)
+    id = models.CharField(max_length=10, unique=True, primary_key=True)
 
     def __unicode__(self):
         return self.get_title()
@@ -45,3 +45,20 @@ class LearnedConcept(models.Model):
             id_concept_dict = get_id_to_concept_dict()
             self.title = id_concept_dict[self.id]['title']
         return self.title
+    
+class StarredConcept(models.Model):
+    """
+    Simple class to maintain starred concepts
+    """
+    uprofiles = models.ManyToManyField(Profile)
+    id = models.CharField(max_length=10, unique=True, primary_key=True)
+
+    def __unicode__(self):
+        return self.get_title()
+
+    def get_title(self):
+        if not hasattr(self, 'title'):
+            id_concept_dict = get_id_to_concept_dict()
+            self.title = id_concept_dict[self.id]['title']
+        return self.title
+    

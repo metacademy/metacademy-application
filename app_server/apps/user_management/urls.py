@@ -9,5 +9,6 @@ urlpatterns = patterns('',
                        url(r'^login$', login, {'template_name': 'login.html'}, name='login'),
                        url(r'^logout$', logout, {'next_page': '/'}, name='logout'),
                        url(r'^register$', views.register, name='register'),
-                       url(r'^learned/([^/]*)$', views.handle_learned_concepts, name='addlearned') 
+                       url(r'^learned/([^/]*)$', views.handle_learned_concepts, name='addlearned'), 
+                       url(r'^starred/([^/]*)$', views.handle_starred_concepts, name='addlearned'), 
                        )

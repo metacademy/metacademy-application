@@ -89,14 +89,14 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         nodePvt.learned = false;
         nodePvt.starred = false;
 
-        this.setStarStatus = function(status){
+        this.setStarredStatus = function(status){
           if (status !== nodePvt.starred){
             nodePvt.starred = status;
-            this.trigger("change:starStatus", this.get("id"), status);
+            this.trigger("change:starStatus", this.get("id"), status, this.get("sid"));
           }
         };
 
-        this.getStarStatus = function(){
+        this.getStarredStatus = function(){
           return nodePvt.starred;
         };
         
@@ -310,8 +310,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
       isFinished: function(){
         return this.get("summary") && this.get("resources").length > 0;
       }
-      
-     
+           
     });
   })();
 });

@@ -325,7 +325,8 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
           }
 
           if (paramsObj[qViewMode] === pLearnMode && !pvt.elTransition){ 
-            thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
+          //  thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
+              thisRoute.lview.expandConcept(paramQLearnScrollConcept);
           }
           thisRoute.setELTransition(false); // reset the router state
           pvt.prevUrlParams = $.extend({}, paramsObj);

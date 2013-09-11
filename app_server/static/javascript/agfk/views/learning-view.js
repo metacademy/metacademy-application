@@ -37,6 +37,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
                                            " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnStatus ?
                                                                                   "": " " + viewConsts.implicitLearnedClass);
       },
+      tagName: "li",
 
       events: {
         "click .learn-view-check": "toggleLearnedConcept"
@@ -553,7 +554,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
     pvt.isRendered = false;
 
     // keep track of expanded nodes: key: title node id, value: expanded view object
-    pvt.expandedNodes = {};
+    pvt.expandedNode = null;
+    pvt.$expandedTitle = null;
 
     pvt.idToTitleView = {};
     
@@ -561,14 +563,9 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
 
     pvt.viewConsts = {
       viewId: "learn-view",
-      clickedItmClass: "clicked-title"
-    };
-
-    /**
-     * Insert a given subview after the specified dom node
-     */
-    pvt.insertSubViewAfter = function(subview, domNode){
-      domNode.parentNode.insertBefore(subview.render().el, domNode.nextSibling);
+      clickedItmClass: "clicked-title",
+      titleListId: "learn-title-list",
+      conceptDisplayWrapId: "learn-concept-wrapper"
     };
 
     // return public object
@@ -590,86 +587,50 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
               nid = titleId.split("-").pop();
           this.appRouter.changeUrlParams({lfocus: nid});
         } else{
-          this.toggleConceptDetails(null, $curTarget);
+          this.showConceptDetailsForTitleEl(null, $curTarget);
         }
       },
 
       /**
-       * Expand/collapse the given concept title
+       * Show the given concept details
        */
-      toggleConceptDetails: function(titleEl, $titleEl){
+      showConceptDetailsForTitleEl: function(titleEl, $titleEl){
           var nid,
             clickedItmClass = pvt.viewConsts.clickedItmClass,
             thisView = this,
             titleId;
         $titleEl = $titleEl || $(titleEl);
-        $titleEl.toggleClass(clickedItmClass);
+        if ($titleEl.hasClass(clickedItmClass)){
+          return false;
+        }
+        if (pvt.expandedNode !== null){
+          pvt.$expandedTitle.removeClass(clickedItmClass);
+          pvt.expandedNode.close();
+        }
+        $titleEl.addClass(clickedItmClass);
         titleId = $titleEl.attr("id");
         
-        if ($titleEl.hasClass(clickedItmClass)){ 
-          nid = titleId.split("-").pop();
-          var dnode = thisView.appendDetailedNodeAfter(thisView.model.get("nodes").get(nid), $titleEl.get(0));
-          pvt.expandedNodes[titleId] = dnode;
-        }
-        else{
-          if (pvt.expandedNodes.hasOwnProperty(titleId)){
-            var expView = pvt.expandedNodes[titleId];
-            expView.close();
-            delete pvt.expandedNodes[titleId];
-          }
-        }       
+        nid = titleId.split("-").pop();
+        var dnode = thisView.showConceptDetails(thisView.model.get("nodes").get(nid));
+        pvt.expandedNode = dnode;
+        pvt.$expandedTitle = $titleEl;
+        return true;
       },
 
       /**
-       * Append detailed node view to given element id that is a child of thisView
+       * Show the concept detail of the given nodeModel
        * Returns the view object for the appended concept
        */
-      appendDetailedNodeAfter: function(nodeModel, domNode){
+      showConceptDetails: function(nodeModel){
         var thisView = this,
             dNodeView = new DetailedNodeView({model: nodeModel});
-        pvt.insertSubViewAfter(dNodeView, domNode);
+        pvt.conceptDisplayWrap.appendChild(dNodeView.render().el);
         return dNodeView;
       },
 
-      /**
-       * Set the scroll bar so that the top of domEl aligns with the top of the page (if possible)
-       * NB the view must be rendered before this function will work TODO workarounds?
-       */
-      setScrollTop: function(domEl, $domEl){
-        try{
-          var $parentNode = this.$el.parent(),
-              scrollPos;
-          $domEl = $domEl || $(domEl);
-
-          ErrorHandler.assert($parentNode.length > 0, "parent node not present for setScrollTop in the learning view)");
-          // $parentNode.scrollTop(0); // reset the scroll position
-          scrollPos = $domEl.position().top - $domEl.outerHeight()/2 + $parentNode.scrollTop();
-          $parentNode.animate({scrollTop:scrollPos}, 400);
-        }
-        catch(err){
-          window.console.warn("Error in setScrollTop (make sure view is rendered before calling): " + err.message);
-        }
+      expandConcept: function(conceptTag){
+        this.showConceptDetailsForTitleEl(null, pvt.idToTitleView[conceptTag].$el);
       },
-
-      /**
-       * Scroll the learning view so that the top of the input concept is 
-       * aligned with the top of the view and expand the concept
-       */
-      scrollExpandToConcept: function(conceptTag){
-        // get the dom el for the given concept tag
-        var thisView = this,
-            titleView = pvt.idToTitleView[conceptTag];
-        if (titleView instanceof NodeListItemView){
-          var $titleEl = $(titleView.el);
-          // scroll to dom el
-          thisView.setScrollTop(null, $titleEl);
-          // expand dom el
-          if (!$titleEl.hasClass(pvt.viewConsts.clickedItmClass)){
-            thisView.toggleConceptDetails(null, $titleEl);
-          }
-        }
-      },
-
 
       initialize: function(inp){
         this.appRouter = inp.appRouter;
@@ -684,23 +645,30 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
         pvt.isRendered = false;
         var thisView = this,
             $el = thisView.$el,
-            expandedNodes = pvt.expandedNodes,
+            $expandedTitle = pvt.$expandedTitle,
             clkItmClass = pvt.viewConsts.clickedItmClass;
 
         $el.html("");
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
         thisView.renderTitles();
-
+        pvt.conceptDisplayWrap = document.createElement("div");
+        pvt.conceptDisplayWrap.id =  pvt.viewConsts.conceptDisplayWrapId;
+        thisView.$el.append(pvt.conceptDisplayWrap);
         // recapture previous expand/collapse state TODO is this desirable behavior?
-        for (var expN in expandedNodes){
-          if (expandedNodes.hasOwnProperty(expN)){
-            var domEl = document.getElementById(expN);
-            if (domEl !== null){
-              pvt.insertSubViewAfter(expandedNodes[expN], domEl);
-              domEl.className += " " + clkItmClass;
-            }
+        if ($expandedTitle){
+          // check that new title is in group         
+          var $newTitle = thisView.$el.find("#" + $expandedTitle.attr("id"));
+          if ($newTitle.length > 0){
+            pvt.$expandedTitle = $newTitle;
+            thisView.showConceptDetailsForTitleEl(null, $newTitle);
           }
+          else{
+            pvt.$expandedTitle = null;
+            pvt.expandedNode = null;
+          }
+
         }
+
         thisView.delegateEvents();
         pvt.isRendered = true;
         return thisView;
@@ -717,32 +685,25 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             curNode,
             nliview,
             $el = thisView.$el,
+            $list = $(document.createElement("ol")),
             thisModel = thisView.model,
             nodes = thisModel.get("nodes");
-        
+        $list.attr("id", (pvt.viewConsts.titleListId));
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
           nliview = new NodeListItemView({model: curNode});
           nliview.setParentView(thisView);
           pvt.idToTitleView[curNode.get("id")] = nliview;
-          $el.append(nliview.render().el); 
+          $list.append(nliview.render().el); 
         }
+        $el.append($list);
       },
 
       /**
        * Clean up the view
        */
       close: function(){
-        var expN,
-            expandedNodes = pvt.expandedNodes,
-            domeEl;
-        for (expN in expandedNodes){
-          if (expandedNodes.hasOwnProperty(expN)){
-            var domEl = document.getElementById(expN);
-            expandedNodes[expN].close();
-            delete expandedNodes[expN];
-          }
-        }
+        pvt.expandedNode.close();
         this.remove();
         this.unbind();
       },

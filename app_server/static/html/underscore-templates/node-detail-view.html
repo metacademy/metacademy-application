@@ -1,5 +1,6 @@
 <script type="text/template" id="node-detail-view-template">
-  <div id = "node-detail-<%- id %>">
+  <h1><%- title %></h1>
+
     <h2 class="node-detail-title">Summary</h2>
     <div class="node-detail-comp-wrap node-detail-summary-text">
       <%= summary.length ? summary : '<span class="no-content-msg">-No Summary-</span>'%>
@@ -59,7 +60,6 @@
     </div>
 
     
-  </div>
 </script>
 
 <!-- see wiki for attributes and think about future changes and how these could be propagated -->

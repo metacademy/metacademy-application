@@ -138,20 +138,39 @@ body {
     border: 1px saddlebrown solid;
     padding: 0.7em;
 }
+
 /* ---------------------------------------------------*/
-/* ---------->>> Learn Mode Styles <<<----------------*/
+/* ---------->>> Learn View Styles <<<----------------*/
 /* ---------------------------------------------------*/
 
 #learn-view-wrapper{
     display: none;
-    height: 100%;
     width: 100%;
-    overflow: auto;
     background: white;
+    height: inherit;
 }
 
 #learn-view{
     padding-bottom: 5em;
+    min-width: 600px;
+    height: inherit;
+}
+
+#learn-title-list{
+    width: 20%;
+    float: left;
+    border-right: 1px solid #333;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;   
+    box-sizing: border-box;
+    overflow: auto;
+    height: inherit;
+}
+
+#learn-concept-wrapper{
+    height: inherit;
+    margin-left: 20%;
+    overflow: auto;
 }
 
 .learn-title-display{
@@ -160,46 +179,39 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: #3E4018;
-    padding: 1em 0;
-    padding-left: 1ex;
-    line-height: 1.5em;
-    font-size: 1.1em;
+    padding: 0.7em 1.4em;;
+    line-height: 1.2em;
+    font-size: 0.9em;
     margin-left: -2em; /* offset checkmark so text appears centered */
-    border-bottom: 0.3ex solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
 }
-.learn-title-display:hover, .learn-title-display.clicked-title:hover {
-    background-color: #f8f5f0;
-    font-weight: bold;
+.learn-title-display:hover{
+    background-color: rgb(250, 242, 248);
 }
 .learn-title-display.clicked-title{
     /*background-color: rgb(255, 255, 249);*/
     font-weight: bold;
     color: #333333;
-    border-bottom: 1px dotted #CCCCCC;
-}
-.learn-title-display.clicked-title a:after{
-    content: "";
-    border: solid;
-    border-color: #333333 transparent;
-    border-width: 10px 5px 0 5px;
-    position: relative;
-    top: 0.1ex;
-    left: 0.5ex;
-    display: inline-block;
-    -moz-transform: scale(.9999);
+    background-color: rgb(245, 232, 242);
+    cursor: default;
 }
 
 .node-detail-view{
    background-color: white; 
    color: #23240D;
-   border-bottom:  0.3ex solid #CCCCCC;
    padding: 0.3em 8em 1em 1.5em;
    line-height: 1.2em;
 }
 
+.node-detail-view h1{
+    font-size: 1.2em;
+    text-align: center;
+    font-weight: bold;
+}
+
 .node-detail-title{
     color: #333333;
-    font-size: 1.1em;
+    font-size: 1em;
     font-style: normal;
     font-weight: bold;
     padding: 2em 0 .7em 0;

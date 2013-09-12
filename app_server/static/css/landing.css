@@ -55,6 +55,7 @@
     background-color: #FCF7FB;
     line-height: 1.3em;
     font-size: 0.8em;
+    z-index: 10;
 }
 /* creates the larger triangle that points to the top > */
 .login-note:before {

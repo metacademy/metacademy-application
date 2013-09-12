@@ -16,6 +16,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       disabledClass: "disabled"
     };
     pvt.numVisLearned = 0;
+    pvt.numLearned = 0;
 
     /**
      * helper function to enable/disable the appropriate clear/show learned button
@@ -73,9 +74,13 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
        */
       changeShowHideState: function(chmodel, chstate){
         if (chstate){
+          // enables the "hide learned concepts" and disables "show learned concepts"
+          pvt.numVisLearned = pvt.numLearned;
           pvt.enableHide();
           pvt.disableShow();
         } else{
+          // enables the "show learned concepts" and disables "hide learned concepts"
+          pvt.numVisLearned = 0;
           pvt.disableHide();
           pvt.enableShow();
         }
@@ -85,16 +90,17 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
        * Handle changing node status
        */
       handleChLearnStatus: function(tag, state){
-       // keep count of the number of learned nodes
-        var x = 5;
+       // keep count of the number of visible learned nodes
         if (state){
           pvt.numVisLearned++;
+          pvt.numLearned++;
           if (pvt.numVisLearned === 1){
             pvt.enableHide();
           }
         }
         else{
           pvt.numVisLearned--;
+          pvt.numLearned--;
           if(pvt.numVisLearned === 0){
             pvt.disableHide();
           }

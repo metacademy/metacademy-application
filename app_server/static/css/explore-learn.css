@@ -230,6 +230,20 @@ body {
     font-weight: bold;
 }
 
+h1 .learn-view-check, h1 .learn-view-star{
+    display: inline-block;
+    cursor: default;
+}
+
+h1 .learn-view-check{
+    margin-left: 0.2em;
+}
+
+h1 .learn-view-star{
+    font-family: Arial;
+    font-size: 0.9em;
+}
+
 .node-detail-title{
     color: #333333;
     font-size: 1em;
@@ -277,12 +291,12 @@ body {
     visibility: hidden;
 }
 
-.learned-concept-title .learn-view-check, .learn-view-check:hover{
+.learned-concept-title .learn-view-check, .learned-concept .learn-view-check, .learn-view-check:hover{
     visibility: visible;
     color: green;
 }
 
-.starred-concept-title .learn-view-star, .learn-view-star:hover{
+.starred-concept-title .learn-view-star, .starred-concept .learn-view-star, .learn-view-star:hover{
     visibility: visible;
     color: rgb(192, 182, 109);
 }

@@ -442,7 +442,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
       depLocClass: 'dep-wrap',
       ptrLocClass: 'pointers-wrap',
       goalsLocClass: 'goals-wrap',
-      outlinkLocClass: 'outlinks-wrap'
+      outlinkLocClass: 'outlinks-wrap',
+      learnViewCheckClass: 'learn-view-check',
+      learnViewStarClass: 'learn-view-star',
+      learnedClass: "learned-concept",
+      starredClass: "starred-concept", // TODO this needs to be refactored with learn view title
+      implicitLearnedClass: "implicit-learned-concept"
     };
 
     // return public object
@@ -450,8 +455,58 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix + this.model.get("id");},
       tagName: pvt.viewConsts.viewTag,
-      className: pvt.viewConsts.viewClass,
-      
+      className: function(){
+        var viewConsts = pvt.viewConsts,
+            thisView = this,
+            thisModel = thisView.model;
+        return pvt.viewConsts.viewClass
+          + (thisModel.getStarredStatus() ? " " + viewConsts.starredClass : "")
+          + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "")
+          + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
+      },
+
+      // TODO refactor with list item view
+      events: {
+        "click .learn-view-check": "toggleLearnedConcept",
+        "click .learn-view-star": "toggleStarredConcept"
+      },
+
+      initialize: function(){
+        var viewConsts = pvt.viewConsts,
+            thisView = this;
+
+        function changeClass(sel, className, status){
+          if(status){
+            thisView.$el.addClass(className);
+          }
+          else{
+            thisView.$el.removeClass(className);
+          }
+        }
+        // TODO refactor this code if we keep the star and check in current location
+        this.listenTo(this.model, "change:learnStatus", function(nodeId, status){
+          changeClass("." + viewConsts.learnViewCheckClass, viewConsts.learnedClass, status);
+        });
+        this.listenTo(this.model, "change:starStatus", function(nodeId, status){
+          changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
+        });
+      },
+    /**
+       * Toggle learned state of given concept
+       */
+      toggleLearnedConcept: function(evt){
+        evt.stopPropagation();
+        this.model.setLearnedStatus(!this.$el.hasClass(pvt.viewConsts.learnedClass));
+      },
+
+      /**
+       * Toggle starred state of given concept
+       */
+      toggleStarredConcept: function(evt){
+        evt.stopPropagation();
+        this.model.setStarredStatus(!this.$el.hasClass(pvt.viewConsts.starredClass));
+      },
+
       /**
        * Render the learning view given the supplied model TODO consider using setElement instead of html
        * TODO try to reduce the boiler-plate repetition in rendering this view

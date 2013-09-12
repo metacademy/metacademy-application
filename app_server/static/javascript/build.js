@@ -7,7 +7,7 @@
     "jquery.cookie": "lib/jquery.cookie",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
-    d3: "lib/d3-v3-min",
+    d3: "lib/d3",
     "btouch": "lib/backbone.touch"
   },
   shim: {

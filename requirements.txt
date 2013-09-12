@@ -6,3 +6,4 @@ flask
 bleach
 markdown
 south
+django_compressor>=1.3

@@ -84,6 +84,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder'
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -130,12 +131,15 @@ INSTALLED_APPS = (
     'apps.roadmaps',
     'captcha',
     'south',
+    'compressor'
 )
 
+# apps settings
 CAPTCHA_NOISE_FUNCTIONS = ()
 CAPTCHA_LETTER_ROTATION = (-10,10)
 CAPTCHA_FONT_SIZE = 24
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

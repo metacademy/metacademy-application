@@ -19,6 +19,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
     pvt.viewConsts = {
       templateId: "node-title-view-template", // name of view template (warning: hardcoded in html)
       learnedClass: "learned-concept-title",
+      starredClass: "starred-concept-title",
       implicitLearnedClass: "implicit-learned-concept-title",
       viewClass: "learn-title-display",
       viewIdPrefix: "node-title-view-div-",
@@ -33,14 +34,16 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
         var viewConsts = pvt.viewConsts,
             thisView = this,
             thisModel = thisView.model;
-        return pvt.viewConsts.viewClass + (thisModel.getLearnedStatus() ?
-                                           " " + viewConsts.learnedClass : "") + (thisModel.getImplicitLearnStatus ?
-                                                                                  "": " " + viewConsts.implicitLearnedClass);
+        return pvt.viewConsts.viewClass
+          + (thisModel.getStarredStatus() ? " " + viewConsts.starredClass : "")
+          + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "")
+          + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
       tagName: "li",
 
       events: {
-        "click .learn-view-check": "toggleLearnedConcept"
+        "click .learn-view-check": "toggleLearnedConcept",
+        "click .learn-view-star": "toggleStarredConcept"
       },
 
       /**
@@ -49,13 +52,17 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
       initialize: function(){
         var thisView = this,
             viewConsts = pvt.viewConsts,
-            learnClass = viewConsts.learnedClass,
-            implicitLearnedClass = viewConsts.implicitLearnedClass;
+            learnedClass = viewConsts.learnedClass,
+            implicitLearnedClass = viewConsts.implicitLearnedClass,
+            starredClass = viewConsts.starredClass;
         thisView.listenTo(thisView.model, "change:learnStatus", function(nodeId, status){
-          thisView.changeTitleClass(learnClass, status);
+          thisView.changeTitleClass(learnedClass, status);
         });
         thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
           thisView.changeTitleClass(implicitLearnedClass, status);
+        });
+        thisView.listenTo(thisView.model, "change:starStatus", function(nodeId, status){
+          thisView.changeTitleClass(starredClass, status);
         });
       },
       
@@ -76,8 +83,15 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        */
       toggleLearnedConcept: function(evt){
         evt.stopPropagation();
-        var lclass = pvt.viewConsts.learnedClass;
-        this.model.setLearnedStatus(!this.$el.hasClass(lclass));
+        this.model.setLearnedStatus(!this.$el.hasClass(pvt.viewConsts.learnedClass));
+      },
+
+      /**
+       * Toggle starred state of given concept
+       */
+      toggleStarredConcept: function(evt){
+        evt.stopPropagation();
+        this.model.setStarredStatus(!this.$el.hasClass(pvt.viewConsts.starredClass));
       },
 
       /**

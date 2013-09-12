@@ -188,11 +188,11 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: #3E4018;
-    padding: 0.7em 1.4em;;
+    padding: 0.9em 2.55em;;
     line-height: 1.2em;
     font-size: 0.9em;
-    margin-left: -2em; /* offset checkmark so text appears centered */
     border-bottom: 1px solid #CCCCCC;
+    position: relative;
 }
 .learn-title-display:hover{
     background-color: rgb(250, 242, 248);
@@ -208,7 +208,7 @@ body {
 .node-detail-view{
    background-color: white; 
    color: #23240D;
-   padding: 0.3em 8em 1em 1.5em;
+   padding: 0.3em 10em 1em 1.5em;
    line-height: 1.2em;
 }
 
@@ -248,20 +248,34 @@ body {
     opacity: 0.5;
 }
 
-.learn-view-check{
-    visibility: hidden;
+.learn-title-buttons{
     display: inline-block;
-    margin-right: 0.5ex;
     color: #8e8888;
     font-size: 1.3em;
+    font-weight: bold;
+    right: 0.1em;
+    position: absolute;
 }
 
-.learned-concept-title > .learn-view-check, .learn-view-check:hover{
-   visibility: visible;
+.learn-title-buttons .learn-view-star{
+    font-weight: normal;
+}
+
+.learn-title-buttons span{
+    visibility: hidden;
+}
+
+.learned-concept-title .learn-view-check, .learn-view-check:hover{
+    visibility: visible;
     color: green;
 }
 
-.learn-title-display:hover > .learn-view-check{
+.starred-concept-title .learn-view-star, .learn-view-star:hover{
+    visibility: visible;
+    color: rgb(192, 182, 109);
+}
+
+.learn-title-display:hover .learn-title-buttons span{
     visibility: visible;
 }
 
@@ -276,7 +290,7 @@ body {
 .resource-view{
     color: #252313;
     line-height: 1.1em;
-    width: 60%;
+    width: 90%;
     display: inline-block;
     overflow: auto;
     margin-bottom: 1em;
@@ -336,12 +350,22 @@ body {
     padding-right: 5px;
 }
 
+.pointers-wrap li{
+    margin-top: 0.5em;
+    margin-bottom: 0;
+}
+
 .pointers-wrap ul{
     margin-left: 0;
 }
 
 .pointers-wrap ul ul{
     margin-left: 1em;
+    margin-top: 0.1em;
+}
+
+.pointers-wrap ul ul li{
+    margin-top: 0.1em;
 }
 
 .pointers-wrap ul ul li:before{
@@ -488,26 +512,6 @@ body {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
-
-/* .exp-to-learn-txt{ */
-/*     text-align: center; */
-/*     margin: auto; */
-/*     color: #3E4018; */
-/*     background-color: white; */
-/*     border: solid; */
-/*     border-width: 4px 4px 0 4px; */
-/*     border-color: #493A5C; */
-/*     font-size: 0.85em; */
-/*     font-weight: bold; */
-/*     line-height: 1.2em; */
-/*     border-radius: 0.7em 0.7em 0 0;  */
-/*     -moz-box-sizing: border-box; /\* Firefox *\/ */
-/*     -webkit-box-sizing: border-box; /\* Safari *\/ */
-/*     -ms-box-sizing: border-box; /\* IE *\/ */
-/*     box-sizing: border-box;     */
-/*     width: 100%; */
-/*     cursor: pointer; */
-/* } */
 
 /* ---------------------------------------------------*/
 /* ---------->>> Explore Graph Svg Style<<<-----------*/

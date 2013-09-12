@@ -633,12 +633,13 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
 
       /**
        * Show the concept detail of the given nodeModel
-       * Returns the view object for the appended concept
+       * Returns the view object for the shown concept
        */
       showConceptDetails: function(nodeModel){
         var thisView = this,
             dNodeView = new DetailedNodeView({model: nodeModel});
         pvt.conceptDisplayWrap.appendChild(dNodeView.render().el);
+        $(pvt.conceptDisplayWrap).scrollTop(0);
         return dNodeView;
       },
 

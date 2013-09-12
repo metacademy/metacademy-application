@@ -12,9 +12,38 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       elNameAppend: "-button",
       elNavButtonClass: "el-nav-button",
       clearLearnedId: "button-clear-learned",
-      showLearnedId: "button-show-learned"
+      showLearnedId: "button-show-learned",
+      disabledClass: "disabled"
+    };
+    pvt.numVisLearned = 0;
+
+    /**
+     * helper function to enable/disable the appropriate clear/show learned button
+     */
+    pvt.changeShowHideButtons = function(elId, enable){
+      if (enable){
+        $("#" + elId).removeClass(pvt.viewConsts.disabledClass);
+      } else{
+        $("#" + elId).addClass(pvt.viewConsts.disabledClass);
+      }
+    };
+    
+    pvt.enableHide = function(){
+      pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, true);
     };
 
+    pvt.disableHide = function(){
+      pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, false);
+    };
+
+    pvt.disableShow = function(){
+      pvt.changeShowHideButtons(pvt.viewConsts.showLearnedId, false);
+    };
+
+    pvt.enableShow = function(){
+      pvt.changeShowHideButtons(pvt.viewConsts.showLearnedId, true);
+    };
+    
     pvt.isRendered = true; // view is prerendered 
     
     return Backbone.View.extend({
@@ -33,8 +62,45 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
         $('#' + viewConsts.showLearnedId).on("click", function(evt){
           thisView.handleShowLearnedClick.call(thisView, evt);
         });
+
+        // enable/disable the hide/show buttons
+        thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.changeShowHideState);
+        thisView.listenTo(thisView.model.get("nodes"), "change:learnStatus", thisView.handleChLearnStatus ); // listen for check clicks
       },
 
+      /**
+       *  Change the show/hide learned concepts buttons state
+       */
+      changeShowHideState: function(chmodel, chstate){
+        if (chstate){
+          pvt.enableHide();
+          pvt.disableShow();
+        } else{
+          pvt.disableHide();
+          pvt.enableShow();
+        }
+      },
+
+      /**
+       * Handle changing node status
+       */
+      handleChLearnStatus: function(tag, state){
+       // keep count of the number of learned nodes
+        var x = 5;
+        if (state){
+          pvt.numVisLearned++;
+          if (pvt.numVisLearned === 1){
+            pvt.enableHide();
+          }
+        }
+        else{
+          pvt.numVisLearned--;
+          if(pvt.numVisLearned === 0){
+            pvt.disableHide();
+          }
+        }
+      },
+      
       /**
        * Return true if the view has been rendered
        */
@@ -46,15 +112,18 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
        * Handle click event for showing the [implicitly] learned nodes
        */
       handleClearLearnedClick: function(evt){
-        // TODO: check that learned concepts have changed
-        this.model.get("options").setLearnedConceptsState(false);
+        if (!$(evt.currentTarget).hasClass(pvt.viewConsts.disabledClass)){
+          this.model.get("options").setLearnedConceptsState(false);
+        }
       },
 
       /**
        * Handle click event for showing the [implicitly] learned nodes
        */
       handleShowLearnedClick: function(evt){
-        this.model.get("options").setLearnedConceptsState(true);
+        if (!$(evt.currentTarget).hasClass(pvt.viewConsts.disabledClass)){
+          this.model.get("options").setLearnedConceptsState(true);
+        }
       },
 
       /**

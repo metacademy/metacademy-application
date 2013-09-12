@@ -85,9 +85,21 @@ body {
 
 #apptools .toggle-lc-button{
     width: 5em;
-    margin: 0.5em 0.3em;
+    margin: 0.5em 0.4em;
     line-height: 1.3em;
  }
+
+#apptools button.toggle-lc-button.disabled{
+    opacity: 0.5;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+#apptools button.toggle-lc-button.disabled:hover{
+    border: 2px #5C4A56 solid;
+    cursor: default;
+}
 
 .horz-center-wrapper{
     margin: 0 auto;

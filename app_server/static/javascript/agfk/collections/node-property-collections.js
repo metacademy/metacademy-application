@@ -30,6 +30,18 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
       }));
     },
 
+    getCore: function(){
+      return new ResourceCollection(this.filter(function(rsrc){
+        return rsrc.get("mark").indexOf("star") !== -1;
+      }));
+    },
+
+    getSupplemental: function(){
+      return new ResourceCollection(this.filter(function(rsrc){
+        return rsrc.get("mark").indexOf("star") === -1;
+      }));
+    },
+
     getMessage: function(){
       if (this.getFreeResources().getStarredResources().length > 0) {
         return "Read/watch one starred resource, and go to any of the others for additional clarification.";

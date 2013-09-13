@@ -174,13 +174,15 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
     var pvt = {};
 
     pvt.viewConsts = {
+      templateId: "resources-section-view-template",
       viewClass: "resources-wrapper",
-      viewIdPrefix: "resources-wrapper-"
+      viewIdPrefix: "resources-wrapper-",
     };
 
     // return public object
     return Backbone.View.extend({
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
+      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.options.conceptId;},
       className: pvt.viewConsts.viewClass,
       
       /**
@@ -188,10 +190,44 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
        */
       render: function(){
         var thisView = this;
-        thisView.$el.html("");
-        thisView.model.each(function(itm){
-          thisView.$el.append(new ResourceView({model: itm}).render().el);
+        var coreResources = thisView.model.getCore(),
+            suppResources = thisView.model.getSupplemental(),
+            fcResources = coreResources.getFreeResources(),
+            pcResources = coreResources.getPaidResources(),
+            fsResources = suppResources.getFreeResources(),
+            psResources = suppResources.getPaidResources();
+
+        var tempVars = {
+          'coreResources': coreResources,
+          'suppResources': suppResources,
+          'freeCoreResources': fcResources,
+          'paidCoreResources': pcResources,
+          'freeSuppResources': fsResources,
+          'paidSuppResources': psResources,
+          'id': this.options.conceptId,
+        };
+        thisView.$el.html(thisView.template(_.extend(thisView.model.toJSON(), tempVars)));
+
+        var fcEl = thisView.$el.find(".free-core-resources-wrap");
+        fcResources.each(function(itm){
+          fcEl.append(new ResourceView({model: itm}).render().el);
         });
+
+        var pcEl = thisView.$el.find(".paid-core-resources-wrap");
+        pcResources.each(function(itm){
+          pcEl.append(new ResourceView({model: itm}).render().el);
+        });
+
+        var fsEl = thisView.$el.find(".free-supp-resources-wrap");
+        fsResources.each(function(itm){
+          fsEl.append(new ResourceView({model: itm}).render().el);
+        });
+
+        var psEl = thisView.$el.find(".paid-supp-resources-wrap");
+        psResources.each(function(itm){
+          psEl.append(new ResourceView({model: itm}).render().el);
+        });
+
         thisView.delegateEvents();
         return thisView;
       }
@@ -437,8 +473,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
       viewTag: "section",
       viewIdPrefix: "node-detail-view-",
       viewClass: "node-detail-view",
-      freeResourcesLocClass: 'free-resources-wrap', // classes are specified in the node-detail template
-      paidResourcesLocClass: 'paid-resources-wrap',
+      resourcesLocClass: 'resources-wrap', // classes are specified in the node-detail template
       depLocClass: 'dep-wrap',
       ptrLocClass: 'pointers-wrap',
       goalsLocClass: 'goals-wrap',
@@ -515,30 +550,25 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
         var thisView = this,
             viewConsts = pvt.viewConsts,
             assignObj = {},
-            freeResourcesLocClass = "." + viewConsts.freeResourcesLocClass,
-            paidResourcesLocClass = "." + viewConsts.paidResourcesLocClass,
+            resourcesLocClass = "." + viewConsts.resourcesLocClass,
             depLocClass = "." + viewConsts.depLocClass,
             outlinkLocClass = "." + viewConsts.outlinkLocClass,
             ptrLocClass = "." + viewConsts.ptrLocClass,
             goalsLocClass = "." + viewConsts.goalsLocClass;
         
-        var templateVars = _.extend(thisView.model.toJSON(), {"resourcesMsg": thisView.model.get("resources").getMessage(),
-                                                              "neededFor": thisView.model.computeNeededFor(),
+        var templateVars = _.extend(thisView.model.toJSON(), {"neededFor": thisView.model.computeNeededFor(),
                                                               "notes": thisView.notesList()});
         thisView.$el.html(thisView.template(templateVars));
-        thisView.fresources = thisView.fresource || new ResourcesSectionView({model: thisView.model.get("resources").getFreeResources()});
-        thisView.presources = thisView.presources || new ResourcesSectionView({model: thisView.model.get("resources").getPaidResources()});
+        thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"), 
+                                                                             conceptId: this.model.get("id")});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
         thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
         thisView.pointers = thisView.pointers || new NestedListView({model: {text: thisView.model.get("pointers")},
                                                                      prefix: "pointers"});
         thisView.goals = thisView.goals || new NestedListView({model: {text: thisView.model.get("goals")},
                                                                prefix: "goals"});
-        if (thisView.fresources.model.length > 0){
-          assignObj[freeResourcesLocClass] = thisView.fresources;
-        }
-        if (thisView.presources.model.length > 0){
-          assignObj[paidResourcesLocClass] = thisView.presources;
+        if (thisView.resources.model.length > 0){
+          assignObj[resourcesLocClass] = thisView.resources;
         }
         if (thisView.dependencies.model.length > 0){
           assignObj[depLocClass] = thisView.dependencies;

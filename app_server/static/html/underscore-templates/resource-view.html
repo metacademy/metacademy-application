@@ -1,7 +1,6 @@
 <script type="text/template" id="resource-view-template">
   <div class="resource-title-display">
     <% var titleDisp = title ? title : "-no title-" %>
-    <% titleDisp = (mark ? (mark.indexOf("star") > -1 ? '<span class="key-resource-star">&#9734;</span>' : "") : "") + titleDisp %>
     <% if (url){ %>
     <span class="resource-link"> <a class="external-link" href="<%= url %>"> <%= titleDisp %> </a> </span>
     <% } else{ %>

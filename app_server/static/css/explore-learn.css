@@ -256,7 +256,7 @@ h1 .learn-view-star{
     color: #333333;
     font-size: 1em;
     font-style: normal;
-    margin: 0.5em 0 0.3em 0;
+    margin: 0.5em 0;
     font-weight: bold;
 }
 
@@ -267,6 +267,8 @@ h1 .learn-view-star{
 
 .info-text{
     font-style: italic;
+    font-weight: normal;
+    font-size: 0.95em;
 }
 
 .learned-concept-title, .implicit-learned-concept-title{
@@ -318,8 +320,13 @@ h1 .learn-view-star{
     width: 90%;
     display: inline-block;
     overflow: auto;
-    margin-bottom: 1em;
+    margin-top: 0;
 }
+
+.resource-view ~ .resource-view{
+    margin-top: 1em;
+}
+
 
 .resource-title a{
     color: #223804;
@@ -375,7 +382,7 @@ h1 .learn-view-star{
     padding-right: 5px;
 }
 
-.pointers-wrap li{
+.pointers-wrap li ~ li{
     margin-top: 0.5em;
     margin-bottom: 0;
 }

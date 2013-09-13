@@ -1,32 +1,35 @@
 <script type="text/template" id="resources-section-view-template">
   
-  <h2 class="node-detail-title">Core resources</h2>
-  <div class="node-detail-comp-wrap">
+  <h2 class="node-detail-title">Core resources
     <% if (coreResources.length > 0) { %>
-      <p class="info-text">Read/watch one of the following:</p>
+    <span class="info-text">(read/watch one of the following)</span>
+    <% } else { %>
+      <span class="info-text">(we're sorry, we haven't finished tracking down resources for this node yet)</span>
+    <% } %>
+
+</h2>
+  <div class="node-detail-comp-wrap">
       <% if (freeCoreResources.length > 0) { %>
-        <h2 class="node-detail-subtitle">Free</h2>
+        <h2 class="node-detail-subtitle">-Free-</h2>
         <div class="node-detail-comp-wrap free-core-resources-wrap" id="node-detail-fcresources-<%- id %>" />
       <% } %>
       <% if (paidCoreResources.length > 0) { %>
-        <h2 class="node-detail-subtitle">Paid</h2>
+        <h2 class="node-detail-subtitle">-Paid-</h2>
         <div class="node-detail-comp-wrap paid-core-resources-wrap" id="node-detail-pcresources-<%- id %>" />
       <% } %>
-    <% } else { %>
-      <p class="info-text">We're sorry, we haven't finished tracking down resources for this node yet.</p>
-    <% } %>
   </div>
 
   <% if (suppResources.length > 0) { %>
-  <h2 class="node-detail-title">Supplemental resources</h2>
+  <h2 class="node-detail-title">Supplemental resources
+      <span class="info-text">(the following are optional, but you may find them useful)</span>
+</h2>
     <div class="node-detail-comp-wrap">
-      <p class="info-text">The following are optional, but you may find them useful:</p>
       <% if (freeSuppResources.length > 0) { %>
-        <h2 class="node-detail-subtitle">Free</h2>
+        <h2 class="node-detail-subtitle">-Free-</h2>
         <div class="node-detail-comp-wrap free-supp-resources-wrap" id="node-detail-fsresources-<%- id %>" />
       <% } %>
       <% if (paidSuppResources.length > 0) { %>
-        <h2 class="node-detail-subtitle">Paid</h2>
+        <h2 class="node-detail-subtitle">-Paid-</h2>
         <div class="node-detail-comp-wrap paid-supp-resources-wrap" id="node-detail-psresources-<%- id %>" />
       <% } %>
     </div>

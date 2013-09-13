@@ -114,6 +114,11 @@ def json_repr(resource, db):
         else:
             resource['extra'] = resource['note']
 
+    if 'mark' in resource:
+        if 'star' in resource['mark']:
+            resource['core'] = 1
+        del resource['mark']
+
     if 'dependencies' in resource:
         resource['dependencies'] = [{'title': db.nodes[dep].title, 'link': dep}
                                     for dep in resource['dependencies']

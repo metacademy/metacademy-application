@@ -23,7 +23,7 @@ define(["backbone"], function(Backbone){
    * Learning resource model
    */
   var Resource = Backbone.Model.extend({
-    listFields: ['authors', 'dependencies', 'mark', 'extra', 'note'],
+    listFields: ['authors', 'dependencies', 'extra', 'note'],
 
     /**
      * default values -- attributes match possible data from server
@@ -36,11 +36,11 @@ define(["backbone"], function(Backbone){
         node: null,
         resource_type: "",
         free: 0,
+        core: 0,
         edition: "",
         level: "",
         authors: [],
         dependencies: [],
-        mark: [],
         extra: [],
         note: []
       };

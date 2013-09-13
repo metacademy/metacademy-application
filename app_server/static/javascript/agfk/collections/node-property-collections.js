@@ -24,42 +24,14 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
       return new ResourceCollection(this.where({free: 0}));
     },
 
-    getStarredResources: function(){
-      return new ResourceCollection(this.filter(function(rsrc){
-        return rsrc.get("mark").indexOf("star") !== -1;
-      }));
-    },
-
     getCore: function(){
-      return new ResourceCollection(this.filter(function(rsrc){
-        return rsrc.get("mark").indexOf("star") !== -1;
-      }));
+      return new ResourceCollection(this.where({core: 1}));
     },
 
     getSupplemental: function(){
-      return new ResourceCollection(this.filter(function(rsrc){
-        return rsrc.get("mark").indexOf("star") === -1;
-      }));
+      return new ResourceCollection(this.where({core: 0}));
     },
 
-    getMessage: function(){
-      if (this.getFreeResources().getStarredResources().length > 0) {
-        return "Read/watch one starred resource, and go to any of the others for additional clarification.";
-      } else if (this.getStarredResources().length > 0) {
-        return "Sorry, we haven't found any free resources which fit nicely with our graph structure. Read/watch one of the starred resources if you happen to have it available, and go to any of the others for additional clarification.";
-      } else if (this.length > 0) {
-        return "Sorry, we haven't found any resources which fit nicely with the graph structure. Maybe you'll find some of the following helpful anyway.";
-      } else {
-        return "Sorry, we haven't finished annotating this concept yet."
-      }
-    },
-
-    /**
-     * Keep the resource sorted by mark !== 'star'
-     */
-    comparator: function(rsrc){
-      return rsrc.get("mark").indexOf("star") === -1;
-    }
   });
 
 

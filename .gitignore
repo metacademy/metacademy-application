@@ -48,3 +48,6 @@ settings_local.py
 
 # local copies
 media
+
+# debugging
+sandbox.py

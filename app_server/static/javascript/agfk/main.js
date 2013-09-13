@@ -74,6 +74,24 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "
   // automatically resize window when viewport changes
   Utils.scaleWindowSize("header", "main");
 
+  // log internal and external views (piwik won't track if the client has donottrack set)
+  $("body").on("click", "a.external-link", function(evt){
+    if(window._paq){
+        window._paq.push(['trackLink', evt.currentTarget.href, "link"]);
+    }
+  });
+  $(window).on('hashchange', function() {
+    if(window._paq){
+        window._paq.push(['trackPageView', window.location.hash]);
+    }
+  });
+
+  $("body").on("click", ".toggle-lc-button", function(evt){
+    if(window._paq){
+        window._paq.push(['trackPageView', evt.currentTarget.id]);
+    }
+  });
+
   // start the AGFK app
   var appRouter = new AppRouter();
   Backbone.history.start();

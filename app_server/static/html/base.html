@@ -130,10 +130,9 @@
 
     <script>
       // piwik server-side tracking
-      if (window.PRODUCTION){
+      if (true){//window.PRODUCTION){
       var _paq = _paq || [];
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
+      _paq.push(['trackPageView', window.location.href.split('/').pop()]);
       (function() {
       var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
       _paq.push(['setTrackerUrl', u+'piwik.php']);

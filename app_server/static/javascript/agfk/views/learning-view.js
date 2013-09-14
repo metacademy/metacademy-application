@@ -176,7 +176,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
     pvt.viewConsts = {
       templateId: "resources-section-view-template",
       viewClass: "resources-wrapper",
-      viewIdPrefix: "resources-wrapper-",
+      viewIdPrefix: "resources-wrapper-"
     };
 
     // return public object
@@ -204,7 +204,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
           'paidCoreResources': pcResources,
           'freeSuppResources': fsResources,
           'paidSuppResources': psResources,
-          'id': this.options.conceptId,
+          'id': this.options.conceptId
         };
         thisView.$el.html(thisView.template(_.extend(thisView.model.toJSON(), tempVars)));
 
@@ -526,6 +526,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
           changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
         });
       },
+
     /**
        * Toggle learned state of given concept
        */

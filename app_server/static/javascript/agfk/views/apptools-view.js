@@ -2,7 +2,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
   "use strict";
 
   /**
-   * Simple explore-learn button toggle view
+   * Application Tools View
    */
   var AppToolsView = (function(){
     var pvt = {};

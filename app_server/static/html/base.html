@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load compress %}
+{% load i18n lazysignup_tags %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -38,11 +39,6 @@
       window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
       window.PRODUCTION = window.location.href.match('metacademy') !== null;
       window.CSRF_TOKEN = "{{ csrf_token }}";
-      {% if user.is_authenticated %}
-      window.isAuth = true;
-      {% else %}
-      window.isAuth = false;
-      {% endif %}
     </script>
     {% endblock %}
 
@@ -96,7 +92,7 @@
 
       {% block standard-header-content %}
       <ul id="header-user-tools" class="header-el">
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and not user|is_lazy_user %}
         <li>
           <a target="_self" href="{% url 'user:user_main' %}">{{ user.username }}</a>
           &#124;

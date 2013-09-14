@@ -20,6 +20,11 @@ class UserCreateForm(UserCreationForm):
             user.save()
         return user
 
+    def get_credentials(self):
+        return {
+            'username': self.cleaned_data['username'],
+            'password': self.cleaned_data['password1']}
+
 class Profile(models.Model):
     """
     This is a skeleton user profile model with a one-to-one relationship

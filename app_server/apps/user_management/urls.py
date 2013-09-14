@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.views import login, logout
-from django.contrib.auth.forms import AuthenticationForm
 
 from apps.user_management import views
+from apps.user_management.models import UserCreateForm as Form
 
 urlpatterns = patterns('',
                        url(r'^$', views.user_main, name='user_main'),

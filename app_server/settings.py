@@ -131,7 +131,8 @@ INSTALLED_APPS = (
     'apps.roadmaps',
     'captcha',
     'south',
-    'compressor'
+    'compressor',
+    'lazysignup'
 )
 
 # apps settings
@@ -169,6 +170,12 @@ LOGGING = {
         },
     }
 }
+
+
+AUTHENTICATION_BACKENDS = (
+  'django.contrib.auth.backends.ModelBackend',
+  'lazysignup.backends.LazySignupBackend',
+)
 
 # default URL to redirect to after login
 LOGIN_REDIRECT_URL = '/user'

@@ -1,8 +1,9 @@
 import collections
 import numpy as np
 import re
-import scipy.special
+import scipy.optimize, scipy.special
 
+MIN_TIME = 0.5    # all concepts' time estimates must be at least this many hours.
 
 LOCATION_TYPES = ['location', 'page', 'lecture_sequence']
 
@@ -273,15 +274,57 @@ class PoissonModel:
 
     def fit(self):
         params = ModelParams.default_init(self.names)
-        for i in range(100):
+        for i in range(500):
             params.concept_work = self.update_concept_work(params)
             params.ltype_factors = self.update_ltype_factors(params)
-            if i > 50:
+            if i > 200:
                 params.resource_factors = self.update_resource_factors(params)
             print i, self.fobj(params)
         return params
 
 
 
+# I set the coversion factor at 45 minutes per work unit. This should correspond roughly to
+# two hours for every one hour of video lecture. In the future, we'll fit this explicitly
+# by scraping the lengths of the videos we link to.
+CONVERSION_FACTOR = 0.75
 
+def fit_model(db, model_name='poisson'):
+    concepts = [(tag, False) for tag in db.nodes]
+    shortcuts = [(tag, True) for tag in db.shortcuts]
+    resources = db.resources.keys() + ['unknown']
+    names = Names(concepts + shortcuts, resources)
+
+    obs = []
+    for tag, node in db.nodes.items():
+        for resource in node.resources:
+            if 'mark' in resource and 'star' in resource['mark']:
+                obs.append(Observation.from_resource((tag, False), resource, names))
+    for tag, shortcut in db.shortcuts.items():
+        for resource in shortcut.resources:
+            if 'mark' in resource and 'star' in resource['mark']:
+                obs.append(Observation.from_resource((tag, True), resource, names))
+
+    if model_name == 'least_squares':
+        params = LeastSquaresModel(obs, names, False).fit()
+    elif model_name == 'fake_poisson':
+        params = LeastSquaresModel(obs, names, True).fit()
+    elif model_name == 'poisson':
+        params = PoissonModel(obs, names, 1.).fit()
+    else:
+        raise RuntimeError('Unknown model: %s' % model_name)
+
+    concept_times, shortcut_times = {}, {}
+    
+    for idx, (tag, is_shortcut) in enumerate(names.concepts):
+        if not any([o.concept_id == idx for o in obs]):
+            continue
+
+        if is_shortcut:
+            shortcut_times[tag] = CONVERSION_FACTOR * params.concept_work[idx]
+        else:
+            concept_times[tag] = CONVERSION_FACTOR * params.concept_work[idx]
+
+    return concept_times, shortcut_times
+            
 

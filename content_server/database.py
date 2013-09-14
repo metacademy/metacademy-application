@@ -5,6 +5,7 @@ import concepts
 import formats
 import graphs
 import resources
+import work_estimates
 
 
 
@@ -12,7 +13,7 @@ class DatabaseFormatError(RuntimeError):
     pass
 
 class Database:
-    def __init__(self, nodes, shortcuts, graph, resources, id2tag, tag2id, flags):
+    def __init__(self, nodes, shortcuts, graph, resources, id2tag, tag2id, flags, concept_times, shortcut_times):
         self.nodes = nodes
         self.shortcuts = shortcuts
         self.graph = graph
@@ -20,6 +21,8 @@ class Database:
         self.id2tag = id2tag
         self.tag2id = tag2id
         self.flags = flags
+        self.concept_times = concept_times
+        self.shortcut_times = shortcut_times
 
     @staticmethod
     def load(content_dir):
@@ -33,7 +36,9 @@ class Database:
         tag2id = dict([(tag, node.id) for tag, node in nodes.items()
                        if node.id is not None])
         flags = read_flags(content_dir)
-        return Database(nodes, shortcuts, graph, resource_dict, id2tag, tag2id, flags)
+        concept_times, shortcut_times = read_time_estimates(content_dir)
+        return Database(nodes, shortcuts, graph, resource_dict, id2tag, tag2id, flags,
+                        concept_times, shortcut_times)
 
     def check(self):
         all_errors = {}
@@ -128,6 +133,12 @@ def shortcut_resources_file(content_path, tag):
 
 def shortcut_dependencies_file(content_path, tag):
     return os.path.join(shortcut_dir(content_path, tag), 'dependencies.txt')
+
+def concept_time_estimates_file(content_path):
+    return os.path.join(content_path, 'time_estimates', 'concepts.txt')
+
+def shortcut_time_estimates_file(content_path):
+    return os.path.join(content_path, 'time_estimates', 'shortcuts.txt')
 
 
 
@@ -364,4 +375,36 @@ def read_flags(content_path):
         return {item['key']: item['text'] for item in items}
     else:
         return {}
+
+def save_time_estimates(content_path):
+    db = Database.load(content_path)
+    concept_times, shortcut_times = work_estimates.fit_model(db)
+
+    outstr = open(concept_time_estimates_file(content_path), 'w')
+    for tag, time in concept_times.items():
+        print >> outstr, tag, time
+    outstr.close()
+
+    outstr = open(shortcut_time_estimates_file(content_path), 'w')
+    for tag, time in shortcut_times.items():
+        print >> outstr, tag, time
+    outstr.close()
+    
+def read_time_estimates(content_path):
+    concept_times = {}
+    fname = concept_time_estimates_file(content_path)
+    if os.path.exists(fname):
+        for line in open(fname):
+            tag, time_str = line.strip().split()
+            concept_times[tag] = float(time_str)
+
+    shortcut_times = {}
+    fname = shortcut_time_estimates_file(content_path)
+    if os.path.exists(fname):
+        for line in open(fname):
+            tag, time_str = line.strip().split()
+            shortcut_times[tag] = float(time_str)
+
+    return concept_times, shortcut_times
+
 

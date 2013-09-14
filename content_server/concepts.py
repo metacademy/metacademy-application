@@ -1,6 +1,7 @@
 import random
 import resources
 import string
+import work_estimates
 
 ID_LENGTH = 8
 
@@ -85,6 +86,9 @@ class Concept:
              'flags': flags,
              }
 
+        if self.tag in db.concept_times:
+            d['time'] = max(db.concept_times[self.tag], work_estimates.MIN_TIME)
+
         return d
              
 
@@ -142,6 +146,9 @@ class Shortcut:
              'is_shortcut': 1,
              'flags': flags,
              }
+
+        if self.concept.tag in db.shortcut_times:
+            d['time'] = max(db.shortcut_times[self.concept.tag], work_estimates.MIN_TIME)
 
         return d
 

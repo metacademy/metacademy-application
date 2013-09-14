@@ -171,6 +171,19 @@ define(["jquery"], function($){
     windowSize.init();
   };
 
+  utils.formatTimeEstimate = function(timeEstimate) {
+    if (!timeEstimate) {
+      return "";
+    }
+    if (timeEstimate > 5) {
+      return Math.round(timeEstimate) + " hours";  // round to nearest hour
+    } else if (timeEstimate > 1) {
+      return (Math.round(timeEstimate * 10) / 10) + " hours";   // round to nearest 0.1 hours
+    } else {
+      return (Math.round(timeEstimate * 12) * 5) + " minutes";    // round to nearest 5 minutes
+    }
+  }
+
   // return require.js object
   return utils;
 });

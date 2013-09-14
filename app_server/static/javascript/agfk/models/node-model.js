@@ -10,7 +10,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
     // maintain ancillary/user-specific info and fields in a private object
     var pvt = {};
     pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
-    pvt.txtFields = ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags"];
+    pvt.txtFields = ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time"];
     
     return Backbone.Model.extend({
       /**
@@ -24,6 +24,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           summary: "",
           goals: "",
           pointers: "",
+          time: "",
           is_shortcut: 0,
           flags: [],
           questions: new NodePropertyCollections.QuestionCollection(),
@@ -309,8 +310,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
        */
       isFinished: function(){
         return this.get("summary") && this.get("resources").length > 0;
-      }
-           
+      },
     });
   })();
 });

@@ -184,6 +184,12 @@ body {
     font-weight: bold;
     color: #333;
     font-size: 0.9em;
+    padding-bottom: 0.5em;
+}
+
+#learn-title-list .time-estimate{
+    font-size: 0.8em;
+    text-align: center;
     border-bottom: 1px solid #CCCCCC;
     padding-bottom: 1em;
 }

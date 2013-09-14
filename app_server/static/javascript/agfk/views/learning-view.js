@@ -4,7 +4,7 @@
  */
 
 
-define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backbone, _, $, ErrorHandler){
+define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/utils"], function(Backbone, _, $, ErrorHandler, Utils){
   "use strict";
   
   /**
@@ -558,7 +558,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
             goalsLocClass = "." + viewConsts.goalsLocClass;
         
         var templateVars = _.extend(thisView.model.toJSON(), {"neededFor": thisView.model.computeNeededFor(),
-                                                              "notes": thisView.notesList()});
+                                                              "notes": thisView.notesList(),
+                                                              "time": Utils.formatTimeEstimate(thisView.model.get("time"))});
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"), 
                                                                              conceptId: this.model.get("id")});
@@ -736,6 +737,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
       initialize: function(inp){
         this.appRouter = inp.appRouter;
         this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
+        this.listenTo(this.model.get("nodes"), "change:learnStatus", this.updateTimeEstimate);
       },
       
       /**
@@ -757,9 +759,15 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
         titlesTitle.textContent = "Learning List"; // TODO move this to a template
         thisView.$el.prepend(titlesTitle);
         $div.append(titlesTitle);
+        var timeEstimateEl = document.createElement("div");
+        timeEstimateEl.className = "time-estimate";
+        var timeEstimate = thisView.model.get("nodes").getTimeEstimate();
+        
+        $div.append(timeEstimateEl);
         var $titlesEl = thisView.renderTitles();
         $div.append($titlesEl);
         thisView.$el.append($div);
+        thisView.updateTimeEstimate();
         pvt.conceptDisplayWrap = document.createElement("div");
         pvt.conceptDisplayWrap.id =  pvt.viewConsts.conceptDisplayWrapId;
         thisView.$el.append(pvt.conceptDisplayWrap);
@@ -804,6 +812,17 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors"], function(Backb
           $list.append(nliview.render().el); 
         }
         return $list;
+      },
+
+      updateTimeEstimate: function(){
+        var thisView = this,
+            timeEstimate = thisView.model.get("nodes").getTimeEstimate();
+        if (timeEstimate) {
+          var timeStr = "Time: " + Utils.formatTimeEstimate(timeEstimate);
+        } else {
+          var timeStr = "All done!";
+        }
+        thisView.$el.find(".time-estimate").html(timeStr);
       },
 
       /**

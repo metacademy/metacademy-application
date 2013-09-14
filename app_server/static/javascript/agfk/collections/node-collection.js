@@ -75,6 +75,21 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
         });
       }
       return true;
+    },
+
+    getTimeEstimate: function(){
+      var total = 0;
+      this.each(function(node) {
+        if (!node.isLearnedOrImplicitLearned()) {
+          if (node.get("time")) {
+            total += node.get("time");
+          } else {
+            total += 1;     // reasonable guess when the time is unknown
+          }
+        }
+      });
+      return total;
     }
+    
   });
 });

@@ -298,15 +298,23 @@ h1 .learn-view-star{
     visibility: hidden;
 }
 
-.learned-concept-title .learn-view-check, .learned-concept .learn-view-check, .learn-view-check:hover{
+ .learn-view-check:hover, .learn-view-star:hover{
+     color: #B99797;
+     cursor: pointer;
+ }
+
+
+.learned-concept-title .learn-view-check, .learned-concept .learn-view-check, .learned-concept .learn-view-check:hover{
     visibility: visible;
     color: green;
 }
 
-.starred-concept-title .learn-view-star, .starred-concept .learn-view-star, .learn-view-star:hover{
+
+.starred-concept-title .learn-view-star, .starred-concept .learn-view-star, .starred-concept .learn-view-star:hover{
     visibility: visible;
     color: rgb(192, 182, 109);
 }
+
 
 .learn-title-display:hover .learn-title-buttons span{
     visibility: visible;

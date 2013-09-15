@@ -559,7 +559,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         
         var templateVars = _.extend(thisView.model.toJSON(), {"neededFor": thisView.model.computeNeededFor(),
                                                               "notes": thisView.notesList(),
-                                                              "time": Utils.formatTimeEstimate(thisView.model.get("time"))});
+                                                              "time": Utils.formatTimeEstimate(thisView.model.get("time")),
+                                                              "displayTitle": thisView.model.getLearnViewTitle()});
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"), 
                                                                              conceptId: this.model.get("id")});

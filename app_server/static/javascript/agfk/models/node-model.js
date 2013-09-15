@@ -172,6 +172,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
       getNodeDisplayTitle: function(numCharNodeLine){
         if (!this.nodeDisplayTitle){
           var title = this.get("title") || this.id.replace(/_/g, " ");
+          title += this.get("is_shortcut") ? " (shortcut)" : "";
           this.nodeDisplayTitle = Utils.wrapNodeText(title, numCharNodeLine || 9);
         }
         return this.nodeDisplayTitle;
@@ -181,7 +182,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
        * Returns the title to be displayed in the learning view
        */
       getLearnViewTitle: function(){
-        var title = this.get("title");
+        var title = this.get("title") || this.id.replace(/_/g, " ");
         if (this.get("is_shortcut")) {
           title += " (shortcut)";
         }

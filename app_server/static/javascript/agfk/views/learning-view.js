@@ -628,7 +628,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       conceptDisplayWrapId: "learn-concept-wrapper",
       learnedClass: "learned-concept",
       starredClass: "starred-concept",
-      dataTagName: "data-tag"
+      dataTagName: "data-tag",
+      timeEstimateClass: "time-estimate"
 
     };
 
@@ -724,7 +725,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         var thisView = this,
             $el = thisView.$el,
             $expandedTitle = pvt.$expandedTitle,
-            clkItmClass = pvt.viewConsts.clickedItmClass;
+            viewConsts = pvt.viewConsts,
+            clkItmClass = viewConsts.clickedItmClass;
 
         $el.html("");
         var $div = $(document.createElement("div"));
@@ -735,7 +737,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         thisView.$el.prepend(titlesTitle);
         $div.append(titlesTitle);
         var timeEstimateEl = document.createElement("div");
-        timeEstimateEl.className = "time-estimate";
+        timeEstimateEl.className = viewConsts.timeEstimateClass;
         var timeEstimate = thisView.model.get("nodes").getTimeEstimate();
         
         $div.append(timeEstimateEl);
@@ -793,7 +795,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         var thisView = this,
             timeEstimate = thisView.model.get("nodes").getTimeEstimate();
         if (timeEstimate) {
-          var timeStr = "Time: " + Utils.formatTimeEstimate(timeEstimate);
+          var timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
         } else {
           var timeStr = "All done!";
         }

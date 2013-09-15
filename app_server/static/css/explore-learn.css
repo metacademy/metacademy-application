@@ -164,7 +164,7 @@ body {
 
 #learn-view{
     padding-bottom: 5em;
-    min-width: 600px;
+    min-width: 650px;
     height: inherit;
 }
 
@@ -239,6 +239,7 @@ body {
 h1 .learn-view-check, h1 .learn-view-star{
     display: inline-block;
     cursor: default;
+    width: 0.9em;
 }
 
 h1 .learn-view-check{
@@ -269,6 +270,14 @@ h1 .learn-view-star{
 .node-detail-summary-text{
     line-height: 1.2em;
     padding-right: 3em;
+}
+
+.detail-time-est{
+    text-align: center;
+    margin-right: 2.5em;
+    margin-top: 0.2em;
+    font-size: 0.9em;
+    color: #8D5E5E;
 }
 
 .info-text{

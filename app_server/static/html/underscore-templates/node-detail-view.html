@@ -3,17 +3,18 @@
    <span class="learn-view-check" data-tag="<%= id %>"> ✓ </span>
    <span class="learn-view-star" data-tag="<%= id %>"> ★ </span>
   </h1>
+  <div class="detail-time-est">
+    <% if (time) { %>
+        <span class="info-text">(<%- time %> to learn)</span>
+    <% } else{ %>
+    <% } %>
+  </div>
+
 
     <h2 class="node-detail-title">Summary</h2>
     <div class="node-detail-comp-wrap node-detail-summary-text">
       <%= summary.length ? summary : '<span class="no-content-msg">-No Summary-</span>'%>
     </div>
-
-    <% if (time) { %>
-      <h2 class="node-detail-title">Time estimate:
-        <span class="info-text"><%- time %></span>
-      </h2>
-    <% } %>
 
     <% if (notes.length > 0){ %>
       <h2 class="node-detail-title">Notes</h2>

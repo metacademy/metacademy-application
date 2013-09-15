@@ -1,7 +1,7 @@
 <script type="text/template" id="node-title-view-template">
   <div class="learn-title-buttons">
-   <span class="learn-view-check"> ✓ </span>
-   <span class="learn-view-star"> ★ </span>
+   <span class="learn-view-check" data-tag="<%=id %>"> ✓ </span>
+   <span class="learn-view-star" data-tag="<%=id %>"> ★ </span>
   </div>
    <a> <%- title ? title : id %></a>
 </script>

@@ -106,6 +106,14 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           ival = ival || 1;
           this.setImplicitLearnCt(nodePvt.implicitLearnCt + ival);
         };
+
+        this.toggleLearnedStatus = function(){
+          this.setLearnedStatus(!nodePvt.learned);
+        };
+
+        this.toggleStarredStatus = function(){
+          this.setStarredStatus(!nodePvt.starred);
+        };
         
         this.setLearnedStatus = function(status){
           if (status !== nodePvt.learned){

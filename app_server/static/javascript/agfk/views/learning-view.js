@@ -18,12 +18,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
     
     pvt.viewConsts = {
       templateId: "node-title-view-template", // name of view template (warning: hardcoded in html)
-      learnedClass: "learned-concept-title",
-      starredClass: "starred-concept-title",
       implicitLearnedClass: "implicit-learned-concept-title",
       viewClass: "learn-title-display",
       viewIdPrefix: "node-title-view-div-",
-      learnedCheckClass: "lcheck"
+      learnedCheckClass: "lcheck",
+      learnedClass: "learned-concept-title",
+      starredClass: "starred-concept-title"
     };
 
     // return public object
@@ -40,11 +40,6 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
       tagName: "li",
-
-      events: {
-        "click .learn-view-check": "toggleLearnedConcept",
-        "click .learn-view-star": "toggleStarredConcept"
-      },
 
       /**
        * Initialize the view with appropriate listeners
@@ -76,22 +71,6 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         h.title = thisModel.getLearnViewTitle();
         thisView.$el.html(thisView.template(h));
         return thisView;
-      },
-
-      /**
-       * Toggle learned state of given concept
-       */
-      toggleLearnedConcept: function(evt){
-        evt.stopPropagation();
-        this.model.setLearnedStatus(!this.$el.hasClass(pvt.viewConsts.learnedClass));
-      },
-
-      /**
-       * Toggle starred state of given concept
-       */
-      toggleStarredConcept: function(evt){
-        evt.stopPropagation();
-        this.model.setStarredStatus(!this.$el.hasClass(pvt.viewConsts.starredClass));
       },
 
       /**
@@ -500,12 +479,6 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
 
-      // TODO refactor with list item view
-      events: {
-        "click .learn-view-check": "toggleLearnedConcept",
-        "click .learn-view-star": "toggleStarredConcept"
-      },
-
       initialize: function(){
         var viewConsts = pvt.viewConsts,
             thisView = this;
@@ -525,22 +498,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         this.listenTo(this.model, "change:starStatus", function(nodeId, status){
           changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
         });
-      },
 
-    /**
-       * Toggle learned state of given concept
-       */
-      toggleLearnedConcept: function(evt){
-        evt.stopPropagation();
-        this.model.setLearnedStatus(!this.$el.hasClass(pvt.viewConsts.learnedClass));
-      },
-
-      /**
-       * Toggle starred state of given concept
-       */
-      toggleStarredConcept: function(evt){
-        evt.stopPropagation();
-        this.model.setStarredStatus(!this.$el.hasClass(pvt.viewConsts.starredClass));
       },
 
       /**
@@ -667,7 +625,11 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       viewId: "learn-view",
       clickedItmClass: "clicked-title",
       titleListId: "learn-title-list",
-      conceptDisplayWrapId: "learn-concept-wrapper"
+      conceptDisplayWrapId: "learn-concept-wrapper",
+      learnedClass: "learned-concept",
+      starredClass: "starred-concept",
+      dataTagName: "data-tag"
+
     };
 
     // return public object
@@ -675,7 +637,19 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       id: pvt.viewConsts.viewId,
 
       events: {
-        "click .learn-title-display": "showNodeDetailsFromEvt"
+        "click .learn-title-display": "showNodeDetailsFromEvt",
+        "click .learn-view-check": function(evt){this.toggleConceptState(evt, "learn");},
+        "click .learn-view-star": function(evt){this.toggleConceptState(evt, "star");}
+      },
+
+     /**
+       * Toggle speficied state of given concept
+       */
+      toggleConceptState: function(evt, state){
+        evt.stopPropagation();
+        var nodeTag = evt.currentTarget.getAttribute(pvt.viewConsts.dataTagName),
+            node = this.model.get("nodes").get(nodeTag);
+        state === "learn" ? node.toggleLearnedStatus() : node.toggleStarredStatus();
       },
 
       /**

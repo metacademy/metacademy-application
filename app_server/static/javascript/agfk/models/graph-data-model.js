@@ -62,10 +62,17 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
         pvt.timeEstimates = {};
       },
 
+      conceptIsLearned: function(tag){
+        var learnedConcepts = this.parentModel.parentModel.get("userData").get("learnedConcepts"),
+            fullGraph = this.get("fullGraph"),
+            id = fullGraph[tag].id;
+        return learnedConcepts.findWhere({id: id});
+      },
+
       computeDependencies: function(tag){
         var fullGraph = this.get("fullGraph"),
-            thisModel = this,
-            learnedConcepts = this.parentModel.parentModel.get("userData").get("learnedConcepts");
+            thisModel = this;
+            
 
         if (pvt.dependencies.hasOwnProperty(tag)) {
           return;
@@ -79,8 +86,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
           if (!(fullGraph.hasOwnProperty(dep))) {
             return;
           }
-          var id = fullGraph[dep].id;
-          if (learnedConcepts.findWhere({id: id})) {
+          if (thisModel.conceptIsLearned(tag)){
             return;
           }
           thisModel.computeDependencies(dep);

@@ -545,6 +545,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         }
 
         thisView.assign(assignObj);
+        thisView.addHoverText();
         thisView.delegateEvents();
         return thisView;
       },
@@ -565,6 +566,29 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         _.each(selectors, function (view, selector) {
           view.setElement(this.$(selector)).render();
         }, this);
+      },
+
+      getHoverText: function(conceptTag) {
+        var aux = this.options.graphData.get("aux");
+        if (aux.conceptIsLearned(conceptTag)) {
+          return "You have learned this concept.";
+        } else {
+          var timeEstimate = aux.computeTimeEstimate(conceptTag);
+          if (timeEstimate) {
+            return "Time estimate: " + Utils.formatTimeEstimate(timeEstimate);
+          } else {
+            return "";
+          }
+        }
+      },
+
+      addHoverText: function() {
+        var thisView = this;
+        this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
+          var temp = _.last(this.href.split("/"));
+          var concept = _.last(temp.split("="));
+          return thisView.getHoverText(concept);
+        });
       },
 
       /**
@@ -700,7 +724,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
        */
       showConceptDetails: function(nodeModel){
         var thisView = this,
-            dNodeView = new DetailedNodeView({model: nodeModel});
+        dNodeView = new DetailedNodeView({model: nodeModel, graphData: thisView.model.parentModel.get("graphData")});
         pvt.conceptDisplayWrap.appendChild(dNodeView.render().el);
         $(pvt.conceptDisplayWrap).scrollTop(0);
         return dNodeView;

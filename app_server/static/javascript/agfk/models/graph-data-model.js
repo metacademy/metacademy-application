@@ -2,7 +2,7 @@
  This file contains the graph-data model, which is a wrapper model for the nodes, edges, and auxiliary models
  */
 
-define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection"], function(Backbone, NodePropertyCollections, NodeCollection){
+define(["backbone", "agfk/collections/node-property-collections", "agfk/collections/node-collection", "agfk/models/node-model"], function(Backbone, NodePropertyCollections, NodeCollection, NodeModel){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
@@ -38,6 +38,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
     var pvt = {
       dependencies: {},
       timeEstimates: {},
+      shortcutDependencies: {},
       loadedGraph: false,
     };
 
@@ -45,14 +46,28 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
       defaults: {
         depRoot: undefined,
         titles: {},
-        fullGraph: {},
+        nodes: new NodeCollection(),
+        shortcuts: new NodeCollection(),
       },
 
       initialize: function(){
         var url = window.CONTENT_SERVER + '/full_graph',
             thisModel = this;
         $.get(url, function(data) {
-          thisModel.set("fullGraph", data);
+          if ("nodes" in data) {
+            var nodesObj = _.map(data.nodes, function(node) {
+              var temp = _.extend(node, {"id": node.tag, "sid": node.id})
+              return NodeModel.prototype.parse(temp);
+            });
+            thisModel.set("nodes", new NodeCollection(nodesObj));
+          }
+          if ("shortcuts" in data) {
+            var shortcutsObj = _.map(data.shortcuts, function(node) {
+              var temp = _.extend(node, {"id": node.tag, "sid": node.id})
+              return NodeModel.prototype.parse(temp);
+            });
+            thisModel.set("shortcuts", new NodeCollection(shortcutsObj));
+          }
         });
         pvt.loadedGraph = true;
       },
@@ -60,63 +75,94 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
       resetEstimates: function(){
         pvt.dependencies = {};
         pvt.timeEstimates = {};
+        pvt.shortcutDependencies = {};
       },
 
       conceptIsLearned: function(tag){
         var learnedConcepts = this.parentModel.parentModel.get("userData").get("learnedConcepts"),
-            fullGraph = this.get("fullGraph"),
-            id = fullGraph[tag].id;
+        nodes = this.get("nodes");
+        if (!nodes.findWhere({"id": tag})) {
+          return false;
+        }
+        id = nodes.findWhere({"id": tag}).get("sid");
         return learnedConcepts.findWhere({id: id});
       },
 
-      computeDependencies: function(tag){
-        var fullGraph = this.get("fullGraph"),
+      computeDependencies: function(tag, isShortcut){
+        var nodes = this.get("nodes"),
+            shortcuts = this.get("shortcuts"),
             thisModel = this;
-            
 
-        if (pvt.dependencies.hasOwnProperty(tag)) {
-          return;
+        console.log('computeDependencies ' + tag + ' ' + isShortcut);
+
+        if (isShortcut && shortcuts.findWhere({"id": tag})) {
+          var node = shortcuts.findWhere({"id": tag});
+          var dependenciesObj = pvt.shortcutDependencies;
+        } else if (nodes.findWhere({"id": tag})) {
+          var node = nodes.findWhere({"id": tag});
+          var dependenciesObj = pvt.dependencies;
+        } else {
+          // shouldn't happen
+          return [];
         }
-        if (!fullGraph.hasOwnProperty(tag)) {
-          return;
+
+        if (dependenciesObj.hasOwnProperty(tag)) {
+          return dependenciesObj[tag];
         }
-        pvt.dependencies[tag] = [];    // so we don't get in an infinite loop if there are cycles
-        deps = fullGraph[tag].dependencies;
-        _.each(deps, function(dep) {
-          if (!(fullGraph.hasOwnProperty(dep))) {
-            return;
-          }
-          if (thisModel.conceptIsLearned(tag)){
-            return;
-          }
-          thisModel.computeDependencies(dep);
-          if (pvt.dependencies.hasOwnProperty(dep)) {
-            pvt.dependencies[tag] = _.union(pvt.dependencies[tag], pvt.dependencies[dep], [dep]);
+        
+        var result = [];
+        dependenciesObj[tag] = result;     // so that we don't get into an infinite loop if there's a cycle
+
+
+        node.get("dependencies").each(function(dep) {
+          currDep = {'from_tag': dep.get("from_tag"), 'shortcut': dep.get("shortcut")};
+          if (!thisModel.conceptIsLearned(dep.get("from_tag"))) {
+            result = _.union(result, [currDep], thisModel.computeDependencies(dep.get("from_tag"), dep.get("shortcut")));
+            result = _.unique(result, false, function(dep) { return dep.from_tag + ':' + dep.shortcut; });
           }
         });
+
+        dependenciesObj[tag] = result;
+        return result;
       },
 
       computeTimeEstimate: function(tag){
-        var fullGraph = this.get("fullGraph");
-        if (!(tag in fullGraph)) {
+        var fullGraph = this.get("fullGraph"),
+            nodes = this.get("nodes"),
+            shortcuts = this.get("shortcuts"),
+            node = nodes.findWhere({"id": tag});
+
+        if (!node) {
           return '';
         }
+
         if (!(tag in pvt.timeEstimates)) {
-          if (!(tag in pvt.dependencies)) {
-            this.computeDependencies(tag);
-          }
-          
+          var deps = this.computeDependencies(tag, 0);
+
+          // eliminate redundant shortcuts
+          deps = _.filter(deps, function(dep) {
+            if (dep.shortcut) {
+              var found = _.where(deps, {"from_tag": dep.from_tag, "shortcut": 0});
+              return found.length == 0;
+            }
+            return true;
+          });
+
           var total = 0;
-          _.each(pvt.dependencies[tag], function(dep) {
-            if (dep in fullGraph && fullGraph[dep].time) {
-              total += fullGraph[dep].time;
+          _.each(deps, function(dep) {
+            var depShortcut = shortcuts.findWhere({"id": dep.from_tag}),
+                depNode = nodes.findWhere({"id": dep.from_tag});
+            if (dep.shortcut && depShortcut && depShortcut.get("time")) {
+              total += depShortcut.get("time");
+            } else if (depNode && depNode.get("time")) {
+              total += depNode.get("time");
             } else {
               total += 1;
             }
           });
 
-          if (fullGraph[tag].time) {
-            total += fullGraph[tag].time;
+          if (node.get("time")) {
+            total += node.get("time");
           } else {
             total += 1;
           }

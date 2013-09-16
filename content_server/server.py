@@ -189,7 +189,13 @@ def do_search():
 
     # TODO: for security reasons, make the response an object rather than an array
     return make_response(text, 'json')
-    
+
+@app.route('/full_graph')
+def do_full_graph():
+    load_graph()
+    text = json.dumps(db.full_graph_json())
+    return make_response(text, 'json')
+
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:

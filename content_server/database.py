@@ -79,8 +79,36 @@ class Database:
                         curr_errors.append('Resource %s missing %s' % (name, field))
 
         return all_errors
-                
+
+    def full_graph_json(self):
+        items = {}
+        def format_dep(dep):
+            if dep.shortcut and dep.tag in self.shortcuts:
+                return dep.tag + ':shortcut'
+            else:
+                return dep.tag
             
+        for tag, node in self.nodes.items():
+            items[tag] = {
+                'id': node.id,
+                'title': node.title,
+                'dependencies': map(format_dep, node.dependencies),
+                }
+            if tag in self.concept_times:
+                items[tag]['time'] = self.concept_times[tag]
+
+        for tag, shortcut in self.shortcuts.items():
+            graph_tag = tag + ':shortcut'
+            items[graph_tag] = {
+                'id': shortcut.concept.id,
+                'title': shortcut.concept.title,
+                'dependencies': map(format_dep, shortcut.dependencies),
+                }
+            if tag in self.shortcut_times:
+                items[graph_tag]['time'] = self.shortcut_times[tag]
+        
+        return items
+
 
 
 def global_flags_file(content_path):

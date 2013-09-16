@@ -40,6 +40,9 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       userData.listenTo(nodes, "change:starStatus", userData.updateStarredConcept);
       userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
       userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
+
+      var aux = graphData.get("aux");
+      aux.listenTo(userData, "change:learnedConcepts", aux.resetEstimates);
     },
     
     /**

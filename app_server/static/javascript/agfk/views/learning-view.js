@@ -544,6 +544,10 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
           assignObj[goalsLocClass] = thisView.goals;
         }
 
+        // update the hovertext when nodes are marked learned/unlearned
+        var aux = this.options.graphData.get("aux");
+        this.listenTo(aux, "reset:estimates", this.addHoverText);
+
         thisView.assign(assignObj);
         thisView.addHoverText();
         thisView.delegateEvents();

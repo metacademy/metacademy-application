@@ -76,6 +76,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
         pvt.dependencies = {};
         pvt.timeEstimates = {};
         pvt.shortcutDependencies = {};
+        this.trigger("reset:estimates");
       },
 
       conceptIsLearned: function(tag){
@@ -92,8 +93,6 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
         var nodes = this.get("nodes"),
             shortcuts = this.get("shortcuts"),
             thisModel = this;
-
-        console.log('computeDependencies ' + tag + ' ' + isShortcut);
 
         if (isShortcut && shortcuts.findWhere({"id": tag})) {
           var node = shortcuts.findWhere({"id": tag});
@@ -204,10 +203,15 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
        * initialize graph data (place parentModel field in child models)
        */
       initialize: function(){
-        this.get("nodes").parentModel = this;
-        this.get("edges").parentModel = this;
-        this.get("aux").parentModel = this;
-        this.get("options").parentModel = this;
+        var nodes = this.get("nodes"),
+            edges = this.get("edges"),
+            aux = this.get("aux"),
+            options = this.get("options");
+
+        nodes.parentModel = this;
+        edges.parentModel = this;
+        aux.parentModel = this;
+        options.parentModel = this;
       }
     });
   })();

@@ -35,12 +35,90 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/collecti
   var GraphAuxModel = (function(){
 
     // private data (not currently used)
-    var pvt = {};
+    var pvt = {
+      dependencies: {},
+      timeEstimates: {},
+      loadedGraph: false,
+    };
 
     return Backbone.Model.extend({
       defaults: {
         depRoot: undefined,
-        titles: {}
+        titles: {},
+        fullGraph: {},
+      },
+
+      initialize: function(){
+        var url = window.CONTENT_SERVER + '/full_graph',
+            thisModel = this;
+        $.get(url, function(data) {
+          thisModel.set("fullGraph", data);
+        });
+        pvt.loadedGraph = true;
+      },
+
+      resetEstimates: function(){
+        pvt.dependencies = {};
+        pvt.timeEstimates = {};
+      },
+
+      computeDependencies: function(tag){
+        var fullGraph = this.get("fullGraph"),
+            thisModel = this,
+            learnedConcepts = this.parentModel.parentModel.get("userData").get("learnedConcepts");
+
+        if (pvt.dependencies.hasOwnProperty(tag)) {
+          return;
+        }
+        if (!fullGraph.hasOwnProperty(tag)) {
+          return;
+        }
+        pvt.dependencies[tag] = [];    // so we don't get in an infinite loop if there are cycles
+        deps = fullGraph[tag].dependencies;
+        _.each(deps, function(dep) {
+          if (!(fullGraph.hasOwnProperty(dep))) {
+            return;
+          }
+          var id = fullGraph[dep].id;
+          if (learnedConcepts.findWhere({id: id})) {
+            return;
+          }
+          thisModel.computeDependencies(dep);
+          if (pvt.dependencies.hasOwnProperty(dep)) {
+            pvt.dependencies[tag] = _.union(pvt.dependencies[tag], pvt.dependencies[dep], [dep]);
+          }
+        });
+      },
+
+      computeTimeEstimate: function(tag){
+        var fullGraph = this.get("fullGraph");
+        if (!(tag in fullGraph)) {
+          return '';
+        }
+        if (!(tag in pvt.timeEstimates)) {
+          if (!(tag in pvt.dependencies)) {
+            this.computeDependencies(tag);
+          }
+          
+          var total = 0;
+          _.each(pvt.dependencies[tag], function(dep) {
+            if (dep in fullGraph && fullGraph[dep].time) {
+              total += fullGraph[dep].time;
+            } else {
+              total += 1;
+            }
+          });
+
+          if (fullGraph[tag].time) {
+            total += fullGraph[tag].time;
+          } else {
+            total += 1;
+          }
+
+          pvt.timeEstimates[tag] = total;
+        }
+        
+        return pvt.timeEstimates[tag];
       },
 
       /**

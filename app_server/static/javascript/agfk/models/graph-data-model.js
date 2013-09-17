@@ -53,12 +53,6 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections", 
 
       url: window.CONTENT_SERVER + '/full_graph',
 
-      events: {
-        "reset": function(){
-            pvt.loadedGraph = true;
-          }
-      },
-
       /**
        * parse data from server
        */
@@ -81,6 +75,7 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections", 
           });
           retObj["shortcuts"] =  new NodeCollection(nodesObj);
         }
+        pvt.loadedGraph = true;
         return retObj;        
       },
 

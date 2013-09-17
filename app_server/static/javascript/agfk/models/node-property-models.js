@@ -60,7 +60,8 @@ define(["backbone"], function(Backbone){
       return {
         from_tag: "",
         to_tag: "",
-        reason: ""
+        reason: "",
+        shortcut: "",
       };
     },
 

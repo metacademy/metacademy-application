@@ -51,9 +51,12 @@ define(["backbone"], function(Backbone){
     pvt.createDestroyUserConcept = function(conceptCollection, status, nodeSid){
       if (status && !conceptCollection.get(nodeSid)) {
         conceptCollection.create({id: nodeSid});
+        return true;
       } else if (!status) {
         conceptCollection.get(nodeSid).destroy({id: nodeSid});
+        return true;
       }
+      return false;
     };
     
     pvt.learnedConceptsPopulated = false;
@@ -107,6 +110,8 @@ define(["backbone"], function(Backbone){
         var thisModel = this,
             lConcepts = thisModel.get("learnedConcepts"),
             sConcepts = thisModel.get("starredConcepts");
+
+        // note: the folowing are not getting triggered   -RBG
         lConcepts.bind("change:learnStatus", function(){
           thisModel.trigger("change:learnStatus", lConcepts);
         });
@@ -134,11 +139,17 @@ define(["backbone"], function(Backbone){
        * Setter function that triggers an appropriate change event
        */
       updateLearnedConcept: function(nodeTag, status, nodeSid){
-        pvt.createDestroyUserConcept.call(this, this.get("learnedConcepts"), status, nodeSid);
+        var changed = pvt.createDestroyUserConcept.call(this, this.get("learnedConcepts"), status, nodeSid);
+        if (changed) {
+          this.trigger("change:learnedConcepts");
+        }
       },
 
       updateStarredConcept: function(nodeTag, status, nodeSid){
-        pvt.createDestroyUserConcept.call(this, this.get("starredConcepts"), status, nodeSid);
+        var changed = pvt.createDestroyUserConcept.call(this, this.get("starredConcepts"), status, nodeSid);
+        if (changed) {
+          this.trigger("change:starredConcepts");
+        }
       },
 
       /**

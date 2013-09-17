@@ -81,33 +81,39 @@ class Database:
         return all_errors
 
     def full_graph_json(self):
-        items = {}
-        def format_dep(dep):
-            if dep.shortcut and dep.tag in self.shortcuts:
-                return dep.tag + ':shortcut'
+        def format_dep(dep, node):
+            if isinstance(node, concepts.Shortcut):
+                return {'from_tag': dep.tag, 'to_tag': node.concept.tag, 'shortcut': dep.shortcut}
             else:
-                return dep.tag
-            
+                return {'from_tag': dep.tag, 'to_tag': node.tag, 'shortcut': dep.shortcut}
+
+        nodes = []
         for tag, node in self.nodes.items():
-            items[tag] = {
+            item = {
+                'tag': node.tag,
                 'id': node.id,
                 'title': node.title,
-                'dependencies': map(format_dep, node.dependencies),
+                'dependencies': [format_dep(dep, node) for dep in node.dependencies],
+                'is_shortcut': 0,
                 }
             if tag in self.concept_times:
-                items[tag]['time'] = self.concept_times[tag]
+                item['time'] = self.concept_times[tag]
+            nodes.append(item)
 
+        shortcuts = []
         for tag, shortcut in self.shortcuts.items():
-            graph_tag = tag + ':shortcut'
-            items[graph_tag] = {
+            item = {
+                'tag': shortcut.concept.tag,
                 'id': shortcut.concept.id,
                 'title': shortcut.concept.title,
-                'dependencies': map(format_dep, shortcut.dependencies),
+                'dependencies': [format_dep(dep, shortcut) for dep in shortcut.dependencies],
+                'is_shortcut': 1,
                 }
             if tag in self.shortcut_times:
-                items[graph_tag]['time'] = self.shortcut_times[tag]
+                item['time'] = self.shortcut_times[tag]
+            shortcuts.append(item)
         
-        return items
+        return {'nodes': nodes, 'shortcuts': shortcuts}
 
 
 

@@ -49,10 +49,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      * Aux function to set graph data from wrapper model (TODO this function may not be necessary)
      */
     setGraphData: function(gdataObj){
-      // TODO make this function more general (if we keep it)
-      if (gdataObj.hasOwnProperty("depRoot")){
         this.get("graphData").get("aux").set("depRoot", gdataObj.depRoot);
-      }
     },
 
     /**
@@ -99,7 +96,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
           edges = graphData.get("edges"),
           aux = graphData.get("aux");
 
-      aux.set("titles", response.titles); // TODO: change this to response.aux.titles?
+      aux.set("titles", response.titles);
 
       // build node set
       nodes.add(response.nodes, {parse: true});

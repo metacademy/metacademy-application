@@ -856,7 +856,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         if (keyTag === ""){
           // init: obtain node tags with 0 outlinks (root nodes)
           startRootNodes = _.map(nodes.filter(function(mdl){
-            return mdl.get("outlinks").length == 0 && (!includeLearned || mdl.isLearnedOrImplicitLearned());
+            return mdl.get("outlinks").length == 0 && (includeLearned || !mdl.isLearnedOrImplicitLearned());
           }), function(itm){
             return itm.get("id");
           });

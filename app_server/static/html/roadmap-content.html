@@ -4,6 +4,8 @@
     <span class="edit-link"><a href="{{ edit_url }}">[edit]</a></span>
   {% endif %}
 </div>
-<div class="author"> Created by: {{ roadmap.author }} </div>
-<div class="audience"> Intended for: {{ roadmap.audience }} </div>
+<div class="aux-info">
+  <div class="author"> Created by: {{ roadmap.author }} </div>
+  <div class="audience"> Intended for: {{ roadmap.audience }} </div>
+</div>
 <div class="content"> {{ body_html }} </div>

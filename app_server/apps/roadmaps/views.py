@@ -22,15 +22,18 @@ MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mi
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div']
+BLEACH_ATTR_WHITELIST = {
+    '*': ['id', 'class'],
+    'a': ['href', 'rel']
+}
 
 # temporary: list of users who can edit
 EDIT_USERS = ['rgrosse', 'cjrd']
 
-
 def markdown_to_html(markdown_text):
     roadmap_ext = RoadmapExtension()
     body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, 'toc'])
-    return bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST)
+    return bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes = BLEACH_ATTR_WHITELIST)
 
 
 def show(request, username, tag):

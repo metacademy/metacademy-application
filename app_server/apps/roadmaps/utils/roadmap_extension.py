@@ -1,5 +1,4 @@
 import re
-import pdb
 
 from markdown.preprocessors import Preprocessor
 from markdown.inlinepatterns import LINK_RE
@@ -26,12 +25,11 @@ class RoadMapPreprocessor(Preprocessor):
                 if int_link_match:
                     match_txt = int_link_match.groups()[0]
                     reptxt = self.base_url + match_txt
-                    reptxt = re.sub(r'\s+', '_', reptxt.strip()).lower()
-                    line = line.replace(res_txt, res_txt.replace(match_txt, reptxt))
+                    reptxt = '(%s)' % re.sub(r'\s+', '_', reptxt.strip()).lower() 
+                    line = line.replace(res_txt, res_txt.replace('(%s)' % match_txt, reptxt))
             new_lines.append(line)
         return new_lines
 
 class RoadmapExtension(Extension):
     def extendMarkdown(self, md, md_globals):
-#        pdb.set_trace()
         md.preprocessors.add('roadmappreprocessor', RoadMapPreprocessor(md), '<normalize_whitespace')

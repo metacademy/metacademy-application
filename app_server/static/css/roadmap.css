@@ -1,8 +1,15 @@
 .container {
-    margin-left: 20%;
-    margin-right: 20%;
+    width: 70%;
+    min-width: 600px;
     margin-top: 2em;
     padding-bottom: 3em;
+    margin: 2em auto;
+    font: 16px Helvetica, arial, freesans, clean, sans-serif;
+    color: #23240D;
+}
+
+.aux-info{
+    font-style: italic;
 }
 
 .title {
@@ -11,9 +18,10 @@
     margin-bottom: 0.4em;
 }
 
-.edit-link {
-    font-size: 0.6em;
+.edit-link a{
+    font-size: 16px;
     font-weight: normal;
+    text-decoration: none;
 }
 
 .author, .audience {
@@ -26,6 +34,7 @@
     font-size: 1.0em;
     overflow: hidden;
     color: #23240D;
+    line-height: 1.4em;
 }
 
 .content p {
@@ -33,20 +42,31 @@
 }
 
 .content h1 {
-    font-size: 2.2em;
-    margin-top: 1em;
+    font-weight: bold;
+    font-size: 2em;
+    margin-top: 1.3em;
+    margin-bottom: 0.4em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #eee;
 }
 
 .content h2 {
-    font-size: 2.0em;
-    margin-top: 1em;
+    font-weight: bold;
+    font-size: 1.8em;
+    margin-top:  1.3em;
     margin-bottom: 0.4em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #eee;
 }
 
 .content h3 {
-    font-size: 1.8em;
-    margin-top: 1em;
+    font-weight: bold;
+    font-size: 1.6em;
+    margin-top: 1.3em;
     margin-bottom: 0.4em;
+    margin-bottom: 0.4em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #eee;
 }
 
 .content ul {

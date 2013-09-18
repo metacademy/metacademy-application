@@ -1,6 +1,10 @@
+import os
+
 import bleach
 import markdown
-import os
+
+
+import pdb
 
 from django.contrib.auth.models import User
 from django.forms import ModelForm, Textarea
@@ -9,6 +13,7 @@ from django.shortcuts import render
 from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
 
+from utils.roadmap_extension import RoadmapExtension
 import models
 import settings
 
@@ -16,15 +21,16 @@ import settings
 MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mit_6_438.txt')
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
-                        'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+                        'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div']
 
 # temporary: list of users who can edit
 EDIT_USERS = ['rgrosse', 'cjrd']
 
-def markdown_to_html(markdown_text):
-    body_html = markdown.markdown(markdown_text, safe_mode=True)
-    return bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST)
 
+def markdown_to_html(markdown_text):
+    roadmap_ext = RoadmapExtension()
+    body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, 'toc'])
+    return bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST)
 
 
 def show(request, username, tag):

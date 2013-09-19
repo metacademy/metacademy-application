@@ -29,8 +29,7 @@ def build_main_index():
 
 def load_main_index():
     global main_index
-    if not os.path.exists(config.INDEX_PATH):
-        build_main_index()
+    build_main_index()
     main_index = index.open_dir(config.INDEX_PATH)
 
 def answer_query(query):

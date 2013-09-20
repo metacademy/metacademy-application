@@ -73,7 +73,7 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections", 
             var temp = _.extend(node, {"id": node.tag, "sid": node.id});
             return new NodeModel(temp, {parse: true});
           });
-          retObj["shortcuts"] =  new NodeCollection(nodesObj);
+          retObj["shortcuts"] =  new NodeCollection(shortcutsObj);
         }
         pvt.loadedGraph = true;
         return retObj;        
@@ -111,9 +111,11 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections", 
             node,
             dependenciesObj;
 
-        if (isShortcut && (node = shortcuts.get(tag))) {
+        if (isShortcut && shortcuts.get(tag)) {
+          node = shortcuts.get(tag);
           dependenciesObj = pvt.shortcutDependencies;
-        } else if ((node = nodes.get(tag))) {
+        } else if (nodes.get(tag)) {
+          node = nodes.get(tag);
           dependenciesObj = pvt.dependencies;
         } else {
           // shouldn't happen

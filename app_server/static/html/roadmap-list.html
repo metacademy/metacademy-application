@@ -2,6 +2,12 @@
 {% load staticfiles $}
 {% load static %}
 
+
+{% block jscript %}
+{% include "load-jquery-snippet.html" %}
+<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
+{% endblock %}
+
 {% block title %}
   Metacademy - Roadmaps
 {% endblock %}
@@ -14,7 +20,10 @@
 {% block main %}
   <div class="search-res-wrapper">
     
-
+    <h1>
+      Public Roadmaps
+    </h1>
+      
     <div class="search-res">
       {% if not roadmaps|length %}
         <div class="nosearch-message">

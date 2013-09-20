@@ -30,6 +30,16 @@
     box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
 
+h1{
+    font-size: 1.5em;
+    text-align: center;
+    margin: 1em 20%;
+    color: #50094A;
+    font-weight: bold;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 1em;
+}
+
 .sres-search-wrapper{
     margin: 1.2em auto;
     margin-bottom: 1.6em;

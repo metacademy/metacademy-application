@@ -2,7 +2,7 @@ p{
    margin:  0.5em 0;
 }
 
-h3{
+h1{
     font-size: 1.6em;
     text-align: center;
     margin: 1em 0;
@@ -21,6 +21,9 @@ h3{
 
 ol{
     list-style-type: decimal;
+}
+
+ul,ol{
     padding: 0 0 0 3em;
     line-height: 1.5em;
 }

@@ -21,6 +21,7 @@ urlpatterns = patterns('',
                        # url(r'^dev/benchmarktest', benchmark_viewer),
                        url(r'^captcha/', include('captcha.urls')),
                        url(r'^about$',  TemplateView.as_view(template_name='about.html')),
+                       url(r'^contribute$',  TemplateView.as_view(template_name='contribute.html')),
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^happy/', include('lazysignup.urls')),
 )

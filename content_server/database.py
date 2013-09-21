@@ -8,11 +8,11 @@ import resources
 import work_estimates
 
 
-
 class DatabaseFormatError(RuntimeError):
     pass
 
 class Database:
+
     def __init__(self, nodes, shortcuts, graph, resources, id2tag, tag2id, flags, concept_times, shortcut_times):
         self.nodes = nodes
         self.shortcuts = shortcuts
@@ -121,7 +121,7 @@ def global_flags_file(content_path):
     return os.path.join(content_path, 'flags.txt')
 
 def node_dir(content_path, tag):
-    return os.path.join(content_path, 'nodes', tag)
+    return os.path.join(content_path, 'concepts', tag)
 
 def id_file(content_path, tag):
     return os.path.join(node_dir(content_path, tag), 'id.txt')
@@ -316,7 +316,7 @@ def check_node_format(content_path, tag):
     return errors
     
 def check_all_node_formats(content_path):
-    tags = os.listdir(os.path.join(content_path, 'nodes'))
+    tags = os.listdir(os.path.join(content_path, 'concepts'))
     errors = {}
     for tag in tags:
         errors[tag] = check_node_format(content_path, tag)
@@ -325,8 +325,10 @@ def check_all_node_formats(content_path):
 
 def read_nodes(content_path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Concept objects."""
-    nodes_path = os.path.join(content_path, 'nodes')
+    IGNORE_NODE_TAGS = ['.DS_Store', 'ANNOTATED_EXAMPLE']
+    nodes_path = os.path.join(content_path, 'concepts')
     tags = os.listdir(nodes_path)
+    tags = filter(lambda t: not t in IGNORE_NODE_TAGS, tags)
     if onlytitle:
         return tags
     else:
@@ -353,7 +355,7 @@ def _filter_non_nodes(tags):
 
 
 def check_format(content_path):
-    nodes_path = os.path.join(content_path, 'nodes')
+    nodes_path = os.path.join(content_path, 'concepts')
     tags = os.listdir(nodes_path)
     # make sure files exist and are formatted correctly
     nodes = []
@@ -377,7 +379,7 @@ def check_format(content_path):
 
 def assign_ids(content_path):
     """Assign unique IDs to all of the concepts which don't already have IDs."""
-    nodes_path = os.path.join(content_path, 'nodes')
+    nodes_path = os.path.join(content_path, 'concepts')
     tags = os.listdir(nodes_path)
 
     # read in current ID strings
@@ -395,7 +397,7 @@ def assign_ids(content_path):
             open(id_file(content_path, tag), 'w').write(new_id)
 
 def concepts_without_ids(content_path):
-    nodes_path = os.path.join(content_path, 'nodes')
+    nodes_path = os.path.join(content_path, 'concepts')
     tags = os.listdir(nodes_path)
 
     return [t for t in tags if not os.path.exists(id_file(content_path, t))]

@@ -761,7 +761,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         $div.attr("id", (pvt.viewConsts.titleListId));
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
         var titlesTitle = document.createElement("h1");
-        titlesTitle.textContent = "Learning List"; // TODO move this to a template
+        titlesTitle.textContent = "Learning Plan"; // TODO move this to a template
         thisView.$el.prepend(titlesTitle);
         $div.append(titlesTitle);
         var timeEstimateEl = document.createElement("div");

@@ -40,6 +40,9 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
     // keeps track of Explore to Learn and Learn to Explore clicks
     pvt.elTransition = false;
 
+    // first learning view transition
+    pvt.firstLTrans = true; 
+
     /**
      * Asynchronously load Viz.js
      * Note: must call with "this = router instance"
@@ -327,9 +330,9 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
             paramQLearnScrollConcept = nodeId;
           }
 
-          if (paramsObj[qViewMode] === pLearnMode && !pvt.elTransition){ 
-          //  thisRoute.lview.scrollExpandToConcept(paramQLearnScrollConcept);
+          if (paramsObj[qViewMode] === pLearnMode && (!pvt.elTransition || pvt.firstLTrans)){ 
               thisRoute.lview.expandConcept(paramQLearnScrollConcept);
+              pvt.firstLTrans = false;
           }
           thisRoute.setELTransition(false); // reset the router state
           pvt.prevUrlParams = $.extend({}, paramsObj);

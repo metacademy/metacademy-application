@@ -12,30 +12,38 @@ import formats
 import graphs
 import search
 
-"""This server responds to the following requests:
+"""The API for this server responds to the following requests:
 
-TODO this description is no longer accurate -- update once API is finalized
+  GET  /dependencies                get a JSON representation of the dependency graph of the supplied concept(s) (specify via the 'concepts' or 'ids' parameter)
+  GET  /concepts/<concept_name>     get a JSON representation of <concept_name>              
+  GET  search                       process a search query, return a list of JSON objects for the results
 
-  GET nodes                           get a JSON object representing the full graph
-  GET nodes/node-name                 get the JSON representation of a single node
-  GET nodes/node-name?set=map             get the part of the graph that a node depends on
-  GET nodes/node-name?set=related         get the part of the graph that's related to a node
-                                         (ancestors/descendants)
+EXMAPLES
 
-  GET search                          process a search query, return a list of JSON objects for the results
+obtain the full dependency graph for gibbs sampling:
 
-It can also produce SVG and DOT output for all the graph requests.
-You can specify this with a query field in the URL, e.g. (Will be deprecated in frontend V2)
+  GET /dependencies?concepts=gibbs_sampling
 
-  GET full_graph?format=svg
+obtain the full dependency graph for gibbs sampling and indian buffet process:
 
-Example search query:
+  GET /dependencies?concepts=gibbs_sampling&concepts=indian_buffet_process
+
+obtain the full dependency graph for gibbs sampling and indian buffet process using their permanent ids:
+
+  GET /dependencies?ids=n4mru8iv&ids=5638xo54
+
+obtain a all data for gibbs sampling:
+
+  GET /concepts/gibbs_sampling
+
+search query:
 
   GET search?q=gibbs+sampling
 
-Start the server by typing (from the main knowledge-maps directory):
 
-  python content_server/server.py 8000
+Start the server by typing (from /metacademy-application):
+
+  python content_server/server.py 9080 # for port 9080
 """
 
 
@@ -63,17 +71,6 @@ def format_graph(full_tags, shortcut_tags, fmt):
         f = cStringIO.StringIO()
         formats.write_graph_json(db, full_tags, shortcut_tags, f)
         return f.getvalue()
-    # TODO these have been deprecated
-    # elif fmt == 'dot':
-    #     f = cStringIO.StringIO()
-    #     formats.write_graph_dot(db, full_tags, shortcut_tags, f, bottom_up=True)
-    #     return f.getvalue()
-    # elif fmt == 'svg':
-    #     dotfile = os.path.join(config.TEMP_PATH, 'graph.dot')
-    #     svgfile = os.path.join(config.TEMP_PATH, 'graph.svg')
-    #     formats.write_graph_dot(db, full_tags, shortcut_tags, open(dotfile, 'w'), bottom_up=True)
-    #     os.system('dot -Tsvg %s -o %s' % (dotfile, svgfile))
-    #     return open(svgfile, 'rb').read()
     else:
         raise RuntimeError('Unknown format: %s' % fmt)
 

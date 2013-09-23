@@ -96,16 +96,24 @@
     padding-right: 5px;
 }
 
-.content a{
+.external-link{
+    font-size: 1em;
     color:#2B7536;
     text-decoration: none;
 }
+.external-link:hover{
+    color:#14330E;
+    text-decoration: underline;
+}
 
-.content a:hover{
+.internal-link{
+    color: #A01F70;
+    text-decoration: none;
+}
+.internal-link:hover{
     text-decoration: underline;
     color: #2414B0;
 }
-
 
 .form-wrapper {
     width: 60%;

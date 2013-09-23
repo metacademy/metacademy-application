@@ -2,6 +2,7 @@ import os
 
 import bleach
 import markdown
+import urlparse
 
 
 import pdb
@@ -30,10 +31,29 @@ BLEACH_ATTR_WHITELIST = {
 # temporary: list of users who can edit
 EDIT_USERS = ['rgrosse', 'cjrd']
 
+def metacademy_domains():
+    domain = urlparse.urlparse(settings.CONTENT_SERVER).netloc
+    return ['', domain]
+
+def is_internal_link(url):
+    p = urlparse.urlparse(url)
+    if p.netloc not in metacademy_domains():
+        return False
+    return p.path.find('/concepts/') != -1
+
+def process_link(attrs, new=False):
+    if is_internal_link(attrs['href']):
+        attrs['class'] = 'internal-link'
+    else:
+        attrs['class'] = 'external-link'
+    attrs['target'] = '_blank'
+    return attrs
+
 def markdown_to_html(markdown_text):
     roadmap_ext = RoadmapExtension()
     body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, 'toc'])
-    return bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes = BLEACH_ATTR_WHITELIST)
+    html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
+    return bleach.linkify(html, callbacks=[process_link])
 
 
 def show(request, username, tag):

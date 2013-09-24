@@ -26,11 +26,11 @@ p {
 
 .external-link{
     font-size: 1em;
-    color: #36b;
+    color: #068519;
     text-decoration: none;
 }
 .external-link:hover{
-    color:#041F63;
+    color: #041F63;
     text-decoration: underline;
 }
 

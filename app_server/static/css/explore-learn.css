@@ -607,6 +607,12 @@ ellipse{
     font-size: 1.2em;
     stroke-width: 0;
     fill: #333
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* node e-to-l icon */

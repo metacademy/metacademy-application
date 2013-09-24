@@ -1,7 +1,6 @@
 .container {
     width: 70%;
     min-width: 600px;
-    margin-top: 2em;
     padding-bottom: 3em;
     margin: 2em auto;
     font: 16px Helvetica, arial, freesans, clean, sans-serif;
@@ -10,12 +9,19 @@
 
 .aux-info{
     font-style: italic;
+    margin-bottom: 0.58em;
 }
 
 .title {
     font-size: 2.2em;
     font-weight: bold;
     margin-bottom: 0.4em;
+}
+
+a.external-link{
+     background: url("http://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png") center right no-repeat; padding-right: 12px;
+     background-size: 10px;
+
 }
 
 .edit-link a{
@@ -37,36 +43,38 @@
     line-height: 1.4em;
 }
 
-.content p {
-    padding: 0.1em 0;
+.content p{
+    margin: 0.2em 0 0 0;
+    padding: 0;
+}
+
+.content p + p, .content ul + p {
+    margin: 0.7em 0 0 0;
 }
 
 .content h1 {
     font-weight: bold;
     font-size: 2em;
-    margin-top: 1.3em;
-    margin-bottom: 0.4em;
-    padding-bottom: 0.5em;
-    border-bottom: 1px solid #eee;
+    margin-top: 1em;
+    margin-bottom: 0.3em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #B6B0B0;
 }
 
 .content h2 {
     font-weight: bold;
-    font-size: 1.8em;
-    margin-top:  1.3em;
-    margin-bottom: 0.4em;
-    padding-bottom: 0.5em;
-    border-bottom: 1px solid #eee;
+    font-size: 1.3em;
+    margin-top:  0.8em;
+    margin-bottom: 0.3em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #E6E6E6;
 }
 
 .content h3 {
     font-weight: bold;
-    font-size: 1.6em;
-    margin-top: 1.3em;
-    margin-bottom: 0.4em;
-    margin-bottom: 0.4em;
-    padding-bottom: 0.5em;
-    border-bottom: 1px solid #eee;
+    font-size: 1.1em;
+    margin-top: 0.6em;
+    margin-bottom: 0.3em;
 }
 
 .content ul {
@@ -75,10 +83,22 @@
     padding-left: 0;
 }
 
-.content li {
+.content li{
     padding-left: 1em;
     text-indent: -1em;
-    margin-bottom: 0.2em;
+    margin-top: 0.2em;
+}
+
+.content li ~ li {
+    margin-top: 0.4em;
+}
+
+.content ul ul li{
+    margin-top: 0;
+}
+
+.content ul ul li ~ li{
+    margin-top: 0.1em;
 }
 
 .content li:before {
@@ -88,31 +108,11 @@
 
 .content ul ul {
     margin-left: 1em;
-    margin-bottom: 1em;
 }
 
 .content ul ul li:before {
     content: "-";
     padding-right: 5px;
-}
-
-.external-link{
-    font-size: 1em;
-    color:#2B7536;
-    text-decoration: none;
-}
-.external-link:hover{
-    color:#14330E;
-    text-decoration: underline;
-}
-
-.internal-link{
-    color: #A01F70;
-    text-decoration: none;
-}
-.internal-link:hover{
-    text-decoration: underline;
-    color: #2414B0;
 }
 
 .form-wrapper {

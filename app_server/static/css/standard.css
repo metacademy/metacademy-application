@@ -26,13 +26,14 @@ p {
 
 .external-link{
     font-size: 1em;
-    color:#2B7536;
+    color: #36b;
     text-decoration: none;
 }
 .external-link:hover{
-    color:#14330E;
+    color:#041F63;
     text-decoration: underline;
 }
+
 
 .internal-link, .focus-link{
     color: #A01F70;
@@ -40,7 +41,7 @@ p {
 }
 .internal-link:hover, .focus-link:hover{
     text-decoration: underline;
-    color: #2414B0;
+    color: #690259;
 }
 
 a.expand-collapse-link{

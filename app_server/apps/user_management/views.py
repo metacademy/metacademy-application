@@ -42,10 +42,16 @@ def user_main(request):
 
 @allow_lazy_user
 def register(request, redirect_addr="/user"):
+
+    # don't allow logged-in users to register a new account
+    if request.user.is_authenticated and not is_lazy_user(request.user):
+        return HttpResponseRedirect(redirect_addr)
+        
     if request.method == 'POST':
         form = UserCreateForm(request.POST, instance=request.user)
 
         if form.is_valid():
+
             # save lazy or non-lazy acct
             if is_lazy_user(form.instance):
                 user = LazyUser.objects.convert(form) 
@@ -58,7 +64,7 @@ def register(request, redirect_addr="/user"):
 
             # send basic info email
             uname = form.cleaned_data['username']
-            subject, from_email, to = 'Metacademy account successfully created', 'noreply@metacademy.org', form.cleaned_data['email']
+            subject, from_email, to = 'Metacademy account successfully created', 'welcome@metacademy.org', form.cleaned_data['email']
             text_content = TXT_ACCT_EMAIL % uname
             
             html_content = HTML_ACCT_EMAIL % uname

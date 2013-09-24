@@ -1,27 +1,49 @@
 {% extends "login.html" %}
-{% load i18n %}
 
- {% block headtitle %} Metacademy Registration {% endblock %}
+{% block headtitle %} Metacademy Registration {% endblock %}
 
 {% block form-content %}
 <div class="user-form-field">
   {{ form.username.label_tag }}
   {{ form.username }}
+  {% if form.username.errors %}
+  <div class="form-errors">
+    {{form.username.errors}}
+  </div>
+  {% endif %}
 </div>
 
 <div class="user-form-field">
   {{ form.email.label_tag }}
   {{ form.email }}
+  {% if form.email.errors %}
+  <div class="form-errors">
+    {{form.email.errors}}
+  </div>
+  {% endif %}
+
 </div>
 
 <div class="user-form-field">
   {{ form.password1.label_tag }}
   {{ form.password1 }}
+  {% if form.password1.errors %}
+  <div class="form-errors">
+    {{form.password1.errors}}
+  </div>
+  {% endif %}
+
 </div>
 
 <div class="user-form-field">
   {{ form.password2.label_tag }}
   {{ form.password2 }}
+  {% if form.password2.errors %}
+  <div class="form-errors">
+    {{form.password2.errors}}
+  </div>
+  {% endif %}
+
 </div>
 
 <div class="user-form-field">
@@ -29,6 +51,12 @@
   <div class="captcha-wrapper">
     {{ form.captcha }}
   </div>
+  {% if form.captcha.errors %}
+  <div class="form-errors">
+    {{form.captcha.errors}}
+  </div>
+  {% endif %}
+
 </div>
 
 <div class="submit-field">

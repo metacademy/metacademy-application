@@ -57,14 +57,22 @@ h3{
     font-weight: bold;
 }
 
-.form-errors{
-    background: rgb(255, 255, 184);
+.form-errors, .non-field-form-errors{
+    background: rgb(255, 255, 213);
     text-align: center;
-    border: 2px #333 solid;
-    padding: 1em;
-    margin: 0 auto 1em auto;
+    border: 1px #333 solid;
+    padding: 0.3em;
+    margin: 0.4em auto;
     width: 70%;
+    line-height: 1.2em;
 }
+
+.non-field-form-errors{
+    border-width: 2px;
+    padding: 0.8em;
+    margin-bottom: 1em;
+}
+
 .captcha-wrapper{
     text-align: left;
     margin-left: 10%;

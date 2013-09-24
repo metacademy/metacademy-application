@@ -1,12 +1,17 @@
+import pdb
+
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.core.validators import validate_email
+
 from captcha.fields import CaptchaField
 from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 
 class UserCreateForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    email = forms.CharField(validators=[validate_email],
+        error_messages={'invalid': ('Please enter a valid email address.')})
     captcha = CaptchaField()
 
     class Meta:
@@ -19,6 +24,12 @@ class UserCreateForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if len(User.objects.filter(email=email)) > 0:
+            raise forms.ValidationError("This email address is already registered to an account -- use the username/password reminder (below) to obtain the credentials for this email.")
+        return email
 
     def get_credentials(self):
         return {

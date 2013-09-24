@@ -14,26 +14,37 @@
 
 <h3> {% block headtitle %} Metacademy Login {% endblock %}</h3>
 
-{% if form.errors %}
-<div class="form-errors">
-{% for key, value in form.errors.items %}
-<p>
-  {{ value }}
-<p>
-{% endfor %}
-</div>
-{% endif %}
+
+{% if form.non_field_errors %}
+  <div class="non-field-form-errors">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+  </div>
+  {% endif %}
 
 {% block form-content %}
 
 <div class="user-form-field">
   {{ form.username.label_tag }}
   {{ form.username }}
+  {% if form.username.errors %}
+  <div class="form-errors">
+    {{form.username.errors}}
+  </div>
+  {% endif %}
+
 </div>
 
 <div class="user-form-field">
   {{ form.password.label_tag }}
   {{ form.password }}
+  {% if form.password.errors %}
+  <div class="form-errors">
+    {{form.password.errors}}
+  </div>
+  {% endif %}
+
 </div>
 
 <div class="submit-field">

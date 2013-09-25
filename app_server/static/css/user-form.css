@@ -6,13 +6,26 @@ form{
     width: 40%;
     min-width: 20em;
     text-align: center;
-    margin: 3em auto;
+    margin: 3em auto 0 auto;
     border: 3px solid #2E0C3C;
     -webkit-border-radius: 11px;
     -moz-border-radius: 11px;
     border-radius: 11px;
     position: relative;
     padding-bottom: 1.8em;
+}
+
+.forgot-pw-link{
+    margin-top: 0.3em;
+    text-align: center;
+}
+.forgot-pw-link a{
+    font-size: 0.9em;
+    color: rgb(80, 9 ,74);
+    text-decoration: none;
+}
+.forgot-pw-link a:hover{
+    text-decoration: underline;
 }
 
 .user-form-field{
@@ -32,6 +45,10 @@ form{
     padding-left: 0.3em;
     font-size: 1em;
     width: 80%;
+}
+
+.submit-field{
+    padding-top: 0.8em;
 }
 
 .submit-field input{
@@ -80,4 +97,12 @@ h3{
 }
 .captcha-wrapper input{
     width: 3em;
+}
+
+.sole-content{
+    margin: auto;
+    padding: 2em;
+    line-height: 1.4em;
+    font-size: 1.2em;
+    text-align: center;
 }

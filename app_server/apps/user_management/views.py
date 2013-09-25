@@ -64,7 +64,7 @@ def register(request, redirect_addr="/user"):
 
             # send basic info email
             uname = form.cleaned_data['username']
-            subject, from_email, to = 'Metacademy account successfully created', 'welcome@metacademy.org', form.cleaned_data['email']
+            subject, from_email, to = 'Metacademy account successfully created', 'accounts@metacademy.org', form.cleaned_data['email']
             text_content = TXT_ACCT_EMAIL % uname
             
             html_content = HTML_ACCT_EMAIL % uname
@@ -80,7 +80,7 @@ def register(request, redirect_addr="/user"):
             return HttpResponseRedirect(redirect_addr)
     else:
         form = UserCreateForm()
-    return render(request, "register.html", {
+    return render(request, "user_management/register.html", {
         'form': form,
     })
 

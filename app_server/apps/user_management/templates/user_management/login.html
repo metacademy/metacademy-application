@@ -9,7 +9,7 @@
 
 
 <div class="form-wrapper">
-<form method="post" action="">
+<form method="post" action={% block form-action %}""{% endblock %}>
 {% csrf_token %}
 
 <h3> {% block headtitle %} Metacademy Login {% endblock %}</h3>
@@ -33,7 +33,6 @@
     {{form.username.errors}}
   </div>
   {% endif %}
-
 </div>
 
 <div class="user-form-field">
@@ -46,17 +45,22 @@
   {% endif %}
 
 </div>
+{% endblock %}
 
+{% block submit-button %}
 <div class="submit-field">
-  <input type="submit" value="login" />
+  <input type="submit" value={% block button-text %}"login"{% endblock %} />
 </div>
-
 {% endblock %}
 
 </form>
-
-
 </div>
+
+{% block post-form-text %}
+<div class="forgot-pw-link">
+     <a href="{% url "user:password_reset" %}">forgot your username/password?</a>
+</div>
+{% endblock %}
 
 {% endblock %}
 

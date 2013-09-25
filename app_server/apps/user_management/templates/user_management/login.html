@@ -1,30 +1,6 @@
-{% extends "base.html" %}
-{% load staticfiles %}
-
-{% block extra-css %}
-<link rel="stylesheet" href="{% static "css/user-form.css" %}" />
-{% endblock %}
-
-{% block main %}
-
-
-<div class="form-wrapper">
-<form method="post" action={% block form-action %}""{% endblock %}>
-{% csrf_token %}
-
-<h3> {% block headtitle %} Metacademy Login {% endblock %}</h3>
-
-
-{% if form.non_field_errors %}
-  <div class="non-field-form-errors">
-        {% for error in form.non_field_errors %}
-            {{ error }}
-        {% endfor %}
-  </div>
-  {% endif %}
+{% extends "user_management/base_form.html" %}
 
 {% block form-content %}
-
 <div class="user-form-field">
   {{ form.username.label_tag }}
   {{ form.username }}
@@ -47,20 +23,11 @@
 </div>
 {% endblock %}
 
-{% block submit-button %}
-<div class="submit-field">
-  <input type="submit" value={% block button-text %}"login"{% endblock %} />
-</div>
-{% endblock %}
-
-</form>
-</div>
+{% block button-text %}"login"{% endblock %}
 
 {% block post-form-text %}
 <div class="forgot-pw-link">
      <a href="{% url "user:password_reset" %}">forgot your username/password?</a>
 </div>
-{% endblock %}
-
 {% endblock %}
 

@@ -5,8 +5,16 @@
 <link rel="stylesheet" href="{% static "css/user-form.css" %}" />
 {% endblock %}
 
-{% block main %}
+{% block jscript %}
+{% include "load-jquery-snippet.html" %}
+<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
+<script type="text/javascript">
+  
+</script>
+{% endblock %}
 
+
+{% block main %}
 
 <div class="form-wrapper">
 <form method="post" action={% block form-action %}""{% endblock %}>

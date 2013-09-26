@@ -77,8 +77,7 @@ def show(request, username, tag):
         'body_html': safestring.mark_safe(body_html),
         'roadmap': roadmap,
         'show_edit_link': can_edit,
-        'edit_url': edit_url,
-        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        'edit_url': edit_url
         })
 
 
@@ -128,8 +127,7 @@ def edit(request, username, tag):
     
     return render(request, 'roadmap-edit.html', {
         'form': form,
-        'tag': roadmap.url_tag,
-        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        'tag': roadmap.url_tag
         })
 
 def new(request):
@@ -152,8 +150,7 @@ def new(request):
         form = RoadmapCreateForm()
         
     return render(request, 'roadmap-new.html', {
-        'form': form,
-        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        'form': form
         })
 
 
@@ -176,8 +173,7 @@ def preview(request):
     return render(request, 'roadmap-content.html', {
         'roadmap': roadmap,
         'body_html': safestring.mark_safe(body_html),
-        'show_edit_link': False,
-        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        'show_edit_link': False
         })
 
 
@@ -189,8 +185,7 @@ def list(request):
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
         'include_create': True,
-        'empty_message': 'Nobody has made any roadmaps yet.',
-        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        'empty_message': 'Nobody has made any roadmaps yet.'
         })
     
 def list_by_user(request, username):
@@ -208,7 +203,6 @@ def list_by_user(request, username):
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
         'include_create': include_create,
-        'empty_message': 'This user has not made any roadmaps.',
-        'CONTENT_SERVER': settings.CONTENT_SERVER,
+        'empty_message': 'This user has not made any roadmaps.'
         })
     

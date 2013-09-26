@@ -15,7 +15,6 @@ from lazysignup.models import LazyUser
 
 from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 from aux_text import HTML_ACCT_EMAIL, TXT_ACCT_EMAIL
-from settings import CONTENT_SERVER
 
 def user_main(request):
     if not request.user.is_authenticated() or is_lazy_user(request.user):
@@ -38,7 +37,7 @@ def user_main(request):
     else:
         sconcepts = []
 
-    return render_to_response('user.html', {"lconcepts": lconcepts, "sconcepts": sconcepts, "content_server": CONTENT_SERVER}, context_instance=RequestContext(request))
+    return render_to_response('user.html', {"lconcepts": lconcepts, "sconcepts": sconcepts}, context_instance=RequestContext(request))
 
 @allow_lazy_user
 def register(request, redirect_addr="/user"):

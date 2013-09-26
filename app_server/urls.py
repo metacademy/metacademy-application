@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.views.decorators.cache import cache_page
 from django.views.generic.base import TemplateView, RedirectView
 
-from apps.graph.views import benchmark_viewer
+from views import SearchView
 
 admin.autodiscover()
 
@@ -13,7 +13,9 @@ admin.autodiscover()
 Django urls handler
 """
 urlpatterns = patterns('',
-                       url(r'^', include('apps.content_search.urls') ),
+                       url(r'^$', TemplateView.as_view(template_name="landing.html")),
+                       url(r'^(?i)search$', SearchView.as_view()),
+                       url(r'^(?i)list$', TemplateView.as_view(template_name="concept-list.html")),
                        url(r'^(?i)concepts/((?P<anything>.*))', RedirectView.as_view(url="/graphs/concepts/%(anything)s", query_string=True), name='concepts'),
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),
                        url(r'^user/', include('apps.user_management.urls', namespace='user') ),
@@ -25,6 +27,5 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^happy/', include('lazysignup.urls')),
 )
-
 
 urlpatterns += staticfiles_urlpatterns()

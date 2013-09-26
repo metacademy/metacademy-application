@@ -125,7 +125,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'apps.graph',
-    'apps.content_search',
     'apps.user_management',
     'apps.cserver_comm',
     'apps.roadmaps',
@@ -141,6 +140,17 @@ CAPTCHA_LETTER_ROTATION = (-10,10)
 CAPTCHA_FONT_SIZE = 24
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
+
+# context processors
+
+TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
+                               "django.core.context_processors.debug",
+                               "django.core.context_processors.i18n",
+                               "django.core.context_processors.media",
+                               "django.core.context_processors.static",
+                               "django.core.context_processors.tz",
+                               "django.contrib.messages.context_processors.messages",
+                               "context_processors.global_cp.settings_cp")
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

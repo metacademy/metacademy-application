@@ -301,7 +301,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       var relTarget = d3.event.relatedTarget;
       
       // check if we're in a semantically related el
-      if (!relTarget ||nodeEl.contains(relTarget) || (relTarget.id&& relTarget.id.match(nodeEl.id))){
+      if (!relTarget || $.contains(nodeEl, relTarget) || (relTarget.id && relTarget.id.match(nodeEl.id))){
         return;
       }
 

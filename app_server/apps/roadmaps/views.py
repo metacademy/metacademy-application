@@ -1,9 +1,9 @@
 import os
+from operator import attrgetter
 
 import bleach
 import markdown
 import urlparse
-
 
 import pdb
 
@@ -184,6 +184,7 @@ def preview(request):
 def list(request):
     roadmaps = models.Roadmap.objects.all()
     roadmaps = filter(lambda r: r.listed_in_main(), roadmaps)
+    roadmaps.sort(key=attrgetter("title"))
 
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
@@ -200,6 +201,7 @@ def list_by_user(request, username):
 
     roadmaps = models.Roadmap.objects.filter(user__username__exact=user.username)
     roadmaps = filter(lambda r: r.is_public(), roadmaps)
+    roadmaps.sort(key=attrgetter("title"))
 
     include_create = request.user.is_authenticated() and request.user.username == username
 

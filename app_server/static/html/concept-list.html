@@ -12,10 +12,8 @@ Concepts - Metacademy
 <link rel="stylesheet" href="{% static "css/list.css" %}"> </rel>
 {% endblock %}
 
-{% block jscript %}
-{% include "load-jquery-snippet.html" %}
+{% block jscript-extend %}
 <script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
-<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
 <script type="text/javascript" src="{% static "javascript/show-concepts-list.js" %}"></script>
 {% endblock %}
 

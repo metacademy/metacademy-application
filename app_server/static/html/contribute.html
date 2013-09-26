@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-{% block jscript %}
-{% include "load-jquery-snippet.html" %}
-<script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></scrip>
-{% endblock %}
-
 {% block extra-css %}
 <link rel="stylesheet" href="{% static "css/about.css" %}"/>
 {% endblock %}

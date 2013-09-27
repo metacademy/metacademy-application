@@ -65,34 +65,33 @@ h1{
 .search-info{
     font-size: 0.98em;
     font-weight: bold;
-    padding-bottom: 1.2em;
     margin-bottom: 1em;
-    margin-top: 1.2em;
-    margin-left: 20%;
+    margin-top: 1.5em;
+    margin-left: 20%;;
+    position: relative;
+    left: -1.5em;
     margin-right: 20%;
-    border-bottom: 1px solid #eaeaea
 }
 
 .search-res-wrapper{
-    height: 100%;
     width: 100%;
     background: white;
     position: absolute;
+    padding-bottom: 2em;
 }    
 
 .search-res{
     margin-left: 20%;
     margin-right: 20%;
-    padding-bottom: 3em;
 }
 .search-res-list{
     line-height: 1.1em;
 }
 
-.search-res-li{
-    padding-bottom: 0.8em;
-    margin-bottom: 1em;
-    border-bottom: 1px solid #eaeaea
+.search-res-li + .search-res-li{
+    padding-top: 0.8em;
+    margin-top: 1em;
+    border-top: 1px solid #eaeaea
 }
 
 .search-res-title{

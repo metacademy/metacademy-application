@@ -4,17 +4,24 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 from django.views.decorators.cache import cache_page
 from django.views.generic.base import TemplateView, RedirectView
+from haystack.views import search_view_factory
+from haystack.query import SearchQuerySet
 
-from views import SearchView
+from apps.roadmaps.models import Roadmap
+from views import MultiSearchView
 
 admin.autodiscover()
+
+sqs = SearchQuerySet().filter(visibility=Roadmap.VIS_MAIN)
+search_inst = search_view_factory(view_class=MultiSearchView, searchqueryset=sqs, template='search-results.html')
+
 
 """
 Django urls handler
 """
 urlpatterns = patterns('',
                        url(r'^$', TemplateView.as_view(template_name="landing.html")),
-                       url(r'^(?i)search$', SearchView.as_view()),
+                       url(r'^(?i)search$', search_inst, name="haystack_search"),
                        url(r'^(?i)list$', TemplateView.as_view(template_name="concept-list.html")),
                        url(r'^(?i)concepts/((?P<anything>.*))', RedirectView.as_view(url="/graphs/concepts/%(anything)s", query_string=True), name='concepts'),
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),

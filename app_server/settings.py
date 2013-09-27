@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'apps.user_management',
     'apps.cserver_comm',
     'apps.roadmaps',
+    'haystack',
     'captcha',
     'south',
     'compressor',
@@ -140,9 +141,17 @@ CAPTCHA_LETTER_ROTATION = (-10,10)
 CAPTCHA_FONT_SIZE = 24
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(config.APP_SERVER_SEARCH_INDEX_PATH, 'whoosh_index'),
+    },
+}
+# TODO we may want to eventually switch to queued processing
+# https://github.com/toastdriven/queued_search
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # context processors
-
 TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
                                "django.core.context_processors.debug",
                                "django.core.context_processors.i18n",

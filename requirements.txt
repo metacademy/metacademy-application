@@ -1,4 +1,5 @@
 django
+django-haystack>=2.1.0
 whoosh
 pillow==2.0
 django-simple-captcha

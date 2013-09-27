@@ -1,0 +1,6 @@
+{{ object.title }}
+{{ object.user }}
+{{ object.audience }}
+{{ object.blurb }}
+{{ object.author }}
+{{ object.body }}

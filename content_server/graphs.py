@@ -181,16 +181,17 @@ def remove_missing_links(nodes):
 
 
     
-def count_dependencies(graph, ignore=None):
+def count_dependencies(graph, ignore=[]):
     """Count the total number of long-distance dependencies in a graph."""
     all_deps = graph.gather_dependencies()
     
     total = 0
     for vertex, deps in all_deps.items():
-        if vertex[0] == 'concept' and vertex[1] != ignore:
+        if vertex[0] == 'concept' and vertex[1] not in ignore:
             dep_tags = set(d[1] for d in deps)     # don't double count concepts and shortcuts
-            if ignore in dep_tags:
-                dep_tags.remove(ignore)
+            for ig in ignore:
+                if ig in dep_tags:
+                    dep_tags.remove(ig)
             total += len(dep_tags)
 
     return total
@@ -208,7 +209,7 @@ def bottleneck_score(graph, tag):
     if ('shortcut', tag) in graph_rem.vertices:
         graph_rem.remove_vertex(('shortcut', tag))
     
-    orig = count_dependencies(graph, ignore=tag)
+    orig = count_dependencies(graph, ignore=[tag])
     diff = orig - count_dependencies(graph_rem)
     return diff / float(orig)
 
@@ -219,14 +220,14 @@ def rank_bottleneck_scores(nodes, graph):
     for tag in order:
         print '%10.5f %s' % (scores[tag], nodes[tag].title)
 
-def edge_bottleneck_score(graph, from_node, to_node):
+def edge_bottleneck_score(graph, from_node, to_node, ignore=[]):
     graph_rem = graph.copy()
     graph_rem.remove_edge(from_node, to_node)
 
     # TODO: handle shortcuts in a sensible way
 
-    orig = count_dependencies(graph)
-    diff = orig - count_dependencies(graph_rem)
+    orig = count_dependencies(graph, ignore=ignore)
+    diff = orig - count_dependencies(graph_rem, ignore=ignore)
     return diff / float(orig)
 
 def get_label(nodes, k):
@@ -237,11 +238,13 @@ def get_label(nodes, k):
     else:
         raise RuntimeError('Invalid key: %s' % k)
 
-def rank_edge_bottleneck_scores(nodes, graph):
-    scores = {edge: edge_bottleneck_score(graph, edge[0], edge[1]) for edge in graph.edges}
+def rank_edge_bottleneck_scores(nodes, graph, ignore=[]):
+    scores = {edge: edge_bottleneck_score(graph, edge[0], edge[1], ignore=ignore)
+              for edge in graph.edges}
     srtd = sorted(graph.edges, key=lambda e: scores[e], reverse=True)
     for from_node, to_node in srtd:
-        print '%10.5f   %s ==> %s' % (scores[from_node, to_node], get_label(from_node), get_label(to_node))
+        print '%10.5f   %s ==> %s' % (scores[from_node, to_node], get_label(nodes, from_node),
+                                      get_label(nodes, to_node))
 
 def explain_edge_bottleneck_score(nodes, graph, from_node, to_node):
     graph_rem = graph.copy()

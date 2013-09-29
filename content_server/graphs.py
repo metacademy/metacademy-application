@@ -1,3 +1,4 @@
+import collections
 import numpy as np
 try:
     import scipy.linalg
@@ -217,6 +218,57 @@ def rank_bottleneck_scores(nodes, graph):
     order = sorted(nodes.keys(), key=lambda t: scores[t], reverse=True)
     for tag in order:
         print '%10.5f %s' % (scores[tag], nodes[tag].title)
+
+def edge_bottleneck_score(graph, from_node, to_node):
+    graph_rem = graph.copy()
+    graph_rem.remove_edge(from_node, to_node)
+
+    # TODO: handle shortcuts in a sensible way
+
+    orig = count_dependencies(graph)
+    diff = orig - count_dependencies(graph_rem)
+    return diff / float(orig)
+
+def get_label(nodes, k):
+    if k[0] == 'concept':
+        return nodes[k[1]].title
+    elif k[0] == 'shortcut':
+        return nodes[k[1]].title + ' (shortcut)'
+    else:
+        raise RuntimeError('Invalid key: %s' % k)
+
+def rank_edge_bottleneck_scores(nodes, graph):
+    scores = {edge: edge_bottleneck_score(graph, edge[0], edge[1]) for edge in graph.edges}
+    srtd = sorted(graph.edges, key=lambda e: scores[e], reverse=True)
+    for from_node, to_node in srtd:
+        print '%10.5f   %s ==> %s' % (scores[from_node, to_node], get_label(from_node), get_label(to_node))
+
+def explain_edge_bottleneck_score(nodes, graph, from_node, to_node):
+    graph_rem = graph.copy()
+    graph_rem.remove_edge(from_node, to_node)
+
+    # TODO: handle shortcuts in a sensible way
+    all_deps = graph.gather_dependencies()
+    all_deps_rem = graph_rem.gather_dependencies()
+
+    dep_diff = collections.defaultdict(set)
+    for k, deps in all_deps.items():
+        for dep in deps:
+            if dep not in all_deps_rem[k]:
+                dep_diff[dep].add(k)
+
+    keys = sorted(dep_diff.keys(), key=lambda d: len(dep_diff[d]), reverse=True)
+    for k in keys:
+        if len(dep_diff[k]) > 0:
+            print '%d concepts depend on %s only through this edge:' % (len(dep_diff[k]), get_label(nodes, k))
+            for k2 in dep_diff[k]:
+                print '   ', get_label(nodes, k2)
+            print
+
+    
+
+
+        
 
 
 def page_rank(nodes, damping=0.25):

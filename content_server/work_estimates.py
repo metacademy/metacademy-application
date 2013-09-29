@@ -1,7 +1,10 @@
 import collections
 import numpy as np
 import re
-import scipy.optimize, scipy.special
+try:
+    import scipy.optimize, scipy.special
+except:
+    pass
 
 MIN_TIME = 0.5    # all concepts' time estimates must be at least this many hours.
 

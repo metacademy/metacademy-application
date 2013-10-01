@@ -48,7 +48,7 @@ h1{
 }
 
 .nosearch-message{
-    line-height: 1.3em;
+    line-height: 1.5em;
     font-size: 1.2em;
 }
 
@@ -69,13 +69,13 @@ h1{
     margin-top: 1.5em;
     position: relative;
 }
-.search-info:before{
-    content: "◦";
+.search-section-indicator:before{
+    content: "▬";
     position: absolute;
-    left: -1em;
-    top: -0.3em;
-    font-size: 2em;
-    color: rgb(66, 13, 62);
+    left: -2.8em;
+    top: -0.1em;
+    font-size: 0.8em;
+    color: rgb(64, 20, 68);
 }
 
 .search-res-wrapper{

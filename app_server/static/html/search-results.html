@@ -28,7 +28,7 @@
 
   {% if page.object_list|length %}
   <div class="roadmap-seach-res">
-  <div class="search-info">
+  <div class="search-info {% if concepts_search_data|length > 0 %}search-section-indicator{% endif %}">
     We found {{ page.object_list|length }} relevant roadmap{% if page.object_list|length > 1 %}s{% endif %}
   </div>
   <div class="search-res">
@@ -53,15 +53,22 @@
   </div>
 {% endif %}
 
-<div class="search-info">
+ {% if concepts_search_data %}
+<div class="search-info {% if page.object_list|length > 0 %}search-section-indicator{% endif %}">
   We found {{ concepts_search_data|length }} relevant concept{% if concepts_search_data|length > 1 %}s{% endif %}
 </div>
+{% endif %}
 <div class="search-res">
   <ol class="search-res-list">
-    {% if not concepts_search_data|length %}
+    {% if not concepts_search_data|length and page.object_list|length == 0 %}
 
     <div class="nosearch-message">
-      Perhaps check out our <a href="/list" class="internal-link">full list of concepts</a>
+      <p>
+      We did not find any relevant results (is your spelling correct?).
+      </p>
+      <p>
+        Perhaps check out our <a href="/list" class="internal-link">full list of concepts</a> to see if you can find what you're looking for.
+      </p>
     </div>
     <div class="sidenote"> (note: we're a young project and currently focus on machine learning and statistics)</span> <!-- TODO add "contribute content" link here -->
 <div>

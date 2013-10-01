@@ -22,7 +22,7 @@ body {
     top: 2em;
     right: 0;
     background: rgba(253, 253, 253, 0.98);
-    border: 2px solid #5C4A56;
+    border: 2px solid #75526A;
     border-radius: 10px;
 }
 
@@ -633,8 +633,11 @@ ellipse{
    stroke-width: 20;
    visibility: hidden;
 }
-
-.node-star-hovered polygon, .node-starred .node-star polygon{
+.node-star-hovered polygon{
+    fill: #D4C4E7;
+    Stroke: #56574D;
+}
+.node-starred .node-star polygon{
    fill: #F8F8C9;
    stroke: #56574D;
 }
@@ -652,13 +655,28 @@ ellipse{
     stroke-width: 3;
     visibility: hidden;
 }
-.checkmark-hovered circle, .node-learned .checkmark circle{
+.node-learned .checkmark circle{
     fill: transparent;
     stroke: #759466;
     stroke-width: 4;
     visibility: visible;
 }
-.checkmark-hovered path, .node-learned .checkmark path{
+
+.checkmark-hovered circle{
+   fill: transparent;
+   stroke: #9987AF;
+   stroke-width: 4;
+   visibility: visible;
+}
+
+
+.checkmark-hovered path{
+    stroke-width: 5;
+    stroke: #9987AF;
+    visibility: visible;
+}
+
+.node-learned .checkmark path{
     stroke-width: 5;
     stroke: #759466;
     visibility: visible;

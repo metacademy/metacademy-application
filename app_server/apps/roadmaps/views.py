@@ -34,8 +34,7 @@ BLEACH_ATTR_WHITELIST = {
 EDIT_USERS = ['rgrosse', 'cjrd']
 
 def metacademy_domains():
-    domain = urlparse.urlparse(settings.CONTENT_SERVER).netloc
-    return ['', domain]
+    return ['']
 
 def is_internal_link(url):
     p = urlparse.urlparse(url)

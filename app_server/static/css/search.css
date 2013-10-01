@@ -33,7 +33,7 @@
 h1{
     font-size: 1.5em;
     text-align: center;
-    margin: 1em 20%;
+    margin: 1em;
     color: #50094A;
     font-weight: bold;
     border-bottom: 1px solid #eaeaea;
@@ -67,22 +67,24 @@ h1{
     font-weight: bold;
     margin-bottom: 1em;
     margin-top: 1.5em;
-    margin-left: 20%;;
     position: relative;
-    left: -1.5em;
-    margin-right: 20%;
+}
+.search-info:before{
+    content: "◦";
+    position: absolute;
+    left: -1em;
+    top: -0.3em;
+    font-size: 2em;
+    color: rgb(66, 13, 62);
 }
 
 .search-res-wrapper{
-    width: 100%;
     background: white;
     position: absolute;
-    padding-bottom: 2em;
+    padding: 0 20% 2em 20%;
 }    
 
 .search-res{
-    margin-left: 20%;
-    margin-right: 20%;
 }
 .search-res-list{
     line-height: 1.1em;

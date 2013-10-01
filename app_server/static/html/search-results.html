@@ -27,8 +27,9 @@
   </div>
 
   {% if page.object_list|length %}
+  <div class="roadmap-seach-res">
   <div class="search-info">
-    -We found {{ page.object_list|length }} relevant roadmap{% if page.object_list|length > 1 %}s{% endif %}-
+    We found {{ page.object_list|length }} relevant roadmap{% if page.object_list|length > 1 %}s{% endif %}
   </div>
   <div class="search-res">
     <ol class="search-res-list">
@@ -49,10 +50,11 @@
       {% endfor %}
     </ol>
   </div>
+  </div>
 {% endif %}
 
 <div class="search-info">
-  -We found {{ concepts_search_data|length }} relevant concept{% if concepts_search_data|length > 1 %}s{% endif %}-
+  We found {{ concepts_search_data|length }} relevant concept{% if concepts_search_data|length > 1 %}s{% endif %}
 </div>
 <div class="search-res">
   <ol class="search-res-list">

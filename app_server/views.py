@@ -18,7 +18,7 @@ class MultiSearchView(SearchView):
     """
     def extra_context(self):
         """
-        Adds the concept search (list) results for a given query
+        Adds the concept search (list) results for a given query TODO we may want to move this funcitonality to the client (have their browser query the content server)
         """
         qstring = self.get_query()
         if len(qstring) == 0:
@@ -27,4 +27,4 @@ class MultiSearchView(SearchView):
         else:
             search_data = get_search_json(qstring)
 
-        return {"concepts_search_data": search_data, 'search_query': qstring}# render_to_response('search-results.html', {'search_data': search_data, 'search_query': qstring}, context_instance=RequestContext(request))
+        return {"concepts_search_data": search_data, 'search_query': qstring}

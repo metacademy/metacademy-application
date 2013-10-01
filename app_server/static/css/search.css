@@ -73,7 +73,7 @@ h1{
     content: "▬";
     position: absolute;
     left: -2.8em;
-    top: -0.1em;
+    top: 0;
     font-size: 0.8em;
     color: rgb(64, 20, 68);
 }

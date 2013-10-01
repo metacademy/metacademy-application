@@ -3,6 +3,7 @@ from operator import attrgetter
 
 import bleach
 import markdown
+import re
 import urlparse
 
 import pdb
@@ -14,6 +15,7 @@ from django.shortcuts import render
 from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
 
+import apps.cserver_comm.cserver_communicator as cscomm
 from utils.roadmap_extension import RoadmapExtension
 import models
 import settings
@@ -41,9 +43,20 @@ def is_internal_link(url):
         return False
     return p.path.find('/concepts/') != -1
 
+re_tag = re.compile(r'/concepts/(\w+)')
+def parse_tag(url):
+    m = re_tag.match(url)
+    if m:
+        return m.group(1)
+    else:
+        return None
+
 def process_link(attrs, new=False):
     if is_internal_link(attrs['href']):
-        attrs['class'] = 'internal-link'
+        if cscomm.is_node_present(parse_tag(attrs['href'])):
+            attrs['class'] = 'internal-link'
+        else:
+            attrs['class'] = 'internal-link missing-link'
     else:
         attrs['class'] = 'external-link'
     attrs['target'] = '_blank'

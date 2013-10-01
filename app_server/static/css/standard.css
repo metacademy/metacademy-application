@@ -44,6 +44,15 @@ p {
     color: #690259;
 }
 
+.missing-link{
+    color: #BBBB70;
+    text-decoration: none;
+}
+.missing-link:hover{
+    color: #666620;
+    text-decoration: underline;
+}
+
 a.expand-collapse-link{
     font-size: 0.8em;
     color:#190797;

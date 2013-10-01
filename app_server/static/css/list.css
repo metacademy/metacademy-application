@@ -1,8 +1,25 @@
 .list-concepts-li{
-    font-size: 1.1em;
-    line-height: 1.5em;
+    font-size: 1.2em;
+    line-height: 1.6em;
+    margin-left: 1em;
+    position: relative;
+}
+
+.list-concepts-li:before{
+    content: "-";
+    position: absolute;
+    left: -1em;
 }
 
 .list-concepts-wrapper{
-    margin: 1em;
+    margin: 1em 5%;
+}
+
+.list-concepts-wrapper h2{
+    margin-bottom: 0.3em;
+    overflow: hidden;
+    padding-top: .5em;
+    padding-bottom: .3em;
+    border-bottom: 1px solid #aaa;
+    font-size: 1.35em;
 }

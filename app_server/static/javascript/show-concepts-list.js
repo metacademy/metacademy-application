@@ -13,9 +13,15 @@ window.onload = (function($, _, undefined){
       }
     });
   }
+
+  // helper function for creating letter headers
+  function getLetterHeader(letter){
+    return "<h2>" + letter.toUpperCase() + "</h2>\n";
+  }
   
   // TODO fix all of the hardcoding if possible
   var template = _.template(document.getElementById("list-concept-item-template").innerHTML);
+  
   // load the list titles and tags from the server
   $.getJSON(window.CONTENT_SERVER + '/list' + (courseName.length ? "?course=" + courseName : ""),
     function(listData){
@@ -23,12 +29,19 @@ window.onload = (function($, _, undefined){
       listData.sort(function(itma, itmb){
         return itma.title.toLowerCase().localeCompare(itmb.title.toLowerCase());
       });
-      var innerListTxt = "";
+      var innerListTxt = "<ul>\n",
+          prevStartLtr = "",
+          thisLtr = "";
       _.forEach(listData, function(listItm){
+        thisLtr = listItm.title.substring(0,1).toLowerCase();
+        if (thisLtr !== prevStartLtr){
+          innerListTxt += "</ul>\n";
+          prevStartLtr = thisLtr;
+          innerListTxt += getLetterHeader(thisLtr) + "<ul>";
+        }
         innerListTxt += template(listItm);
       });
-      var litemList = document.createElement("ul");
-      litemList.innerHTML = innerListTxt;
-      $('.list-concepts-wrapper').append(litemList);
+      innerListTxt += "</ul>";
+      $('.list-concepts-wrapper').append(innerListTxt);
     });
 })(window.$, window._);

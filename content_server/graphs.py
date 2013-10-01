@@ -43,6 +43,18 @@ class Graph:
         return graph
 
     @staticmethod
+    def from_node_pointers(nodes):
+        graph = Graph.init_empty(nodes.keys())
+
+        for tag, node in nodes.items():
+            for line in node.pointers:
+                for item in line.items:
+                    if hasattr(item, 'link') and item.link in nodes:
+                        graph.add_edge(node.tag, item.link)
+
+        return graph
+
+    @staticmethod
     def from_node_and_shortcut_dependencies(nodes, shortcuts):
         """Construct the dependency graph from dicts of nodes and shortcuts. Expects all the links to be
         present in the graph (so call remove_missing_liks on nodes first). Returns a dependency graph
@@ -274,7 +286,7 @@ def explain_edge_bottleneck_score(nodes, graph, from_node, to_node):
         
 
 
-def page_rank(nodes, damping=0.25):
+def page_rank(nodes, damping=0.25, pointers_weight=0.75):
     """Compute the page rank scores for the nodes in the graph. This is defined as the stationary distribution
     of the Markov chain where in each step, a surfer (a) follows a link uniformly at random from the set of
     dependencies and see-also links with probability 1 - damping, or (b) chooses a node uniformly at random
@@ -291,10 +303,12 @@ def page_rank(nodes, damping=0.25):
     
     T = np.zeros((N, N))
     for i, tag in enumerate(id2tag):
-        neighbors = set(pgraph.outgoing[tag] + dgraph.incoming[tag])
-        if neighbors:
-            for n in neighbors:
-                T[tag2id[n], i] = 1. / len(neighbors) * (1. - damping)
+        if pgraph.outgoing[tag] or dgraph.incoming[tag]:
+            for n in pgraph.outgoing[tag]:
+                T[tag2id[n], i] += pointers_weight
+            for n in dgraph.incoming[tag]:
+                T[tag2id[n], i] += 1. - pointers_weight
+            T[:, i] *= (1. - damping) / T[:, i].sum()
             T[:, i] += damping / N
         else:
             T[:, i] += 1. / N
@@ -315,12 +329,20 @@ def page_rank(nodes, damping=0.25):
 
     
 
-def print_page_ranks(nodes, damping):
+def print_page_ranks(nodes, damping=0.25, pointers_weight=0.75):
     """Print the list of nodes sorted by their page ranks."""
-    scores = page_rank(nodes, damping)
+    scores = page_rank(nodes, damping, pointers_weight)
     order = sorted(nodes.keys(), key=lambda t: scores[t], reverse=True)
     for tag in order:
         print '%10.5f %s' % (scores[tag], nodes[tag].title)
+
+def print_centrality(nodes, damping=0.25, pointers_weight=0.75):
+    scores = page_rank(nodes, damping, pointers_weight)
+    order = sorted(nodes.keys(), key=lambda t: scores[t], reverse=True)
+    mn, mx = np.log(min(scores.values())), np.log(max(scores.values()))
+    for tag in order:
+        centrality = 10. * (np.log(scores[tag]) - mn) / (mx - mn)
+        print '%10.2f %s' % (centrality, nodes[tag].title)
             
 def missing_titles(nodes):
     """List the tags of all nodes with missing titles."""

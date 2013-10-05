@@ -2,7 +2,10 @@ import pdb
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import HttpResponse
 from haystack.views import SearchView
+
+from os import system
 
 from apps.cserver_comm.cserver_communicator import get_search_json
 
@@ -28,3 +31,12 @@ class MultiSearchView(SearchView):
             search_data = get_search_json(qstring)
 
         return {"concepts_search_data": search_data, 'search_query': qstring}
+
+"""
+Git pull
+Pull the latest content from GitHub once requested by a webhook
+"""
+def gitpull(request):
+    system('/bin/git --work-tree="/srv/octal" pull 2>&1 >/dev/null')
+    return HttpResponse("ok")
+

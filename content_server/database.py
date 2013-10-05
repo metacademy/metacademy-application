@@ -314,9 +314,15 @@ def check_node_format(content_path, tag):
         errors.append({'shortcut dependencies.txt': formats.check_dependencies_format(open(fname))})
 
     return errors
-    
-def check_all_node_formats(content_path):
+
+IGNORE_NODE_TAGS = ['.DS_Store', 'ANNOTATED_EXAMPLE']
+
+def all_concept_tags(content_path):
     tags = os.listdir(os.path.join(content_path, 'concepts'))
+    return filter(lambda t: not t in IGNORE_NODE_TAGS, tags)
+
+def check_all_node_formats(content_path):
+    tags = all_concept_tags(content_path)
     errors = {}
     for tag in tags:
         errors[tag] = check_node_format(content_path, tag)
@@ -325,10 +331,7 @@ def check_all_node_formats(content_path):
 
 def read_nodes(content_path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Concept objects."""
-    IGNORE_NODE_TAGS = ['.DS_Store', 'ANNOTATED_EXAMPLE']
-    nodes_path = os.path.join(content_path, 'concepts')
-    tags = os.listdir(nodes_path)
-    tags = filter(lambda t: not t in IGNORE_NODE_TAGS, tags)
+    tags = all_concept_tags(content_path)
     if onlytitle:
         return tags
     else:
@@ -355,8 +358,7 @@ def _filter_non_nodes(tags):
 
 
 def check_format(content_path):
-    nodes_path = os.path.join(content_path, 'concepts')
-    tags = os.listdir(nodes_path)
+    tags = all_concept_tags(content_path)
     # make sure files exist and are formatted correctly
     nodes = []
     for tag in tags:
@@ -379,8 +381,7 @@ def check_format(content_path):
 
 def assign_ids(content_path):
     """Assign unique IDs to all of the concepts which don't already have IDs."""
-    nodes_path = os.path.join(content_path, 'concepts')
-    tags = os.listdir(nodes_path)
+    tags = all_concept_tags(content_path)
 
     # read in current ID strings
     ids = set()
@@ -397,8 +398,7 @@ def assign_ids(content_path):
             open(id_file(content_path, tag), 'w').write(new_id)
 
 def concepts_without_ids(content_path):
-    nodes_path = os.path.join(content_path, 'concepts')
-    tags = os.listdir(nodes_path)
+    tags = all_concept_tags(content_path)
 
     return [t for t in tags if not os.path.exists(id_file(content_path, t))]
 

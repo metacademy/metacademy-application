@@ -12,6 +12,10 @@ def find_references(key):
     if db is None:
         load_db()
 
+    if key not in db.nodes:
+        print 'Not found.'
+        return
+
     print 'The following concepts depend on it:'
     for tag, node in db.nodes.items():
         for dep in node.dependencies:

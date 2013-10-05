@@ -77,14 +77,22 @@ def nodes_missing_summaries():
     if db is None:
         load_db()
 
+    def missing_summary(node):
+        return not node.summary or node.summary[:9] == 'Wikipedia'
+
+    scores = graphs.page_rank(db.nodes)
+    order = sorted(db.nodes.keys(), key=lambda t: scores[t], reverse=True)
+
     print 'With resources:'
-    for tag, node in db.nodes.items():
-        if node.resources and not node.summary:
+    for key in order:
+        node = db.nodes[key]
+        if node.resources and missing_summary(node):
             print '   ', node.title
     print
     print 'No resources:'
-    for tag, node in db.nodes.items():
-        if not node.resources and not node.summary:
+    for key in order:
+        node = db.nodes[key]
+        if not node.resources and missing_summary(node):
             print '   ', node.title
 
 

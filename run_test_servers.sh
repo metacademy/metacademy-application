@@ -4,13 +4,14 @@
 #obtain ports
 ports=`python config.py`
 set -- $ports
-cp=$1
-shift
-fp=$@
+ci=$1
+cp=$2
+fi=$3
+fp=$4
 
-python content_server/server.py $cp &
+python content_server/server.py $ci:$cp &
 cserver_id=$!
-python app_server/manage.py runserver $fp
+python app_server/manage.py runserver $fi:$fp
 
 # stop both servers on exit (this may not be desirable)
 kill $cserver_id

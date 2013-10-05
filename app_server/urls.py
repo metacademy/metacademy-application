@@ -9,6 +9,7 @@ from haystack.query import SearchQuerySet
 
 from apps.roadmaps.models import Roadmap
 from views import MultiSearchView
+from views import gitpull
 
 admin.autodiscover()
 
@@ -33,6 +34,7 @@ urlpatterns = patterns('',
                        url(r'^contribute/?$',  TemplateView.as_view(template_name='contribute.html')),
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^happy/', include('lazysignup.urls')),
+                       url(r'^gitpull$', gitpull),
 )
 
 urlpatterns += staticfiles_urlpatterns()

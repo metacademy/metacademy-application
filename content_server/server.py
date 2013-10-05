@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import pdb
+from string import split
 
 import config
 import database
@@ -196,8 +197,10 @@ def do_full_graph():
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
-        port = int(sys.argv[1])
+        host, port = split(sys.argv[1], ':')
+        port = int(port)
     else:
+        host = '127.0.0.1'
         port = 8000
-    app.run(debug=config.DEBUG, port=port)
+    app.run(debug=config.DEBUG, port=port, host=host)
 

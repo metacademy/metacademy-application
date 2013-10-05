@@ -68,7 +68,20 @@ def find_resource(source):
         print r
         print
 
+def nodes_missing_summaries():
+    global db
+    if db is None:
+        load_db()
 
+    print 'With resources:'
+    for tag, node in db.nodes.items():
+        if node.resources and not node.summary:
+            print '   ', node.title
+    print
+    print 'No resources:'
+    for tag, node in db.nodes.items():
+        if not node.resources and not node.summary:
+            print '   ', node.title
 
 
 

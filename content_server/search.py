@@ -25,12 +25,12 @@ def build_index(nodes, content_dir, index_dir):
     
 def build_main_index():
     db = database.Database.load(config.CONTENT_PATH)
-    build_index(db.nodes, config.CONTENT_PATH, config.INDEX_PATH)
+    build_index(db.nodes, config.CONTENT_PATH, config.CONTENT_INDEX_PATH)
 
 def load_main_index():
     global main_index
     build_main_index()
-    main_index = index.open_dir(config.INDEX_PATH)
+    main_index = index.open_dir(config.CONTENT_INDEX_PATH)
 
 def answer_query(query):
     with main_index.searcher() as searcher:

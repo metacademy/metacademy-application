@@ -196,11 +196,15 @@ def do_full_graph():
 
 
 if __name__ == '__main__':
+    host = '127.0.0.1'
+    port = 8000
     if len(sys.argv) >= 2:
-        host, port = split(sys.argv[1], ':')
+        hp_args = split(sys.argv[1], ':')
+        if len(hp_args) >1:
+            host = hp_args[0]
+            port = hp_args[1]
+        else:
+            port = hp_args[0]
         port = int(port)
-    else:
-        host = '127.0.0.1'
-        port = 8000
     app.run(debug=config.DEBUG, port=port, host=host)
 

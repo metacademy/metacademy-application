@@ -16,6 +16,8 @@ Current testing instructions (30 Aug 2013):
 5. from `metacademy-application` project directory:
 
         python app_server/manage.py syncdb
+        
+        python app_server/manage.py migrate
 
         run_test_servers.sh
         

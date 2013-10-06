@@ -1,18 +1,22 @@
 Metacademy's Source
 ==============
 
-This source is licenses under GPLv3, see LICENSE.txt (note: metacademy's content is CC BY SA 3.0).
+This source is licensed under GPLv3, see LICENSE.txt (note: metacademy's content is CC BY SA 3.0).
 
 ## Installation
 
 Current installation instructions for *nix and OSX (6 Oct 2013), all commands are executed from the terminal
 
+### Preliminary requirements
+
+1. Currently, the only preliminary requirement is [pip](http://www.pip-installer.org/en/latest/); here are [pip's installation instructions](http://www.pip-installer.org/en/latest/installing.html)
+
 ### Setting up a virtual environment
 We recommend using a virtual environment if you will be developing for the metacademy application, this way, metacademy won't conflict with your system libraries
 
-1. install virtualenv `pip install virtualenv` (you may need to instead run `sudo pip install virtualenv` or `[sudo] easy_install install virtualenv`)
+1. install virtualenv `pip install virtualenv` (you may need to instead run `sudo pip install virtualenv`)
 1. create a top-level metacademy directory in a desired location, e.g. `mkdir -p ~/MyProjects/metacademy`
-1.  go to the top-level metacademy directory `cd ~/MyProjects/metacademy`
+1. go to the top-level metacademy directory `cd ~/MyProjects/metacademy`
 1. initialize a virtual environment in this directory 
 
         virtualenv --no-site-packages .
@@ -62,7 +66,7 @@ We recommend using a virtual environment if you will be developing for the metac
         
         python app_server/manage.py migrate
 
-        run_test_servers.sh
+        ./run_test_servers.sh
         
 1. Open [localhost:8080](http://localhost:8080) with a modern javascript-enabled browser, preferably a webkit-based browser
 

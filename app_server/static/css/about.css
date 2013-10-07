@@ -1,13 +1,30 @@
-p{
+#main p{
    margin:  0.5em 0;
 }
 
-h1{
-    font-size: 1.6em;
+#main h1{
+    font-size: 1.3em;
     text-align: center;
     margin: 1em 0;
     color: #50094A;
     font-weight: bold;
+}
+
+#main ol{
+    list-style-type: decimal;
+}
+
+#main ul,ol{
+    padding: 0 0 0 3em;
+    line-height: 1.5em;
+}
+
+#main i{
+    font-style:italic;
+}
+
+#main em{
+    font-style:italic;
 }
 
 .about-meta{
@@ -19,19 +36,3 @@ h1{
     font-size: 1.2em;
 }
 
-ol{
-    list-style-type: decimal;
-}
-
-ul,ol{
-    padding: 0 0 0 3em;
-    line-height: 1.5em;
-}
-
-i{
-    font-style:italic;
-}
-
-em{
-    font-style:italic;
-}

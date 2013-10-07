@@ -33,7 +33,7 @@
 h1{
     font-size: 1.5em;
     text-align: center;
-    margin: 1em;
+    margin: 1em 0;
     color: #50094A;
     font-weight: bold;
     border-bottom: 1px solid #eaeaea;
@@ -82,10 +82,9 @@ h1{
     background: white;
     position: absolute;
     padding: 0 20% 2em 20%;
+    width: 60%;
 }    
 
-.search-res{
-}
 .search-res-list{
     line-height: 1.1em;
 }
@@ -105,4 +104,8 @@ h1{
     line-height: 1.1em;
     margin-top: 0.4em;
     font-size: 0.9em;
+}
+
+.roadmap-search-res{
+    margin-bottom: 3em;
 }

@@ -3,4 +3,3 @@
 {{ object.audience }}
 {{ object.blurb }}
 {{ object.author }}
-{{ object.body }}

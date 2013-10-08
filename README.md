@@ -8,8 +8,17 @@ This source is licensed under GPLv3, see LICENSE.txt (note: metacademy's content
 Current installation instructions for *nix and OSX (6 Oct 2013), all commands are executed from the terminal
 
 ### Preliminary requirements
+* Install python 2.7X. NB: install `python-devel` if you're using a package manager such as apt-get. The following command should print a path (if this command raises an exception, make sure that you have the `python-devel` version installed):
+* 
+            python -c 'from distutils.sysconfig import get_makefile_filename as m; print m()'
 
-1. Currently, the only preliminary requirement is [pip](http://www.pip-installer.org/en/latest/); here are [pip's installation instructions](http://www.pip-installer.org/en/latest/installing.html)
+* Install [gcc](http://gcc.gnu.org) (OSX users: installing the [OSX developer tools](https://developer.apple.com/technologies/tools/) is probably the easiest way to do this). The following command should not throw an error:
+        
+        gcc -v  
+
+* Install [pip](http://www.pip-installer.org/en/latest/); here are [pip's installation instructions](http://www.pip-installer.org/en/latest/installing.html). The following command should not throw an error:
+
+        pip -V
 
 ### Setting up a virtual environment
 We recommend using a virtual environment if you will be developing for the metacademy application, this way, metacademy won't conflict with your system libraries
@@ -38,12 +47,8 @@ We recommend using a virtual environment if you will be developing for the metac
         
 1. create appropriate subdirectories (note: you can move/change these directories as long as you update `config.py` appropriately, see below)
 
-        mkdir local_dbs/django_db
-        
-        mkdir local_dbs/content_index
-        
-        mkdir local_dbs/app_index
-        
+        mkdir local_dbs/django_db local_dbs/content_index local_dbs/app_index
+
 1. go to the `metacademy-application` directory
 
         cd metacademy-application
@@ -59,6 +64,12 @@ We recommend using a virtual environment if you will be developing for the metac
 1. copy `app_server/settings_local-template.py` to `app_server/settings_local.py`
 
         cp app_server/settings_local-template.py app_server/settings_local.py
+
+1. add the `metacademy-application` to your `PYTHONPATH` environmental variable (this assumes you're running a bash terminal, if you're not, set your `PYTHONPATH` to include the `metacademy-application` directory)
+
+        echo "export PYTHONPATH=$PWD:$PYTHONPATH" >> ../bin/activate
+        
+        source ../bin/activate
 
 1. from `metacademy-application` project directory:
 

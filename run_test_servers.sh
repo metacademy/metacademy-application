@@ -14,4 +14,4 @@ cserver_id=$!
 python app_server/manage.py runserver $fi:$fp
 
 # stop both servers on exit (this may not be desirable)
-kill $cserver_id
+pkill -TERM -P $cserver_id

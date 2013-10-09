@@ -303,7 +303,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         var nodes = this.collection, thisModel = this;
 
         var found = this.get("outlinks").filter(function(item){
-          node = nodes.findWhere({"id": item.get("to_tag")});
+          var node = nodes.findWhere({"id": item.get("to_tag")});
           if (!node) {
             return false;
           }
@@ -319,7 +319,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
        */
       isFinished: function(){
         return this.get("summary") && this.get("resources").length > 0;
-      },
+      }
     });
   })();
 });

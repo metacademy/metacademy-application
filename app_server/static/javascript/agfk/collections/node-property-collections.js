@@ -30,7 +30,7 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
 
     getSupplemental: function(){
       return new ResourceCollection(this.where({core: 0}));
-    },
+    }
 
   });
 

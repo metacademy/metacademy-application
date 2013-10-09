@@ -10,8 +10,7 @@ define(["backbone"], function(Backbone){
   };
   
   // wrapper model for learned concepts
-  var UserConcept = Backbone.Model.extend({
-    
+  var UserConcept = Backbone.Model.extend({    
     defaults:{
       id: "",
       useCsrf: true

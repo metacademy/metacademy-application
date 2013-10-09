@@ -7,9 +7,9 @@ define(["backbone"], function(Backbone){
   var pvt = {};
   pvt.viewConsts = {
     errorWrapClass: "app-error-wrapper", // must also change in main.js
-    noContentErrorKey: "nocontent", // musst also change in router.js
-    ajaxErrorKey: "ajax", // musst also change in router.js
-    unsupportedBrowserKey: "unsupportedbrowser", // musst also change in router.js
+    noContentErrorKey: "nocontent", // must also change in router.js
+    ajaxErrorKey: "ajax", // must also change in router.js
+    unsupportedBrowserKey: "unsupportedbrowser", // must also change in router.js
     closeMessageClass: "close-error-message" // must also change in events definition
   };
 
@@ -49,7 +49,6 @@ define(["backbone"], function(Backbone){
      * inp.extra: extra information to accompany the error
      */
     render: function(inp){
-      var thisView = this;
       pvt.isRendered = false;
       var thisView = this,
           viewConsts = pvt.viewConsts,
@@ -99,7 +98,5 @@ define(["backbone"], function(Backbone){
       this.remove();
       this.unbind();
     }
-
-
   });
 });

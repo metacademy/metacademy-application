@@ -4,7 +4,7 @@
  */
 
 
-define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/utils"], function(Backbone, _, $, ErrorHandler, Utils){
+define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbone, _, $, Utils){
   "use strict";
   
   /**
@@ -363,7 +363,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
     };
 
     pvt.viewConsts = {
-      templateId: "pointers-view-template",
+      templateId: "pointers-view-template"
     };
 
     pvt.itemToStr = function(item){

@@ -1,4 +1,4 @@
-define(["backbone", "underscore"], function(Backbone, _){ 
+define(["backbone"], function(Backbone){ 
   "use strict";
 
   /**
@@ -7,12 +7,16 @@ define(["backbone", "underscore"], function(Backbone, _){
    * and updates this view appropriately
    */
   var pvt = {};
+  pvt.viewConsts = {
+    viewID: "loading-view-template"
+  };
   pvt.isRendered = false;
   return Backbone.View.extend({
-    template: _.template(document.getElementById("loading-view-template").innerHTML),
-    className: "load-content",        
+    className: "load-content",
+    el: document.getElementById(pvt.viewConsts.viewId),
+    
+    /* render: view html does not use a template */
     render: function(){
-      this.$el.html(this.template());
       pvt.isRendered = true;
       return this;
     },

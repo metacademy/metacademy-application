@@ -2,27 +2,14 @@
   <div class="resource-title-display">
     <% var titleDisp = title ? title : "-no title-" %>
     <% if (url){ %>
-    <span class="resource-link"> <a class="external-link" href="<%= url %>"> <%= titleDisp %> </a> </span>
+    <span class="resource-link"><a class="external-link" href="<%= url %>"> ⍓</a>  <%= titleDisp %>  </span>
     <% } else{ %>
     <%= titleDisp %>
     <% } %>
   </div>
-
   
   <div class="resource-content-wrap">
-       <% if (authors.length > 1) { %>
-    <span class="resource-author"> Authors: <%= authors %> </span>
-    <% } else if (authors.length == 1) { %>
-    <span class="resource-author"> Author: <%= authors[0] %> </span>
-    <% } %>
 
-    <div class="resource-level-display">
-      <% if (level){ %>
-      <span class="resource-level"> Level: <%= level %> </span>
-      <% } %>
-    </div>
-    
-    
     <% if (location){ %>
     <div class="resource-location-display">
       <% if (edition){ %>
@@ -32,52 +19,65 @@
       <% } %>
 
       <% if (location.length === 1){ %>
-        <% if (location[0].link) { %>
-          <span class="resource-location-item">
-	    <a class="external-link" href="<%- location[0].link %>"> <%- location[0].text %> </a>
-          </span>
-        <% } else { %>
-          <span class="resource-location-item"> <%- location[0].text %> </span></li>
-    <% } %>
-    <% } else { %>
-      <ul>
-        <% for (var i = 0; i < location.length; i++) { %>
-	   <% if (location[i].link) { %>
-           <li>
-             <span class="resource-location-item">
-	       <a class="external-link" href="<%- location[i].link %>"> <%- location[i].text %> </a>
-	   </span>
-           </li>
-	   <% } else { %>
-           <li><span class="resource-location-item"> <%- location[i].text %> </span></li>
-	   <% } %>
-           <% } %>
-      </ul>
-      <% } %>
-    </div>
-    <% } %>
+      <% if (location[0].link) { %>
+      <span class="resource-location-item">
+	<a class="external-link" href="<%- location[0].link %>"> <%- location[0].text %> </a>
+      </span>
+      <% } else { %>
+      <span class="resource-location-item"> <%- location[0].text %> </span></li>
+<% } %>
+<% } else { %>
+<ul>
+  <% for (var i = 0; i < location.length; i++) { %>
+     <% if (location[i].link) { %>
+     <li>
+       <span class="resource-location-item">
+	 <a class="external-link" href="<%- location[i].link %>"> <%- location[i].text %> </a>
+       </span>
+     </li>
+     <% } else { %>
+     <li><span class="resource-location-item"> <%- location[i].text %> </span></li>
+     <% } %>
+     <% } %>
+</ul>
+<% } %>
+</div>
+<% } %>
 
-    <% if (dependencies.length > 0) { %>
-        <div class="resource-dependencies-display">
-          <span class="resource-dependencies"> Additional dependencies:</span>
-          <ul>
-            <% for (var i = 0; i < dependencies.length; i++) { %>
-               <li><span class="resource-dependencies-item">
-	           <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#lfocus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
-	       </span></li>
-               <% } %>
-          </ul>
-        </div>
-        <% } %>
+<% if (authors.length > 1) { %>
+  <span class="resource-author"> Authors: <%= authors %> </span>
+  <% } else if (authors.length == 1) { %>
+  <span class="resource-author"> Author: <%= authors[0] %> </span>
+  <% } %>
 
-        <% if (extra.length > 0){ %>
-            <div class="resource-extra-display">
-              <span class="resource-extra"> Other notes: </span>
-              <ul>
-                <% for (var i = 0; i < extra.length; i++ ){ %>
-                   <li><span class="resource-extra-item"> <%= extra[i] %> </span></li>
-                   <% } %>
-              </ul>
+  <div class="resource-level-display">
+    <% if (level){ %>
+    <span class="resource-level"> Level: <%= level %> </span>
+    <% } %>
+  </div>
+  
+
+  <% if (dependencies.length > 0) { %>
+  <div class="resource-dependencies-display">
+    <span class="resource-dependencies"> Additional dependencies:</span>
+    <ul>
+      <% for (var i = 0; i < dependencies.length; i++) { %>
+         <li><span class="resource-dependencies-item">
+	     <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#lfocus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
+	 </span></li>
+         <% } %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (extra.length > 0){ %>
+      <div class="resource-extra-display">
+        <span class="resource-extra"> Other notes: </span>
+        <ul>
+          <% for (var i = 0; i < extra.length; i++ ){ %>
+             <li><span class="resource-extra-item"> <%= extra[i] %> </span></li>
+             <% } %>
+        </ul>
 </li>
 </div>
 <% } %>

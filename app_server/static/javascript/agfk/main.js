@@ -7,7 +7,6 @@ requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
     jquery:"lib/jquery-2.0.3.min",
-    "jquery.cookie": "lib/jquery.cookie",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
@@ -23,9 +22,6 @@ requirejs.config({
     backbone: {
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
-    },
-    "jquery.cookie"  : {
-      deps: ["jquery"]
     },
     "btouch" : {
       deps: ["jquery", "underscore", "backbone"]
@@ -55,7 +51,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "jquery.cookie", "btouch"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // initialize global auxData

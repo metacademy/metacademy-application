@@ -1,4 +1,4 @@
-define(["backbone", "underscore", "agfk/collections/node-collection", "agfk/models/node-model"], function(Backbone, _, NodeCollection, NodeModel){
+define(["backbone", "underscore", "agfk/collections/node-collection"], function(Backbone, _, NodeCollection){
   /**
    * AuxModel: model to store all auxiliary information used throughout metacademy
    * All data associated with the aux model should be read only
@@ -15,6 +15,7 @@ define(["backbone", "underscore", "agfk/collections/node-collection", "agfk/mode
     };
 
     return Backbone.Model.extend({
+    
       defaults: {
         depRoot: undefined,
         titles: {},
@@ -29,23 +30,21 @@ define(["backbone", "underscore", "agfk/collections/node-collection", "agfk/mode
         if (resp === null){
           return {};
         }
-        var retObj = this.attributes;
+
+        var retObj = this.defaults;
+        
+        // depending on how aux is initialized, these may already be defined
+        var nodes = retObj.nodes,
+            shortcuts = retObj.shortcuts;
+        
         if (resp.hasOwnProperty("nodes")) {
-          var nodesObj = _.map(resp.nodes, function(node) {
-            var temp = _.extend(node, {"id": node.tag, "sid": node.id});
-            return new NodeModel(temp, {parse: true});
-          });
-          retObj["nodes"] = new NodeCollection(nodesObj);
+          nodes.add(resp.nodes, {parse: true});
         }
         if (resp.hasOwnProperty("shortcuts")) {
-          var shortcutsObj = _.map(resp.shortcuts, function(node) {
-            var temp = _.extend(node, {"id": node.tag, "sid": node.id});
-            return new NodeModel(temp, {parse: true});
-          });
-          retObj["shortcuts"] =  new NodeCollection(shortcutsObj);
+          shortcuts.add(resp.shortcuts, {parse: true});
         }
         pvt.loadedGraph = true;
-        return retObj;        
+        return retObj;
       },
 
       /* this should be called after the user data is initialized */
@@ -128,8 +127,7 @@ define(["backbone", "underscore", "agfk/collections/node-collection", "agfk/mode
        * Concepts without a learning time estimate are currently given a default value of 1 hour
        */
       computeTimeEstimate: function(tag){
-        var fullGraph = this.get("fullGraph"),
-            nodes = this.get("nodes"),
+        var nodes = this.get("nodes"),
             shortcuts = this.get("shortcuts"),
             node = nodes.get(tag),
             DEFAULT_LEARNING_TIME = pvt.DEFAULT_LEARNING_TIME;

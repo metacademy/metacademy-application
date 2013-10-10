@@ -19,9 +19,10 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
      */
     parse: function(response){
       var ents = [];
+      
       for (var key in response) {
         // place the server id in "sid" since all deps are returned in terms of the tag
-        ents.push(_.extend(response[key],{sid: response[key].id, id: key})); 
+        ents.push(_.extend(response[key],{sid: response[key].id, id: response[key].tag})); 
       }
       return ents;
     },
@@ -64,7 +65,8 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
 
       // DFS over the nodes
         while ((nextRoot = depNodes.pop())){
-        $.each(nextRoot.getUniqueDependencies(), function(dct, dtag){
+        nextRoot.get("dependencies").each(function(dep){
+          var dtag = dep.get("from_tag");
           addDepNode = thisColl.get(dtag);
           var initStatus = addDepNode.isLearnedOrImplicitLearned();
           addDepNode.incrementILCt(ctChange);

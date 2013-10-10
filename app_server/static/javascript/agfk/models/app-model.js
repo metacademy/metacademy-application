@@ -92,8 +92,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       // TODO check for extending the nodes vs resetting
       var thisModel = this,
           graphData = thisModel.get("graphData"),
-          nodes = graphData.get("nodes"),
-          edges = graphData.get("edges");
+          nodes = graphData.get("nodes");
 
       window.agfkGlobals.auxModel.set("titles", response.titles);
 

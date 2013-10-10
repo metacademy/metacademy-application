@@ -243,7 +243,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             thisModel = thisView.model;
         // TODO this seems awkward
         thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), 
-                                                     {fromTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("from_tag"))}))); 
+                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))}))); 
         return thisView;
       }
 
@@ -311,7 +311,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       render: function(){
         var thisView = this,
             thisModel = thisView.model;
-        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("to_tag"))})));
+        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("to_tag"))})));
         return thisView;
       }
 
@@ -521,7 +521,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
                                                               "displayTitle": thisView.model.getLearnViewTitle()});
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"), 
-                                                                             conceptId: this.model.get("id")});
+                                                                             conceptId: thisView.model.get("id")});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
         thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
         thisView.pointers = thisView.pointers || new NestedListView({model: {text: thisView.model.get("pointers")},
@@ -545,8 +545,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         }
 
         // update the hovertext when nodes are marked learned/unlearned
-        var aux = this.options.graphData.get("aux");
-        this.listenTo(aux, "reset:estimates", this.addHoverText);
+        var aux = window.agfkGlobals.auxModel;
+        thisView.listenTo(aux, "reset:estimates", thisView.addHoverText);
 
         thisView.assign(assignObj);
         thisView.addHoverText();
@@ -573,7 +573,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       },
 
       getHoverText: function(conceptTag) {
-        var aux = this.options.graphData.get("aux");
+        var aux = window.agfkGlobals.auxModel;
         if (aux.conceptIsLearned(conceptTag)) {
           return "You have learned this concept.";
         } else {
@@ -847,7 +847,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       getTopoSortedConcepts: function(){
         var thisView = this,
             thisModel = thisView.model,
-            keyTag = thisModel.get("aux").get("depRoot") || "",
+            keyTag = window.agfkGlobals.auxModel.get("depRoot") || "",
             nodes = thisModel.get("nodes"),
             traversedNodes = {}, // keep track of traversed nodes
             startRootNodes,

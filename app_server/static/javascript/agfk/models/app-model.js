@@ -41,7 +41,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
       userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
 
-      var aux = graphData.get("aux");
+      var aux = window.agfkGlobals.auxModel;
       aux.listenTo(userData, "change:learnedConcepts", aux.resetEstimates);
     },
     
@@ -49,7 +49,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      * Aux function to set graph data from wrapper model (TODO this function may not be necessary)
      */
     setGraphData: function(gdataObj){
-        this.get("graphData").get("aux").set("depRoot", gdataObj.depRoot);
+        window.agfkGlobals.auxModel.set("depRoot", gdataObj.depRoot);
     },
 
     /**
@@ -93,24 +93,12 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       var thisModel = this,
           graphData = thisModel.get("graphData"),
           nodes = graphData.get("nodes"),
-          edges = graphData.get("edges"),
-          aux = graphData.get("aux");
+          edges = graphData.get("edges");
 
-      aux.set("titles", response.titles);
+      window.agfkGlobals.auxModel.set("titles", response.titles);
 
       // build node set
       nodes.add(response.nodes, {parse: true});
-
-      // build edge set from nodes
-      nodes.each(function(node){
-        // add all edges from nodes
-        ["dependencies", "outlinks"].forEach(function(edgeType){
-          node.get(edgeType).each(function(edge){
-            edges.add(edge);
-            edge.graphEdgeCollection = edges;
-          });
-        });
-      });
       
       delete response.nodes;
       return response;
@@ -120,8 +108,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      * Specify URL for HTTP verbs (GET/POST/etc)
      */
     url: function(){
-      var thisModel = this, 
-          depTag = thisModel.get("graphData").get("aux").get("depRoot");
+          var depTag = window.agfkGlobals.auxModel.get("depRoot");
       // TODO post CR-Restruct handle different types of input (aggregated graphs) based on url
       ErrorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request"); 
       return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;

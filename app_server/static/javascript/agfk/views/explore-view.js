@@ -553,7 +553,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         var d3graph =  d3this.select("." + graphClass),
             scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : viewConsts.defaultScale;
 
-        var keyNode = thisView.model.get("aux").get("depRoot"),
+        var keyNode = window.agfkGlobals.auxModel.get("depRoot"),
             newtrans = new Array(2);
         if (keyNode) {
           var keyNodeLoc = Utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
@@ -730,14 +730,14 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             thisModel = thisView.model,
             viewConsts = pvt.viewConsts,
             showLearned = thisModel.get("options").get("showLearnedConcepts"),
-            dgArr,
-            args = args || {},
-            depth = args.depth || viewConsts.defaultGraphDepth,
-            graphOrient = args.graphOrient || viewConsts.defaultGraphOrient,
-            nodeSep = args.nodeSep || viewConsts.defaultNodeSepDist,
-            nodeWidth = args.nodeWidth || viewConsts.defaultNodeWidth,
-            keyNode = args.keyNode || thisModel.get("nodes").get(thisModel.get("aux").get("depRoot")),
-            remVisible = args.remVisible || false; // TODO describe these params
+            dgArr;
+            args = args || {};
+            var depth = args.depth || viewConsts.defaultGraphDepth,
+                graphOrient = args.graphOrient || viewConsts.defaultGraphOrient,
+                nodeSep = args.nodeSep || viewConsts.defaultNodeSepDist,
+                nodeWidth = args.nodeWidth || viewConsts.defaultNodeWidth,
+                keyNode = args.keyNode || thisModel.get("nodes").get(window.agfkGlobals.auxModel.get("depRoot")),
+                remVisible = args.remVisible || false; // TODO describe these params
 
         dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible, showLearned);
         // include digraph options

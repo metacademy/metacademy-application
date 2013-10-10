@@ -243,9 +243,12 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         // init main app model
         if (!thisRoute.appData){
           thisRoute.appData = new AppData();
-          var userData = thisRoute.appData.get("userData");
+          var userModel = thisRoute.appData.get("userData");
           $.each(["learnedConcepts", "starredConcepts"], function(idx, val){
-            userData.get(val).fetch({
+            userModel.get(val).fetch({
+            success: function(){
+                window.agfkGlobals.auxModel.setUserModel(userModel);
+              },
               reset: true,
               error: function(emodel, eresp, eoptions){
                 ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
@@ -307,7 +310,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
           }
 
           // set the document title to be the key concept
-          document.title = thisRoute.appData.get("graphData").get("aux").getTitleFromId(nodeId) + " - Metacademy";
+          document.title = window.agfkGlobals.auxModel.getTitleFromId(nodeId) + " - Metacademy";
          
           switch (paramsObj[qViewMode]){
           case pExploreMode:

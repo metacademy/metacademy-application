@@ -1,17 +1,15 @@
 /*
- This file contains the node model, which contains the data for each concept TODO should this be renamed "conept-model"?
+ This file contains the node model, which contains the data for each concept TODO should this be renamed "concept-model"?
  */
 
-define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/utils"], function(Backbone, NodePropertyCollections, Utils){
+define(["backbone", "agfk/collections/node-property-collections"], function(Backbone, NodePropertyCollections){
   /**
    * Node: node model that encompasses several collections and sub-models
    */
   return  (function(){
     // maintain ancillary/user-specific info and fields in a private object
     var pvt = {};
-    pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
-    pvt.txtFields = ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time"];
-    
+
     return Backbone.Model.extend({
       /**
        * all possible attributes are present by default
@@ -22,17 +20,16 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           id: "",
           sid: "",
           summary: "",
-          goals: "",
-          pointers: "",
           time: "",
           is_shortcut: 0,
-          flags: [],
-          questions: new NodePropertyCollections.QuestionCollection(),
           dependencies: new NodePropertyCollections.DirectedEdgeCollection(),
-          outlinks: new NodePropertyCollections.DirectedEdgeCollection(),
-          resources: new NodePropertyCollections.ResourceCollection()
+          outlinks: new NodePropertyCollections.DirectedEdgeCollection()
         };
       },
+
+      collFields: ["dependencies", "outlinks"],
+      
+      txtFields: ["id", "sid", "title", "summary", "is_shortcut", "time"],
 
       /**
        *  parse the incoming server data
@@ -44,18 +41,18 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         }
         var output = this.defaults();
         // ---- parse the text values ---- //
-        var i = pvt.txtFields.length;
+        var i = this.txtFields.length;
         while (i--) {
-          var tv = pvt.txtFields[i];
+          var tv = this.txtFields[i];
           if (resp[tv]) {
             output[tv] = resp[tv];
           }
         }
 
         // ---- parse the collection values ---- //
-        i = pvt.collFields.length;
+        i = this.collFields.length;
         while (i--) {
-          var cv = pvt.collFields[i];
+          var cv = this.collFields[i];
           output[cv].parent = this;
           if (resp[cv]) {
             output[cv].add(resp[cv]);
@@ -71,9 +68,9 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
       initialize: function() {
         var model = this;
         // changes in attribute collections should trigger a change in the node model
-        var i = pvt.collFields.length;
+        var i = this.collFields.length;
         while (i--) {
-          var cval = pvt.collFields[i];
+          var cval = this.collFields[i];
           this.get(cval).bind("change", function () {
             model.trigger("change", cval);
           });
@@ -156,12 +153,12 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           return nodePvt.visible;
         };
         
-        this.getCollFields = function(){
-          return nodePvt.collFields;
+        this.getCvtollFields = function(){
+          return this.collFields;
         };
 
         this.getTxtFields = function(){
-          return nodePvt.txtFields;
+          return this.txtFields;
         };
         
         this.getLearnedStatus = function(){
@@ -172,18 +169,6 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           return nodePvt.learned || nodePvt.implicitLearn;
         };
 
-      },
-
-      /**
-       * returns and caches the node display title
-       */
-      getNodeDisplayTitle: function(numCharNodeLine){
-        if (!this.nodeDisplayTitle){
-          var title = this.get("title") || this.id.replace(/_/g, " ");
-          title += this.get("is_shortcut") ? " (shortcut)" : "";
-          this.nodeDisplayTitle = Utils.wrapNodeText(title, numCharNodeLine || 9);
-        }
-        return this.nodeDisplayTitle;
       },
 
       /**

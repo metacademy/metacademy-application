@@ -92,46 +92,6 @@ define(["jquery"], function($){
       }
     };
   })();
-
-  
-  /**
-   * Simple function to break long strings and insert a hyphen (idea from http://ejohn.org/blog/injecting-word-breaks-with-javascript/)
-   * str: string to be potentially hyphenated
-   * num: longest accecptable length -1 (single letters will not be broken)
-   */
-  utils.wbr = function(str, num) {
-    return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
-      return text + "-\\n" + ch;
-    });
-  };
-
-
-  /**
-   * Wrap a long string to avoid elongated graph nodes. Translated/modified from server technique
-   */
-  utils.wrapNodeText = function(s, width) {
-    if (!s) {
-      return '';
-    }
-    s = s.replace(/-/g, " ");
-    var parts = s.split(" "),
-        result = [],
-        resArr = [],
-        total = 0;
-
-    for (var i = 0; i < parts.length; i++) {
-      if (total + parts[i].length + 1 > width && total !== 0) {
-        resArr.push(result.join(" "));
-        result = [];
-        total = 0;
-      }
-      result.push(utils.wbr(parts[i], width));
-      total += parts[i].length + 1;
-    }
-    resArr.push(result.join(" "));
-    return resArr.join("\\n");
-  };
-
   
   /**
    * Check if input is a url

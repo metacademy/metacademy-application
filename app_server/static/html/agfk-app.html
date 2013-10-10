@@ -37,6 +37,7 @@
   {% block jscript %}
     <script>
       window.agfkGlobals = {};
+      agfkGlobals.userInitData = {{ user_data|safe }};
       agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
       agfkGlobals.auxModel = null; // init in main js app
     </script>

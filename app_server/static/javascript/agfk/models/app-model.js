@@ -41,6 +41,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
       userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
 
+      // TODO this should be moved to aux-model.js
       var aux = window.agfkGlobals.auxModel;
       aux.listenTo(userData, "change:learnedConcepts", aux.resetEstimates);
     },
@@ -59,7 +60,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      */
     applyUserDataToGraph: function(){
       var thisModel = this,
-      userData = thisModel.get("userData");
+          userData = thisModel.get("userData");
       if (userData.areLearnedConceptsPopulated()){
         applyLearnedConcepts();
       } else{

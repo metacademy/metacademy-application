@@ -105,25 +105,42 @@ define(["backbone"], function(Backbone){
         };
       },
 
-      initialize: function(){
+      initialize: function(inp){
         var thisModel = this,
             lConcepts = thisModel.get("learnedConcepts"),
             sConcepts = thisModel.get("starredConcepts");
 
-        // note: the folowing are not getting triggered   -RBG
         lConcepts.bind("change:learnStatus", function(){
           thisModel.trigger("change:learnStatus", lConcepts);
         });
         sConcepts.bind("change:starStatus", function(){
           thisModel.trigger("change:starStatus", sConcepts);
         });
-        
-        thisModel.listenTo(lConcepts, "reset", function(){
+
+        if (!pvt.learnedConceptsPopulated){
+          thisModel.listenTo(lConcepts, "reset", function(){
+            pvt.learnedConceptsPopulated = true;
+          });
+        }
+        if (!pvt.starredConceptsPopulated){
+          thisModel.listenTo(sConcepts, "reset", function(){
+            pvt.starredConceptsPopulated = true;
+          });
+        }
+      },
+
+      parse: function(inp){
+        var lConcepts = this.get("learnedConcepts") || this.defaults().learnedConcepts,
+            sConcepts = this.get("starredConcepts") || this.defaults().starredConcepts;
+        if (inp && inp.learned){
+          lConcepts.add(inp.learned, {parse: true});
           pvt.learnedConceptsPopulated = true;
-        });
-        thisModel.listenTo(sConcepts, "reset", function(){
+        }
+        if (inp && inp.starred){
+          sConcepts.add(inp.starred, {parse: true});
           pvt.starredConceptsPopulated = true;
-        });
+        }
+        return {learnedConcepts: lConcepts, starredConcepts: sConcepts};
       },
 
       areLearnedConceptsPopulated: function(){

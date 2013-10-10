@@ -1,8 +1,8 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
-define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/utils/errors", "agfk/views/error-view"],
-  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData, ErrorHandler, ErrorMessageView){
+define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/models/user-data-model", "agfk/utils/errors", "agfk/views/error-view"],
+  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData,UserData, ErrorHandler, ErrorMessageView){
   "use strict";
   
   /**
@@ -240,22 +240,29 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         paramsObj[qViewMode] = paramsObj[qViewMode] || pLearnMode;
         pvt.viewMode = paramsObj[qViewMode];
 
-        // init main app model
+        // // init main app model
         if (!thisRoute.appData){
-          thisRoute.appData = new AppData();
-          var userModel = thisRoute.appData.get("userData");
-          $.each(["learnedConcepts", "starredConcepts"], function(idx, val){
-            userModel.get(val).fetch({
-            success: function(){
-                window.agfkGlobals.auxModel.setUserModel(userModel);
-              },
-              reset: true,
-              error: function(emodel, eresp, eoptions){
-                ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
-              }
-            });
-          });
+          var userData = new UserData(window.agfkGlobals.userInitData, {parse: true}),
+              appData= new AppData({userData: userData});
+
+          window.agfkGlobals.auxModel.setUserModel(userData);
+          thisRoute.appData = appData;
         }
+        //   var userModel = thisRoute.appData.get("userData");
+        //   $.each(["learnedConcepts", "starredConcepts"], function(idx, val){
+        //     userModel.get(val).fetch({
+        //     success: function(){
+        //         window.agfkGlobals.auxModel.setUserModel(userModel);
+        //       }, 
+        //       reset: true,
+        //       error: function(emodel, eresp, eoptions){
+        //         ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
+        //       }
+        //     });
+        //   });
+        // }
+        
+        
         thisRoute.appData.setGraphData({depRoot: nodeId});
         
         // show app tools

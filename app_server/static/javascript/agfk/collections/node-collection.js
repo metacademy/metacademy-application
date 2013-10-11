@@ -10,10 +10,6 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
   return Backbone.Collection.extend({
     model: NodeModel,
 
-    initialize: function(){
-      var thisColl = this;
-      this.on("change:learnStatus", thisColl.dfsChangeILCount);
-    },
     /**
      * parse incoming json data
      */
@@ -27,69 +23,48 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
       return ents;
     },
 
-    /**
-     * Apply the user data to the given node collection
-     */
-    applyUserConcepts: function(learnedConcepts, type){
-      var thisColl = this,
-          collNode;
-      learnedConcepts.each(function(lcModel){
-        collNode = thisColl.findWhere({sid: lcModel.get("id")});
-        if (collNode !== undefined){
-          if (type === "starred"){
-            collNode.setStarredStatus(true);
-          } else{
-            collNode.setLearnedStatus(true);
-          }
-        }
-      });
-    },
 
-    /**
-     * DFS to change the implicit learned count of the dependencies of rootTag
-     * This method works by changing the implicitLearnCt of unique dependent concepts
-     * if the learned status of the root node changes
-     */
-    dfsChangeILCount: function(rootTag, ctChange){
-        var thisColl = this,     
-            rootNode = thisColl.get(rootTag);
-          if (rootNode.getImplicitLearnStatus()){
-            return false;
-          }
+      
+      
+      //   var thisColl = this,     
+      //       rootNode = thisColl.get(rootTag);
+      //     if (rootNode.getImplicitLearnStatus()){
+      //       return false;
+      //     }
      
-      var depNodes = [rootNode],
-          nextRoot,
-          addDepNode,
-          passedNodes = {};
-      ctChange = typeof ctChange === "boolean" ? (ctChange === true ? 1 : -1) : ctChange;
+      // var depNodes = [rootNode],
+      //     nextRoot,
+      //     addDepNode,
+      //     passedNodes = {};
+      // ctChange = typeof ctChange === "boolean" ? (ctChange === true ? 1 : -1) : ctChange;
 
-      // DFS over the nodes
-        while ((nextRoot = depNodes.pop())){
-        nextRoot.get("dependencies").each(function(dep){
-          var dtag = dep.get("from_tag");
-          addDepNode = thisColl.get(dtag);
-          var initStatus = addDepNode.isLearnedOrImplicitLearned();
-          addDepNode.incrementILCt(ctChange);
-          if (addDepNode.isLearnedOrImplicitLearned() !== initStatus && !passedNodes.hasOwnProperty(dtag)){
-            depNodes.push(addDepNode);
-            passedNodes[dtag] = true;
-          }
-        });
-      }
-      return true;
-    },
+      // // DFS over the nodes
+      //   while ((nextRoot = depNodes.pop())){
+      //   nextRoot.get("dependencies").each(function(dep){
+      //     var dtag = dep.get("from_tag");
+      //     addDepNode = thisColl.get(dtag);
+      //     var initStatus = addDepNode.isLearnedOrImplicitLearned();
+      //     addDepNode.incrementILCt(ctChange);
+      //     if (addDepNode.isLearnedOrImplicitLearned() !== initStatus && !passedNodes.hasOwnProperty(dtag)){
+      //       depNodes.push(addDepNode);
+      //       passedNodes[dtag] = true;
+      //     }
+      //   });
+      // }
+      // return true;
+    //},
 
     getTimeEstimate: function(){
       var total = 0;
-      this.each(function(node) {
-        if (!node.isLearnedOrImplicitLearned()) {
-          if (node.get("time")) {
-            total += node.get("time");
-          } else {
-            total += 1;     // reasonable guess when the time is unknown
-          }
-        }
-      });
+      // this.each(function(node) {
+      //   if (!node.isLearnedOrImplicitLearned()) {
+      //     if (node.get("time")) {
+      //       total += node.get("time");
+      //     } else {
+      //       total += 1;     // reasonable guess when the time is unknown
+      //     }
+      //   }
+      // });
       return total;
     }
     

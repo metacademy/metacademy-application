@@ -26,17 +26,19 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       starredClass: "starred-concept-title"
     };
 
-    // return public object
+    // return public object for node list item view
     return Backbone.View.extend({
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.id;},
       className: function(){
         var viewConsts = pvt.viewConsts,
             thisView = this,
-            thisModel = thisView.model;
+            thisModel = thisView.model,
+            aux = window.agfkGlobals.auxModel,
+            id = thisModel.id;
         return pvt.viewConsts.viewClass
-          + (thisModel.getStarredStatus() ? " " + viewConsts.starredClass : "")
-          + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "")
+          + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
+          + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
       tagName: "li",
@@ -49,15 +51,18 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             viewConsts = pvt.viewConsts,
             learnedClass = viewConsts.learnedClass,
             implicitLearnedClass = viewConsts.implicitLearnedClass,
-            starredClass = viewConsts.starredClass;
-        thisView.listenTo(thisView.model, "change:learnStatus", function(nodeId, status){
+            starredClass = viewConsts.starredClass,
+            nodeTag = thisView.model.id,
+            aux = window.agfkGlobals.auxModel,
+            gConsts = aux.getConsts();
+        thisView.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
           thisView.changeTitleClass(learnedClass, status);
         });
-        thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
-          thisView.changeTitleClass(implicitLearnedClass, status);
-        });
-        thisView.listenTo(thisView.model, "change:starStatus", function(nodeId, status){
+        thisView.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
           thisView.changeTitleClass(starredClass, status);
+        });
+        thisView.listenTo(thisView.model, "change:ImplicitLearnStatus", function(nodeId, nodeSid, status){
+          thisView.changeTitleClass(implicitLearnedClass, status);
         });
       },
       
@@ -464,7 +469,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       implicitLearnedClass: "implicit-learned-concept"
     };
 
-    // return public object
+    // return public object for detailed node view
     return Backbone.View.extend({
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix + this.model.get("id");},
@@ -472,16 +477,22 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       className: function(){
         var viewConsts = pvt.viewConsts,
             thisView = this,
-            thisModel = thisView.model;
+            thisModel = thisView.model,
+            id = thisModel.id,
+            aux = window.agfkGlobals.auxModel;
+        
         return pvt.viewConsts.viewClass
-          + (thisModel.getStarredStatus() ? " " + viewConsts.starredClass : "")
-          + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "")
+          + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
+          + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
 
       initialize: function(){
         var viewConsts = pvt.viewConsts,
-            thisView = this;
+            thisView = this,
+            aux = window.agfkGlobals.auxModel,
+            nodeTag = thisView.model.id,
+            gConsts = aux.getConsts();
 
         function changeClass(sel, className, status){
           if(status){
@@ -491,11 +502,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             thisView.$el.removeClass(className);
           }
         }
+
         // TODO refactor this code if we keep the star and check in current location
-        this.listenTo(this.model, "change:learnStatus", function(nodeId, status){
+        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
           changeClass("." + viewConsts.learnViewCheckClass, viewConsts.learnedClass, status);
         });
-        this.listenTo(this.model, "change:starStatus", function(nodeId, status){
+        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
           changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
         });
 
@@ -627,7 +639,6 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         this.unbind();
         this.remove();
       }
-
     });
   })();
 
@@ -676,9 +687,9 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
        */
       toggleConceptState: function(evt, state){
         evt.stopPropagation();
-        var nodeTag = evt.currentTarget.getAttribute(pvt.viewConsts.dataTagName),
-            node = this.model.get("nodes").get(nodeTag);
-        state === "learn" ? node.toggleLearnedStatus() : node.toggleStarredStatus();
+        var aux = window.agfkGlobals.auxModel,
+            nodeTag = evt.currentTarget.getAttribute(pvt.viewConsts.dataTagName);
+        state === "learn" ? aux.toggleLearnedStatus(nodeTag) : aux.toggleStarredStatus(nodeTag);
       },
 
       /**
@@ -739,9 +750,10 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       },
 
       initialize: function(inp){
+        var gConsts = window.agfkGlobals.auxModel.getConsts();
         this.appRouter = inp.appRouter;
         this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
-        this.listenTo(this.model.get("nodes"), "change:learnStatus", this.updateTimeEstimate);
+        this.listenTo(window.agfkGlobals.auxModel, gConsts.learnedTrigger, this.updateTimeEstimate);
       },
       
       /**

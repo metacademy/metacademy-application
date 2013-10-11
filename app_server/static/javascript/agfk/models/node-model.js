@@ -67,70 +67,18 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
        */
       initialize: function() {
         var model = this;
-        // changes in attribute collections should trigger a change in the node model
-        var i = this.collFields.length;
-        while (i--) {
-          var cval = this.collFields[i];
-          this.get(cval).bind("change", function () {
-            model.trigger("change", cval);
-          });
-        } 
-        this.bind("change", function () {
-          this.save();
-        });
 
         // ***** Add private instance variable workaround ***** //
         var nodePvt = {};
         nodePvt.visible = false;
-        nodePvt.implicitLearnCt = 0;
         nodePvt.implicitLearn = false;
         nodePvt.learned = false;
         nodePvt.starred = false;
-
-        this.setStarredStatus = function(status){
-          if (status !== nodePvt.starred){
-            nodePvt.starred = status;
-            this.trigger("change:starStatus", this.get("id"), status, this.get("sid"));
-          }
-        };
-
-        this.getStarredStatus = function(){
-          return nodePvt.starred;
-        };
-        
-        // * Increment the implicit learn count by ival (default 1)
-        this.incrementILCt = function(ival){
-          ival = ival || 1;
-          this.setImplicitLearnCt(nodePvt.implicitLearnCt + ival);
-        };
-
-        this.toggleLearnedStatus = function(){
-          this.setLearnedStatus(!nodePvt.learned);
-        };
-
-        this.toggleStarredStatus = function(){
-          this.setStarredStatus(!nodePvt.starred);
-        };
-        
-        this.setLearnedStatus = function(status){
-          if (status !== nodePvt.learned){
-            nodePvt.learned = status;
-            this.trigger("change:learnStatus", this.get("id"), status, this.get("sid"));
-          }
-        };
 
         this.setVisibleStatus = function(status){
           if (nodePvt.visible !== nodePvt.visible){
             nodePvt.visible = status;
             this.trigger("change:visibleStatus", this.get("id"), status);
-          }
-        };
-
-        this.setImplicitLearnCt = function(ilct){
-          if (nodePvt.implicitLearnCt !== nodePvt.ilct){
-            nodePvt.implicitLearnCt = ilct;
-            this.trigger("change:implicitLearnCt", this.get("id"), ilct);
-            this.setImplicitLearnStatus(ilct === this.getNumberOfPresentOutlinks());
           }
         };
 
@@ -141,10 +89,6 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
           }
         };
 
-        this.getImplicitLearnCt = function(){
-          return nodePvt.implicitLearnCt;
-        };
-        
         this.getImplicitLearnStatus = function(){
           return nodePvt.implicitLearn;
         };
@@ -153,20 +97,12 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
           return nodePvt.visible;
         };
         
-        this.getCvtollFields = function(){
-          return this.collFields;
+        this.getCollFields = function(){
+            return this.collFields;
         };
 
         this.getTxtFields = function(){
           return this.txtFields;
-        };
-        
-        this.getLearnedStatus = function(){
-          return nodePvt.learned;
-        };
-
-        this.isLearnedOrImplicitLearned = function(){
-          return nodePvt.learned || nodePvt.implicitLearn;
         };
 
       },

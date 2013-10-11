@@ -14,8 +14,23 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
       DEFAULT_LEARNING_TIME: 1
     };
 
+    /* change learned/starred concept state */
+    pvt.toggleUserConceptState = function(state, nodeTag, nodeId){
+      nodeId = nodeId || this.getSid(nodeTag);
+      var userModel = this.userModel;
+      if (userModel){
+        if (state === "learned"){
+          userModel.updateLearnedConcept(nodeTag, nodeId, !userModel.isLearned(nodeId));
+        } else{
+          userModel.updateStarredConcept(nodeTag, nodeId, !userModel.isStarred(nodeId));
+        }
+        return true;
+      }
+      return false;
+    };
+
     return Backbone.Model.extend({
-    
+      
       defaults: {
         depRoot: undefined,
         titles: {},
@@ -23,6 +38,13 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
         shortcuts: new NodeCollection()
       },
 
+      getConsts: function(){
+        return {
+          starredTrigger: "change:starredConcepts",
+          learnedTrigger: "change:learnedConcepts"
+        };
+      },
+      
       /**
        * parse aux data (data should be bootstrapped rather than ajaxed)
        */
@@ -47,13 +69,56 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
         return retObj;
       },
 
+      setDepRoot: function(depRoot){
+        this.set("depRoot", depRoot);
+      },
+
       /* this should be called after the user data is initialized */
       setUserModel: function(usm){
-        this.userModel = usm;
+        var thisModel = this,
+            gConsts = this.getConsts(),
+            learnedTrigger = gConsts.learnedTrigger,
+            starredTrigger = gConsts.starredTrigger;
+        
+        thisModel.userModel = usm;
+        
+        thisModel.listenTo(usm, learnedTrigger, function(nodeTag, nodeSid, status){
+          thisModel.resetEstimates();
+          thisModel.trigger(learnedTrigger, nodeTag, nodeSid, status);
+          thisModel.trigger(learnedTrigger + nodeTag, nodeTag, nodeSid, status);
+        });
+        thisModel.listenTo(usm, starredTrigger, function(nodeTag, nodeSid, status){
+          thisModel.trigger(starredTrigger, nodeTag, nodeSid, status);
+          thisModel.trigger(starredTrigger + nodeTag, nodeTag, nodeSid, status);
+        });
       },
 
       getUserModel: function(){
         return this.userModel;
+      },
+
+      /* toggle learned status of concept in the user model */
+      toggleLearnedStatus: function(){
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift("learned");
+        pvt.toggleUserConceptState.apply(this, args);
+      },
+
+      /* toggle starred status of concept in the user model */
+      toggleStarredStatus: function(){
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift("starred");
+        pvt.toggleUserConceptState.apply(this, args);
+      },
+
+      /* get server id of concept tag */
+      getSid: function(conceptTag){
+        var nodes = this.get("nodes"),
+            concept;
+        if (nodes){
+          concept = nodes.get(conceptTag);
+        }
+        return concept && concept.get("sid");
       },
 
       /**
@@ -67,24 +132,33 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
       },
 
       /**
-       * Returns true if userData attribute of app-model contains the concept for the input tag (note: must convert tag to server id)
+       * Returns true if userData model has the input concept marked as "learned"
        */
       conceptIsLearned: function(tag){
         if (this.userModel){
-          var learnedConcepts = this.userModel.get("learnedConcepts"),
-              node = this.get("nodes").get(tag);
+              var node = this.get("nodes").get(tag);
           if (node){
-            return learnedConcepts.get(node.get("sid"));
+            return this.userModel.isLearned(node.get("sid"));
           }
         }
         return false;
       },
 
       /**
-       * Finds the unlearned dependencies of a concept with tag 'tag' 
+       * Returns true if userData model has the input concept marked as "starred"
        */
-      computeDependencies: function(tag, isShortcut){
-        var nodes = this.get("nodes"),
+      conceptIsStarred: function(tag){
+        if (this.userModel){
+              var node = this.get("nodes").get(tag);
+          if (node){
+            return this.userModel.isStarred(node.get("sid"));
+          }
+        }
+        return false;
+      },
+
+      computeAllDependencies: function(tag, isShortcut, onlyUnlearned){
+        var nodes =  this.get("nodes"),
             shortcuts = this.get("shortcuts"),
             thisModel = this,
             node,
@@ -108,17 +182,24 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
         var result = [];
         dependenciesObj[tag] = result;     // so that we don't get into an infinite loop if there's a cycle
 
-
         node.get("dependencies").each(function(dep) {
-          var currDep = {'from_tag': dep.get("from_tag"), 'shortcut': dep.get("shortcut")};
-          if (!thisModel.conceptIsLearned(dep.get("from_tag"))) {
-            result = _.union(result, [currDep], thisModel.computeDependencies(dep.get("from_tag"), dep.get("shortcut")));
+          var fromTag = dep.get("from_tag"),
+              currDep = {'from_tag': fromTag, 'shortcut': dep.get("shortcut")};
+          if (!onlyUnlearned || !thisModel.conceptIsLearned(fromTag)) {
+            result = _.union(result, [currDep], thisModel.computeUnlearnedDependencies(fromTag, dep.get("shortcut")));
             result = _.unique(result, false, function(dep) { return dep.from_tag + ':' + dep.shortcut; });
           }
         });
 
         dependenciesObj[tag] = result;
         return result;
+      },
+
+      /**
+       * Finds the unlearned dependencies of a concept with tag 'tag' 
+       */
+      computeUnlearnedDependencies: function(tag, isShortcut){
+        return this.computeAllDependencies(tag, isShortcut, true);
       },
 
       /**
@@ -137,7 +218,7 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
         }
 
         if (!(tag in pvt.timeEstimates)) {
-          var deps = this.computeDependencies(tag, 0);
+          var deps = this.computeUnlearnedDependencies(tag, 0);
 
           // eliminate redundant shortcuts
           deps = _.filter(deps, function(dep) {

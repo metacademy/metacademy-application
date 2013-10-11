@@ -174,7 +174,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           viewConsts = pvt.viewConsts,
           nodeId = d3node.attr("id"),
           mnode = thisView.model.get("nodes").get(nodeId),
-          starHoveredClass = viewConsts.starHoveredClass;
+          starHoveredClass = viewConsts.starHoveredClass,
+          aux = window.agfkGlobals.auxModel;
       svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
       
       var starG = d3node.append("g")
@@ -184,7 +185,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
                     // stop event from firing on the ellipse
                     d3.event.stopPropagation();
                     // change the starred status of the node model
-                    mnode.setStarredStatus(!d3node.classed(viewConsts.starredClass));
+                    aux.toggleStarredStatus(nodeId);
                   })
                   .on("mouseover", function() {
                     d3.select(this).classed(starHoveredClass, true);
@@ -213,7 +214,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           nodeId = d3node.attr("id"),
           mnode = thisView.model.get("nodes").get(nodeId),
           checkHoveredClass = viewConsts.checkHoveredClass,
-          nodeLearnedClass = viewConsts.nodeLearnedClass;
+          nodeLearnedClass = viewConsts.nodeLearnedClass,
+          aux = window.agfkGlobals.auxModel;
       svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
 
       var chkG = d3node.append("g")
@@ -223,7 +225,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
               // stop the event from firing on the ellipse
               d3.event.stopPropagation();
               // change the learned status on the node model
-              mnode.setLearnedStatus(!d3node.classed(nodeLearnedClass));
+              aux.toggleLearnedStatus(nodeId);
+              // mnode.setLearnedStatus(!d3node.classed(nodeLearnedClass));
             })
             .on("mouseover", function() {
               d3.select(this).classed(checkHoveredClass, true);
@@ -472,29 +475,31 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         // build initial graph based on input collection
         var thisView = this,
             d3this = thisView.getd3El(),
-            nodes = thisView.model.get("nodes");
+            nodes = thisView.model.get("nodes"),
+            aux = window.agfkGlobals.auxModel,
+            gConsts = aux.getConsts();
 
         this.appRouter = inp.appRouter;
         
         // TODO this initialization won't work when expanding graphs
         
         // dim nodes that are [implicitly] learned
-        thisView.listenTo(nodes, "change:learnStatus", function(nodeId, status){
+        thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, nodeSid, status){
           var d3El = d3this.select("#" + nodeId);
           if (d3El.node() !== null){
             thisView.toggleNodeProps(d3El, status, "learned", d3this);
+          }
+        });
+        thisView.listenTo(aux, gConsts.starredTrigger, function(nodeId, nodeSid, status){
+          var d3El = d3this.select("#" + nodeId);
+          if (d3El.node() !== null){
+            thisView.toggleNodeProps(d3El, status, "starred", d3this);
           }
         });
         thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, status){
           var d3El = d3this.select("#" + nodeId);
           if (d3El.node() !== null){
             thisView.toggleNodeProps(d3El, status, "implicitLearned", d3this);
-          }
-        });
-        thisView.listenTo(nodes, "change:starStatus", function(nodeId, status){
-          var d3El = d3this.select("#" + nodeId);
-          if (d3El.node() !== null){
-            thisView.toggleNodeProps(d3El, status, "starred", d3this);
           }
         });
         
@@ -527,7 +532,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
 
         // sort the svg such that the edges come before the nodes so mouseover on node doesn't activate edge
         var gdata = gelems[0].map(function(itm) {
-          return d3.select(itm).classed(nodeClass);
+            return d3.select(itm).classed(nodeClass);
         });
         // return if graph is empty (e.g. clear nodes after all nodes were learned)
         if (gdata.length === 0){
@@ -609,7 +614,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             viewConsts = pvt.viewConsts,
             d3this = d3selection || this.getd3El(),
             d3Nodes = d3this.selectAll("." + viewConsts.nodeClass),
-            thisNodes = thisView.model.get("nodes");
+            thisNodes = thisView.model.get("nodes"),
+            aux = window.agfkGlobals.auxModel;
         
         // add nodes to observed list TODO move this somewhere else
         d3Nodes.each(function(){
@@ -634,13 +640,13 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             };
 
 
-        _.each(thisNodes.filter(function(nde){return nde.getLearnedStatus();}), function(mnode){
+        _.each(thisNodes.filter(function(nde){return aux.conceptIsLearned(nde.id);}), function(mnode){
           addPropFunction(mnode.get("id"), "learned");
         });
         _.each(thisNodes.filter(function(nde){return nde.getImplicitLearnStatus();}), function(mnode){
           addPropFunction(mnode.get("id"), "implicitLearned");
         });
-        _.each(thisNodes.filter(function(nde){return nde.getStarredStatus();}), function(mnode){
+        _.each(thisNodes.filter(function(nde){return aux.conceptIsStarred(nde.id);}), function(mnode){
           addPropFunction(mnode.get("id"), "starred");
         });
       },

@@ -242,10 +242,12 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
 
         // // init main app model
         if (!thisRoute.appData){
+          var aux = window.agfkGlobals.auxModel;
+          aux.setDepRoot(nodeId);
+
           var userData = new UserData(window.agfkGlobals.userInitData, {parse: true}),
               appData= new AppData({userData: userData});
-
-          window.agfkGlobals.auxModel.setUserModel(userData);
+          aux.setUserModel(userData);
           thisRoute.appData = appData;
         }
         //   var userModel = thisRoute.appData.get("userData");
@@ -261,10 +263,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         //     });
         //   });
         // }
-        
-        
-        thisRoute.appData.setGraphData({depRoot: nodeId});
-        
+                
         // show app tools
         thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
         thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
@@ -351,8 +350,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
           if (loadViz && !preLoadViz && window.vizPromise === undefined){
             pvt.loadViz.call(thisRoute);
           }
-          // apply user data
-          thisRoute.appData.applyUserDataToGraph();
+          //          thisRoute.appData.applyUserDataToGraph();
         }
       }
     });

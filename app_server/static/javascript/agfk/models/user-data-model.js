@@ -67,26 +67,26 @@ define(["backbone"], function(Backbone){
      * arName: name of add/remove property of objName
      * arStatus: truthy values assign objName.arName = arStatus; falsy deletes objName.arName
      */
-    pvt.updateObjProp = function(objName, arName, arStatus){
-      var thisModel = this;
-      if (!thisModel.get(objName)){return false;}
+    // pvt.updateObjProp = function(objName, arName, arStatus){
+    //   var thisModel = this;
+    //   if (!thisModel.get(objName)){return false;}
 
-      var retVal;
-      if (arStatus){
-        thisModel.get(objName)[arName] = arStatus;
-        thisModel.trigger("change:" + objName);
-        retVal = true;
-      }
-      else if (thisModel.get(objName).hasOwnProperty(arName)){
-        delete thisModel.get(objName)[arName];
-        thisModel.trigger("change:" + objName);
-        retVal = true;
-      }
-      else{
-        retVal = false;
-      }
-      return retVal;
-    };
+    //   var retVal;
+    //   if (arStatus){
+    //     thisModel.get(objName)[arName] = arStatus;
+    //     thisModel.trigger("change:" + objName);
+    //     retVal = true;
+    //   }
+    //   else if (thisModel.get(objName).hasOwnProperty(arName)){
+    //     delete thisModel.get(objName)[arName];
+    //     thisModel.trigger("change:" + objName);
+    //     retVal = true;
+    //   }
+    //   else{
+    //     retVal = false;
+    //   }
+    //   return retVal;
+    // };
 
     // return public object
     return Backbone.Model.extend({
@@ -109,13 +109,14 @@ define(["backbone"], function(Backbone){
         var thisModel = this,
             lConcepts = thisModel.get("learnedConcepts"),
             sConcepts = thisModel.get("starredConcepts");
+       //     gConsts = window.agfkGlobals.auxModel.getConsts();
 
-        lConcepts.bind("change:learnStatus", function(){
-          thisModel.trigger("change:learnStatus", lConcepts);
-        });
-        sConcepts.bind("change:starStatus", function(){
-          thisModel.trigger("change:starStatus", sConcepts);
-        });
+        // lConcepts.bind(gConsts.learnedTrigger, function(){
+        //   thisModel.trigger(gConsts.learnedTrigger, lConcepts);
+        // });
+        // sConcepts.bind(gConsts.starredConcepts, function(){
+        //     thisModel.trigger(gConsts.starredConcepts, sConcepts);
+        // });
 
         if (!pvt.learnedConceptsPopulated){
           thisModel.listenTo(lConcepts, "reset", function(){
@@ -151,35 +152,32 @@ define(["backbone"], function(Backbone){
         return pvt.starredConceptsPopulated;
       },
 
+      isLearned: function(conceptId){
+        return this.get("learnedConcepts").get(conceptId) !== undefined;
+      },      
+
+      isStarred: function(conceptId){
+        return this.get("starredConcepts").get(conceptId) !== undefined;
+      },      
+
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateLearnedConcept: function(nodeTag, status, nodeSid){
+      updateLearnedConcept: function(nodeTag, nodeSid, status){
         var changed = pvt.createDestroyUserConcept.call(this, this.get("learnedConcepts"), status, nodeSid);
+        var learnedTrigger = window.agfkGlobals.auxModel.getConsts().learnedTrigger;
         if (changed) {
-          this.trigger("change:learnedConcepts");
+          this.trigger(learnedTrigger, nodeTag, nodeSid, status);
+          // TODO add global consts to Aux file
         }
       },
 
-      updateStarredConcept: function(nodeTag, status, nodeSid){
+      updateStarredConcept: function(nodeTag, nodeSid, status){
         var changed = pvt.createDestroyUserConcept.call(this, this.get("starredConcepts"), status, nodeSid);
+        var starredTrigger = window.agfkGlobals.auxModel.getConsts().starredTrigger;
         if (changed) {
-          this.trigger("change:starredConcepts");
+          this.trigger(starredTrigger, nodeTag, nodeSid, status);
         }
-      },
-
-      /**
-       * Setter function that triggers an appropriate change event
-       */
-      updateImplicitLearnedNodes: function(nodeTag, status, nodeSid){
-        return pvt.updateObjProp.call(this, "implicitLearnedNodes", nodeSid, status);
-      },
-
-      /**
-       * Setter function that triggers an appropriate change event
-       */
-      updateVisibleNodes: function(nodeTag, status, nodeSid){
-        return pvt.updateObjProp.call(this, "visibleNodes", nodeSid, status);
       }
     });
   })();

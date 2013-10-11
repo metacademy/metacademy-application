@@ -31,59 +31,6 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
       // set parentModel for userData and graphData
       graphData.parentModel = thisModel;
       userData.parentModel = thisModel;
-
-      // Update user data when aux node data changes 
-      // TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph 
-      // (there may be a better way to do this, but aux fields on the nodes themselves, such as "learnStatus,"
-      // make it easy to trigger changes in the views for the specific node rather than the entire collection 
-      userData.listenTo(nodes, "change:learnStatus", userData.updateLearnedConcept);
-      userData.listenTo(nodes, "change:starStatus", userData.updateStarredConcept);
-      userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
-      userData.listenTo(nodes, "change:visibleStatus", userData.updateVisibleNodes);
-
-      // TODO this should be moved to aux-model.js
-      var aux = window.agfkGlobals.auxModel;
-      aux.listenTo(userData, "change:learnedConcepts", aux.resetEstimates);
-    },
-    
-    /**
-     * Aux function to set graph data from wrapper model (TODO this function may not be necessary)
-     */
-    setGraphData: function(gdataObj){
-        window.agfkGlobals.auxModel.set("depRoot", gdataObj.depRoot);
-    },
-
-    /**
-     * Apply the user data obtained from the server to the graph
-     * This function should be called after successfully fetching
-     * data from the content server
-     */
-    applyUserDataToGraph: function(){
-      var thisModel = this,
-          userData = thisModel.get("userData");
-      if (userData.areLearnedConceptsPopulated()){
-        applyLearnedConcepts();
-      } else{
-        thisModel.listenTo(userData.get("learnedConcepts"), "reset", applyLearnedConcepts);
-      }
-      if (userData.areStarredConceptsPopulated()){
-        applyStarredConcepts();
-      } else{
-        thisModel.listenTo(userData.get("starredConcepts"), "reset",   applyStarredConcepts);
-      }
-
-      function applyLearnedConcepts(){
-        var learnedConcepts = userData.get("learnedConcepts");
-        if (learnedConcepts.length > 0){
-          thisModel.get("graphData").get("nodes").applyUserConcepts(learnedConcepts, "learned");
-        }
-      }
-      function applyStarredConcepts(){
-        var starredConcepts = userData.get("starredConcepts");
-        if (starredConcepts.length > 0){
-          thisModel.get("graphData").get("nodes").applyUserConcepts(starredConcepts, "starred");
-        }
-      }
     },
 
     /**
@@ -99,6 +46,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
 
       // build node set
       nodes.add(response.nodes, {parse: true});
+      nodes.changeILNodesFromTag();
       
       delete response.nodes;
       return response;
@@ -108,7 +56,7 @@ define(["backbone", "agfk/models/graph-data-model", "agfk/models/user-data-model
      * Specify URL for HTTP verbs (GET/POST/etc)
      */
     url: function(){
-          var depTag = window.agfkGlobals.auxModel.get("depRoot");
+      var depTag = window.agfkGlobals.auxModel.get("depRoot");
       // TODO post CR-Restruct handle different types of input (aggregated graphs) based on url
       ErrorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request"); 
       return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;

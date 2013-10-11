@@ -1,0 +1,43 @@
+{% extends "base_form.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/user-form.css" %}" />
+<link rel="stylesheet" href="{% static "css/feedback.css" %}"/>
+{% endblock %}
+
+{% block pre-form-text %}
+  <p class="form-explanation">
+    Feel free to tell us what's on your mind, and we promise to send you a follow-up response. You can send feedback to <a href="mailto:feedback@metacademy.org">feedback@metacademy.org</a> or simply submit this form:
+  </p>
+{% endblock %}
+
+{% block headtitle %}
+  Send Feedback
+{% endblock %}
+  
+  
+{% block form-content %}
+  <div class="user-form-field">
+  {{ form.email.label_tag }}
+  {{ form.email }}
+  {% if form.email.errors %}
+  <div class="form-errors">
+    {{form.email.errors}}
+  </div>
+  {% endif %}
+</div>
+
+  <div class="user-form-field">
+  {{ form.message.label_tag }}
+  {{ form.message }}
+  {% if form.message.errors %}
+  <div class="form-errors">
+    {{form.message.errors}}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+

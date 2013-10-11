@@ -7,7 +7,10 @@ from haystack.views import SearchView
 
 from os import system
 
+from django.views.generic.edit import FormView
+
 from apps.cserver_comm.cserver_communicator import get_search_json
+from forms import ContactForm
 
 
 """
@@ -32,11 +35,13 @@ class MultiSearchView(SearchView):
 
         return {"concepts_search_data": search_data, 'search_query': qstring}
 
-"""
-Git pull
-Pull the latest content from GitHub once requested by a webhook
-"""
-def gitpull(request):
-    system('/bin/git --work-tree="/srv/octal" pull 2>&1 >/dev/null')
-    return HttpResponse("ok")
+
+class ContactView(FormView):
+    template_name = 'feedback.html'
+    form_class = ContactForm
+    success_url = '/thanks'
+
+    def form_valid(self, form):
+        form.send_email()
+        return super(ContactView, self).form_valid(form)
 

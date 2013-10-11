@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/feedback.css" %}"/>
+{% endblock %}
+
+{% block main %}
+<p class="form-explanation">
+Thanks for your feedback! We'll follow-up with you soon if you provided an email address.
+</p>
+{% endblock %}

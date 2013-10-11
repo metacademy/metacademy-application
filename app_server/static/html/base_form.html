@@ -8,6 +8,10 @@
 
 {% block main %}
 
+{% block pre-form-text %}
+
+{% endblock %}
+
 <div class="form-wrapper">
 <form method="post" action={% block form-action %}""{% endblock %}>
 {% csrf_token %}

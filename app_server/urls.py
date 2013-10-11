@@ -8,8 +8,7 @@ from haystack.views import search_view_factory
 from haystack.query import SearchQuerySet
 
 from apps.roadmaps.models import Roadmap
-from views import MultiSearchView
-from views import gitpull
+from views import MultiSearchView, ContactView
 
 admin.autodiscover()
 
@@ -31,10 +30,9 @@ urlpatterns = patterns('',
                        # url(r'^dev/benchmarktest', benchmark_viewer),
                        url(r'^captcha/', include('captcha.urls')),
                        url(r'^about/?$',  TemplateView.as_view(template_name='about.html')),
-                       url(r'^contribute/?$',  TemplateView.as_view(template_name='contribute.html')),
+                       url(r'^feedback/?$',  ContactView.as_view()),
+                       url(r'^thanks/?$',  TemplateView.as_view(template_name='feedback_thanks.html')),
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^happy/', include('lazysignup.urls')),
-                       url(r'^gitpull$', gitpull),
 )
 
 urlpatterns += staticfiles_urlpatterns()

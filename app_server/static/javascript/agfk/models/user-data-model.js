@@ -61,33 +61,6 @@ define(["backbone"], function(Backbone){
     pvt.learnedConceptsPopulated = false;
     pvt.starredConceptsPopulated = false;
 
-    /**
-     * Internal function to change dictionary objects 
-     * objName: name of object property
-     * arName: name of add/remove property of objName
-     * arStatus: truthy values assign objName.arName = arStatus; falsy deletes objName.arName
-     */
-    // pvt.updateObjProp = function(objName, arName, arStatus){
-    //   var thisModel = this;
-    //   if (!thisModel.get(objName)){return false;}
-
-    //   var retVal;
-    //   if (arStatus){
-    //     thisModel.get(objName)[arName] = arStatus;
-    //     thisModel.trigger("change:" + objName);
-    //     retVal = true;
-    //   }
-    //   else if (thisModel.get(objName).hasOwnProperty(arName)){
-    //     delete thisModel.get(objName)[arName];
-    //     thisModel.trigger("change:" + objName);
-    //     retVal = true;
-    //   }
-    //   else{
-    //     retVal = false;
-    //   }
-    //   return retVal;
-    // };
-
     // return public object
     return Backbone.Model.extend({
 
@@ -109,14 +82,6 @@ define(["backbone"], function(Backbone){
         var thisModel = this,
             lConcepts = thisModel.get("learnedConcepts"),
             sConcepts = thisModel.get("starredConcepts");
-       //     gConsts = window.agfkGlobals.auxModel.getConsts();
-
-        // lConcepts.bind(gConsts.learnedTrigger, function(){
-        //   thisModel.trigger(gConsts.learnedTrigger, lConcepts);
-        // });
-        // sConcepts.bind(gConsts.starredConcepts, function(){
-        //     thisModel.trigger(gConsts.starredConcepts, sConcepts);
-        // });
 
         if (!pvt.learnedConceptsPopulated){
           thisModel.listenTo(lConcepts, "reset", function(){
@@ -168,7 +133,6 @@ define(["backbone"], function(Backbone){
         var learnedTrigger = window.agfkGlobals.auxModel.getConsts().learnedTrigger;
         if (changed) {
           this.trigger(learnedTrigger, nodeTag, nodeSid, status);
-          // TODO add global consts to Aux file
         }
       },
 

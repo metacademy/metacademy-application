@@ -1,8 +1,8 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
-define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/app-model", "agfk/models/user-data-model", "agfk/utils/errors", "agfk/views/error-view"],
-  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, AppData,UserData, ErrorHandler, ErrorMessageView){
+define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/graph-data-model", "agfk/models/user-data-model", "agfk/utils/errors", "agfk/views/error-view"],
+  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, GraphModel, UserData, ErrorHandler, ErrorMessageView){
   "use strict";
   
   /**
@@ -241,31 +241,19 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         pvt.viewMode = paramsObj[qViewMode];
 
         // // init main app model
-        if (!thisRoute.appData){
+        if (!thisRoute.graphModel){
           var aux = window.agfkGlobals.auxModel;
           aux.setDepRoot(nodeId);
 
-          var userData = new UserData(window.agfkGlobals.userInitData, {parse: true}),
-              appData= new AppData({userData: userData});
-          aux.setUserModel(userData);
-          thisRoute.appData = appData;
+          var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true}),
+              graphModel = new GraphModel();
+          aux.setUserModel(userModel);
+          thisRoute.userModel = userModel;
+          thisRoute.graphModel = graphModel;
         }
-        //   var userModel = thisRoute.appData.get("userData");
-        //   $.each(["learnedConcepts", "starredConcepts"], function(idx, val){
-        //     userModel.get(val).fetch({
-        //     success: function(){
-        //         window.agfkGlobals.auxModel.setUserModel(userModel);
-        //       }, 
-        //       reset: true,
-        //       error: function(emodel, eresp, eoptions){
-        //         ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
-        //       }
-        //     });
-        //   });
-        // }
                 
         // show app tools
-        thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
+        thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
         thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
 
         // should we re-render the view?
@@ -290,8 +278,8 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         }
         
         // check if/how we need to acquire more data from the server
-        if(thisRoute.appData.get("graphData").get("nodes").length === 0){
-          thisRoute.appData.fetch({
+        if(thisRoute.graphModel.get("nodes").length === 0){
+          thisRoute.graphModel.get("nodes").fetch({
             success: postNodePop,
             error: function(emodel, eresp, eoptions){
               thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
@@ -306,28 +294,29 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         // helper function to route change parameters appropriately
         // necessary because of AJAX calls to obtain new data
         function postNodePop() {
-          try{
-            ErrorHandler.assert(thisRoute.appData.get("graphData").get("nodes").length > 0,
+         try{
+            ErrorHandler.assert(thisRoute.graphModel.get("nodes").length > 0,
             "Fetch did not populate graph nodes for fetch: " + nodeId);
-          }
-          catch(err){ 
+         }
+          catch(err){
+            console.error(err.message);
             thisRoute.showErrorMessageView(pvt.routeConsts.noContentErrorKey, nodeId);
             return;
-          }
+            }
 
-          // set the document title to be the key concept
+//          set the document title to be the key concept
           document.title = window.agfkGlobals.auxModel.getTitleFromId(nodeId) + " - Metacademy";
          
           switch (paramsObj[qViewMode]){
           case pExploreMode:
             if (doRender){
-              thisRoute.eview = new ExploreView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
+              thisRoute.eview = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute});
             }
             thisRoute.showView(thisRoute.eview, doRender, "#" + routeConsts.eViewId);
             break;
           default:
             if (doRender){
-              thisRoute.lview = new LearnView({model: thisRoute.appData.get("graphData"), appRouter: thisRoute});
+              thisRoute.lview = new LearnView({model: thisRoute.graphModel, appRouter: thisRoute});
             }
             thisRoute.showView(thisRoute.lview, doRender, "#" + routeConsts.lViewId);
           }
@@ -350,7 +339,6 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
           if (loadViz && !preLoadViz && window.vizPromise === undefined){
             pvt.loadViz.call(thisRoute);
           }
-          //          thisRoute.appData.applyUserDataToGraph();
         }
       }
     });

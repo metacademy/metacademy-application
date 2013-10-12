@@ -61,7 +61,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         thisView.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
           thisView.changeTitleClass(starredClass, status);
         });
-        thisView.listenTo(thisView.model, "change:ImplicitLearnStatus", function(nodeId, nodeSid, status){
+        thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
           thisView.changeTitleClass(implicitLearnedClass, status);
         });
       },
@@ -739,7 +739,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
        */
       showConceptDetails: function(nodeModel){
         var thisView = this,
-        dNodeView = new DetailedNodeView({model: nodeModel, graphData: thisView.model.parentModel.get("graphData")});
+        dNodeView = new DetailedNodeView({model: nodeModel});
         pvt.conceptDisplayWrap.appendChild(dNodeView.render().el);
         $(pvt.conceptDisplayWrap).scrollTop(0);
         return dNodeView;
@@ -833,11 +833,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
 
       updateTimeEstimate: function(){
         var thisView = this,
-            timeEstimate = thisView.model.get("nodes").getTimeEstimate();
+            timeEstimate = thisView.model.get("nodes").getTimeEstimate(),
+            timeStr;
         if (timeEstimate) {
-          var timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
+          timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
         } else {
-          var timeStr = "All done!";
+          timeStr = "All done!";
         }
         thisView.$el.find(".time-estimate").html(timeStr);
       },

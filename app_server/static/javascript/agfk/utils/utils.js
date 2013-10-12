@@ -142,7 +142,7 @@ define(["jquery"], function($){
     } else {
       return (Math.round(timeEstimate * 12) * 5) + " minutes";    // round to nearest 5 minutes
     }
-  }
+  };
 
   // return require.js object
   return utils;

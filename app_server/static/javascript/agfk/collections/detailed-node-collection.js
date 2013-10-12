@@ -6,12 +6,13 @@ define(['agfk/collections/node-collection', 'agfk/models/detailed-node-model', '
       var aux = window.agfkGlobals.auxModel,
           thisColl = this;
       thisColl.listenTo(aux, aux.getConsts().learnedTrigger, thisColl.changeILNodesFromTag);
+      thisColl.on("sync", function(){
+        aux.trigger(aux.getConsts().learnedTrigger);
+      });
     },
 
     /**
-     * DFS to change the implicit learned count of the dependencies of rootTag
-     * This method works by changing the implicitLearnCt of unique dependent concepts
-     * if the learned status of the root node changes
+     * DFS to change the implicit learned status of the dependencies of rootTag
      */
     changeILNodesFromTag: function(){
       // TODO cache learned/implicit learned nodes
@@ -28,6 +29,15 @@ define(['agfk/collections/node-collection', 'agfk/models/detailed-node-model', '
           node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
         }
       });
+    },
+
+    /*
+     * Specify URL for HTTP verbs (GET/POST/etc)
+     */
+    url: function(){
+      var depTag = window.agfkGlobals.auxModel.get("depRoot");
+      return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;
     }
   });
+
 });

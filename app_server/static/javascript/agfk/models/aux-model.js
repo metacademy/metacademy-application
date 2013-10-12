@@ -164,6 +164,10 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
             node,
             dependenciesObj;
 
+        if (onlyUnlearned && thisModel.conceptIsLearned(tag)){
+          return [];
+        }
+
         if (isShortcut && shortcuts.get(tag)) {
           node = shortcuts.get(tag);
           dependenciesObj = pvt.shortcutDependencies;

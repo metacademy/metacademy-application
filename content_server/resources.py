@@ -37,6 +37,7 @@ def parse_location(line):
 RESOURCE_FIELDS = {'title': str,
                    'resource_type': str,
                    'free': int,
+                   'core': int,
                    'edition': str,
                    'url': str,
                    'specific_url_base': str,

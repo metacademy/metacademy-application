@@ -9,8 +9,11 @@ from apps.user_management.models import Profile
 def get_agfk_app(request):
     if request.user.is_authenticated():
         uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-        concepts = { "concepts": [{ "id":l.id, "learned": True, "starred": False} for l in getattr(uprof, "learnedconcept_set").all()]}
-        # TODO fix for starred concepts once new schema is in place
+        lset = set()
+        sset = set()
+        [lset.add(lc.id) for lc in uprof.learned.all()]
+        [sset.add(sc.id) for sc in uprof.starred.all()]
+        concepts = {"concepts": [{"id": uid, "learned": uid in lset, "starred": uid in sset} for uid in lset.union(sset)]}
     else:
         concepts = {"concepts": []}
     return render_to_response("agfk-app.html",

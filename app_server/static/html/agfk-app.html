@@ -35,11 +35,17 @@
 {% endblock %}
   
   {% block jscript %}
+    <script>
+      window.agfkGlobals = {};
+      agfkGlobals.userInitData = {{ user_data|safe }};
+      agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+      agfkGlobals.auxModel = null; // init in main js app
+    </script>
   {% if debug %}
   <script data-main="{% static "javascript/agfk/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
   {% else %}
-  <script type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/agfk/main-built.js" %}"></script>
+  <script  src="{% static "javascript/lib/require-min.js" %}"></script>
+  <script src="{% static "javascript/agfk/main-built.js" %}"></script>
   {% endif %}
   {% endblock %}
 

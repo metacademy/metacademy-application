@@ -46,6 +46,12 @@ class Profile(models.Model):
     def __unicode__(self):
         return self.user.username
 
+class Concepts(models.Model):
+
+    learned_uprofs = models.ManyToManyField(Profile, related_name="learned")
+    starred_uprofs = models.ManyToManyField(Profile, related_name="starred")
+    id = models.CharField(max_length=10, unique=True, primary_key=True)
+        
 class LearnedConcept(models.Model):
     """
     Simple class to maintain learned concepts

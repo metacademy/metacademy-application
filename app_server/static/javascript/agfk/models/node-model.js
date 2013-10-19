@@ -1,17 +1,15 @@
 /*
- This file contains the node model, which contains the data for each concept TODO should this be renamed "conept-model"?
+ This file contains the node model, which contains the data for each concept TODO should this be renamed "concept-model"?
  */
 
-define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/utils"], function(Backbone, NodePropertyCollections, Utils){
+define(["backbone", "agfk/collections/node-property-collections"], function(Backbone, NodePropertyCollections){
   /**
    * Node: node model that encompasses several collections and sub-models
    */
   return  (function(){
     // maintain ancillary/user-specific info and fields in a private object
     var pvt = {};
-    pvt.collFields =  ["questions", "dependencies", "outlinks", "resources"]; 
-    pvt.txtFields = ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time"];
-    
+
     return Backbone.Model.extend({
       /**
        * all possible attributes are present by default
@@ -22,17 +20,16 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           id: "",
           sid: "",
           summary: "",
-          goals: "",
-          pointers: "",
           time: "",
           is_shortcut: 0,
-          flags: [],
-          questions: new NodePropertyCollections.QuestionCollection(),
           dependencies: new NodePropertyCollections.DirectedEdgeCollection(),
-          outlinks: new NodePropertyCollections.DirectedEdgeCollection(),
-          resources: new NodePropertyCollections.ResourceCollection()
+          outlinks: new NodePropertyCollections.DirectedEdgeCollection()
         };
       },
+
+      collFields: ["dependencies", "outlinks"],
+      
+      txtFields: ["id", "sid", "title", "summary", "is_shortcut", "time"],
 
       /**
        *  parse the incoming server data
@@ -44,18 +41,18 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         }
         var output = this.defaults();
         // ---- parse the text values ---- //
-        var i = pvt.txtFields.length;
+        var i = this.txtFields.length;
         while (i--) {
-          var tv = pvt.txtFields[i];
+          var tv = this.txtFields[i];
           if (resp[tv]) {
             output[tv] = resp[tv];
           }
         }
 
         // ---- parse the collection values ---- //
-        i = pvt.collFields.length;
+        i = this.collFields.length;
         while (i--) {
-          var cv = pvt.collFields[i];
+          var cv = this.collFields[i];
           output[cv].parent = this;
           if (resp[cv]) {
             output[cv].add(resp[cv]);
@@ -70,57 +67,13 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
        */
       initialize: function() {
         var model = this;
-        // changes in attribute collections should trigger a change in the node model
-        var i = pvt.collFields.length;
-        while (i--) {
-          var cval = pvt.collFields[i];
-          this.get(cval).bind("change", function () {
-            model.trigger("change", cval);
-          });
-        } 
-        this.bind("change", function () {
-          this.save();
-        });
 
         // ***** Add private instance variable workaround ***** //
         var nodePvt = {};
         nodePvt.visible = false;
-        nodePvt.implicitLearnCt = 0;
         nodePvt.implicitLearn = false;
         nodePvt.learned = false;
         nodePvt.starred = false;
-
-        this.setStarredStatus = function(status){
-          if (status !== nodePvt.starred){
-            nodePvt.starred = status;
-            this.trigger("change:starStatus", this.get("id"), status, this.get("sid"));
-          }
-        };
-
-        this.getStarredStatus = function(){
-          return nodePvt.starred;
-        };
-        
-        // * Increment the implicit learn count by ival (default 1)
-        this.incrementILCt = function(ival){
-          ival = ival || 1;
-          this.setImplicitLearnCt(nodePvt.implicitLearnCt + ival);
-        };
-
-        this.toggleLearnedStatus = function(){
-          this.setLearnedStatus(!nodePvt.learned);
-        };
-
-        this.toggleStarredStatus = function(){
-          this.setStarredStatus(!nodePvt.starred);
-        };
-        
-        this.setLearnedStatus = function(status){
-          if (status !== nodePvt.learned){
-            nodePvt.learned = status;
-            this.trigger("change:learnStatus", this.get("id"), status, this.get("sid"));
-          }
-        };
 
         this.setVisibleStatus = function(status){
           if (nodePvt.visible !== nodePvt.visible){
@@ -129,25 +82,13 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
           }
         };
 
-        this.setImplicitLearnCt = function(ilct){
-          if (nodePvt.implicitLearnCt !== nodePvt.ilct){
-            nodePvt.implicitLearnCt = ilct;
-            this.trigger("change:implicitLearnCt", this.get("id"), ilct);
-            this.setImplicitLearnStatus(ilct === this.getNumberOfPresentOutlinks());
-          }
-        };
-
         this.setImplicitLearnStatus = function(status){
           if (nodePvt.implicitLearn !== status){
             nodePvt.implicitLearn = status;
-            this.trigger("change:implicitLearnStatus", this.get("id"), status, this.get("sid"));
+            this.trigger("change:implicitLearnStatus", this.get("id"), this.get("sid"), status);
           }
         };
 
-        this.getImplicitLearnCt = function(){
-          return nodePvt.implicitLearnCt;
-        };
-        
         this.getImplicitLearnStatus = function(){
           return nodePvt.implicitLearn;
         };
@@ -157,33 +98,13 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         };
         
         this.getCollFields = function(){
-          return nodePvt.collFields;
+            return this.collFields;
         };
 
         this.getTxtFields = function(){
-          return nodePvt.txtFields;
-        };
-        
-        this.getLearnedStatus = function(){
-          return nodePvt.learned;
+          return this.txtFields;
         };
 
-        this.isLearnedOrImplicitLearned = function(){
-          return nodePvt.learned || nodePvt.implicitLearn;
-        };
-
-      },
-
-      /**
-       * returns and caches the node display title
-       */
-      getNodeDisplayTitle: function(numCharNodeLine){
-        if (!this.nodeDisplayTitle){
-          var title = this.get("title") || this.id.replace(/_/g, " ");
-          title += this.get("is_shortcut") ? " (shortcut)" : "";
-          this.nodeDisplayTitle = Utils.wrapNodeText(title, numCharNodeLine || 9);
-        }
-        return this.nodeDisplayTitle;
       },
 
       /**
@@ -265,29 +186,6 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
       },
 
       /**
-       * Returns the number of outlinks present in the current graph
-       * TODO should we only use outlinks shown in graph?
-       */
-      getNumberOfPresentOutlinks: function(){
-        var thisModel = this;
-        if (typeof thisModel.numPresOutlinks === "undefined"){
-          thisModel.numPresOutlinks = 0;
-          var thisColl = thisModel.collection,
-              outLNode,
-              thisId = this.get("id");
-          thisModel.get("outlinks").forEach(function(outLink){
-            if ((outLNode = thisColl.get(outLink.get("to_tag")))){
-              // only count distinct outlinks
-              if (outLNode.isUniqueDependency(thisId)){
-                thisModel.numPresOutlinks++;
-              }
-            }
-          });
-        }
-        return this.numPresOutlinks;
-      },
-
-      /**
        * Check if depID is a unique dependency (dependencies not present as an 
        * ancestor of another dependency)
        */
@@ -303,7 +201,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
         var nodes = this.collection, thisModel = this;
 
         var found = this.get("outlinks").filter(function(item){
-          node = nodes.findWhere({"id": item.get("to_tag")});
+          var node = nodes.findWhere({"id": item.get("to_tag")});
           if (!node) {
             return false;
           }
@@ -319,7 +217,7 @@ define(["backbone", "agfk/collections/node-property-collections", "agfk/utils/ut
        */
       isFinished: function(){
         return this.get("summary") && this.get("resources").length > 0;
-      },
+      }
     });
   })();
 });

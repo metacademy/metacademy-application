@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render
-from apps.user_management.models import LearnedConcept, StarredConcept, Profile, UserCreateForm
+from apps.user_management.models import Concepts, Profile, UserCreateForm
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate, login
 
@@ -16,14 +16,15 @@ from lazysignup.models import LazyUser
 from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 from aux_text import HTML_ACCT_EMAIL, TXT_ACCT_EMAIL
 
+
 def user_main(request):
     if not request.user.is_authenticated() or is_lazy_user(request.user):
         return redirect('/user/login?next=%s' % request.path)
 
     # obtain an array of learned concept ids for the user
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-    lids = [l.id for l in uprof.learnedconcept_set.all()]
-    sids = [s.id for s in uprof.starredconcept_set.all()]
+    lids = [l.id for l in uprof.learned.all()]
+    sids = [s.id for s in uprof.starred.all()]
     # TODO refactor
     if len(lids) > 0:
         concepts_dict = get_id_to_concept_dict()
@@ -85,44 +86,35 @@ def register(request, redirect_addr="/user"):
 
 # we may want to consider using a more structured approach like tastypi as we
 # increase the complexity of the project
-# or maybe just switching class-based views would simplify this makeshift API
-def handle_learned_concepts(request, conceptId=""):
-    """
-    A simple REST interface for accessing a user's learned concepts
-    """
-    return handle_user_concepts(request, conceptId, "learnedconcept_set", LearnedConcept)
-
-def handle_starred_concepts(request, conceptId=""):
-    """
-    A simple REST interface for accessing a user's learned concepts
-    """
-    return handle_user_concepts(request, conceptId, "starredconcept_set", StarredConcept)
-
-def handle_user_concepts(request, conceptId, set_name, InConcept):
-    method = request.method
-    if method == "GET":
-        if request.user.is_authenticated():
-            uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-            concepts = [ l.id for l in getattr(uprof, set_name).all()]
-        else:
-            concepts = []
-        return HttpResponse(json.dumps(concepts), mimetype='application/json')
-    elif (method == "PUT" or method == "DELETE") and conceptId:
-        return _perform_put_delete_user_concept(request, method, conceptId, InConcept)
-    else:
-        return HttpResponse(status=405)
-
+# or maybe just switching to class-based views would simplify this makeshift API
 @allow_lazy_user
-def _perform_put_delete_user_concept(request, method, conceptId, InConcept):
-    uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-    dbConceptObj, ucreated = InConcept.objects.get_or_create(id=conceptId)
+def handle_concepts(request, conceptId=""):
+    """
+    A simple interface for handling a user's association with a concept
+    """
+    rbody = json.loads(request.body) # communication payload
+    method = request.method
+
     if method == "PUT":
-        dbConceptObj.uprofiles.add(uprof)
-        return HttpResponse()
-    elif method == "DELETE":
-        dbConceptObj.uprofiles.remove(uprof)
+        cid = rbody["id"]
+        learned = rbody["learned"]
+        starred = rbody["starred"]
+
+        uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
+        dbConceptObj, ucreated = Concepts.objects.get_or_create(id=cid)
+
+        if learned:
+            dbConceptObj.learned_uprofs.add(uprof)
+        else:
+            dbConceptObj.learned_uprofs.remove(uprof)
+        if starred:
+            dbConceptObj.starred_uprofs.add(uprof)
+        else:
+            dbConceptObj.starred_uprofs.remove(uprof)
+
         dbConceptObj.save()
+
         return HttpResponse()
+
     else:
         return HttpResponse(status=405)
-

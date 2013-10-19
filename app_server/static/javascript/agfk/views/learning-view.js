@@ -4,7 +4,7 @@
  */
 
 
-define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/utils"], function(Backbone, _, $, ErrorHandler, Utils){
+define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbone, _, $, Utils){
   "use strict";
   
   /**
@@ -26,17 +26,19 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       starredClass: "starred-concept-title"
     };
 
-    // return public object
+    // return public object for node list item view
     return Backbone.View.extend({
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.id;},
       className: function(){
         var viewConsts = pvt.viewConsts,
             thisView = this,
-            thisModel = thisView.model;
+            thisModel = thisView.model,
+            aux = window.agfkGlobals.auxModel,
+            id = thisModel.id;
         return pvt.viewConsts.viewClass
-          + (thisModel.getStarredStatus() ? " " + viewConsts.starredClass : "")
-          + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "")
+          + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
+          + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
       tagName: "li",
@@ -49,15 +51,18 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
             viewConsts = pvt.viewConsts,
             learnedClass = viewConsts.learnedClass,
             implicitLearnedClass = viewConsts.implicitLearnedClass,
-            starredClass = viewConsts.starredClass;
-        thisView.listenTo(thisView.model, "change:learnStatus", function(nodeId, status){
+            starredClass = viewConsts.starredClass,
+            nodeTag = thisView.model.id,
+            aux = window.agfkGlobals.auxModel,
+            gConsts = aux.getConsts();
+        thisView.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
           thisView.changeTitleClass(learnedClass, status);
         });
-        thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
-          thisView.changeTitleClass(implicitLearnedClass, status);
-        });
-        thisView.listenTo(thisView.model, "change:starStatus", function(nodeId, status){
+        thisView.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
           thisView.changeTitleClass(starredClass, status);
+        });
+        thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
+          thisView.changeTitleClass(implicitLearnedClass, status);
         });
       },
       
@@ -243,7 +248,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
             thisModel = thisView.model;
         // TODO this seems awkward
         thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), 
-                                                     {fromTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("from_tag"))}))); 
+                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))}))); 
         return thisView;
       }
 
@@ -311,7 +316,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       render: function(){
         var thisView = this,
             thisModel = thisView.model;
-        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: thisModel.graphEdgeCollection.parentModel.get("aux").getTitleFromId(thisModel.get("to_tag"))})));
+        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("to_tag"))})));
         return thisView;
       }
 
@@ -363,7 +368,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
     };
 
     pvt.viewConsts = {
-      templateId: "pointers-view-template",
+      templateId: "pointers-view-template"
     };
 
     pvt.itemToStr = function(item){
@@ -464,7 +469,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       implicitLearnedClass: "implicit-learned-concept"
     };
 
-    // return public object
+    // return public object for detailed node view
     return Backbone.View.extend({
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix + this.model.get("id");},
@@ -472,16 +477,22 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       className: function(){
         var viewConsts = pvt.viewConsts,
             thisView = this,
-            thisModel = thisView.model;
+            thisModel = thisView.model,
+            id = thisModel.id,
+            aux = window.agfkGlobals.auxModel;
+        
         return pvt.viewConsts.viewClass
-          + (thisModel.getStarredStatus() ? " " + viewConsts.starredClass : "")
-          + (thisModel.getLearnedStatus() ? " " + viewConsts.learnedClass : "")
+          + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
+          + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
 
       initialize: function(){
         var viewConsts = pvt.viewConsts,
-            thisView = this;
+            thisView = this,
+            aux = window.agfkGlobals.auxModel,
+            nodeTag = thisView.model.id,
+            gConsts = aux.getConsts();
 
         function changeClass(sel, className, status){
           if(status){
@@ -491,11 +502,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
             thisView.$el.removeClass(className);
           }
         }
+
         // TODO refactor this code if we keep the star and check in current location
-        this.listenTo(this.model, "change:learnStatus", function(nodeId, status){
+        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
           changeClass("." + viewConsts.learnViewCheckClass, viewConsts.learnedClass, status);
         });
-        this.listenTo(this.model, "change:starStatus", function(nodeId, status){
+        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
           changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
         });
 
@@ -521,7 +533,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
                                                               "displayTitle": thisView.model.getLearnViewTitle()});
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"), 
-                                                                             conceptId: this.model.get("id")});
+                                                                             conceptId: thisView.model.get("id")});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
         thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
         thisView.pointers = thisView.pointers || new NestedListView({model: {text: thisView.model.get("pointers")},
@@ -545,8 +557,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         }
 
         // update the hovertext when nodes are marked learned/unlearned
-        var aux = this.options.graphData.get("aux");
-        this.listenTo(aux, "reset:estimates", this.addHoverText);
+        var aux = window.agfkGlobals.auxModel;
+        thisView.listenTo(aux, "reset:estimates", thisView.addHoverText);
 
         thisView.assign(assignObj);
         thisView.addHoverText();
@@ -573,7 +585,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       },
 
       getHoverText: function(conceptTag) {
-        var aux = this.options.graphData.get("aux");
+        var aux = window.agfkGlobals.auxModel;
         if (aux.conceptIsLearned(conceptTag)) {
           return "You have learned this concept.";
         } else {
@@ -627,7 +639,6 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
         this.unbind();
         this.remove();
       }
-
     });
   })();
 
@@ -676,9 +687,9 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
        */
       toggleConceptState: function(evt, state){
         evt.stopPropagation();
-        var nodeTag = evt.currentTarget.getAttribute(pvt.viewConsts.dataTagName),
-            node = this.model.get("nodes").get(nodeTag);
-        state === "learn" ? node.toggleLearnedStatus() : node.toggleStarredStatus();
+        var aux = window.agfkGlobals.auxModel,
+            nodeTag = evt.currentTarget.getAttribute(pvt.viewConsts.dataTagName);
+        state === "learn" ? aux.toggleLearnedStatus(nodeTag) : aux.toggleStarredStatus(nodeTag);
       },
 
       /**
@@ -728,7 +739,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
        */
       showConceptDetails: function(nodeModel){
         var thisView = this,
-        dNodeView = new DetailedNodeView({model: nodeModel, graphData: thisView.model.parentModel.get("graphData")});
+        dNodeView = new DetailedNodeView({model: nodeModel});
         pvt.conceptDisplayWrap.appendChild(dNodeView.render().el);
         $(pvt.conceptDisplayWrap).scrollTop(0);
         return dNodeView;
@@ -739,9 +750,10 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       },
 
       initialize: function(inp){
+        var gConsts = window.agfkGlobals.auxModel.getConsts();
         this.appRouter = inp.appRouter;
         this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
-        this.listenTo(this.model.get("nodes"), "change:learnStatus", this.updateTimeEstimate);
+        this.listenTo(window.agfkGlobals.auxModel, gConsts.learnedTrigger, this.updateTimeEstimate);
       },
       
       /**
@@ -821,11 +833,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
 
       updateTimeEstimate: function(){
         var thisView = this,
-            timeEstimate = thisView.model.get("nodes").getTimeEstimate();
+            timeEstimate = thisView.model.get("nodes").getTimeEstimate(),
+            timeStr;
         if (timeEstimate) {
-          var timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
+          timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
         } else {
-          var timeStr = "All done!";
+          timeStr = "All done!";
         }
         thisView.$el.find(".time-estimate").html(timeStr);
       },
@@ -847,7 +860,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/errors", "agfk/utils/uti
       getTopoSortedConcepts: function(){
         var thisView = this,
             thisModel = thisView.model,
-            keyTag = thisModel.get("aux").get("depRoot") || "",
+            keyTag = window.agfkGlobals.auxModel.get("depRoot") || "",
             nodes = thisModel.get("nodes"),
             traversedNodes = {}, // keep track of traversed nodes
             startRootNodes,

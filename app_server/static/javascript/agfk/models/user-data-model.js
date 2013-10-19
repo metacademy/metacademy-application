@@ -1,44 +1,65 @@
 /*
-This file contains the user data model, which contains the user-specific data that synces with the app server
-*/
-define(["backbone"], function(Backbone){
+ This file contains the user data model, which contains the user-specific data that synces with the app server
+ */
+define(["backbone", "underscore"], function(Backbone, _){
 
   var USER_CONSTS = {
     userPath: "/user/",
-    learnedConceptPath: "/user/learned/",
-    starredConceptPath: "/user/starred/"
+    conceptPath: "/user/concepts/"
   };
   
   // wrapper model for learned concepts
+  var sharedVars = {};
+  
   var UserConcept = Backbone.Model.extend({
+    url: function(){
+      return USER_CONSTS.conceptPath + this.id;
+    },
     
-    defaults:{
-      id: "",
-      useCsrf: true
-    }
+    defaults: { id: "",
+                useCsrf: true,
+                learned: false,
+                starred: false
+              }
   });
 
-  // wrapper collection for learned concepts
-  var ConceptsCollection = Backbone.Collection.extend({
-    model: UserConcept,
-    url: function(){
-      return {"learned": USER_CONSTS.learnedConceptPath,
-              "starred": USER_CONSTS.starredConceptPath}[this.type || "learned"];
-    },
+  // wrapper collection for user concepts
+  var ConceptsCollection = (function(){
+    var pvt = {};
     
-    initialize: function(args){
-      this.type = args.type;
-    },
-    
-    parse: function(resp, xhr){
-      var i = resp.length,
-          res = [];
-      while(i--){
-        res.push({id: resp[i]});
+    /*
+     *  Create or change a users concept state
+     * returns true if the concept was created or changed and changes were propagated to the server
+     *  call using pvt.createDestroyUserConcept.call(props)
+     */
+    pvt.changeUserConceptState = function(props){
+      var thisColl = this,
+          nodeSid = props.id,
+          concept = thisColl.get(nodeSid);
+      if (!concept){
+        thisColl.create(props);
+      } else{        
+        concept.save(props);
       }
-      return res;
-    }
-  });
+      return true;
+    };
+    
+    return Backbone.Collection.extend({
+      model: UserConcept,
+      
+      initialize: function(args){
+        this.type = args.type;
+      },
+
+      setStarredStatus: function(sid, status){
+        return pvt.changeUserConceptState.call(this, {id: sid, starred: status});
+      },
+
+      setLearnedStatus: function(sid, status){
+        return pvt.changeUserConceptState.call(this, {id: sid, learned: status});
+      }
+    });
+  })();
 
 
   /** 
@@ -48,46 +69,7 @@ define(["backbone"], function(Backbone){
     // define private methods and variables
     var pvt = {};
 
-    pvt.createDestroyUserConcept = function(conceptCollection, status, nodeSid){
-      if (status && !conceptCollection.get(nodeSid)) {
-        conceptCollection.create({id: nodeSid});
-        return true;
-      } else if (!status) {
-        conceptCollection.get(nodeSid).destroy({id: nodeSid});
-        return true;
-      }
-      return false;
-    };
-    
-    pvt.learnedConceptsPopulated = false;
-    pvt.starredConceptsPopulated = false;
-
-    /**
-     * Internal function to change dictionary objects 
-     * objName: name of object property
-     * arName: name of add/remove property of objName
-     * arStatus: truthy values assign objName.arName = arStatus; falsy deletes objName.arName
-     */
-    pvt.updateObjProp = function(objName, arName, arStatus){
-      var thisModel = this;
-      if (!thisModel.get(objName)){return false;}
-
-      var retVal;
-      if (arStatus){
-        thisModel.get(objName)[arName] = arStatus;
-        thisModel.trigger("change:" + objName);
-        retVal = true;
-      }
-      else if (thisModel.get(objName).hasOwnProperty(arName)){
-        delete thisModel.get(objName)[arName];
-        thisModel.trigger("change:" + objName);
-        retVal = true;
-      }
-      else{
-        retVal = false;
-      }
-      return retVal;
-    };
+    pvt.isPopulated = false;
 
     // return public object
     return Backbone.Model.extend({
@@ -99,71 +81,51 @@ define(["backbone"], function(Backbone){
        */
       defaults: function() {
         return {
-          learnedConcepts: new ConceptsCollection({type: "learned"}),
-          starredConcepts: new ConceptsCollection({type: "starred"}),
-          visibleNodes: {},
-          implicitLearnedNodes: {}
+          concepts: new ConceptsCollection({type: "learned"})
         };
       },
 
-      initialize: function(){
-        var thisModel = this,
-            lConcepts = thisModel.get("learnedConcepts"),
-            sConcepts = thisModel.get("starredConcepts");
-
-        // note: the folowing are not getting triggered   -RBG
-        lConcepts.bind("change:learnStatus", function(){
-          thisModel.trigger("change:learnStatus", lConcepts);
-        });
-        sConcepts.bind("change:starStatus", function(){
-          thisModel.trigger("change:starStatus", sConcepts);
-        });
-        
-        thisModel.listenTo(lConcepts, "reset", function(){
-          pvt.learnedConceptsPopulated = true;
-        });
-        thisModel.listenTo(sConcepts, "reset", function(){
-          pvt.starredConceptsPopulated = true;
-        });
+      /**
+       * Parse the user data (should be bootstrapped)
+       */
+      parse: function(inp){
+        var concepts = this.get("concepts") || this.defaults().concepts;
+        concepts.add(inp.concepts);
+        pvt.populated = true;
+        return {concepts: concepts};
       },
 
-      areLearnedConceptsPopulated: function(){
-        return pvt.learnedConceptsPopulated;
+      isModelPopulated: function(){
+        return pvt.isPopulated;
       },
 
-      areStarredConceptsPopulated: function(){
-        return pvt.starredConceptsPopulated;
+      isLearned: function(sid){
+        var concept = this.get("concepts").get(sid);
+        return concept && concept.get("learned");
+      },
+
+      isStarred: function(sid){
+        var concept = this.get("concepts").get(sid);
+        return concept && concept.get("starred");
       },
 
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateLearnedConcept: function(nodeTag, status, nodeSid){
-        var changed = pvt.createDestroyUserConcept.call(this, this.get("learnedConcepts"), status, nodeSid);
+      updateLearnedConcept: function(nodeTag, nodeSid, status){
+        var changed = this.get("concepts").setLearnedStatus(nodeSid, status);
+        var learnedTrigger = window.agfkGlobals.auxModel.getConsts().learnedTrigger;
         if (changed) {
-          this.trigger("change:learnedConcepts");
+          this.trigger(learnedTrigger, nodeTag, nodeSid, status);
         }
       },
 
-      updateStarredConcept: function(nodeTag, status, nodeSid){
-        var changed = pvt.createDestroyUserConcept.call(this, this.get("starredConcepts"), status, nodeSid);
+      updateStarredConcept: function(nodeTag, nodeSid, status){
+        var changed = this.get("concepts").setStarredStatus(nodeSid, status);
+        var starredTrigger = window.agfkGlobals.auxModel.getConsts().starredTrigger;
         if (changed) {
-          this.trigger("change:starredConcepts");
+          this.trigger(starredTrigger, nodeTag, nodeSid, status);
         }
-      },
-
-      /**
-       * Setter function that triggers an appropriate change event
-       */
-      updateImplicitLearnedNodes: function(nodeTag, status, nodeSid){
-        return pvt.updateObjProp.call(this, "implicitLearnedNodes", nodeSid, status);
-      },
-
-      /**
-       * Setter function that triggers an appropriate change event
-       */
-      updateVisibleNodes: function(nodeTag, status, nodeSid){
-        return pvt.updateObjProp.call(this, "visibleNodes", nodeSid, status);
       }
     });
   })();

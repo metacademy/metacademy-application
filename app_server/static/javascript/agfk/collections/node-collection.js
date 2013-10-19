@@ -10,77 +10,30 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
   return Backbone.Collection.extend({
     model: NodeModel,
 
-    initialize: function(){
-      var thisColl = this;
-      this.on("change:learnStatus", thisColl.dfsChangeILCount);
-    },
     /**
      * parse incoming json data
      */
     parse: function(response){
-      var ents = [];
-      for (var key in response) {
+    if (response.hasOwnProperty("titles")){
+      window.agfkGlobals.auxModel.set("titles", response.titles);
+    }
+      var ents = [],
+          nodes = response.hasOwnProperty("nodes") ? response.nodes : response;
+      
+      for (var key in nodes) {
         // place the server id in "sid" since all deps are returned in terms of the tag
-        ents.push(_.extend(response[key],{sid: response[key].id, id: key})); 
+        ents.push(_.extend(nodes[key],{sid: nodes[key].id, id: nodes[key].tag})); 
       }
       return ents;
     },
 
-    /**
-     * Apply the user data to the given node collection
-     */
-    applyUserConcepts: function(learnedConcepts, type){
-      var thisColl = this,
-          collNode;
-      learnedConcepts.each(function(lcModel){
-        collNode = thisColl.findWhere({sid: lcModel.get("id")});
-        if (collNode !== undefined){
-          if (type === "starred"){
-            collNode.setStarredStatus(true);
-          } else{
-            collNode.setLearnedStatus(true);
-          }
-        }
-      });
-    },
-
-    /**
-     * DFS to change the implicit learned count of the dependencies of rootTag
-     * This method works by changing the implicitLearnCt of unique dependent concepts
-     * if the learned status of the root node changes
-     */
-    dfsChangeILCount: function(rootTag, ctChange){
-        var thisColl = this,     
-            rootNode = thisColl.get(rootTag);
-          if (rootNode.getImplicitLearnStatus()){
-            return false;
-          }
-     
-      var depNodes = [rootNode],
-          nextRoot,
-          addDepNode,
-          passedNodes = {};
-      ctChange = typeof ctChange === "boolean" ? (ctChange === true ? 1 : -1) : ctChange;
-
-      // DFS over the nodes
-        while ((nextRoot = depNodes.pop())){
-        $.each(nextRoot.getUniqueDependencies(), function(dct, dtag){
-          addDepNode = thisColl.get(dtag);
-          var initStatus = addDepNode.isLearnedOrImplicitLearned();
-          addDepNode.incrementILCt(ctChange);
-          if (addDepNode.isLearnedOrImplicitLearned() !== initStatus && !passedNodes.hasOwnProperty(dtag)){
-            depNodes.push(addDepNode);
-            passedNodes[dtag] = true;
-          }
-        });
-      }
-      return true;
-    },
-
+    /* Learning time estimate for the given node collection */
     getTimeEstimate: function(){
-      var total = 0;
+      var aux = window.agfkGlobals.auxModel,
+          total = 0;
+      
       this.each(function(node) {
-        if (!node.isLearnedOrImplicitLearned()) {
+        if (!aux.conceptIsLearned(node.id) && !node.getImplicitLearnStatus()) {
           if (node.get("time")) {
             total += node.get("time");
           } else {

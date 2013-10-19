@@ -7,7 +7,6 @@ requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
     jquery:"lib/jquery-2.0.3.min",
-    "jquery.cookie": "lib/jquery.cookie",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
@@ -23,9 +22,6 @@ requirejs.config({
     backbone: {
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
-    },
-    "jquery.cookie"  : {
-      deps: ["jquery"]
     },
     "btouch" : {
       deps: ["jquery", "underscore", "backbone"]
@@ -55,8 +51,11 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "jquery", "jquery.cookie", "btouch"], function(Backbone, Utils, AppRouter, GenPageUtils, $){
+requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
   "use strict";
+
+  // initialize global auxData
+  window.agfkGlobals.auxModel = new AuxModel(window.agfkGlobals.auxData, {parse: true});
 
   // shim for CSRF token integration with backbone and django
   var oldSync = Backbone.sync;
@@ -77,18 +76,18 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils", "
   // log internal and external views (piwik won't track if the client has donottrack set)
   $("body").on("click", "a.external-link", function(evt){
     if(window._paq){
-        window._paq.push(['trackLink', evt.currentTarget.href, "link"]);
+      window._paq.push(['trackLink', evt.currentTarget.href, "link"]);
     }
   });
   $(window).on('hashchange', function() {
     if(window._paq){
-        window._paq.push(['trackPageView', window.location.hash]);
+      window._paq.push(['trackPageView', window.location.hash]);
     }
   });
 
   $("body").on("click", ".toggle-lc-button", function(evt){
     if(window._paq){
-        window._paq.push(['trackPageView', evt.currentTarget.id]);
+      window._paq.push(['trackPageView', evt.currentTarget.id]);
     }
   });
 

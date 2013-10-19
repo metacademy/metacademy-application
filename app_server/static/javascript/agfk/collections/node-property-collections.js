@@ -30,7 +30,7 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
 
     getSupplemental: function(){
       return new ResourceCollection(this.where({core: 0}));
-    },
+    }
 
   });
 
@@ -50,18 +50,8 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
     model: NodePropertyModels.Question
   });
 
-
-  /**
-   * Collection of all edge models in graph
-   */
-  var GraphEdgeCollection = Backbone.Collection.extend({
-    model: NodePropertyModels.DirectedEdge
-  });
-
-
   return {
     DirectedEdgeCollection: DirectedEdgeCollection,
-    GraphEdgeCollection: GraphEdgeCollection,
     QuestionCollection: QuestionCollection,
     ResourceCollection: ResourceCollection
   };

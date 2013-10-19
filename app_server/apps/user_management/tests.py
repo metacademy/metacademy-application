@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 
-from apps.user_management.models import LearnedConcept, Profile
+from apps.user_management.models import Concepts, Profile
 from apps.user_management.views import user_main
 
 class TestUserManagementViews(TestCase):
@@ -26,8 +26,8 @@ class TestUserManagementViews(TestCase):
         # create 5 learned concepts and add the previously created user to each concepts learned list
         learned_concepts = ['7yjmqglq', 'dvwtwwnk', '1toqv2qm']
         for learned_concept_id in learned_concepts:
-            lc, created = LearnedConcept.objects.get_or_create(id=learned_concept_id)
-            lc.uprofiles.add(self.prof)
+            lc, created = Concepts.objects.get_or_create(id=learned_concept_id)
+            lc.learned_uprofs.add(self.prof)
 
         # check the /user page before authentication
         resp = self.client.get(reverse('user:user_main'))

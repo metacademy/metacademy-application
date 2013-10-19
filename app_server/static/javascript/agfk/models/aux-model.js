@@ -156,7 +156,8 @@ define(["backbone", "underscore", "agfk/collections/node-collection"], function(
         }
         return false;
       },
-
+      
+      /* Finds all (learned) dependendcies of input "tag" */
       computeAllDependencies: function(tag, isShortcut, onlyUnlearned){
         var nodes =  this.get("nodes"),
             shortcuts = this.get("shortcuts"),

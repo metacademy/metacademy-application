@@ -87,43 +87,34 @@ def register(request, redirect_addr="/user"):
 # we may want to consider using a more structured approach like tastypi as we
 # increase the complexity of the project
 # or maybe just switching to class-based views would simplify this makeshift API
-def handle_learned_concepts(request, conceptId=""):
-    """
-    A simple REST interface for accessing a user's learned concepts
-    """
-    return handle_user_concepts(request, conceptId, "learned", Concepts)
-
-def handle_starred_concepts(request, conceptId=""):
-    """
-    A simple REST interface for accessing a user's learned concepts
-    """
-    return handle_user_concepts(request, conceptId, "starred", Concepts)
-
-def handle_user_concepts(request, conceptId, set_name, InConcept):
-    method = request.method
-    if method == "GET":
-        if request.user.is_authenticated():
-            uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-            concepts = [ l.id for l in getattr(uprof, set_name).all()]
-        else:
-            concepts = []
-        return HttpResponse(json.dumps(concepts), mimetype='application/json')
-    elif (method == "PUT" or method == "DELETE") and conceptId:
-        return _perform_put_delete_user_concept(request, method, conceptId, InConcept)
-    else:
-        return HttpResponse(status=405)
-
 @allow_lazy_user
-def _perform_put_delete_user_concept(request, method, conceptId, InConcept):
-    uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-    dbConceptObj, ucreated = InConcept.objects.get_or_create(id=conceptId)
+def handle_concepts(request, conceptId=""):
+    """
+    A simple interface for handling a user's association with a concept
+    """
+    rbody = json.loads(request.body) # communication payload
+    method = request.method
+
     if method == "PUT":
-        dbConceptObj.uprofiles.add(uprof)
-        return HttpResponse()
-    elif method == "DELETE":
-        dbConceptObj.uprofiles.remove(uprof)
+        cid = rbody["id"]
+        learned = rbody["learned"]
+        starred = rbody["starred"]
+
+        uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
+        dbConceptObj, ucreated = Concepts.objects.get_or_create(id=cid)
+
+        if learned:
+            dbConceptObj.learned_uprofs.add(uprof)
+        else:
+            dbConceptObj.learned_uprofs.remove(uprof)
+        if starred:
+            dbConceptObj.starred_uprofs.add(uprof)
+        else:
+            dbConceptObj.starred_uprofs.remove(uprof)
+
         dbConceptObj.save()
+
         return HttpResponse()
+
     else:
         return HttpResponse(status=405)
-

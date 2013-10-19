@@ -18,6 +18,5 @@ urlpatterns = patterns('',
                            password_reset_confirm, {'template_name': 'user_management/password_reset_confirm.html',
                                                     'post_reset_redirect': '/user/password_reset/success'}, name="password_reset_confirm"),
                        url(r'^password_reset/success$', password_reset_done, {'template_name': 'user_management/password_reset_done.html'}, name='password_reset_done'),
-                       url(r'^learned/([^/]*)$', views.handle_learned_concepts, name='addlearned'), 
-                       url(r'^starred/([^/]*)$', views.handle_starred_concepts, name='addstarred'), 
+                       url(r'^concepts/([^/]*)$', views.handle_concepts, name='addlearned')
                        )

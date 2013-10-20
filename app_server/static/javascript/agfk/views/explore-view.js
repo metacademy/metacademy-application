@@ -685,8 +685,9 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           if (propType === "learned" && toggleOn && !hasCheck){
             pvt.addCheckMark.call(thisView, d3node);
           }
-          // toggle appropriate class for outlinks
+          // toggle appropriate class for outlinks and inlinks
           thisView.changeEdgesClass(mnode.get("outlinks"), propClass, toggleOn, d3Sel);
+          thisView.changeEdgesClass(mnode.get("dependencies"), propClass, toggleOn, d3Sel);
         }
         else{
           var hasStar =  d3node.select("." + viewConsts.starClass).node() !== null;

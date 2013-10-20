@@ -7,7 +7,7 @@ define(['agfk/collections/node-collection', 'agfk/models/detailed-node-model', '
           thisColl = this;
       thisColl.listenTo(aux, aux.getConsts().learnedTrigger, thisColl.changeILNodesFromTag);
       thisColl.on("sync", function(){
-        aux.trigger(aux.getConsts().learnedTrigger);
+          thisColl.changeILNodesFromTag();
       });
     },
 

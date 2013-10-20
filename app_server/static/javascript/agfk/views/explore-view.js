@@ -114,7 +114,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
      */
     pvt.preprocessNodesEdges = function(d3Sel){
       d3Sel.attr('id', function(){
-        return d3.select(this).select('title').text().replace(/->/g, "TO"); // TODO remove all undesired characters from ID (chars that cause css problems like '>')
+        return d3.select(this).select('title').text().replace(/->/g, "TO"); 
       });
       d3Sel.selectAll("title").remove(); // remove the title for a cleaner hovering experience
       return true;
@@ -158,7 +158,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
 
       var numEls = d3node.selectAll("text")[0].length,
           elIconX = svgSpatialInfo.cx + viewConsts.elIconXOffset,
-          elIconY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.elIconYOffset; // TODO move hardcoding
+          elIconY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset
+            + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.elIconYOffset;
       iconG.attr("transform", 
                 "translate(" + elIconX + "," + elIconY + ") "
                 + "scale(" + viewConsts.elIconScale + ")");      
@@ -198,7 +199,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
 
       var numEls = d3node.selectAll("text")[0].length,
           starX = svgSpatialInfo.cx + viewConsts.starXOffset,
-          starY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.starYOffset; // TODO move hardcoding
+          starY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset
+            + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.starYOffset;
       starG.attr("transform", 
                 "translate(" + starX + "," + starY + ") "
                 + "scale(" + viewConsts.starGScale + ")");      
@@ -241,7 +243,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       
       var numEls = d3node.selectAll("text")[0].length,
           chkX = svgSpatialInfo.cx + viewConsts.checkXOffset,
-          chkY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset + (numEls-1)*viewConsts.nodeIconsPerYOffset; // TODO move hardcoding
+          chkY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset
+            + (numEls-1)*viewConsts.nodeIconsPerYOffset; // TODO move hardcoding
       chkG.attr("transform", 
                 "translate(" + chkX + "," + chkY + ") "
                 + "scale(" + viewConsts.checkGScale + ")");      
@@ -346,11 +349,14 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           thisModel = thisView.model,
           thisNodes = thisModel.get("nodes"),
           curEndNodes = [keyNode], // this should generalize easily to multiple end nodes
-          curNode;
+          curNode,
+          tag;
       
       _.each(curEndNodes, function(node) {
-        curNode = thisNodes.get(node.get("id"));
-        if ((showLearned || !curNode.isLearnedOrImplicitLearned() ) && (!checkVisible || curNode.getVisibleStatus())){
+        tag = node.get("id");
+        curNode = thisNodes.get(tag);
+        if ((showLearned || !(curNode.getImplicitLearnStatus() || window.agfkGlobals.auxModel.conceptIsLearned(tag)))
+            && (!checkVisible || curNode.getVisibleStatus())){
           dgArr.unshift(pvt.fullGraphVizStr.call(thisView, node));
         }
       });
@@ -358,10 +364,12 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       // This is essentially adding nodes via a breadth-first search to the desired dependency depth
       // for each dependency depth level...
       var addedNodes = {},
+          aux = window.agfkGlobals.auxModel,
           curDep,
           cenLen,
           node,
-          depNode;
+          depNode,
+          depNodeArr;
       for (curDep = 0; curDep < depth; curDep++) {
         // obtain number of nodes at given depth
         cenLen = curEndNodes.length;
@@ -370,11 +378,13 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           // grab a specific node at that depth
           node = curEndNodes.shift();
           // for each unqiue dependency for the specific node...
-          _.each(node.getUniqueDependencies(), function(depNodeId) {
+          depNodeArr = showLearned ? node.getUniqueDeps() : node.getUnlearnedUniqueDeps();
+          _.each(depNodeArr, function(depNodeId) {
             // grab the dependency node
             depNode = thisNodes.get(depNodeId);
 
-            if ((showLearned || !depNode.isLearnedOrImplicitLearned() ) && (!checkVisible || depNode.getVisibleStatus())){
+            if ((showLearned || !(depNode.getImplicitLearnStatus() || aux.conceptIsLearned(depNodeId)) )
+                && (!checkVisible || depNode.getVisibleStatus())){
               // add node strings to the front of the dgArr
               dgArr.unshift(pvt.fullGraphVizStr.call(thisView, depNode));
               // add edge string to the end
@@ -496,7 +506,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             thisView.toggleNodeProps(d3El, status, "starred", d3this);
           }
         });
-        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, status){
+        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
           var d3El = d3this.select("#" + nodeId);
           if (d3El.node() !== null){
             thisView.toggleNodeProps(d3El, status, "implicitLearned", d3this);

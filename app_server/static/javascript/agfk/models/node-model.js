@@ -2,7 +2,7 @@
  This file contains the node model, which contains the data for each concept TODO should this be renamed "concept-model"?
  */
 
-define(["backbone", "agfk/collections/node-property-collections"], function(Backbone, NodePropertyCollections){
+define(["backbone", "underscore", "agfk/collections/node-property-collections"], function(Backbone, _, NodePropertyCollections){
   /**
    * Node: node model that encompasses several collections and sub-models
    */
@@ -66,7 +66,7 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
        * bind changes from collection such that they trigger changes in the original model
        */
       initialize: function() {
-        var model = this;
+        var thisModel = this;
 
         // ***** Add private instance variable workaround ***** //
         var nodePvt = {};
@@ -75,34 +75,38 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
         nodePvt.learned = false;
         nodePvt.starred = false;
 
-        this.setVisibleStatus = function(status){
+        thisModel.setVisibleStatus = function(status){
           if (nodePvt.visible !== nodePvt.visible){
             nodePvt.visible = status;
-            this.trigger("change:visibleStatus", this.get("id"), status);
+            thisModel.trigger("change:visibleStatus", thisModel.get("id"), status);
           }
         };
 
-        this.setImplicitLearnStatus = function(status){
+        thisModel.setImplicitLearnStatus = function(status){
           if (nodePvt.implicitLearn !== status){
             nodePvt.implicitLearn = status;
-            this.trigger("change:implicitLearnStatus", this.get("id"), this.get("sid"), status);
+            thisModel.trigger("change:implicitLearnStatus", thisModel.get("id"), thisModel.get("sid"), status);
           }
         };
 
-        this.getImplicitLearnStatus = function(){
+        thisModel.isLearnedOrImplicitLearned = function(){
+          return nodePvt.implicitLearn || window.agfkGlobals.auxModel.conceptIsLearned(thisModel.id);
+        };
+        
+        thisModel.getImplicitLearnStatus = function(){
           return nodePvt.implicitLearn;
         };
 
-        this.getVisibleStatus = function(){
+        thisModel.getVisibleStatus = function(){
           return nodePvt.visible;
         };
         
-        this.getCollFields = function(){
-            return this.collFields;
+        thisModel.getCollFields = function(){
+            return thisModel.collFields;
         };
 
-        this.getTxtFields = function(){
-          return this.txtFields;
+        thisModel.getTxtFields = function(){
+          return thisModel.txtFields;
         };
 
       },
@@ -137,31 +141,8 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
        * ancestor of another dependency) which is stored in this.uniqueDeps
        */
       getAncestors: function(noReturn){
-        if (!this.ancestors){
-          var ancests = {},
-              coll = this.collection;
-          this.get("dependencies").each(function(dep){
-            var depNode = coll.get(dep.get("from_tag")),
-                dAncests = depNode.getAncestors();
-            for (var dAn in dAncests){
-              if(dAncests.hasOwnProperty(dAn)){
-                ancests[dAn] = 1;
-              }
-            }
-          });
+        if (!this.ancestors || this.ancestorsStateChanged()){
 
-          // create list of unique dependencies
-          var uniqueDeps = {},
-              dtag;
-          this.get("dependencies").each(function(dep){
-            dtag = dep.get("from_tag");
-            if (!ancests.hasOwnProperty(dtag)){
-              uniqueDeps[dtag] = 1;
-            }
-            ancests[dtag] = 1;
-          });
-          this.uniqueDeps = uniqueDeps;
-          this.ancestors = ancests;
         }
 
         if (!noReturn){
@@ -173,26 +154,98 @@ define(["backbone", "agfk/collections/node-property-collections"], function(Back
         }
       },
 
-      /**
-       * Get a list of unqiue dependencies (dependencies not present as an 
-       * ancestor of another dependency)
-       */
-      getUniqueDependencies: function(noReturn){
-        if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
-        if (!noReturn){
-          return Object.keys(this.uniqueDeps);
+      getAncestors: function(){
+        var thisModel = this;
+        if (!thisModel.ancestors){
+
+          var ancests = {},
+              coll = this.collection;
+          thisModel.get("dependencies").each(function(dep){
+            var depNode = coll.get(dep.get("from_tag")),
+                dAncests = depNode.getAncestors();
+            for (var dAn in dAncests){
+              if(dAncests.hasOwnProperty(dAn)){
+                ancests[dAn] = 1;
+              }
+            }
+          });
+          // create list of unique dependencies
+          var uniqueDeps = {},
+              dtag;
+          thisModel.get("dependencies").each(function(dep){
+            dtag = dep.get("from_tag");
+            ancests[dtag] = 1;
+          });
+          thisModel.ancestors = ancests;          
         }
-        return false;
+        return thisModel.ancestors;
       },
 
-      /**
-       * Check if depID is a unique dependency (dependencies not present as an 
-       * ancestor of another dependency)
-       */
-      isUniqueDependency: function(depID){
-        if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
-        return this.uniqueDeps.hasOwnProperty(depID);
+      // TODO this method might fit better on the node collection or aux
+      getUnlearnedUniqueDeps: function(){
+        return this.getUniqueDeps(true);
       },
+
+      getUniqueDeps: function(ulOnly){
+        var thisModel = this,
+            ancests = thisModel.ancestors || thisModel.getAncestors(),
+            thisColl = thisModel.collection, 
+            ulAncests = {},
+            ulUniqueAncests = {},
+            ulAcest,
+            acest;
+
+        if (ulOnly){
+          for (acest in ancests){
+            if (ancests.hasOwnProperty(acest) && !thisColl.get(acest).isLearnedOrImplicitLearned()){
+              ulAncests[acest] = 1;
+              ulUniqueAncests[acest] = 1;
+            }
+          }
+        }
+        else{
+          ulAncests = _.extend({}, ancests);
+          ulUniqueAncests = _.extend({}, ancests);
+        }
+
+        // for each unlearned ancestor, check if any of its ancestors are in the unlearned ancestor list
+        // if they are, remove it from the ulUniqueAncests object
+        for (ulAcest in ulAncests){
+          if (ulAncests.hasOwnProperty(ulAcest)){
+            var ulAcestAncests = thisColl.get(ulAcest).getAncestors();
+                for (var ulAcestAcest in ulAcestAncests){
+                  if (ulAcestAncests.hasOwnProperty(ulAcestAcest)
+                      && ulAncests[ulAcestAcest]){
+                    if (ulUniqueAncests[ulAcestAcest]){
+                      delete ulUniqueAncests[ulAcestAcest];
+                    }
+                  }
+                }
+            }
+        }
+        return Object.keys(ulUniqueAncests);
+      },
+
+      // /**
+      //  * Get a list of unqiue dependencies (dependencies not present as an 
+      //  * ancestor of another dependency)
+      //  */
+      // getUniqueDependencies: function(noReturn){
+      //   if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
+      //   if (!noReturn){
+      //     return Object.keys(this.uniqueDeps);
+      //   }
+      //   return false;
+      // },
+
+      // /**
+      //  * Check if depID is a unique dependency (dependencies not present as an 
+      //  * ancestor of another dependency)
+      //  */
+      // isUniqueDependency: function(depID){
+      //   if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
+      //   return this.uniqueDeps.hasOwnProperty(depID);
+      // },
       
       /**
        * Compute the list of outlinks to be displayed in the context section

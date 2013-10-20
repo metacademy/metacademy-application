@@ -90,7 +90,7 @@ body {
  }
 
 #apptools button.toggle-lc-button.disabled{
-    opacity: 0.5;
+    opacity: 0.4;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -617,7 +617,7 @@ ellipse{
 
 /* node e-to-l icon */
 .e-to-l-icon{
-    opacity: 0.5;
+    opacity: 0.3;
     visibility: hidden;
 }
 

@@ -874,7 +874,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             return itm.get("id");
           });
         }
-        else if(includeLearned || !nodes.get(keyTag).isLearnedOrImplicitLearned()){
+        else if (includeLearned || !nodes.get(keyTag).isLearnedOrImplicitLearned()){
           // root node is the keyTag
           startRootNodes = [keyTag];
         }
@@ -896,7 +896,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
             curNode = nodes.get(curRootNodeTag);
             if (!traversedNodes.hasOwnProperty(curRootNodeTag) && (includeLearned || (curNode && !curNode.isLearnedOrImplicitLearned()))){
-              unqDepTags = curNode.getUniqueDependencies();
+              unqDepTags = includeLearned ? curNode.getUniqueDeps() : curNode.getUnlearnedUniqueDeps();
               if (unqDepTags.length > 0){
                 returnArr = returnArr.concat(dfsTopSort(unqDepTags));
               }

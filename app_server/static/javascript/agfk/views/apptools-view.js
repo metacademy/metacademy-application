@@ -22,17 +22,20 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
      * helper function to enable/disable the appropriate clear/show learned button
      */
     pvt.changeShowHideButtons = function(elId, enable){
+      var $el = $("#" + elId);
       if (enable){
-        $("#" + elId).removeClass(pvt.viewConsts.disabledClass);
+        $el.removeClass(pvt.viewConsts.disabledClass);
+        $el.prop("disabled", false);
       } else{
-        $("#" + elId).addClass(pvt.viewConsts.disabledClass);
+        $el.addClass(pvt.viewConsts.disabledClass);
+        $el.prop("disabled", true);
       }
     };
     
     pvt.enableHide = function(){
       pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, true);
     };
-
+    
     pvt.disableHide = function(){
       pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, false);
     };
@@ -64,9 +67,18 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
           thisView.handleShowLearnedClick.call(thisView, evt);
         });
 
+        var aux = window.agfkGlobals.auxModel;
+        
         // enable/disable the hide/show buttons
         thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.changeShowHideState);
-        thisView.listenTo(thisView.model.get("nodes"), "change:learnStatus", thisView.handleChLearnStatus ); // listen for check clicks
+        thisView.listenTo(aux, "change:learnedConcepts", thisView.handleChLearnStatus ); // listen for check clicks
+        thisView.listenTo(thisView.model.get("nodes"), "sync", function(){
+          thisView.model.get("nodes").each(function(node){
+            if (aux.conceptIsLearned(node.id)){
+              thisView.handleChLearnStatus(node.id, node.get("sid"), true);
+            };
+          });
+        });
       },
 
       /**
@@ -89,7 +101,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       /**
        * Handle changing node status
        */
-      handleChLearnStatus: function(tag, state){
+      handleChLearnStatus: function(tag, nodesid, state){
        // keep count of the number of visible learned nodes
         if (state){
           pvt.numVisLearned++;

@@ -173,9 +173,15 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
        */
       changeActiveELButtonFromDomEl: function(buttonEl){
         if (pvt.prevButtonEl === null || buttonEl.id !== pvt.prevButtonEl.id){
-          var activeClass = pvt.viewConsts.activeClass;
-          $(pvt.prevButtonEl).toggleClass(activeClass);
-          $(buttonEl).toggleClass(activeClass);
+          var activeClass = pvt.viewConsts.activeClass,
+              $prevButton = $(pvt.prevButtonEl);
+          
+          $prevButton.toggleClass(activeClass);
+          $prevButton.prop("disabled", false);
+          
+          var $buttonEl = $(buttonEl);
+          $buttonEl.toggleClass(activeClass);
+          $buttonEl.prop("disabled", true);
           pvt.prevButtonEl = buttonEl;
         }
       },

@@ -92,6 +92,10 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections"],
         thisModel.isLearnedOrImplicitLearned = function(){
           return nodePvt.implicitLearn || window.agfkGlobals.auxModel.conceptIsLearned(thisModel.id);
         };
+
+        thisModel.isLearned = function(){
+          return window.agfkGlobals.auxModel.conceptIsLearned(thisModel.id);
+        };
         
         thisModel.getImplicitLearnStatus = function(){
           return nodePvt.implicitLearn;
@@ -154,99 +158,75 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections"],
         }
       },
 
-      getAncestors: function(){
+      /* ulOnly: set to true to only return unlearned ancestors */
+      getAncestors: function(ulOnly){
         var thisModel = this;
-        if (!thisModel.ancestors){
-
+        if (!thisModel.ancestors || ulOnly){
+          
           var ancests = {},
-              coll = this.collection;
-          thisModel.get("dependencies").each(function(dep){
-            var depNode = coll.get(dep.get("from_tag")),
-                dAncests = depNode.getAncestors();
+              coll = this.collection,
+              aux = window.agfkGlobals.auxModel;
+        thisModel.get("dependencies").each(function(dep){
+          var depId = dep.get("from_tag");
+          if (!ulOnly || !aux.conceptIsLearned(depId)){
+            var depNode = coll.get(depId),            
+                dAncests = depNode.getAncestors(ulOnly);
             for (var dAn in dAncests){
               if(dAncests.hasOwnProperty(dAn)){
                 ancests[dAn] = 1;
               }
             }
-          });
-          // create list of unique dependencies
-          var uniqueDeps = {},
-              dtag;
+          }
+        });
           thisModel.get("dependencies").each(function(dep){
-            dtag = dep.get("from_tag");
-            ancests[dtag] = 1;
+            ancests[dep.get("from_tag")] = 1;
           });
-          thisModel.ancestors = ancests;          
+          if(!ulOnly){
+            thisModel.ancestors = ancests;
+          }
         }
-        return thisModel.ancestors;
+        return ancests || thisModel.ancestors;
       },
 
-      // TODO this method might fit better on the node collection or aux
+      // TODO these methods might fit better on the node collection or aux
       getUnlearnedUniqueDeps: function(){
         return this.getUniqueDeps(true);
       },
 
       getUniqueDeps: function(ulOnly){
         var thisModel = this,
-            ancests = thisModel.ancestors || thisModel.getAncestors(),
+            allDeps = thisModel.get("dependencies").pluck("from_tag"),
             thisColl = thisModel.collection, 
-            ulAncests = {},
-            ulUniqueAncests = {},
+            ulDeps = {},
+            ulUniqueDeps = {},
             ulAcest,
-            acest;
+            dep;
 
-        if (ulOnly){
-          for (acest in ancests){
-            if (ancests.hasOwnProperty(acest) && !thisColl.get(acest).isLearnedOrImplicitLearned()){
-              ulAncests[acest] = 1;
-              ulUniqueAncests[acest] = 1;
-            }
-          }
-        }
-        else{
-          ulAncests = _.extend({}, ancests);
-          ulUniqueAncests = _.extend({}, ancests);
-        }
+          _.each(allDeps, function(dep){
+            if (!ulOnly || !thisColl.get(dep).isLearnedOrImplicitLearned()){
+              ulDeps[dep] = 1;
+              ulUniqueDeps[dep] = 1;
+            } 
+          });
 
         // for each unlearned ancestor, check if any of its ancestors are in the unlearned ancestor list
-        // if they are, remove it from the ulUniqueAncests object
-        for (ulAcest in ulAncests){
-          if (ulAncests.hasOwnProperty(ulAcest)){
-            var ulAcestAncests = thisColl.get(ulAcest).getAncestors();
+        // if they are, remove it from the ulUniqueDeps object
+        for (ulAcest in ulDeps){
+          if (ulDeps.hasOwnProperty(ulAcest)){
+            var ulAcestAncests = thisColl.get(ulAcest).getAncestors(ulOnly);
                 for (var ulAcestAcest in ulAcestAncests){
                   if (ulAcestAncests.hasOwnProperty(ulAcestAcest)
-                      && ulAncests[ulAcestAcest]){
-                    if (ulUniqueAncests[ulAcestAcest]){
-                      delete ulUniqueAncests[ulAcestAcest];
+                      && ulDeps[ulAcestAcest]){
+                    if (ulUniqueDeps[ulAcestAcest]){
+                      delete ulUniqueDeps[ulAcestAcest];
                     }
                   }
                 }
             }
         }
-        return Object.keys(ulUniqueAncests);
+        return Object.keys(ulUniqueDeps);
       },
 
-      // /**
-      //  * Get a list of unqiue dependencies (dependencies not present as an 
-      //  * ancestor of another dependency)
-      //  */
-      // getUniqueDependencies: function(noReturn){
-      //   if (!this.uniqueDeps){ this.getAncestors(true); } // TODO: do we want to populate unique dependencies as a side effect of obtaining ancestors?
-      //   if (!noReturn){
-      //     return Object.keys(this.uniqueDeps);
-      //   }
-      //   return false;
-      // },
-
-      // /**
-      //  * Check if depID is a unique dependency (dependencies not present as an 
-      //  * ancestor of another dependency)
-      //  */
-      // isUniqueDependency: function(depID){
-      //   if (!this.uniqueDeps){ this.getUniqueDependencies(true); }
-      //   return this.uniqueDeps.hasOwnProperty(depID);
-      // },
-      
       /**
        * Compute the list of outlinks to be displayed in the context section
        */

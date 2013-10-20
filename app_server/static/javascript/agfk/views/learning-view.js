@@ -754,6 +754,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         this.appRouter = inp.appRouter;
         this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
         this.listenTo(window.agfkGlobals.auxModel, gConsts.learnedTrigger, this.updateTimeEstimate);
+        this.listenTo(this.model.get("nodes"), "sync", this.updateTimeEstimate);
       },
       
       /**

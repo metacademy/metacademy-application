@@ -8,6 +8,7 @@
     {% block meta %}
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="initial-scale=1.0">
     <meta name="description" content="Metacademy - a free open source platform for efficient, personalized learning.">
     {% endblock %}
 
@@ -22,7 +23,6 @@
     {% compress css %}
 
     {% block css %}
-    <link rel="stylesheet" href="{% static "css/pure-min.css" %}"/>
     <link rel="stylesheet" href="{% static "css/jquery.sidr.dark.css" %}"/>
     <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
     <link rel="stylesheet" href="{% static "css/standard.css" %}"/>
@@ -37,7 +37,7 @@
     {% block hackscript %}
     <script type="text/javascript">
       // current hack for multiple development environments will change for server
-      window.CONTENT_SERVER = "{{ content_server }}";
+      window.CONTENT_SERVER = "http//:10.0.2.2:9090/"; //"{{ content_server }}";
       window.STATIC_PATH = "{% static "" %}";
       window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
       window.PRODUCTION = window.location.href.match('metacademy') !== null;
@@ -76,9 +76,9 @@
     
     {% block body %}
 
-    <div class="pure-menu pure-menu-open pure-menu-horizontal pure-menu-pull-right" id="header">
+    <div class="header-pull-right header-menu" id="header">
     {% block header-search %}
-      <div id="meta-heading-search" class="pure-menu-heading"> <a class="home-nav" href="/" target="_self"><span class="meta-home-link">&nbsp;</span></a> <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1"> </div>
+      <div id="meta-heading-search" class="header-title"> <a class="home-nav" href="/" target="_self"><span class="meta-home-link">&nbsp;</span></a> <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1"> </div>
       </input>
     {% endblock %}
       <ul>

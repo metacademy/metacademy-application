@@ -19,66 +19,65 @@ p {
    padding: 0.1em 0;
 }
 
+input{
+    font-size: 90%;
+    font-family: "Lucida Grande" arial sans-serif;   
+}
+
 /* ----------------------------------------------------*/
 /* ---------->>> Pure CSS Customizations <<<-----------*/
 /* ----------------------------------------------------*/
-.pure-menu-heading{
+.header-menu{
     font-size: 100%;
     margin: 0;
+    line-height: 1em;
+    color: #ECECEC;
 }
 
-.pure-menu.pure-menu-pull-right {
-    display: table;
-}
-.pure-menu.pure-menu-pull-right .pure-menu-heading,
-.pure-menu.pure-menu-pull-right > ul {
-    display: table-cell;
-    vertical-align: middle;
-}
-.pure-menu.pure-menu-pull-right > ul {
-    text-align: right;
-}
-.pure-menu-rtl {
-    direction: rtl;
-}
-.pure-menu-rtl.pure-menu-pull-right > ul {
-    text-align: left;
+.header-menu ul li{
+    display: inline-block;
 }
 
-input{
-    font-size: 90%;
-    font-family: "Lucida Grande" arial sans-serif;
-}
-
-.pure-menu.pure-menu-horizontal>ul{
+.header-menu header-menu >ul{
     height: 1.8em;
 }
 
-.pure-menu a{
-    line-height: 1em;
-    display: inline;
-    color: #ECECEC;
+.header-menu a{
+    color: #EFEFEF;
     font-size: 0.9em;
+    text-decoration: none;
+    padding: 0 1em;
+    line-height: 1.8em;
+    display: inline-block;
 }
 
-.pure-menu a:hover{
+.header-menu a:hover{
     text-decoration: underline;
 }
 
-.pure-menu li a:hover{
-    background-color: inherit;
-}
-
-.pure-menu li a.heleft{
+.header-menu  a.heleft{
     padding-right: 0.2em;
 }
 
-.pure-menu li a.heright{
+.header-menu  a.heright{
     padding-left: 0.2em;
 }
 
-#header.pure-menu li{
-    color: white;
+.header-pull-right {
+    display: table;
+}
+.header-pull-right > ul, .header-menu > ul{
+    display: table-cell;
+    vertical-align: middle;
+}
+.header-pull-right > ul {
+    text-align: right;
+}
+
+.header-title{
+    display: table-cell;
+    min-width: 25em;
+    vertical-align: middle;
 }
 
 #mobile-header {
@@ -108,25 +107,10 @@ input{
     display: none;
 }
 
-@media only screen and (max-width: 769px){
-    #mobile-header {
-        display: table-cell;
-        vertical-align: middle;
-        direction: rtl;
-        padding-right: 2em;
-    }
-
-    #header > ul{
-        display: none;
-    }
-    #header{
-        height: 1.85em;
-    }
-
-    div.form-wrapper{
-        width: 95%;
-    }
+#responsive-menu-button{
+    font-size: 100%;
 }
+
 
 /* ---------------------------------------------------*/
 /* ---------->>> General Functional Styles<<<---------*/
@@ -208,7 +192,6 @@ a.expand-collapse-link:hover{
     background-repeat: no-repeat;
     background-position: left center;
     height: 1.7em;
-
 }
 
 a.home-nav{
@@ -245,4 +228,36 @@ a.home-nav{
     height: 100%;
     background: white;
     color: #333;
+}
+
+
+/* @media only screen and (max-width: 767px){ */
+/*     .meta-home-link{ */
+/*         padding: 0.5em 0 0.5em 55px; */
+/*         background-image: url('/static/images/metacademy-toolbar-icon1-trun.png'); */
+/*         background-repeat: no-repeat; */
+/*         background-position: left center; */
+/*         height: 1.7em; */
+/*     } */
+
+/* } */
+
+@media only screen and (max-width: 769px){
+    #mobile-header {
+        display: table-cell;
+        vertical-align: middle;
+        direction: rtl;
+        padding-right: 2em;
+    }
+
+    #header > ul{
+        display: none;
+    }
+    #header{
+        height: 1.85em;
+    }
+
+    div.form-wrapper{
+        width: 95%;
+    }
 }

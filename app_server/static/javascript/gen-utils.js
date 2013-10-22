@@ -52,6 +52,10 @@ function genFun($){
           }
         });
       });
+      
+      $(window.document.body).on("mousedown", function(evt){
+          $.sidr('close', 'sidr-main');
+      });
 
       /* sidr menu */
     $('#responsive-menu-button').sidr({

@@ -183,3 +183,9 @@ a.external-link{
 #preview-area{
     clear: both;
 }
+
+@media only screen and (max-width: 769px){
+    div.container{
+        width: 95%;        
+    }
+}

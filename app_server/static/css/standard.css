@@ -47,6 +47,7 @@ p {
 
 input{
     font-size: 90%;
+    font-family: "Lucida Grande" arial sans-serif;
 }
 
 .pure-menu.pure-menu-horizontal>ul{
@@ -107,7 +108,7 @@ input{
     display: none;
 }
 
-@media only screen and (max-width: 767px){
+@media only screen and (max-width: 769px){
     #mobile-header {
         display: table-cell;
         vertical-align: middle;
@@ -122,8 +123,8 @@ input{
         height: 1.85em;
     }
 
-    div.container{
-        width: 95%;        
+    div.form-wrapper{
+        width: 95%;
     }
 }
 

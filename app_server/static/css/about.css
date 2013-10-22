@@ -29,10 +29,14 @@
 
 .about-meta{
     width: 70%;
-    min-width: 500px;
     margin: 0 auto;
     line-height: 1.4em;
     padding-bottom: 5em;
     font-size: 1.2em;
 }
 
+@media only screen and (max-width: 769px){
+    section.about-meta{
+        width: 95%;
+    }
+}

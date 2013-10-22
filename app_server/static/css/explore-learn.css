@@ -16,7 +16,7 @@ body {
 
 #apptools{
     width: 15%;
-    max-width: 200px;
+    max-width: 180px;
     margin: 0.5em;
     padding: 0.5em 0.5em;
     position: absolute;
@@ -344,7 +344,7 @@ h1 .learn-view-star{
 }
 
 .resource-content-wrap{
-    margin-left: 1.5em;
+    margin-left: 2.5em;
 }
 
 .resource-view{
@@ -360,9 +360,12 @@ h1 .learn-view-star{
     margin-top: 1em;
 }
 
-
 .resource-title a{
     color: #223804;
+}
+
+.res-arrow{
+    font-size: 0.8em;
 }
 
 .more-resource-info{ 
@@ -374,7 +377,7 @@ h1 .learn-view-star{
     margin-top: 0.1em;
 }
 
-.resource-location, .resource-edition, .resource-level, .resource-author, .resource-dependencies, .resource-extra{
+.resource-location, .resource-edition, .resource-level, .resource-author, .resource-dependencies, .resource-extra, .resource-link{
     font-size: 0.9em
 }
 

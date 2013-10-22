@@ -1,15 +1,10 @@
 <script type="text/template" id="resource-view-template">
   <div class="resource-title-display">
     <% var titleDisp = title ? title : "-no title-" %>
-    <% if (url){ %>
-    <span class="resource-link"><a class="external-link" href="<%= url %>"> ⍓</a>  <%= titleDisp %>  </span>
-    <% } else{ %>
-    <%= titleDisp %>
-    <% } %>
+      	<span class="res-arrow">→ </span><%= titleDisp %>
   </div>
   
   <div class="resource-content-wrap">
-
     <% if (location){ %>
     <div class="resource-location-display">
       <% if (edition){ %>
@@ -44,18 +39,26 @@
 </div>
 <% } %>
 
+  <% if (url){ %>
+  <div class="resource-url-display">
+    <span class="resource-link"><a class="external-link" href="<%= url %>">[external website]</a> </span>
+  </div>
+  <% }%>
+
+
+<div class="resource-author-display">
 <% if (authors.length > 1) { %>
   <span class="resource-author"> Authors: <%= authors %> </span>
   <% } else if (authors.length == 1) { %>
   <span class="resource-author"> Author: <%= authors[0] %> </span>
-  <% } %>
+<% } %>
+</div>
 
   <div class="resource-level-display">
     <% if (level){ %>
     <span class="resource-level"> Level: <%= level %> </span>
     <% } %>
   </div>
-  
 
   <% if (dependencies.length > 0) { %>
   <div class="resource-dependencies-display">

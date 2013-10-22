@@ -252,7 +252,7 @@ a.home-nav{
     }
 }
 
-@media only screen and (max-width:799px){
+@media only screen and (max-width:899px){
     #mobile-header {
         display: table-cell;
         vertical-align: middle;

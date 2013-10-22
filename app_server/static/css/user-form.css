@@ -4,7 +4,6 @@ form{
 
 .form-wrapper{
     width: 40%;
-    min-width: 20em;
     text-align: center;
     margin: 3em auto 0 auto;
     border: 3px solid #2E0C3C;
@@ -105,4 +104,10 @@ h3{
     line-height: 1.4em;
     font-size: 1.2em;
     text-align: center;
+}
+
+@media only screen and (max-width: 767px){
+    div.form-wrapper{
+        width: 90%;
+    }
 }

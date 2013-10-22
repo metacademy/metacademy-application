@@ -15,6 +15,8 @@ body {
 /* App tools */
 
 #apptools{
+    width: 15%;
+    max-width: 200px;
     margin: 0.5em;
     padding: 0.5em 0.5em;
     position: absolute;
@@ -24,6 +26,7 @@ body {
     background: rgba(253, 253, 253, 0.98);
     border: 2px solid #75526A;
     border-radius: 10px;
+    text-align: center;
 }
 
 #apptools button, #hovertext-buttons button{
@@ -100,6 +103,11 @@ body {
 #apptools button.toggle-lc-button.disabled:hover{
     border: 2px #5C4A56 solid;
     cursor: default;
+}
+
+#apptools .apptools-lc-buttons-wrap{
+    display: inline-block;
+    margin: 0 auto;
 }
 
 .horz-center-wrapper{
@@ -228,7 +236,8 @@ body {
 .node-detail-view{
    background-color: white; 
    color: #23240D;
-   padding: 0.3em 10em 1em 1.5em;
+   padding: 0.3em 0 1em 1.5em;
+   width: 75%;
    line-height: 1.2em;
 }
 
@@ -257,8 +266,7 @@ h1 .learn-view-star{
     font-size: 1em;
     font-style: normal;
     font-weight: bold;
-    padding: 2em 0 .7em 0;
-    line-height: 0;
+    padding: 1em 0 .2em 0;
 }
 
 .node-detail-subtitle{

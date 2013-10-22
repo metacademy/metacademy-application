@@ -8,7 +8,10 @@
     {% block meta %}
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="initial-scale=1.0">
+    {% block meta-viewport %}
+      <meta name="viewport" content="initial-scale=1">
+    {% endblock %}
+
     <meta name="description" content="Metacademy - a free open source platform for efficient, personalized learning.">
     {% endblock %}
 
@@ -37,7 +40,7 @@
     {% block hackscript %}
     <script type="text/javascript">
       // current hack for multiple development environments will change for server
-      window.CONTENT_SERVER = "http//:10.0.2.2:9090/"; //"{{ content_server }}";
+      window.CONTENT_SERVER = "{{ content_server }}";
       window.STATIC_PATH = "{% static "" %}";
       window.GRAPH_CONCEPT_PATH = "{% url 'graphs:concepts' %}";
       window.PRODUCTION = window.location.href.match('metacademy') !== null;
@@ -97,12 +100,20 @@
         {% if user.is_authenticated and not user|is_lazy_user %}
         <li>
           <a target="_self" href="{% url 'user:user_main' %}" class="heleft">{{ user.username }}</a>
+        </li>
+        
+        <li class="join-line">
+          &#124;
+        </li>
+        
+        <li>
           <a target="_self" href="{% url 'user:logout' %}" class="heright">Sign out</a>
         </li>
+
         {% else %}
         <li>
           <a target="_self" href="{% url 'user:login' %}" class="heleft">Sign in</a>
-          </li>
+        </li>
         
         <li class="join-line">
           &#124;

@@ -53,8 +53,11 @@ function genFun($){
         });
       });
       
-      $(window.document.body).on("mousedown", function(evt){
+      $("#main").on("mousedown", function(evt){
           $.sidr('close', 'sidr-main');
+      });
+      $("#main").on("touchstart", function(evt){
+        $.sidr('close', 'sidr-main');
       });
 
       /* sidr menu */

@@ -113,8 +113,9 @@ h1{
 
 @media only screen and (max-width: 769px){
     div.search-res-wrapper{
-        padding: 0 2% 2em 2%;
-        width: 100%;
+        padding: 0 4% 2em 4%;
+        width: 90%;
+        margin: 0;
     }
     #sres-search-input{
         width: 300px;
@@ -131,3 +132,12 @@ h1{
         margin-left: -21px;
     }
 }
+
+@media only screen and (max-width: 400px){
+    #sres-search-input{
+        width: 280px;
+        margin-left: -11px;
+    }
+}
+
+

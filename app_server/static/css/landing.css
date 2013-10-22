@@ -3,13 +3,14 @@
 }
 
 .main-search-wrap{
-    margin: 5em auto;
+    margin: 5em auto 1em auto;
     display: inline-block;
     padding-bottom: 5em;
 }
 
 #main-search-input{
     width: 700px;
+    display: block;
     font-size: 70%;
     padding: 0.2ex 1ex;
     margin-top: 0.3em;
@@ -44,9 +45,14 @@
     color: #512161;
 }
 
+.dev-note p{
+    padding: 0.1em 0.7em;
+}
+
 @media only screen and (max-width: 767px){
     #main-search-input{
         width: 95%;
+        display: inline-block;
     }
 
     #main-search-logo{
@@ -56,6 +62,13 @@
 
 @media only screen and (max-width: 500px){
     #main-search-logo{
-        width: 350px;
+        width: 310px;
     }
+    div.dev-note{
+        margin-top: 3em;
+    }
+    .dev-note p{
+        margin-top: 1em;
+    }
+    
 }

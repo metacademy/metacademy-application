@@ -230,24 +230,34 @@ a.home-nav{
     color: #333;
 }
 
+@media only screen and (max-width: 767px){
+    .meta-home-link{
+        padding: 0.5em 0 0.5em 35px;
+        background-image: url('/static/images/metacademy-toolbar-icon1-crop.png');
+        background-repeat: no-repeat;
+        background-position: left center;
+        height: 1.7em;
+    }
+    .header-title{
+        min-width: 0;
+    }
+}
 
-/* @media only screen and (max-width: 767px){ */
-/*     .meta-home-link{ */
-/*         padding: 0.5em 0 0.5em 55px; */
-/*         background-image: url('/static/images/metacademy-toolbar-icon1-trun.png'); */
-/*         background-repeat: no-repeat; */
-/*         background-position: left center; */
-/*         height: 1.7em; */
-/*     } */
+@media only screen and (max-width:999px){
+    #header-search-input{
+        width: 10em;
+    }
+    .header-title{
+        min-width: 19em;
+    }
+}
 
-/* } */
-
-@media only screen and (max-width: 769px){
+@media only screen and (max-width:799px){
     #mobile-header {
         display: table-cell;
         vertical-align: middle;
         direction: rtl;
-        padding-right: 2em;
+        padding-right: 1em;
     }
 
     #header > ul{
@@ -255,9 +265,5 @@ a.home-nav{
     }
     #header{
         height: 1.85em;
-    }
-
-    div.form-wrapper{
-        width: 95%;
     }
 }

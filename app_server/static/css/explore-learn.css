@@ -87,6 +87,7 @@ body {
     width: 5em;
     margin: 0.5em 0.4em;
     line-height: 1.3em;
+    font-size: 0.8em;
  }
 
 #apptools button.toggle-lc-button.disabled{

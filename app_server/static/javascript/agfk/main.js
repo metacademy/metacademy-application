@@ -10,7 +10,8 @@ requirejs.config({
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
-    "btouch": "lib/backbone.touch"
+    "btouch": "lib/backbone.touch",
+    "sidr": "lib/jquery.sidr.min"
   },
   shim: {
     d3: {
@@ -23,9 +24,10 @@ requirejs.config({
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
     },
-    "btouch" : {
+    "btouch": {
       deps: ["jquery", "underscore", "backbone"]
-    }
+    },
+    "sidr": ["jquery"]
   },
   waitSeconds: 15
 });
@@ -51,7 +53,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // initialize global auxData
@@ -69,7 +71,7 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","a
   };
   
   GenPageUtils.prep();
-  
+
   // automatically resize window when viewport changes
   Utils.scaleWindowSize("header", "main");
 

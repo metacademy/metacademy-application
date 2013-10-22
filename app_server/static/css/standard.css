@@ -5,7 +5,6 @@
 body {
     margin: 0;
     padding: 0;
-    border: 0; /* removes the border around the viewport in old versions of IE */
     width: 100%;
     height: 100%;
     font-family: Arial, sans-serif;
@@ -18,6 +17,114 @@ h1 {
 
 p {
    padding: 0.1em 0;
+}
+
+/* ----------------------------------------------------*/
+/* ---------->>> Pure CSS Customizations <<<-----------*/
+/* ----------------------------------------------------*/
+.pure-menu-heading{
+    font-size: 100%;
+    margin: 0;
+}
+
+.pure-menu.pure-menu-pull-right {
+    display: table;
+}
+.pure-menu.pure-menu-pull-right .pure-menu-heading,
+.pure-menu.pure-menu-pull-right > ul {
+    display: table-cell;
+    vertical-align: middle;
+}
+.pure-menu.pure-menu-pull-right > ul {
+    text-align: right;
+}
+.pure-menu-rtl {
+    direction: rtl;
+}
+.pure-menu-rtl.pure-menu-pull-right > ul {
+    text-align: left;
+}
+
+input{
+    font-size: 90%;
+}
+
+.pure-menu.pure-menu-horizontal>ul{
+    height: 1.8em;
+}
+
+.pure-menu a{
+    line-height: 1em;
+    display: inline;
+    color: #ECECEC;
+    font-size: 0.9em;
+}
+
+.pure-menu a:hover{
+    text-decoration: underline;
+}
+
+.pure-menu li a:hover{
+    background-color: inherit;
+}
+
+.pure-menu li a.heleft{
+    padding-right: 0.2em;
+}
+
+.pure-menu li a.heright{
+    padding-left: 0.2em;
+}
+
+#header.pure-menu li{
+    color: white;
+}
+
+#mobile-header {
+    display: none;
+}
+
+#mobile-header button{
+    border: none;
+    background: #666;
+    padding: 0.2em 1em;
+    color: #ECECEC;
+}
+
+.sidr ul li.sidr-class-join-line{
+    display: none;
+}
+
+.sidr-class-home-nav{
+    display: none;
+}
+
+#sidr-id-header-search-input{
+    display: none;
+}
+
+#sidr-id-mobile-header{
+    display: none;
+}
+
+@media only screen and (max-width: 767px){
+    #mobile-header {
+        display: table-cell;
+        vertical-align: middle;
+        direction: rtl;
+        padding-right: 2em;
+    }
+
+    #header > ul{
+        display: none;
+    }
+    #header{
+        height: 1.85em;
+    }
+
+    div.container{
+        width: 95%;        
+    }
 }
 
 /* ---------------------------------------------------*/
@@ -82,22 +189,37 @@ a.expand-collapse-link:hover{
     font-size: 1.1em;
 }
 
-.header-bar {
-    height: 1.6em;		 
-    width: 100%;
+#header {
     background: #333;
-    position: relative;
     z-index: 10;
-    text-align: right;
-    min-width: 600px;
-    overflow: hidden;
+    position: relative;
+    width: 100%;
 }
 
+#meta-heading-search{
+    padding: 0;
+}
+
+.meta-home-link{
+    margin-left: 0.2em;
+    padding: 0.5em 0 0.5em 110px;
+    background-image: url('/static/images/metacademy-toolbar-icon1.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+    height: 1.7em;
+
+}
+
+a.home-nav{
+    display: inline;
+    padding: 0;
+}
+
+
 #header-search-input, user-form-field input{
-    outline: none;
-    display: inline-block;
+    outline: none;    
     padding: 0.2ex 0.4ex;
-    margin-top: 0.3ex;
+    /* margin-top: 0.3ex; */
     border: 1px solid #999999;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
     background-color: white;
@@ -117,59 +239,9 @@ a.expand-collapse-link:hover{
     box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
 
-.header-el{
-    line-height: 1.6em;
-    display: inline-block;
-    letter-spacing: 1px;
-}
-
-.header-el li{
-    display: inline;
-    padding: 0 0.9em;
-}
-
-.header-el a{
-    color: white;
-    font-size: 0.8em;
-    text-decoration: none;
-}
-.header-el a:hover{
-    text-decoration: underline;
-}
-
-.header-img{
-    vertical-align: middle;
-    padding-left: 0.1em;
-    padding-bottom: 0.2em;
-}
-
-#header-search-img-el{
-    text-align: left;
-    float: left;
-    padding-left: 0.2em;
-}
-
-#header-user-tools{
-    text-align: right;
-    color: white;
-    margin-left: 1.5em;
-}
-
-#header-user-tools a{
-    color: white;
-    text-decoration: none;
-    padding: 0 0.2em;
-}
-
-#header-user-tools a:hover{
-    text-decoration: underline;
-}
-
-
 #main {
     width: 100%;
     height: 100%;
     background: white;
     color: #333;
 }
-

@@ -7,8 +7,8 @@
     {% block head %}
     {% block meta %}
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Metacademy - a free open source platform for efficient, personalized learning.">
     {% endblock %}
 
     {% block favicon %}
@@ -22,12 +22,15 @@
     {% compress css %}
 
     {% block css %}
-      <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
-      <link rel="stylesheet" href="{% static "css/standard.css" %}"/>
-      {% endblock %}
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css"/>
+    <link rel="stylesheet" href="{% static "css/jquery.sidr.dark.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/reset.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/standard.css" %}"/>
 
-      {% block extra-css %}
-      {% endblock %}
+    {% endblock %}
+
+    {% block extra-css %}
+    {% endblock %}
 
     {% endcompress %}
 
@@ -73,14 +76,12 @@
     
     {% block body %}
 
-    <div id="header" class="header-bar">
-      {% block header %}
-
-      {% block pre-standard-header-content %}
-      {% block header-search %}
-      {% include "header-search-logo.html" %}
-      {% endblock %}
-      <ul class="header-el">
+    <div class="pure-menu pure-menu-open pure-menu-horizontal pure-menu-pull-right" id="header">
+    {% block header-search %}
+      <div id="meta-heading-search" class="pure-menu-heading"> <a class="home-nav" href="/" target="_self"><span class="meta-home-link">&nbsp;</span></a> <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1"> </div>
+      </input>
+    {% endblock %}
+      <ul>
         <li>
           <a href="/list" target="_self">Concept list</a>
         </li>
@@ -93,66 +94,69 @@
         <li>
           <a href="/about" target="_self">About</a>
         </li>
-      </ul>
-      {% endblock %}
-      
-
-      {% block standard-header-content %}
-      <ul id="header-user-tools" class="header-el">
         {% if user.is_authenticated and not user|is_lazy_user %}
         <li>
-          <a target="_self" href="{% url 'user:user_main' %}">{{ user.username }}</a>
-          &#124;
-	  <a target="_self" href="{% url 'user:logout' %}">Sign out</a>
+          <a target="_self" href="{% url 'user:user_main' %}" class="heleft">{{ user.username }}</a>
+          <a target="_self" href="{% url 'user:logout' %}" class="heright">Sign out</a>
         </li>
-	{% else %}
+        {% else %}
         <li>
-	  <a target="_self" href="{% url 'user:login' %}">Sign in</a>
-          &#124;
-	  <a target="_self" href="{% url 'user:register' %}">Sign up</a>
-        </li>
-	{% endif %}
-        {% endblock %}
+          <a target="_self" href="{% url 'user:login' %}" class="heleft">Sign in</a>
+          </li>
         
-	{% endblock %}
+        <li class="join-line">
+          &#124;
+        </li>
+        
+        <li>
+          <a target="_self" href="{% url 'user:register' %}" class="heright">Sign up</a>
+        </li>
+        {% endif %}
       </ul>
+
+      <div id="mobile-header">
+        <button id="responsive-menu-button">Menu</a>
+      </div>
     </div>
 
-    <div id="main">
-      {% block main %}
+</div>
 
-      {% endblock %}
-    </div>
+<div id="main">
+  {% block main %}
 
-    {% compress js %}
-    {% block jscript %}
-    {% include "load-jquery-snippet.html" %}
-    <script type="text/javascript" src="{% static "javascript/gen-utils.js" %}"></script>
-    {% endblock %}
+  {% endblock %}
+</div>
 
-    {% block jscript-extend %}
+{% compress js %}
+{% block jscript %}
+{% include "load-jquery-snippet.html" %}
+<script src="{% static "javascript/lib/jquery.sidr.min.js" %}"></script>
+<script src="{% static "javascript/gen-utils.js" %}"></script>
+{% endblock %}
 
-    {% endblock %}
+{% block jscript-extend %}
 
-    {% endcompress %}
+{% endblock %}
 
-    {% endblock %}
+{% endcompress %}
 
-    <script>
-      // piwik server-side tracking
-      if (window.PRODUCTION){
-      var _paq = _paq || [];
-      _paq.push(['trackPageView', window.location.href.split('/').pop()]);
-      (function() {
-      var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
-      _paq.push(['setTrackerUrl', u+'piwik.php']);
-      _paq.push(['setSiteId', 1]);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-      g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-      })();
-      }
-    </script>
-  </body>
+{% endblock %}
+
+<script>
+  // piwik server-side tracking
+  if (window.PRODUCTION){
+  var _paq = _paq || [];
+  _paq.push(['trackPageView', window.location.href.split('/').pop()]);
+  (function() {
+  var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
+  _paq.push(['setTrackerUrl', u+'piwik.php']);
+  _paq.push(['setSiteId', 1]);
+  var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+  g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+  }
+</script>
+</body>
 </html>          
 
 

@@ -6,7 +6,7 @@ if (typeof window.define === "undefined"){
   genutil.prep();
 }
 else{
-  define(["jquery"], function($){
+  define(["jquery", "sidr"], function($){
     return genFun($);
   } );
 }
@@ -28,6 +28,7 @@ function genFun($){
           }
         }
       });
+
       // IE placehold hack from http://www.hagenburger.net/BLOG/HTML5-Input-Placeholder-Fix-With-jQuery.html
       $('[placeholder]').focus(function() {
         var input = $(this);
@@ -51,6 +52,14 @@ function genFun($){
           }
         });
       });
+
+      /* sidr menu */
+    $('#responsive-menu-button').sidr({
+      name: 'sidr-main',
+      source: '#header',
+      side: "right"
+    });
+
     }
   };
 }

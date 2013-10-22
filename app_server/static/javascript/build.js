@@ -8,7 +8,8 @@
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
-    "btouch": "lib/backbone.touch"
+    "btouch": "lib/backbone.touch",
+    "sidr": "lib/jquery.sidr.min"
   },
   shim: {
     d3: {
@@ -26,6 +27,7 @@
     },
     "btouch" : {
       deps: ["jquery", "underscore", "backbone"]
-    }
+    },
+    "sidr": ["jquery"]
   }
 })

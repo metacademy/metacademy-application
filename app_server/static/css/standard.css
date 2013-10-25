@@ -266,4 +266,7 @@ a.home-nav{
     .header-title{
         min-width: 0;
     }
+    #apptools{
+        display: none;
+    }
 }

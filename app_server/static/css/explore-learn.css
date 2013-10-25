@@ -172,12 +172,12 @@ body {
 }
 
 #learn-view{
-    min-width: 650px;
     height: inherit;
 }
 
 #learn-title-list{
     width: 20%;
+    display: block;
     float: left;
     border-right: 1px solid #333;
     -webkit-box-sizing: border-box;
@@ -288,6 +288,10 @@ h1 .learn-view-star{
     margin-top: 0.2em;
     font-size: 0.9em;
     color: #8D5E5E;
+}
+
+.detailed-title-tools{
+    display: inline;
 }
 
 .info-text{
@@ -703,4 +707,98 @@ ellipse{
 
 .implicit-learned{
     opacity: 0.6;
+}
+
+#learning-plan-button{
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    text-align: center;
+    left: 0;
+    bottom: 40%;
+    font-family: sans-serif;
+    background: #756F6F;
+    z-index: 10;
+    color: rgb(247, 240, 247);
+    letter-spacing: 0px;
+    border: #302C2C solid;
+    padding: 0.2em 1em;
+    border-radius: 0 0 5px 5px;
+    border-width: 0 1px 1px 1px;
+    -webkit-transform: rotate(-90deg);
+    -webkit-transform-origin: 0 0;
+    -moz-transform: rotate(-90deg);
+    -moz-transform-origin: 0 0;
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -o-transform-origin: 0 0;
+    -ms-transform: rotate(-90deg);
+    -ms-transform-origin: 0 0;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+#learning-plan-button.expanded{
+    left: 55%;
+}
+
+@media only screen and  (max-width: 760px){
+    #learning-plan-button{
+        display: block;
+    }
+    
+    #learn-title-list{
+        display: none;
+        width: 55%;
+    }
+
+    #learn-title-list.show{
+        display: block;
+    }
+
+    #learn-concept-wrapper{
+        margin-left: 0;
+        padding: 0 1em 0 2em;
+    }
+
+    .node-detail-view{
+        width: 100%;
+    }
+
+    .node-detail-summary-text {
+        padding-right: 0;
+    }
+
+    #apptools{
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .detailed-title-tools{
+        display: block;
+        margin-top: 0.2em;
+    }
+
+    .detailed-title-tools span{
+        margin: 0 0.15em;
+    }
+
+    .detail-time-est{
+        margin-right: 0;
+    }
+
+    .node-detail-view{
+        padding: 0;
+        margin-bottom: 3em;
+    }
+
+    .learn-title-buttons{
+        position: relative;
+        display: block;
+        margin-top: 0.2em;
+    }
+
+    .learn-title-buttons span{
+        padding: 0 0.2em;
+    }
 }

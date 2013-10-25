@@ -1,7 +1,9 @@
 <script type="text/template" id="node-detail-view-template">
   <h1><%- displayTitle %>
-   <span class="learn-view-check" data-tag="<%= id %>"> ✓ </span>
-   <span class="learn-view-star" data-tag="<%= id %>"> ★ </span>
+    <div class="detailed-title-tools">
+      <span class="learn-view-check" data-tag="<%= id %>"> ✓ </span>
+      <span class="learn-view-star" data-tag="<%= id %>"> ★ </span>
+    </div>
   </h1>
   <div class="detail-time-est">
     <% if (time) { %>

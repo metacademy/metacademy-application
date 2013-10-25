@@ -668,8 +668,9 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       learnedClass: "learned-concept",
       starredClass: "starred-concept",
       dataTagName: "data-tag",
-      timeEstimateClass: "time-estimate"
-
+      timeEstimateClass: "time-estimate",
+      lpButtonId: "learning-plan-button",
+      showClass: "show"
     };
 
     // return public object
@@ -770,11 +771,12 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             clkItmClass = viewConsts.clickedItmClass;
 
         $el.html("");
+        // TODO move this to a template
         var $div = $(document.createElement("div"));
         $div.attr("id", (pvt.viewConsts.titleListId));
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
         var titlesTitle = document.createElement("h1");
-        titlesTitle.textContent = "Learning Plan"; // TODO move this to a template
+        titlesTitle.textContent = "Learning Plan"; 
         thisView.$el.prepend(titlesTitle);
         $div.append(titlesTitle);
         var timeEstimateEl = document.createElement("div");
@@ -784,6 +786,11 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         $div.append(timeEstimateEl);
         var $titlesEl = thisView.renderTitles();
         $div.append($titlesEl);
+        // TODO move hard coding
+        $("#" + viewConsts.lpButtonId).on("click", function(){
+          $div.toggleClass(viewConsts.showClass);
+          $(this).toggleClass("expanded");
+        });
         thisView.$el.append($div);
         thisView.updateTimeEstimate();
         pvt.conceptDisplayWrap = document.createElement("div");

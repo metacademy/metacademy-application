@@ -75,18 +75,17 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","a
   // automatically resize window when viewport changes
   Utils.scaleWindowSize("header", "main");
 
-  // log internal and external views (piwik won't track if the client has donottrack set)
-  $("body").on("click", "a.external-link", function(evt){
+  $("body").on("mousedown", ".external-link", function(evt){
     if(window._paq){
       window._paq.push(['trackLink', evt.currentTarget.href, "link"]);
     }
   });
-  $(window).on('hashchange', function() {
+  $(window).on("hashchange", function() {
     if(window._paq){
       window._paq.push(['trackPageView', window.location.hash]);
     }
   });
-
+  // track clicking between learning and explore view
   $("body").on("click", ".toggle-lc-button", function(evt){
     if(window._paq){
       window._paq.push(['trackPageView', evt.currentTarget.id]);

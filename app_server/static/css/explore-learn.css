@@ -709,20 +709,39 @@ ellipse{
     opacity: 0.6;
 }
 
-#learning-plan-button{
+
+.small-vp-button{
     display: none;
     cursor: pointer;
     position: absolute;
     text-align: center;
-    left: 0;
-    bottom: 40%;
     font-family: sans-serif;
-    background: #756F6F;
+    background: rgb(102, 102, 102);
     z-index: 10;
-    color: rgb(247, 240, 247);
-    letter-spacing: 0px;
+    color: rgb(236, 236, 236);
     border: #302C2C solid;
     padding: 0.2em 1em;
+}
+
+#apptools-button{
+    right: 1.5em;
+    width: 100px;
+    bottom: 0;
+    padding-right: 1em;
+    border-radius: 5px 5px 0 0;
+    border-width: 1px 1px 0 1px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;   
+    box-sizing: border-box;
+}
+#apptools-button.expanded{
+    bottom: 135px;
+    border-bottom: 2px #75526A solid;
+}
+
+#learning-plan-button{
+    left: 0;
+    bottom: 40%;
     border-radius: 0 0 5px 5px;
     border-width: 0 1px 1px 1px;
     -webkit-transform: rotate(-90deg);
@@ -741,10 +760,10 @@ ellipse{
 }
 
 @media only screen and  (max-width: 760px){
-    #learning-plan-button{
+    #learning-plan-button, #apptools-button{
         display: block;
     }
-    
+
     #learn-title-list{
         display: none;
         width: 55%;
@@ -770,8 +789,18 @@ ellipse{
     #apptools{
         top: auto;
         bottom: 0;
-        width: 100%;
-        max-width: 100%;
+        max-width: 200px;
+        margin: 0;
+        margin-right: 1em;
+        padding: 0;
+        padding-top: 0.5em;
+        width: 200px;
+        right: 0;
+        height: 125px;
+        display: none;
+    }
+    #apptools.show{
+        display: block;
     }
 
     .detailed-title-tools{

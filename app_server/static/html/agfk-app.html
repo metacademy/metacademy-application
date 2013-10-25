@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-
-{% block meta-viewport %}
-{% endblock %}
-
 {% block targetblank %}
 <base target="_blank">
 {% endblock %}
@@ -17,9 +13,12 @@
 
 {% include "apptools.html" %}
 
-  <div id="learn-view-wrapper"></div>
-  <div id="explore-view-wrapper"></div>
-  <div id="load-view-wrapper"></div>
+  <div id="learn-view-wrapper">
+  </div>
+  <div id="explore-view-wrapper">
+  </div>
+  <div id="load-view-wrapper">
+  </div>
   
   {% include "node-title-view.html" %}
   {% include "node-detail-view.html" %}
@@ -33,8 +32,8 @@
 <div id="tutorial-modes-content">
 </div>
 
-<div id="learning-plan-button">
-  Learning Plan
+<div id="apptools-button" class="small-vp-button">
+  Toolbox
 </div>
 
 {% endblock %}

@@ -89,6 +89,7 @@ input{
     background: #666;
     padding: 0.2em 1em;
     color: #ECECEC;
+    border: 1px #302C2C solid;
 }
 
 .sidr ul li.sidr-class-join-line{
@@ -265,8 +266,5 @@ a.home-nav{
     }
     .header-title{
         min-width: 0;
-    }
-    #apptools{
-        display: none;
     }
 }

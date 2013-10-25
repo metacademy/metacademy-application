@@ -9,11 +9,15 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
     pvt.prevButtonEl = null;
     pvt.viewConsts = {
       activeClass: "active",
+      showClass: "show",
+      apptoolsButtonId: "apptools-button",
+      expandButtonClass: "expanded",
       elNameAppend: "-button",
       elNavButtonClass: "el-nav-button",
       clearLearnedId: "button-clear-learned",
       showLearnedId: "button-show-learned",
-      disabledClass: "disabled"
+      disabledClass: "disabled",
+      viewId: "apptools"
     };
     pvt.numVisLearned = 0;
     pvt.numLearned = 0;
@@ -67,8 +71,13 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
           thisView.handleShowLearnedClick.call(thisView, evt);
         });
 
+        // hide/show apptools for small view ports
+        $("#" + viewConsts.apptoolsButtonId).on("click", function(){
+          $(this).toggleClass(viewConsts.expandButtonClass);
+          $("#" + viewConsts.viewId).toggleClass(viewConsts.showClass);
+        });
+
         var aux = window.agfkGlobals.auxModel;
-        
         // enable/disable the hide/show buttons
         thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.changeShowHideState);
         thisView.listenTo(aux, "change:learnedConcepts", thisView.handleChLearnStatus ); // listen for check clicks

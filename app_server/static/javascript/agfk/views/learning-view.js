@@ -770,8 +770,8 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             viewConsts = pvt.viewConsts,
             clkItmClass = viewConsts.clickedItmClass;
 
-        $el.html("");
-        // TODO move this to a template
+        $el.html('');
+
         var $div = $(document.createElement("div"));
         $div.attr("id", (pvt.viewConsts.titleListId));
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
@@ -783,14 +783,21 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         timeEstimateEl.className = viewConsts.timeEstimateClass;
         var timeEstimate = thisView.model.get("nodes").getTimeEstimate();
         
+        var lpButton = document.createElement("div");
+        lpButton.id = viewConsts.lpButtonId;
+        lpButton.className = "small-vp-button";
+        lpButton.textContent = "Learning Plan";
+        // TODO move hard coding
+        $(lpButton).on("click", function(){
+          $div.toggleClass(viewConsts.showClass);
+          $(this).toggleClass("expanded");
+        });                
+        $el.append(lpButton);
+
         $div.append(timeEstimateEl);
         var $titlesEl = thisView.renderTitles();
         $div.append($titlesEl);
-        // TODO move hard coding
-        $("#" + viewConsts.lpButtonId).on("click", function(){
-          $div.toggleClass(viewConsts.showClass);
-          $(this).toggleClass("expanded");
-        });
+
         thisView.$el.append($div);
         thisView.updateTimeEstimate();
         pvt.conceptDisplayWrap = document.createElement("div");

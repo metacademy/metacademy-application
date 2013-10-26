@@ -2,51 +2,67 @@
 {% load staticfiles %}
 
 {% block extra-css %}
-    <link rel="stylesheet" href="{% static "css/about.css" %}"/>
+<link rel="stylesheet" href="{% static "css/about.css" %}"/>
 {% endblock %}
 
 {% block main %}
 <section class="about-meta">
-<header>
-  <h1>
-    About Metacademy
-  </h1>
-</header>
-<p>
-Imagine having all knowledge at your fingertips. What would your life be like if whenever you have a question about any topic&mdash;economics, philosophy, string theory&mdash;you can go to a web site, read about it, and actually understand it?  We think this would be incredibly empowering: you would no longer have to spend time figuring out <em>where</em> or <em>how</em> to learn about a topic!
-</p>
-  
-<p>
-By some counts, you already have all knowledge at your fingertips. For any question with a simple answer&mdash;the population of Mongolia, or what the heck that cryptic error message means&mdash;you can find it on sites like Wikipedia or Stack Overflow.  But try learning something of conceptual depth from Wikipedia or the published scientific literature, and you're in for a lot of agony. Before you learn this thing, you need to learn this and that other thing, and pretty soon you're deep in dependency hell.
-</p>
-  
-<p>
-Now imagine you have a super-smart futuristic machine, and you ask it, "What are these deep neural networks I've been hearing so much about?"  It churns away, and then spits out a carefully constructed ordered list of resources for you to consult:
-</p>
-<ol>
-<li> read chapter 7 of textbook X </li>
-<li> watch video lecture Y </li>
-<li> work through problems 7-9 found at website Z</li>
-</ol>
-<p>
-This list is <em>your list</em>, built based on your own goals and what you already know. Your friend asks it the same question and gets back a list that's longer, or shorter, or maybe takes a different path entirely. This machine can bring you up to speed on any topic in a matter of hours or days. It doesn't take four years, and it doesn't cost &#36;200,000.
-</p>
+  <header>
+    <h1>
+      About Metacademy
+    </h1>
+  </header>
 
-<p>
-Okay, that's science fiction. But just barely. The essential functionality can be achieved with today's technology, and we think it's time to get started structuring our scientific and social knowledge in a way that makes it possible. The problem is dependency hell, and what we need is a package manager to keep track of it all, a sort of "apt-get for knowledge."
-</p>
+  <div class="qa-about">
+    <h2 class="question">
+      What is Metacademy, exactly?
+    </h2>
 
-<p>
-Metacademy is an <a class="external-link underline" target="_blank" href="https://github.com/metacademy">open-source platform</a> where experts from various disciplines (mathematics, computer science, medicine, music, etc.) can build a dependency graph of concepts. Then, as a user, you type in what you want to know, and you get back an ordered list of concepts covering everything you need to know to get there, with pointers to open online resources where you can learn them.  And if a topic catches your interest on the way, you can follow one of the forward links to learn about that as well. Not exactly <i>The Matrix</i>, but we hope you'll still find it useful.
-</p>
+    <p>
+      Metacademy is a community-driven, <a class="external-link" target="_blank" href="https://github.com/metacademy">open-source platform</a> for experts to collaboratively construct a web of knowledge. Right now, Metacademy focuses on machine learning and probabilistic AI, because that's what the current contributors are experts in. But eventually, Metacademy will cover a much wider breadth of knowledge, e.g. mathematics, engineering, music, medicine, computer science&hellip;
+    </p>
+  </div>
 
-<p>
-Right now, the content focuses on machine learning and probabilistic AI, because that's what the current contributors are experts in. But as we've been building the graph, we've been pleasantly surprised by how nicely everything fits together and how direct some of the paths are, and we see no reason this can't be extended much further. 
-</p>
 
-<p>
-We don't expect Metacademy to make it <em>easy</em> to learn advanced topics&mdash;we're not sure that's even possible. Learning things on your own, without the structure of deadlines and exams, inevitably takes a bit of motivation and discipline. And our graph, built by mere humans, probably has its quirks. But with any luck, we'll take a process that used to be frustrating and bewildering, and make it merely challenging&mdash;and hopefully fun and rewarding as well.
-</p>
+  <div class="qa-about">
+    <h2 class="question">
+      What do you mean by "web of knowledge," isn't that the World Wide Web?
+    </h2>
+    <p>
+      Yes, the World Wide Web is a "web of knowledge," but it's a very diluted web of knowledge: the knowledge to cat-photo ratio is incredibly low. So we depend on Google to help us find what we're looking for or Wikipedia to provide us with a fairly-high quality synopsis of concepts we're interested in. But try learning something of conceptual depth by sifting through Google search results or from Wikipedia and you're in for a lot of agony. Before you learn this concept, you need to learn its prerequisite concepts (sometimes you're not entirely sure what these are), and the prerequisite concepts may have prerequisites themselves. Pretty soon, you're deep in dependency hell, switching between twenty different tabs trying to understand the various [pre]prerequisite concepts in order to understand the tutorial article Google returned or the Wikipedia page on the subject.
+    </p>
+    <p>    
+      Metacademy is a curated web of knowledge that explicitly tells you how to learn a given subject based on what you already know (or don't know, as the case may be). Metacademy's goal is to make science-fiction-esk learning more of a reality. For instance, imagine you have a super-smart futuristic machine, and you ask it, "What are feed-forward artificial neural networks?"  It churns away, and then spits out a carefully constructed ordered list of resources for you to consult:
+    </p>
+    <ol>
+      <li> read chapter 7 of textbook X in order to understand "linear regression"</li>
+      <li> watch video lecture Y in order to understand "basis function expansions"</li>
+      <li> work through problems 7-9 found at website Z to improve your understanding of these concepts</li>
+      <li> finally, read pages 12-15 of book B and watch the first 30 minutes of lecture L in order to understand "feed-forward neural networks"</li>
+    </ol>
+    <p>
+      This list is <em>your list</em>, built based on your own goals and what you already know. Your friend asks it the same question and gets back a list that's longer, or shorter, or maybe takes a different path entirely. This machine can bring you up to speed on any topic in a matter of hours or days. It doesn't take four years, and it doesn't cost &#36;200,000. Sure, Google may have pointed you to book "B" and lecture "L" in order to learn "feed-forward neural networks," but it didn't know that you first needed to learn "linear regression" and "basis function expansions"and neither did you, for that matter, so you would've been quickly lost if you dove right into this material without first learning the prerequisites.
+    </p>
+    <p>  
+      Okay, so we don't have a super-smart futuristic machine to produce these learning plans (yet), but the essential functionality can be achieved with today's technology, and we think it's time to get started structuring our scientific and social knowledge in a way that makes it possible. Metacademy is a platform where experts can collaborate to build dependency graphs of knowledge. In turn, when you try to learn a given concept, Metacademy can show you the full prerequisite structure of the concept and provide a custom learning plan for you to learn the concept as efficiently as possible, complete with curated learning resources as well as discussions on the concept's relationship to other relevant subjects. Furthermore, once you tell Metacademy that you understand a concept, it will remove this concept from all of your future learning plans. In this way, Metacademy keeps track of what you know and tells you exactly what you need to learn in order to understand a concept. Go ahead and try it for yourself: <a class="internal-link" href="http://metacademy.org/graphs/concepts/feed_forward_neural_nets">here's your learning plan for feed-forward neural networks</a> (click the "graph" button in the toolbox in the right-hand corner to explicitly view the dependency structure).
+  </div>
 
+  <div class="qa-about">
+    <h2 class="question">
+      I spent 10 minutes on this site, and I didn't <a class="external-link" href="http://torsaporsa.files.wordpress.com/2013/09/iltni.jpg">learn all the things!</a> What gives?
+    </h2>
+    <p>
+      We don't expect Metacademy to make it <em>easy</em> to learn advanced topics&mdash;we're not sure that's even possible. Learning things on your own, without the structure of deadlines and exams, inevitably takes a bit of motivation and discipline. And Metacademy is built by mere humans, after all, so it probably has its quirks. But with any luck, it'll take a process that used to be frustrating and bewildering, and make it merely challenging&mdash;and hopefully fun and rewarding as well.
+    </p>
+  </div>
+
+  <div class="qa-about">
+    <h2 class="question">
+      Who made all this, then?
+    </h2>
+    <p>
+      Hundreds of experts created the material you'll find referenced on Metacademy, though of course, they didn't make their material directly <i>for</i> Metacademy. But still, Metacademy could not exist without a large amount of high quality learning resources, so the true credit goes to these experts. Nevertheless, <a class="external-link" href="http://people.csail.mit.edu/rgrosse/">Roger Grosse</a> and <a class="external-link" href="http://mlg.eng.cam.ac.uk/creed/">Colorado Reed</a> built this site and organized roughly 350 machine learning and probabilistic AI concepts that comprise the intellectual seed that will allow Metacademy to flourish into a globally accessible and understandable learning experience. 
+    </p>
+  </div>
 </section>
 {% endblock %}

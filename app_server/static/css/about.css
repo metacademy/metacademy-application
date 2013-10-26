@@ -35,6 +35,12 @@
     font-size: 1.2em;
 }
 
+.question{
+    font-weight: bold;
+    font-size: 1.15em;
+    margin-top: 1em;
+}
+
 @media only screen and (max-width: 769px){
     section.about-meta{
         width: 95%;

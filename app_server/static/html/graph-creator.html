@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+    <link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
+{% endblock %}
+
+{% block jscript-extend %}
+    <script>
+      window.agfkGlobals = {};
+      agfkGlobals.auxModel = null; // init in main js app
+    </script>
+    <script src="{% static "javascript/lib/d3.js" %}"></script>
+    <script data-main="{% static "javascript/gc/main.js" %}" src="{% static "javascript/lib/require-min.js" %}"></script>
+    <script src="{% static "javascript/lib/xrayquire.js" %}"></script>
+{% endblock %}
+    
+{% block main %}
+
+    <svg id="gc-svg" width="100%" height="100%">
+      
+    </svg>
+
+    <!-- <div id="toolbox"> -->
+    <!--   <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="upload-icon.png" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="download-icon.png" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="trash-icon.png" alt="delete graph">  -->
+    <!-- </div> -->
+{% endblock %}
+
+

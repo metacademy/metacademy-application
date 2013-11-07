@@ -2,7 +2,7 @@
  This file contains the node model, which contains the data for each concept TODO should this be renamed "concept-model"?
  */
 
-define(["backbone", "underscore", "agfk/collections/node-property-collections"], function(Backbone, _, NodePropertyCollections){
+define(["backbone", "underscore", "agfk/collections/node-property-collections", "agfk/collections/directed-edge-collection"], function(Backbone, _, NodePropertyCollections, DirectedEdgeCollection){
   /**
    * Node: node model that encompasses several collections and sub-models
    */
@@ -22,8 +22,8 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections"],
           summary: "",
           time: "",
           is_shortcut: 0,
-          dependencies: new NodePropertyCollections.DirectedEdgeCollection(),
-          outlinks: new NodePropertyCollections.DirectedEdgeCollection()
+          dependencies: new DirectedEdgeCollection(),
+          outlinks: new DirectedEdgeCollection()
         };
       },
 
@@ -241,7 +241,7 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections"],
           return node.get("dependencies").findWhere({"from_tag": thisModel.get("id")});
         });
 
-        return new NodePropertyCollections.DirectedEdgeCollection(found);
+        return new DirectedEdgeCollection(found);
       },
 
       /**

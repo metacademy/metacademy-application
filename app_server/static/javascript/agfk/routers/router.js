@@ -59,7 +59,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         }
       } else{
 
-        if(typeof Viz === "undefined" && window.vizPromise === undefined){
+        if(typeof window.Viz === "undefined" && window.vizPromise === undefined){
           window.vizPromise = $.ajax({
             url: window.STATIC_PATH + "javascript/lib/viz.js",
             dataType: "script",
@@ -304,7 +304,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
             return;
             }
 
-//          set the document title to be the key concept
+          // set the document title to be the key concept
           document.title = window.agfkGlobals.auxModel.getTitleFromId(nodeId) + " - Metacademy";
          
           switch (paramsObj[qViewMode]){

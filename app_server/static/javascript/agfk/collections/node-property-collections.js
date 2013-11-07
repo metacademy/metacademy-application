@@ -36,14 +36,6 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
 
 
   /**
-   * Collection of directed edge models TODO post CR-Restruct consider using subets of GraphEdgeCollections -- this will be problematic when adding new data
-   */
-  var DirectedEdgeCollection = Backbone.Collection.extend({
-    model: NodePropertyModels.DirectedEdge
-  });
-
-
-  /**
    * Collection of question models
    */
   var QuestionCollection = Backbone.Collection.extend({
@@ -51,7 +43,6 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
   });
 
   return {
-    DirectedEdgeCollection: DirectedEdgeCollection,
     QuestionCollection: QuestionCollection,
     ResourceCollection: ResourceCollection
   };

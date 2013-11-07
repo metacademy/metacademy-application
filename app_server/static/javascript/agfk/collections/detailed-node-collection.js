@@ -5,7 +5,9 @@ define(['agfk/collections/node-collection', 'agfk/models/detailed-node-model', '
     initialize: function(){
       var aux = window.agfkGlobals.auxModel,
           thisColl = this;
-      thisColl.listenTo(aux, aux.getConsts().learnedTrigger, thisColl.changeILNodesFromTag);
+      if (aux){
+        thisColl.listenTo(aux, aux.getConsts().learnedTrigger, thisColl.changeILNodesFromTag);
+      }
       thisColl.on("sync", function(){
           thisColl.changeILNodesFromTag();
       });

@@ -44,13 +44,14 @@
 <div id="apptools-button" class="small-vp-button">
   Toolbox
 </div>
-
+    <script>
+      var el = document.getElementById("nojs-content");
+      el.parentElement.removeChild(el);
+    </script>
 {% endblock %}
   
   {% block jscript %}
     <script>
-      var el = document.getElementById("nojs-content");
-      el.parentElement.removeChild(el);
       window.agfkGlobals = {};
       agfkGlobals.userInitData = {{ user_data|safe }};
       agfkGlobals.auxData = {{ full_graph_skeleton|safe }};

@@ -1,0 +1,119 @@
+{% load std_extras %}
+
+<section class="node-detail-view" style="width:100%;">
+  <h1>
+    {{ concept_data.title }}
+  </h1>
+
+  <h2 class="node-detail-title">Summary</h2>
+  <div class="node-detail-comp-wrap node-detail-summary-text">
+    {% if concept_data.summary %}
+    {{ concept_data.summary }}
+    {% else %}
+    <span class="no-content-msg">-No Summary-</span>
+    {% endif %}
+  </div>
+
+  <h2 class="node-detail-title">Context</h2>
+  <div class="node-detail-comp-wrap">
+    {% if concept_data.dependencies  %}
+    <p>This concept has the prerequisites:</p>
+    <ul class="node-detail-comp-wrap dep-wrap">
+      {% for preq in concept_data.dependencies %}
+      <li>
+        <a href="/graphs/concepts/{{ preq.from_tag }}" class="focus-link dependency-link" target="_self">
+          {{preq.from_tag|replace_uscores}}
+        </a>
+        {% if preq.reason %}
+        <span class="dependency-reason">({{preq.reason}})</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="no-content-msg">-this concept has no prerequisites-</p>
+    {% endif %}
+  </div>
+
+  {% if concept_data.goals %}
+  <h2 class="node-detail-title">Goals</h2>
+  <div class="node-detail-comp-wrap goals-wrap" >
+    {{ concept_data.goals|parse_txt_url_obj|safe}}
+  </div>
+  {% endif %}
+
+  {% if concept_data.resources %}
+  <h2 class="node-detail-title">
+    Resources
+  </h2>
+
+  <div class="node-detail-comp-wrap">
+    {% for rsrc in concept_data.resources %}
+
+    <div class="resource-view">
+
+      <div class="resource-title-display">
+        <span class="res-arrow">→ </span>{{rsrc.title}}
+      </div>
+      
+      <div class="resource-content-wrap">
+        {% if rsrc.location %}
+        <div class="resource-location-display">
+          {% if rsrc.edition %}
+          <span class="resource-location"> Location (edition {{rsrc.edition}}): </span>
+          {% else %}
+          <span class="resource-location"> Location: </span>
+          {% endif %}
+
+          <ul>
+            {% for loc in rsrc.location %}
+            {% if loc.link %}
+            <li>
+              <span class="resource-location-item">
+	        <a class="external-link" href="{{ loc.link }}"> {{ loc.text }} </a>
+              </span>
+            </li>
+            {% else %}
+            <li><span class="resource-location-item"> {{ loc.text }} </span>
+            </li>
+            {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        {% if rsrc.url %}
+        <div class="resource-url-display">
+          <span class="resource-link"><a class="external-link" href="{{ rsrc.url }}">[external website]</a> </span>
+        </div>
+        {% endif %}
+
+        {% if rsrc.authors %}
+        <div class="resource-author-display">
+          <span class="resource-author"> Authors: {{ rsrc.authors|join_list|safe }} </span>
+        </div>
+        {% endif %}
+
+        {% if rsrc.level %}
+        <div class="resource-level-display">
+          <span class="resource-level"> Level: {{ rsrc.level }} </span>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+
+  <h2 class="node-detail-title">See also</h2>
+  <div class="node-detail-comp-wrap pointers-wrap">
+    {% if concept_data.pointers %}
+    {{ concept_data.pointers|parse_txt_url_obj|safe}}
+    {% else %}
+    <span class="no-content-msg">-No Additional Notes-</span>
+    {% endif %}
+  </div>
+
+</section>

@@ -9,7 +9,7 @@ body {
     height: 100%;
     font-family: Arial, sans-serif;
     font-size: 1.0em;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* App tools */
@@ -27,6 +27,7 @@ body {
     border: 2px solid #75526A;
     border-radius: 10px;
     text-align: center;
+    display: none;
 }
 
 #apptools button, #hovertext-buttons button{

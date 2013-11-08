@@ -9,6 +9,18 @@ import json
 id_to_concept_dict = None
 tag_to_concept_dict = None
 full_graph_json_str = None
+full_graph_json = None
+tag_to_data = {}
+
+def get_concept_data(concept_tag):
+    """
+    get the dependency data for concept_tag from the server
+    """
+    if not tag_to_data.has_key(concept_tag):
+        url_req = urllib2.Request("%s/concepts/%s" % (CONTENT_SERVER, concept_tag))
+        tag_to_data[concept_tag] = _get_json(url_req, "concept acquisition")
+    return tag_to_data[concept_tag]
+        
 
 def get_search_json(search_term):
     """
@@ -43,15 +55,23 @@ def _load_dicts():
             tag_to_concept_dict[entry['tag']] = entry
 
 def _load_full_graph_json_str():
-    global full_graph_json_str
+    global full_graph_json_str, full_graph_json
     url_req = urllib2.Request("%s/full_graph" % CONTENT_SERVER)
-    full_graph_json_str = json.dumps(_get_json(url_req, 'full_graph'))
+    full_graph_json = _get_json(url_req, 'full_graph')
+    full_graph_json_str = json.dumps(full_graph_json)
             
 def get_full_graph_json_str():
     global full_graph_json_str
     if not full_graph_json_str:
         _load_full_graph_json_str()
     return full_graph_json_str
+
+def get_full_graph_data():
+    global full_graph_json
+    if not full_graph_json:
+        _load_full_graph_json_str()
+    return full_graph_json
+    
 
 def get_id_to_concept_dict():
     """

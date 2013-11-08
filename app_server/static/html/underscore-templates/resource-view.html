@@ -1,7 +1,7 @@
 <script type="text/template" id="resource-view-template">
   <div class="resource-title-display">
     <% var titleDisp = title ? title : "-no title-" %>
-      	<span class="res-arrow">→ </span><%= titleDisp %>
+    <span class="res-arrow">→ </span><%= titleDisp %>
   </div>
   
   <div class="resource-content-wrap">
@@ -31,7 +31,8 @@
        </span>
      </li>
      <% } else { %>
-     <li><span class="resource-location-item"> <%- location[i].text %> </span></li>
+     <li><span class="resource-location-item"> <%- location[i].text %> </span>
+     </li>
      <% } %>
      <% } %>
 </ul>
@@ -39,48 +40,48 @@
 </div>
 <% } %>
 
-  <% if (url){ %>
-  <div class="resource-url-display">
-    <span class="resource-link"><a class="external-link" href="<%= url %>">[external website]</a> </span>
-  </div>
-  <% }%>
+<% if (url){ %>
+<div class="resource-url-display">
+  <span class="resource-link"><a class="external-link" href="<%= url %>">[external website]</a> </span>
+</div>
+<% }%>
 
 
 <div class="resource-author-display">
-<% if (authors.length > 1) { %>
+  <% if (authors.length > 1) { %>
   <span class="resource-author"> Authors: <%= authors %> </span>
   <% } else if (authors.length == 1) { %>
   <span class="resource-author"> Author: <%= authors[0] %> </span>
-<% } %>
+  <% } %>
 </div>
 
-  <div class="resource-level-display">
-    <% if (level){ %>
-    <span class="resource-level"> Level: <%= level %> </span>
-    <% } %>
-  </div>
-
-  <% if (dependencies.length > 0) { %>
-  <div class="resource-dependencies-display">
-    <span class="resource-dependencies"> Additional dependencies:</span>
-    <ul>
-      <% for (var i = 0; i < dependencies.length; i++) { %>
-         <li><span class="resource-dependencies-item">
-	     <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#lfocus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
-	 </span></li>
-         <% } %>
-    </ul>
-  </div>
+<div class="resource-level-display">
+  <% if (level){ %>
+  <span class="resource-level"> Level: <%= level %> </span>
   <% } %>
+</div>
 
-  <% if (extra.length > 0){ %>
-      <div class="resource-extra-display">
-        <span class="resource-extra"> Other notes: </span>
-        <ul>
-          <% for (var i = 0; i < extra.length; i++ ){ %>
-             <li><span class="resource-extra-item"> <%= extra[i] %> </span></li>
-             <% } %>
-        </ul>
+<% if (dependencies.length > 0) { %>
+<div class="resource-dependencies-display">
+  <span class="resource-dependencies"> Additional dependencies:</span>
+  <ul>
+    <% for (var i = 0; i < dependencies.length; i++) { %>
+       <li><span class="resource-dependencies-item">
+	   <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#lfocus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
+       </span></li>
+       <% } %>
+  </ul>
+</div>
+<% } %>
+
+<% if (extra.length > 0){ %>
+    <div class="resource-extra-display">
+      <span class="resource-extra"> Other notes: </span>
+      <ul>
+        <% for (var i = 0; i < extra.length; i++ ){ %>
+           <li><span class="resource-extra-item"> <%= extra[i] %> </span></li>
+           <% } %>
+      </ul>
 </li>
 </div>
 <% } %>

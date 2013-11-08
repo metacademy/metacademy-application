@@ -56,6 +56,11 @@ if (window.PRODUCTION){
 requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
+  // handle noscript content
+  /*$("#nojs-content").remove(); */
+  $("body").css("overflow", "hidden");
+  $("#apptools").show();
+
   // initialize global auxData
   window.agfkGlobals.auxModel = new AuxModel(window.agfkGlobals.auxData, {parse: true});
 
@@ -95,4 +100,5 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","a
   // start the AGFK app
   var appRouter = new AppRouter();
   Backbone.history.start();
+
 });

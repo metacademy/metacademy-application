@@ -57,9 +57,7 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","a
   "use strict";
 
   // handle noscript content
-  /*$("#nojs-content").remove(); */
   $("body").css("overflow", "hidden");
-  $("#apptools").show();
 
   // initialize global auxData
   window.agfkGlobals.auxModel = new AuxModel(window.agfkGlobals.auxData, {parse: true});

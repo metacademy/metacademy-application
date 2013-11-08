@@ -27,7 +27,6 @@ body {
     border: 2px solid #75526A;
     border-radius: 10px;
     text-align: center;
-    display: none;
 }
 
 #apptools button, #hovertext-buttons button{

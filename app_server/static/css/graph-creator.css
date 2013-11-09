@@ -20,6 +20,14 @@ body{
     background-color: rgb(248, 248, 248)
 }
 
+#gc-svg{
+    display: none;
+}
+
+#concept-editor-wrap{
+    display: none;
+}
+
 #toolbox{
     position: absolute;
     bottom: 0;
@@ -74,6 +82,10 @@ g.selected:hover circle{
     fill: rgb(250, 232, 255);
 }
 
+g.conceptG circle.to-edit-circle{
+    fill: #C2DBFC;
+}
+
 path.link {
     fill: none;
     stroke: #333;
@@ -95,4 +107,56 @@ path.link.hidden{
 
 path.link.selected {
     stroke: rgb(229, 172, 247);
+}
+
+
+/***************************
+*** Editable Content CSS ***
+***************************/
+
+.ec-tabs {
+   float:left;
+   width:100%;
+   background:#fff;
+   border-bottom:4px solid #000;
+   overflow:hidden;
+   position:relative;
+}
+.ec-tabs ul {
+   clear:left;
+   float:left;
+   list-style:none;
+   margin:0;
+   padding:0;
+   position:relative;
+   left:50%;
+   text-align:center;
+}
+.ec-tabs ul li {
+   display:block;
+   float:left;
+   list-style:none;
+   margin:0;
+   padding:0;
+   position:relative;
+   right:50%;
+}
+.ec-tabs ul li a {
+   display:block;
+   margin:0 0 0 1px;
+   padding:3px 10px;
+   background:#ddd;
+   color:#000;
+   text-decoration:none;
+   line-height:1.3em;
+}
+.ec-tabs ul li a:hover {
+   background:#369;
+   color:#fff;
+}
+.ec-tabs ul li a.active,
+.ec-tabs ul li a.active:hover {
+   color:#fff;
+   background:#000;
+   font-weight:bold;
 }

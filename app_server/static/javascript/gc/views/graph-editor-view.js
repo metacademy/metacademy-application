@@ -6,6 +6,8 @@ window.define(["backbone", "d3"], function(Backbone, d3){
   pvt.consts = {
     selectedClass: "selected",
     connectClass: "connect-node",
+    toEditCircleRadius: 10,
+    toEditCircleClass: "to-edit-circle",
     circleGClass: "conceptG",
     graphClass: "graph",
     activeEditId: "active-editing",
@@ -272,8 +274,21 @@ window.define(["backbone", "d3"], function(Backbone, d3){
         })
         .call(thisView.drag);
 
+      // add big circle to represent the concept node
       newGs.append("circle")
-        .attr("r", String(consts.nodeRadius));
+        .attr("r", consts.nodeRadius);
+
+      // add small circle link for editing
+      newGs.append("circle")
+        .attr("r", consts.toEditCircleRadius)
+        .attr("cx", consts.nodeRadius*0.707)
+        .attr("cy", -consts.nodeRadius*0.707)
+        .classed(consts.toEditCircleClass, true)
+        .on("click", function(d){
+          // send to editor TODO make this less hacky
+          d3.event.preventDefault();
+          document.location = document.location + "#" + d.get("id");
+        });
 
       newGs.each(function(d){
         pvt.insertTitleLinebreaks(d3.select(this), d.get("title"));
@@ -401,7 +416,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
             .append("xhtml:p")
             .attr("id", consts.activeEditId)
             .attr("contentEditable", "true")
-            .text(d.title)
+            .text(d.get("title"))
             .on("mousedown", function(d){
               d3.event.stopPropagation();
             })
@@ -412,8 +427,8 @@ window.define(["backbone", "d3"], function(Backbone, d3){
               }
             })
             .on("blur", function(d){
-              d.title = this.textContent;
-              pvt.insertTitleLinebreaks(d3node, d.title);
+              d.set("title", this.textContent);
+              pvt.insertTitleLinebreaks(d3node, d.get("title"));
               d3.select(this.parentElement).remove();
             });
       return d3txt;
@@ -434,7 +449,9 @@ window.define(["backbone", "d3"], function(Backbone, d3){
         // clicked not dragged from svg
         var xycoords = d3.mouse(thisView.d3SvgG.node()),
             d = {id: thisView.idct++, title: "new concept", x: xycoords[0], y: xycoords[1]};
-        var tmp = thisView.model.get("nodes").add(d); // todo switch to create once server is up
+        var nodes = thisView.model.get("nodes");
+        nodes.add(d); // todo switch to create once server is up
+        d = nodes.get(d.id);
         thisView.render();
         // make title of text immediently editable
         var d3txt = thisView.changeTextOfNode(thisView.circles.filter(function(dval){

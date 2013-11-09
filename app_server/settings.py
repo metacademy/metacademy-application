@@ -112,7 +112,8 @@ WSGI_APPLICATION = 'wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(CLIENT_SERVER_PATH,'static/html/'),
-    os.path.join(CLIENT_SERVER_PATH,'static/html/underscore-templates/')
+    os.path.join(CLIENT_SERVER_PATH,'static/html/underscore-templates/'),
+    os.path.join(CLIENT_SERVER_PATH,'static/html/content-editing/'),
 )
 
 INSTALLED_APPS = (

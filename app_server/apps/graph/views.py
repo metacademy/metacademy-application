@@ -4,7 +4,7 @@ import pdb
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data, get_full_graph_data
+from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data
 from apps.user_management.models import Profile
 
 

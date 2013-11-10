@@ -9,7 +9,7 @@ body {
     height: 100%;
     font-family: Arial, sans-serif;
     font-size: 1.0em;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* App tools */

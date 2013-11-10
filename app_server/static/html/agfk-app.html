@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load std_extras %}
+
+{% block meta-description %}
+    <meta name="description" content="{{ concept_data.title}}: {{concept_data.summary|shorten_to_sentence}}">
+{% endblock %}
 
 {% block targetblank %}
 <base target="_blank">
@@ -10,6 +15,10 @@
 {% endblock %}
 
 {% block main %}
+
+<div id="nojs-content">
+  {% include "concept-presentation.html" %}
+</div>
 
 {% include "apptools.html" %}
 
@@ -35,7 +44,10 @@
 <div id="apptools-button" class="small-vp-button">
   Toolbox
 </div>
-
+    <script>
+      var el = document.getElementById("nojs-content");
+      el.parentElement.removeChild(el);
+    </script>
 {% endblock %}
   
   {% block jscript %}

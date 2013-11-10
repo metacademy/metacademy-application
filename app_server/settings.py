@@ -129,6 +129,7 @@ INSTALLED_APPS = (
     'apps.user_management',
     'apps.cserver_comm',
     'apps.roadmaps',
+    'apps.link_checker',
     'haystack',
     'captcha',
     'south',
@@ -201,5 +202,9 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = '/user'
 
 INTERNAL_IPS = ("127.0.0.1",)
+
+CONTENT_SERVER = 'http://'+ str(config.CONTENT_SERVER_IP) + ":" + str(config.CONTENT_SERVER_PORT)
+
+APP_SERVER = 'http://'+ str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONTEND_SERVER_PORT)
 
 from settings_local import *

@@ -55,7 +55,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
     var thisView = this;
     d3Path.classed(pvt.consts.selectedClass, true);
     if (thisView.state.selectedEdge){
-      thisView.removeSelectFromEdge();
+      pvt.removeSelectFromEdge.call(thisView);
     }
     thisView.state.selectedEdge = edgeData;
   };
@@ -64,7 +64,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
     var thisView = this;
     d3Node.classed(pvt.consts.selectedClass, true);
     if (thisView.state.selectedNode){
-      thisView.removeSelectFromNode();
+      pvt.removeSelectFromNode.call(thisView);
     }
     thisView.state.selectedNode = nodeData;
   };
@@ -163,7 +163,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
         });
 
       // listen for key events
-      d3.select(window).on("keydown", function(){
+      d3Svg.on("keydown", function(){ // TODO figure out deletes
         thisView.svgKeyDown.call(thisView);
       })
         .on("keyup", function(){
@@ -274,6 +274,15 @@ window.define(["backbone", "d3"], function(Backbone, d3){
         })
         .call(thisView.drag);
 
+      // setup event listener for changing title
+      newGs.each(function(d){
+        var d3el = d3.select(this);
+        thisView.listenTo(d, "change:title", function(){
+          d3el.selectAll("text").remove();
+          pvt.insertTitleLinebreaks(d3el, d.get("title"));
+        });
+      });
+      
       // add big circle to represent the concept node
       newGs.append("circle")
         .attr("r", consts.nodeRadius);
@@ -284,10 +293,12 @@ window.define(["backbone", "d3"], function(Backbone, d3){
         .attr("cx", consts.nodeRadius*0.707)
         .attr("cy", -consts.nodeRadius*0.707)
         .classed(consts.toEditCircleClass, true)
-        .on("click", function(d){
-          // send to editor TODO make this less hacky
-          d3.event.preventDefault();
-          document.location = document.location + "#" + d.get("id");
+        .on("mouseup", function(d){
+          if (!thisView.state.justDragged){
+            // send to editor TODO make this less hacky
+            d3.event.preventDefault();
+            document.location = document.location.pathname + "#" + d.get("id");
+          }
         });
 
       newGs.each(function(d){
@@ -377,6 +388,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
             pvt.selectElementContents(txtNode);
             txtNode.focus();
           } else{
+            // normal click node
             if (state.selectedEdge){
               pvt.removeSelectFromEdge.call(thisView);
             }
@@ -428,7 +440,6 @@ window.define(["backbone", "d3"], function(Backbone, d3){
             })
             .on("blur", function(d){
               d.set("title", this.textContent);
-              pvt.insertTitleLinebreaks(d3node, d.get("title"));
               d3.select(this.parentElement).remove();
             });
       return d3txt;
@@ -448,7 +459,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
       } else if (state.graphMouseDown && d3.event.shiftKey){
         // clicked not dragged from svg
         var xycoords = d3.mouse(thisView.d3SvgG.node()),
-            d = {id: thisView.idct++, title: "new concept", x: xycoords[0], y: xycoords[1]};
+            d = {id: thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]};
         var nodes = thisView.model.get("nodes");
         nodes.add(d); // todo switch to create once server is up
         d = nodes.get(d.id);

@@ -36,10 +36,11 @@ window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/ed
     showGCEditor: function(){
       // feed graph creator into the appropriate view
       var thisRoute = this;
-      thisRoute.geModel = thisRoute.geModel || new GraphEditorModel();
-      thisRoute.geView = new GraphEditorView({model: thisRoute.geModel});
-      thisRoute.geView.render();
+      
       thisRoute.removeOtherView();
+      thisRoute.geModel = thisRoute.geModel || new GraphEditorModel();
+      thisRoute.geView = this.geView || new GraphEditorView({model: thisRoute.geModel});
+      thisRoute.geView.render();
       thisRoute.geView.$el.show();
     },
 

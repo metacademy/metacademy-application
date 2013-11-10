@@ -30,7 +30,12 @@
   </div>
 
   <div class="ec-display-wrap" id="dependencies">
-    deps
+    <% dependencies.each(function(dep){ %>
+    <div class="dep-entry">
+       <h3> <%- dep.get("source").get("title") %> </h3>
+      <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">
+    </div>
+     <% }) %>
   </div>
 
   <div class="ec-display-wrap" id="pointers">

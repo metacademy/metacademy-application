@@ -16,6 +16,7 @@ define(["backbone", "underscore"], function(Backbone, _){
       events: {
         "blur .title-input": "changeTitleInput",
         "blur .ec-display-wrap > textarea": "changeTextField",
+        "blur input.dep-reason": "changeDepReason",
         "click .ec-tabs button": "changeDisplayedSection"
       },
 
@@ -46,6 +47,13 @@ define(["backbone", "underscore"], function(Backbone, _){
        */
       changeTextField: function(evt){
         this.model.set(evt.currentTarget.parentElement.id, evt.currentTarget.value);
+      },
+
+      changeDepReason: function(evt){
+        var curTarget = evt.currentTarget,
+            cid = curTarget.id.split("-")[0], // cid-reason
+            reason = curTarget.value;        
+        this.model.get("dependencies").get(cid).set("reason", reason);        
       }
 
     });

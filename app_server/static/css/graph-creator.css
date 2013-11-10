@@ -8,6 +8,11 @@ p{
      position: relative;
 }
 
+input{
+    border-radius: 5px;
+    padding: 0.2em;
+}
+
 body{
     margin: 0;
     padding: 0;
@@ -200,11 +205,31 @@ path.link.selected {
     display:block;
 }
 
-.ec-display-wrap h3{
+.ec-display-wrap > h3{
     margin: 0.5em;
 }
 
 .ec-display-wrap textarea{
     width: 100%;
     height: 15em;
+}
+
+.dep-entry{
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    border: 2px solid #C9B8C7;
+    background-color: rgb(244, 240, 245);
+    border-radius: 5px;
+    padding: 1em;
+}
+
+.dep-entry h3{
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+
+.dep-entry input{
+    width: 70%;
 }

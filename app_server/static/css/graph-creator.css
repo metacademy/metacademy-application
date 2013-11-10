@@ -189,8 +189,11 @@ path.link.selected {
 }
 
 .ec-display-wrap{
-    margin: 1em 0;
+    margin: 1em auto;
     display:none;
+    margin: auto;
+    width: 70%;
+    text-align: center;
 }
 
 .ec-display-wrap.active{
@@ -204,10 +207,4 @@ path.link.selected {
 .ec-display-wrap textarea{
     width: 100%;
     height: 15em;
-}
-
-.summary-els{
-    margin: auto;
-    width: 70%;
-    text-align: center;
 }

@@ -15,7 +15,7 @@ define(["backbone", "underscore"], function(Backbone, _){
 
       events: {
         "blur .title-input": "changeTitleInput",
-        "blur #summary textarea": "changeSummaryText",
+        "blur .ec-display-wrap > textarea": "changeTextField",
         "click .ec-tabs button": "changeDisplayedSection"
       },
 
@@ -40,8 +40,12 @@ define(["backbone", "underscore"], function(Backbone, _){
         this.model.set("title", evt.currentTarget.value);
       },
 
-      changeSummaryText: function(evt){
-        this.model.set("summary", evt.currentTarget.value);
+      /**
+       * Changes text field values for simple attributes of models
+       * the id of the containing element must match the attribute name
+       */
+      changeTextField: function(evt){
+        this.model.set(evt.currentTarget.parentElement.id, evt.currentTarget.value);
       }
 
     });

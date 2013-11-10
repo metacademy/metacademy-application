@@ -411,7 +411,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
       var thisView= this,
           consts = pvt.consts,
           htmlEl = d3node.node();
-      d3node.selectAll("text").remove();
+      d3node.selectAll("text").style("display", "none");
       var nodeBCR = htmlEl.getBoundingClientRect(),
           curScale = nodeBCR.width/consts.nodeRadius,
           placePad  =  5*curScale,
@@ -439,6 +439,7 @@ window.define(["backbone", "d3"], function(Backbone, d3){
               }
             })
             .on("blur", function(d){
+              d3node.selectAll("text").style("display", "block");
               d.set("title", this.textContent);
               d3.select(this.parentElement).remove();
             });

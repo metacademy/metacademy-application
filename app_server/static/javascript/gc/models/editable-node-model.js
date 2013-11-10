@@ -9,7 +9,7 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         dependencies: new EditableEdgeCollection(),
         outlinks: new EditableEdgeCollection()
       };
-      return _.extend({}, DetailedNodeModel.prototype.defaults, enDef);
+      return _.extend({}, DetailedNodeModel.prototype.defaults(), enDef);
     }
   });
   return EditableNode;

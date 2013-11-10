@@ -11,7 +11,7 @@
       <li><button id="btn-resources">Resources</button></li>
       <li><button id="btn-goals">Goals</button></li>
       <li><button id="btn-exercises">Exercises</button></li>
-      <li><button id="btn-see-also">See Also</button></li>
+      <li><button id="btn-pointers">See Also</button></li>
     </ul>
   </div>
 
@@ -19,12 +19,10 @@
        with a given class and showing the one disered element -->
 
   <div class="ec-display-wrap" id="summary">
-    <div class="summary-els">
      <h3>
-    Summary:
+    Summary
     </h3>
-    <textarea></textarea>
-    </div>
+    <textarea><%=summary%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="resources">
@@ -35,12 +33,18 @@
     deps
   </div>
 
-  <div class="ec-display-wrap" id="see-also">
-    see-also
+  <div class="ec-display-wrap" id="pointers">
+     <h3>
+       See also
+    </h3>
+     <textarea><%=pointers%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="goals">
-    goals
+     <h3>
+       Goals
+    </h3>
+     <textarea><%=goals%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="exercises">

@@ -24,7 +24,7 @@ body {
     top: 2em;
     right: 0;
     background: rgba(253, 253, 253, 0.98);
-    border: 2px solid #75526A;
+    border: 2px solid #CE94BC;
     border-radius: 10px;
     text-align: center;
 }
@@ -216,7 +216,7 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: #3E4018;
-    padding: 0.9em 2.55em;;
+    padding: 1.4em 0.5em;
     line-height: 1.2em;
     font-size: 0.9em;
     border-bottom: 1px solid #CCCCCC;
@@ -258,7 +258,7 @@ h1 .learn-view-check{
 }
 
 h1 .learn-view-star{
-    font-size: 0.9em;
+    font-size: 14pt;
 }
 
 .node-detail-title{
@@ -292,6 +292,8 @@ h1 .learn-view-star{
 
 .detailed-title-tools{
     display: inline;
+    color: #7C7C7C;
+    font-size: 12pt;
 }
 
 .info-text{
@@ -305,16 +307,19 @@ h1 .learn-view-star{
 }
 
 .learn-title-buttons{
-    display: inline-block;
     color: #8e8888;
-    font-size: 1.3em;
+    font-size: 12pt;
     font-weight: bold;
-    right: 0.1em;
+    bottom: 0.1em;
     position: absolute;
+    left: 0;
+    text-align: center;
+    width: 100%;
 }
 
 .learn-title-buttons .learn-view-star{
     font-weight: normal;
+    font-size: 14pt;
 }
 
 .learn-title-buttons span{
@@ -329,7 +334,7 @@ h1 .learn-view-star{
 
 .learned-concept-title .learn-view-check, .learned-concept .learn-view-check, .learned-concept .learn-view-check:hover{
     visibility: visible;
-    color: green;
+    color: rgb(18, 107, 18);
 }
 
 

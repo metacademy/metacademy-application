@@ -76,6 +76,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     ('css',os.path.join(CLIENT_SERVER_PATH, 'static/css')),
     ('images',os.path.join(CLIENT_SERVER_PATH, 'static/images')),
+    ('fonts',os.path.join(CLIENT_SERVER_PATH, 'static/fonts')),
     ('javascript',os.path.join(CLIENT_SERVER_PATH, 'static/javascript'))
 )
 

@@ -1,10 +1,11 @@
 <script type="text/template" id="node-detail-view-template">
   <h1><%- displayTitle %>
     <div class="detailed-title-tools">
-      <span class="learn-view-check" data-tag="<%= id %>"> ✓ </span>
-      <span class="learn-view-star" data-tag="<%= id %>"> ★ </span>
+      <span class="learn-view-check" data-tag="<%= id %>"> <i class="icon ion-checkmark-circled"></i> </span>
+      <span class="learn-view-star" data-tag="<%= id %>"> <i class="icon ion-star"></i></span>
     </div>
   </h1>
+
   <div class="detail-time-est">
     <% if (time) { %>
         <span class="info-text">(<%- time %> to learn)</span>

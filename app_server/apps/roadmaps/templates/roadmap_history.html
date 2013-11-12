@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block main %}
+<ol>
+{% for rev in revs %}
+ <li> <a href="{% url "roadmaps:version" username tag rev.revision_id %}">Version {{rev.revision_id}}</a></li>
+{% endfor %}
+</ol>
+{% endblock %}

@@ -1,19 +1,21 @@
 import os
 from operator import attrgetter
+import pdb
 
 import bleach
 import markdown
 import re
 import urlparse
+import reversion
 
-import pdb
-
+from django.db import transaction
 from django.contrib.auth.models import User
 from django.forms import ModelForm, Textarea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
 
 import apps.cserver_comm.cserver_communicator as cscomm
 from utils.roadmap_extension import RoadmapExtension
@@ -68,30 +70,62 @@ def markdown_to_html(markdown_text):
     return bleach.linkify(html, callbacks=[process_link])
 
 
-def show(request, username, tag):
+def show(request, username, tag, vnum=-1):
     roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
 
     if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
-    
+
+    vnum = int(vnum)
+    versions = reversion.get_for_object(roadmap)
+    num_versions = len(versions)
+
+    fdict = {}
+    if num_versions > vnum >= 0 :
+        fdict = versions[vnum].field_dict
     can_edit = roadmap.editable_by(request.user)
-    edit_url = '/roadmaps/%s/%s/edit' % (username, tag)
+    base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
+    edit_url = base_url + "/edit"
+    history_url = base_url + "/history"
 
     # temporary: editing disabled on server
     if username not in EDIT_USERS:
         can_edit = False
 
-    body_html = markdown_to_html(roadmap.body)
+    if fdict:
+        disp_txt = fdict["body"]
+    else:
+        disp_txt = roadmap.body
+    body_html = markdown_to_html(disp_txt)
     
     return render(request, 'roadmap.html', {
         'body_html': safestring.mark_safe(body_html),
         'roadmap': roadmap,
         'show_edit_link': can_edit,
-        'edit_url': edit_url
+        'edit_url': edit_url,
+        'username': username,
+        'tag': tag,
+        'history_url': history_url,
+        'num_versions': num_versions
         })
 
+def show_history(request, username, tag):
+    roadmap = models.load_roadmap(username, tag)
+    if roadmap is None:
+        return HttpResponse(status=404)
+
+    if not roadmap.visible_to(request.user):
+        return HttpResponse(status=404)
+        
+    revs = reversion.get_for_object(roadmap)
+    return render(request, 'roadmap_history.html',
+                  {"revs": revs,
+                   'username': username,
+                   'tag': tag,
+               })
+    
 
 class RoadmapForm(ModelForm):
     class Meta:
@@ -112,6 +146,8 @@ class RoadmapCreateForm(RoadmapForm):
             }
         
 
+
+@transaction.atomic
 def edit(request, username, tag):
     # temporary: editing disabled on server
     if username not in EDIT_USERS:
@@ -130,7 +166,9 @@ def edit(request, username, tag):
         form = RoadmapForm(request.POST, instance=roadmap)
 
         if form.is_valid():
-            form.save()
+            with reversion.create_revision():
+                form.save()
+                reversion.set_user(request.user)
 
             return HttpResponseRedirect('/roadmaps/%s/%s' % (username, tag))
 
@@ -153,9 +191,11 @@ def new(request):
     if request.method == 'POST':
         form = RoadmapCreateForm(request.POST)
         if form.is_valid():
-            roadmap = form.save(commit=False)
-            roadmap.user = request.user
-            roadmap.save()
+            with reversion.create_revision():
+                roadmap = form.save(commit=False)
+                roadmap.user = request.user
+                roadmap.save()
+                reversion.set_user(request.user)
             
             return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, roadmap.url_tag))
     else:
@@ -166,7 +206,7 @@ def new(request):
         })
 
 
-@csrf_exempt  # this is a POST request because it contains data, but there are no side effects
+@csrf_exempt  # this is a POST request because it contains data, but there are no side effects [COLO: why is this csrf exempt?]
 def preview(request):
     if request.method != 'POST':
         return HttpResponse(status=404)

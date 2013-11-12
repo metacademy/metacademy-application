@@ -1,4 +1,4 @@
-Django==1.5.4
+Django==1.6
 Flask==0.10.1
 Flask-Cache==0.12
 Jinja2==2.7.1

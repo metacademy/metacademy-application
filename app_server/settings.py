@@ -134,7 +134,8 @@ INSTALLED_APPS = (
     'captcha',
     'south',
     'compressor',
-    'lazysignup'
+    'lazysignup',
+    'reversion'
 )
 
 # apps settings

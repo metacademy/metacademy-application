@@ -119,8 +119,8 @@ def show_history(request, username, tag):
     if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
         
-    revs = reversion.get_for_object(roadmap)
-    return render(request, 'roadmap_history.html',
+    revs = reversion.get_unique_for_object(roadmap)
+    return render(request, 'roadmap-history.html',
                   {"revs": revs,
                    'username': username,
                    'tag': tag,
@@ -169,6 +169,7 @@ def edit(request, username, tag):
             with reversion.create_revision():
                 form.save()
                 reversion.set_user(request.user)
+                reversion.set_comment("test comment")
 
             return HttpResponseRedirect('/roadmaps/%s/%s' % (username, tag))
 

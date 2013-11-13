@@ -1,0 +1,32 @@
+{% extends "roadmap-base.html" %}
+
+{% block main %}
+<h1 class="history-header">
+  Revisions
+</h1>
+
+<ol class="history-list">
+{% for rev in revs %}
+ <li>
+   <a class="internal-link" href="{% url "roadmaps:version" username tag rev.revision_id %}"> {{rev.revision.date_created}} (#{{rev.revision_id}}) by   {{rev.revision.user.username}} </a>
+
+   <div class="revision-history-revert">
+     <button>Revert</a>
+   </div>
+   <div class="revision-history-preview">
+     <button>Preview this revision</a>
+   </div>
+
+   <div class="revision-history-comment">
+     {% if rev.revision.comment %}
+     {{rev.revision.comment}}
+     {% else %}
+     (updated text -- no commit message)
+     {% endif %}
+     <div style="clear:both;">
+     </div>
+   </div>
+ </li>
+{% endfor %}
+</ol>
+{% endblock %}

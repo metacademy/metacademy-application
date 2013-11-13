@@ -2,7 +2,7 @@
     width: 75%;
     padding-bottom: 3em;
     margin: 2em auto;
-    font: 16px Helvetica, arial, freesans, clean, sans-serif;
+    font-size: 16px;
     color: #23240D;
 }
 
@@ -12,7 +12,7 @@
 }
 
 .title {
-    font-size: 2.2em;
+    font-size: 1.8em;
     font-weight: bold;
     margin-bottom: 0.4em;
 }
@@ -35,7 +35,6 @@ a.external-link{
 }
 
 .content {
-    font-family: Arial, sans-serif;
     font-size: 1.0em;
     overflow: hidden;
     color: #23240D;
@@ -43,12 +42,18 @@ a.external-link{
 }
 
 .content p{
-    margin: 0.2em 0 0 0;
+    margin: 0.4em 0 0 0;
     padding: 0;
 }
 
 .content p + p, .content ul + p {
-    margin: 0.7em 0 0 0;
+    margin: 1.3em 0 0 0;
+}
+
+.history-header{
+    margin-left: 15%;
+    font-size: 1.3em;
+    font-weight: bold;
 }
 
 .content h1 {
@@ -63,7 +68,7 @@ a.external-link{
 .content h2 {
     font-weight: bold;
     font-size: 1.3em;
-    margin-top:  0.8em;
+    margin-top:  1.3em;
     margin-bottom: 0.3em;
     padding-bottom: 0.3em;
     border-bottom: 1px solid #E6E6E6;
@@ -184,8 +189,49 @@ a.external-link{
     clear: both;
 }
 
+ol.history-list{
+    width: 70%;
+    margin: auto;
+}
+
+.history-list li {
+    border: 1px solid #B6ADAD;
+    margin: 1em 0;
+    border-radius: 5px;
+    padding: 0.5em;
+}
+
+.revision-history-comment{
+    color: #818288;
+    font-size: 0.8em;
+}
+
+.revision-history-preview, .revision-history-revert{
+    float: right;
+}
+
+.revision-history-preview button, .revision-history-revert button{
+    color: white;
+    padding: 0.7em;
+    background: #474949;
+    padding: 0.7em;
+    font-size: 0.9em;
+    border-radius: 5px;
+    border: none;
+}
+
+.revision-history-revert button{
+   background: #681030;
+}
+
 @media only screen and (max-width: 769px){
     div.container{
         width: 95%;        
+    }
+    ol.history-list{
+        width: 90%;
+    }
+    .history-header{
+        margin-left: 5%;
     }
 }

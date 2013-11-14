@@ -210,18 +210,26 @@ ol.history-list{
     float: right;
 }
 
-.revision-history-preview button, .revision-history-revert button{
+.revision-history-preview a, .revision-history-revert a{
     color: white;
     padding: 0.7em;
+    display: inline-block;
+    text-decoration: none;
     background: #474949;
+    cursor: pointer;
     padding: 0.7em;
     font-size: 0.9em;
     border-radius: 5px;
     border: none;
 }
 
-.revision-history-revert button{
-   background: #681030;
+.revision-history-revert a{
+    margin-left: 0.5em;
+    background: #681030;
+}
+
+#preview-display-box{
+    display: none;
 }
 
 @media only screen and (max-width: 769px){

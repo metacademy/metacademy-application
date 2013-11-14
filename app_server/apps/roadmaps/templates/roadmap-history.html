@@ -1,4 +1,15 @@
 {% extends "roadmap-base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/roadmap.css" %}"> </rel>
+<link rel="stylesheet" href="{% static "css/colorbox.css" %}" media="screen" />
+{% endblock %}
+
+{% block jscript-extend %}
+<script src="{% static "javascript/lib/jquery.colorbox-min.js" %}"></script>
+<script src="{% static "javascript/roadmap-preview.js" %}"></script>
+{% endblock %}
 
 {% block main %}
 <h1 class="history-header">
@@ -11,10 +22,10 @@
    <a class="internal-link" href="{% url "roadmaps:version" username tag rev.revision_id %}"> {{rev.revision.date_created}} (#{{rev.revision_id}}) by   {{rev.revision.user.username}} </a>
 
    <div class="revision-history-revert">
-     <button>Revert</a>
-   </div>
+     <a href="">Revert</a>
+   </div> 
    <div class="revision-history-preview">
-     <button>Preview this revision</a>
+   <a class="cbox-preview" href="{% url "roadmaps:version" username tag rev.revision_id %}">Preview this revision</a>
    </div>
 
    <div class="revision-history-comment">
@@ -23,10 +34,14 @@
      {% else %}
      (updated text -- no commit message)
      {% endif %}
-     <div style="clear:both;">
-     </div>
+   </div>
+
+   <div style="clear:both;">
    </div>
  </li>
 {% endfor %}
 </ol>
+
+<div id="preview-display-box">
+</div>
 {% endblock %}

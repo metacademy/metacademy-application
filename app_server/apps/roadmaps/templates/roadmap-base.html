@@ -8,3 +8,23 @@ Metacademy - {{ roadmap.title|escape }}
 {% block extra-css %}
 <link rel="stylesheet" href="{% static "css/roadmap.css" %}"> </link>
 {% endblock %}
+
+{% block main %}
+{% block roadmap-header %}
+<div class="roadmap-header">
+  <h1>
+  {{ roadmap.title }}
+  </h1>
+  <div class="roadmap-header-nav">
+    <a href="{{ edit_url }}">View</a>
+    <a href="{{ edit_url }}">Source</a>
+    <a href="{{ history_url }}">Changes</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block roadmap-content %}
+
+{% endblock %}
+
+{% endblock %}

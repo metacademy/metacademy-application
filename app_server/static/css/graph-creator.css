@@ -1,5 +1,6 @@
 #main{
     position: relative;
+    overflow-y: scroll;
 }
 
 p{ 
@@ -25,7 +26,7 @@ body{
     user-select: none;
 }
 
-#gc-svg{
+#gc-wrap{
     display: none;
 }
 
@@ -89,6 +90,11 @@ g.selected:hover circle{
 
 g.conceptG circle.to-edit-circle{
     fill: #C2DBFC;
+    display: none;
+}
+
+g.conceptG.hover-g circle.to-edit-circle{
+    display: block;
 }
 
 path.link {

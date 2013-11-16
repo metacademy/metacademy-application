@@ -10,9 +10,13 @@ requirejs.config({
     backbone: "lib/backbone-min",
     d3: "lib/d3",
     "btouch": "lib/backbone.touch",
-    "sidr": "lib/jquery.sidr.min"
+    "sidr": "lib/jquery.sidr.min",
+    "dagre": "lib/dagre"
   },
   shim: {
+    dagre: {
+      exports: "dagre"
+    },
     d3: {
       exports: "d3"
     },

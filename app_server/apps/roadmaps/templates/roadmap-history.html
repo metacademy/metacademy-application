@@ -19,7 +19,7 @@
 <ol class="history-list">
 {% for rev in revs %}
  <li {% if rev.object_version.object.version_num == cur_version_num%} class="current" {% endif %}>
-   <a class="internal-link" href="{% url "roadmaps:version" username tag rev.revision_id %}"> (#{{forloop.revcounter0}}) by {{rev.revision.user.username}} [{{rev.revision.date_created}}] </a>
+   <a class="internal-link" href="{% url "roadmaps:version" username tag forloop.revcounter0 %}"> (#{{forloop.revcounter0}}) by {{rev.revision.user.username}} [{{rev.revision.date_created}}] </a>
 
    {% if can_edit %}
    <div class="revision-history-revert">

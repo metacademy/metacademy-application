@@ -1,8 +1,14 @@
 {% extends "roadmap-base.html" %}
 {% load staticfiles %}
 
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/roadmap.css" %}"> </rel>
+<link rel="stylesheet" href="{% static "css/colorbox.css" %}" media="screen" />
+{% endblock %}
+
 {% block jscript-extend %}
 <script type="text/javascript" src="{% static "javascript/roadmap-edit.js" %}"></script>
+<script src="{% static "javascript/lib/jquery.colorbox-min.js" %}"></script>
 {% endblock %}
   
 {% block roadmap-content %}
@@ -10,8 +16,7 @@
   <div class="form-wrapper">
     <form method="post" action="">
       {% csrf_token %}
-      <div class="form-title">{% block form_title %}Editing {{ tag }}{% endblock %}</div>
-      
+
       {% if form.errors %}
 	<div class="form-errors">
 	  {% for key, value in form.errors.items %}
@@ -47,7 +52,7 @@
         </div>
 
         <div class="form-field">
-          {{ form.blurb.label_tag }}
+          <label for="id_blurb">Quick Description:</label>
           {{ form.blurb }}
         </div>
 
@@ -56,18 +61,20 @@
             {{ form.body }}
           </div>
           
+          <div id="edit-summary" class="form-field">
+            
+            <label for="commit-blurb">Edit Message</label>
+            {{ form.commit_msg }}
+          </div>
           <div class="buttons">
-            <input id="preview-button" type="button" value="Preview" />
-            <input id="submit-button" type="submit" value="Save" />
+            <button id="preview-button"> Preview </button>
+            <input id="submit-button" type="submit" value="Save" onclick="this.disabled = true; this.form.submit();"/> 
           </div>
         </div>
 
       {% endblock %}
 
     </form>
-    
-    <div id="preview-area"></div>
-
   </div>
 
 

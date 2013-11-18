@@ -28,9 +28,6 @@ window.onload = (function($){
         url: evt.currentTarget.href
     }).complete(function(){
       curTar.innerHTML = 'Revert';
-      // remove spinner
-      // TODO change the currently activated element
-      alert("done");
     });
              
   });

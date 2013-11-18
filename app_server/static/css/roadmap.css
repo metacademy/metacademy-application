@@ -24,18 +24,28 @@
 }
 
 .roadmap-header-nav{
-    float: right;
-    display: block;
+    margin-top: 0.5em;
 }
 
 .roadmap-header-nav a{
     padding: 0.5em;
-    background: #333;
+    border: 1px solid #333;
     border-radius: 5px;
     margin: 0 0.1em;
+    font-size: 8pt;
     display: inline-block;
     text-decoration: none;
+    color: #333;
+}
+
+.roadmap-header-nav a:hover{
+    background-color: #eeeeee;
+}
+
+.edit #source-nav, .view #read-nav, .history #history-nav{
+    background-color: #333;
     color: white;
+    cursor: default;
 }
 
 a.external-link{
@@ -148,6 +158,19 @@ a.external-link{
     padding-bottom: 3em;
 }
 
+.form-wrapper input, .form-wrapper textarea{
+    border-radius: 3px;
+    border: 1px solid #ABACB4;
+    padding: 0.1em;
+    width: 100%;
+    max-width: 70em;
+}
+
+#id_blurb{
+    width: 70%;
+    height: 6em;
+}
+
 .form-title {
     font-size: 1.8em;
     padding-bottom: 0.5em;
@@ -180,12 +203,22 @@ a.external-link{
 }
 
 .body-button-wrapper{
-    float: left;
     padding-bottom: 1em;
+    width: 100%;
 }
 
 .buttons{
-    float: right;
+    text-align: right;
+}
+
+#edit-summary{
+    margin: 0.5em 0;    
+}
+#edit-summary input{
+    width: 100%;
+}
+#edit-summary label{
+    float: none;
 }
 
 #preview-button, #submit-button{
@@ -194,16 +227,23 @@ a.external-link{
     padding-right: 0.5em;
     padding-top: 0.25em;
     padding-bottom: 0.25em;
+    width: 8em;
 }
 
 #preview-button{
-    background-color: #009;
+    background-color: #70404F;
     color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #submit-button{
-    background-color: #905;
+    background-color: #413C3E;
     color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #preview-area{
@@ -225,6 +265,7 @@ ol.history-list{
 .revision-history-comment{
     color: #818288;
     font-size: 0.8em;
+    margin-top: 0.4em;
 }
 
 .revision-history-preview, .revision-history-revert{

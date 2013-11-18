@@ -10,7 +10,6 @@ import reversion
 
 from django.db import transaction
 from django.contrib.auth.models import User
-from django.forms import ModelForm, Textarea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
@@ -19,8 +18,10 @@ from django.contrib.auth.models import User
 
 import apps.cserver_comm.cserver_communicator as cscomm
 from utils.roadmap_extension import RoadmapExtension
+from forms import RoadmapForm, RoadmapCreateForm
 import models
 import settings
+
 
 
 MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mit_6_438.txt')
@@ -100,11 +101,13 @@ def show(request, username, tag, vnum=-1):
         'body_html': markdown_to_html(roadmap.body),
         'roadmap': roadmap,
         'show_edit_link': can_edit,
-        'edit_url': edit_url,
         'username': username,
         'tag': tag,
+        'edit_url': edit_url,
+        'base_url': base_url,
         'history_url': history_url,
-        'num_versions': num_versions
+        'num_versions': num_versions,
+        'page_class': "view",
         })
 
 def show_history(request, username, tag):
@@ -118,10 +121,19 @@ def show_history(request, username, tag):
     revs = get_versions_obj(roadmap)
     revs = revs[::-1]
 
+    base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
+    edit_url = base_url + "/edit"
+    history_url = base_url + "/history"
+
     return render(request, 'roadmap-history.html',
                   {"revs": revs,
                    'username': username,
                    'tag': tag,
+                   'edit_url': edit_url,
+                   'base_url': base_url,
+                   'history_url': history_url,
+                   'page_class': "history",
+                   'roadmap': roadmap,
                })
 
 @csrf_exempt
@@ -154,26 +166,6 @@ def update_to_revision(request, username, tag, vnum):
 def get_versions_obj(obj):
     return reversion.get_for_object(obj).order_by("id")
 
-class RoadmapForm(ModelForm):
-    class Meta:
-        model = models.Roadmap
-        fields = ('title', 'author', 'audience', 'visibility', 'blurb', 'body')
-        widgets = {
-            'blurb': Textarea(attrs={'cols': 50, 'rows': 3}),
-            'body': Textarea(attrs={'cols': 100, 'rows': 40}),
-            }
-
-class RoadmapCreateForm(RoadmapForm):
-    class Meta:
-        model = models.Roadmap
-        fields = ('title', 'url_tag', 'author', 'audience', 'visibility', 'blurb', 'body')
-        widgets = {
-            'blurb': Textarea(attrs={'cols': 50, 'rows': 3}),
-            'body': Textarea(attrs={'cols': 100, 'rows': 40}),
-            }
-        
-
-
 @transaction.atomic
 def edit(request, username, tag):
     # temporary: editing disabled on server
@@ -196,16 +188,26 @@ def edit(request, username, tag):
             with reversion.create_revision():
                 form.save()
                 reversion.set_user(request.user)
-                reversion.set_comment("test comment")
+                reversion.set_comment(form.cleaned_data['commit_msg'])
 
             return HttpResponseRedirect('/roadmaps/%s/%s' % (username, tag))
 
     else:
         form = RoadmapForm(instance=roadmap)
     
+    
+    base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
+    edit_url = base_url + "/edit"
+    history_url = base_url + "/history"
+
     return render(request, 'roadmap-edit.html', {
         'form': form,
-        'tag': roadmap.url_tag
+        'tag': roadmap.url_tag,
+        'edit_url': edit_url,
+        'base_url': base_url,
+        'history_url': history_url,
+        'page_class': "edit",
+        'roadmap': roadmap,
         })
 
 def new(request):

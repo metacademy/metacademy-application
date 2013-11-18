@@ -1,11 +1,22 @@
-$("#preview-button").click(function() {
-  var params = {'title': $("#id_title").val(), 
-                'author': $("#id_author").val(), 
-                'audience': $("#id_audience").val(),
-                'body': $("#id_body").val()};
+window.onload = (function($){
+  $("#preview-button").click(function(evt) {
+    var $curTar = $(this);
 
-  $.post('/roadmaps/preview', params, function(data) {
-    $("#preview-area").html(data);
+    evt.preventDefault();
+    $curTar.prop('disabled', true);
+    $curTar.html('<img src="/static/images/white-ajax-loader.gif">');
+    var params = {'title': $("#id_title").val(), 
+                  'author': $("#id_author").val(), 
+                  'audience': $("#id_audience").val(),
+                  'body': $("#id_body").val()};
+
+    
+    $.post('/roadmaps/preview', params, function(data) {    
+      $curTar.html('Preview');  
+      $curTar.prop('disabled', false);
+      var $res = $(data);
+      $.colorbox({inline: true, href: $res, transition: "elastic", width: "85%", height: "85%"});
+    });
   });
+})(window.$);
 
-});

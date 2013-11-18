@@ -86,8 +86,8 @@ def show(request, username, tag, vnum=-1):
 
     fdict = {}
 
-    if num_versions >= vnum > 0 : 
-        roadmap = versions[vnum-1].object_version.object# since versions are 1 indexed but arrays are 0 indexed
+    if num_versions > vnum >= 0 : 
+        roadmap = versions[vnum].object_version.object
     can_edit = roadmap.editable_by(request.user)
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
@@ -114,13 +114,13 @@ def show_history(request, username, tag):
     roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
+    cur_version_num = roadmap.version_num
+    can_edit = roadmap.editable_by(request.user)
 
     if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
 
-    revs = get_versions_obj(roadmap)
-    revs = revs[::-1]
-
+    revs = get_versions_obj(roadmap)[::-1]
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
     history_url = base_url + "/history"
@@ -134,6 +134,8 @@ def show_history(request, username, tag):
                    'history_url': history_url,
                    'page_class': "history",
                    'roadmap': roadmap,
+                   'cur_version_num':cur_version_num,
+                   'can_edit': can_edit,
                })
 
 @csrf_exempt
@@ -148,18 +150,20 @@ def update_to_revision(request, username, tag, vnum):
     roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
+    
+    can_edit = roadmap.editable_by(request.user)
 
-    if not (roadmap.visible_to(request.user) and roadmap.editable_by(request.user)):
-        return HttpResponse(status=404)
+    if not can_edit:
+        return HttpResponse(status=403)
 
     vnum = int(vnum) 
     versions = get_versions_obj(roadmap)
     num_versions = len(versions)
 
-    if 0 >= vnum or vnum > num_versions:
+    if 0 > vnum or vnum >= num_versions:
         return HttpResponse(status=404)
 
-    versions[vnum-1].revert() # since versions are 1 indexed but arrays are 0 indexed
+    versions[vnum].revert()
     
     return HttpResponse(status=200)
 
@@ -168,25 +172,30 @@ def get_versions_obj(obj):
 
 @transaction.atomic
 def edit(request, username, tag):
-    # temporary: editing disabled on server
-    if username not in EDIT_USERS:
-        return HttpResponse(status=404)
-    
-    if not request.user.is_authenticated():
-        return HttpResponse(status=404)
 
     roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
-    if not roadmap.editable_by(request.user):
+
+    if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
+
+    can_edit = roadmap.editable_by(request.user)
     
     if request.method == 'POST':
+        if not (request.user.is_authenticated() and can_edit):
+            # TODO inform the user that they cannot edit
+            return HttpResponse(status=401)
+        
         form = RoadmapForm(request.POST, instance=roadmap)
 
         if form.is_valid():
+            versions = get_versions_obj(roadmap)
+            cur_vn = len(versions) + 1
+            smodel = form.save(commit=False)
+            smodel.version_num = cur_vn
             with reversion.create_revision():
-                form.save()
+                smodel.save()
                 reversion.set_user(request.user)
                 reversion.set_comment(form.cleaned_data['commit_msg'])
 
@@ -208,11 +217,13 @@ def edit(request, username, tag):
         'history_url': history_url,
         'page_class': "edit",
         'roadmap': roadmap,
+        'can_edit': can_edit,
         })
 
 def new(request):
     # temporary: editing disabled on server
-    if not (request.user.is_authenticated() and request.user.username in EDIT_USERS):
+    can_edit = request.user.is_authenticated() and request.user.username in EDIT_USERS
+    if not can_edit:
         return HttpResponse(status=404)
 
     if not request.user.is_authenticated():
@@ -232,7 +243,8 @@ def new(request):
         form = RoadmapCreateForm()
         
     return render(request, 'roadmap-new.html', {
-        'form': form
+        'form': form,
+        'can_edit': can_edit
         })
 
 

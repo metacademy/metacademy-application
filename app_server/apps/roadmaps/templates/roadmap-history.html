@@ -18,15 +18,17 @@
 
 <ol class="history-list">
 {% for rev in revs %}
- <li>
-   <a class="internal-link" href="{% url "roadmaps:version" username tag rev.revision_id %}"> (#{{rev.revision_id}}) by {{rev.revision.user.username}} [{{rev.revision.date_created}}] </a>
-   <div class="revision-history-revert">
-     <a href="update_to_revision/{{rev.revision_id}}">Revert</a>
-   </div>      
+ <li {% if rev.object_version.object.version_num == cur_version_num%} class="current" {% endif %}>
+   <a class="internal-link" href="{% url "roadmaps:version" username tag rev.revision_id %}"> (#{{forloop.revcounter0}}) by {{rev.revision.user.username}} [{{rev.revision.date_created}}] </a>
 
+   {% if can_edit %}
+   <div class="revision-history-revert">
+     <a href="update_to_revision/{{forloop.revcounter0}}">Revert</a>
+   </div>      
+   {% endif %}
 
    <div class="revision-history-preview">
-   <a class="cbox-preview" href="{% url "roadmaps:version" username tag rev.revision_id %}">Preview</a>
+   <a class="cbox-preview" href="{% url "roadmaps:version" username tag forloop.revcounter0 %}">Preview</a>
    </div>   
 
    <div class="revision-history-comment">

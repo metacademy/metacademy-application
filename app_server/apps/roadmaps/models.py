@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db.models import CharField, ForeignKey, Model, SlugField, TextField
+from django.db.models import CharField, ForeignKey, Model, SlugField, TextField, IntegerField
 
 import reversion
 
@@ -14,6 +14,7 @@ class Roadmap(Model):
     audience = CharField('Target audience', max_length=100)
     blurb = TextField('Blurb', blank=True)
     body = TextField()
+    version_num = IntegerField(default=0)
 
     VIS_PRIVATE = 'PRIVATE'
     VIS_PUBLIC = 'PUBLIC'

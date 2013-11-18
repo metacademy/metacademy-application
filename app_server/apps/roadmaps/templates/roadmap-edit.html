@@ -13,7 +13,14 @@
   
 {% block roadmap-content %}
 
+
   <div class="form-wrapper">
+{% if not can_edit %}
+  <div class="no-edit-inform">
+    Note: your changes to this roadmap will not be saved (you're not on the editor list),
+  </div>
+{% endif %}
+
     <form method="post" action="">
       {% csrf_token %}
 
@@ -60,15 +67,17 @@
           <div class="form-body">
             {{ form.body }}
           </div>
-          
-          <div id="edit-summary" class="form-field">
-            
+          {% if can_edit %}
+          <div id="edit-summary" class="form-field">            
             <label for="commit-blurb">Edit Message</label>
             {{ form.commit_msg }}
           </div>
+          {% endif %}
           <div class="buttons">
             <button id="preview-button"> Preview </button>
-            <input id="submit-button" type="submit" value="Save" onclick="this.disabled = true; this.form.submit();"/> 
+            {% if can_edit %}
+              <input id="submit-button" type="submit" value="Save" onclick="this.disabled = true; this.form.submit();"/>
+            {% endif %}
           </div>
         </div>
 

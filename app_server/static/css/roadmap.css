@@ -11,6 +11,14 @@
     margin-bottom: 0.58em;
 }
 
+.no-edit-inform{
+    padding: 1em;
+    background: rgb(245, 200, 200);
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
 .roadmap-header {
     margin: 1.5em auto 1em auto;
     width: 75%;
@@ -82,9 +90,9 @@ a.external-link{
 }
 
 .history-header{
-    margin-left: 15%;
     font-size: 1.3em;
     font-weight: bold;
+    text-align: center;
 }
 
 .content h1 {
@@ -257,9 +265,14 @@ ol.history-list{
 
 .history-list li {
     border: 1px solid #B6ADAD;
-    margin: 1em 0;
+    margin: 1em auto;
     border-radius: 5px;
     padding: 0.5em;
+    max-width: 40em;    
+}
+
+.history-list li.current{
+    background-color: #FFF7FD;
 }
 
 .revision-history-comment{
@@ -292,7 +305,7 @@ ol.history-list{
     background: #681030;
 }
 
-.revision-history-revert.current-version a{
+.current .revision-history-revert a{
     background: #D8C6CD;
     cursor: default;
 }

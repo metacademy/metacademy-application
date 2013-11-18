@@ -69,22 +69,24 @@ def markdown_to_html(markdown_text):
     html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
     return bleach.linkify(html, callbacks=[process_link])
 
-
+# todo a class-based view will simplify this
 def show(request, username, tag, vnum=-1):
     roadmap = models.load_roadmap(username, tag)
+
     if roadmap is None:
         return HttpResponse(status=404)
 
     if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
 
-    vnum = int(vnum)
-    versions = reversion.get_for_object(roadmap)
+    vnum = int(vnum) 
+    versions = get_versions_obj(roadmap)
     num_versions = len(versions)
 
     fdict = {}
-    if num_versions > vnum >= 0 :
-        fdict = versions[vnum].field_dict
+
+    if num_versions >= vnum > 0 : 
+        roadmap = versions[vnum-1].object_version.object# since versions are 1 indexed but arrays are 0 indexed
     can_edit = roadmap.editable_by(request.user)
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
@@ -94,14 +96,8 @@ def show(request, username, tag, vnum=-1):
     if username not in EDIT_USERS:
         can_edit = False
 
-    if fdict:
-        disp_txt = fdict["body"]
-    else:
-        disp_txt = roadmap.body
-    body_html = markdown_to_html(disp_txt)
-    
     return render(request, 'roadmap.html', {
-        'body_html': safestring.mark_safe(body_html),
+        'body_html': markdown_to_html(roadmap.body),
         'roadmap': roadmap,
         'show_edit_link': can_edit,
         'edit_url': edit_url,
@@ -118,14 +114,45 @@ def show_history(request, username, tag):
 
     if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
-        
-    revs = reversion.get_unique_for_object(roadmap)
+
+    revs = get_versions_obj(roadmap)
+    revs = revs[::-1]
+
     return render(request, 'roadmap-history.html',
                   {"revs": revs,
                    'username': username,
                    'tag': tag,
                })
+
+@csrf_exempt
+def update_to_revision(request, username, tag, vnum):
+    """
+    update the given roadmap to the specified reversion number (simply copies over the previous entry)
+    """
+
+    if not request.method == "PUT":
+        return HttpResponse(status=403)
+
+    roadmap = models.load_roadmap(username, tag)
+    if roadmap is None:
+        return HttpResponse(status=404)
+
+    if not (roadmap.visible_to(request.user) and roadmap.editable_by(request.user)):
+        return HttpResponse(status=404)
+
+    vnum = int(vnum) 
+    versions = get_versions_obj(roadmap)
+    num_versions = len(versions)
+
+    if 0 >= vnum or vnum > num_versions:
+        return HttpResponse(status=404)
+
+    versions[vnum-1].revert() # since versions are 1 indexed but arrays are 0 indexed
     
+    return HttpResponse(status=200)
+
+def get_versions_obj(obj):
+    return reversion.get_for_object(obj).order_by("id")
 
 class RoadmapForm(ModelForm):
     class Meta:
@@ -207,7 +234,7 @@ def new(request):
         })
 
 
-@csrf_exempt  # this is a POST request because it contains data, but there are no side effects [COLO: why is this csrf exempt?]
+@csrf_exempt  # this is a POST request because it contains data, but there are no side effects 
 def preview(request):
     if request.method != 'POST':
         return HttpResponse(status=404)

@@ -232,6 +232,8 @@ ol.history-list{
 }
 
 .revision-history-preview a, .revision-history-revert a{
+    min-width: 3.5em;
+    text-align: center;
     color: white;
     padding: 0.7em;
     display: inline-block;
@@ -245,8 +247,13 @@ ol.history-list{
 }
 
 .revision-history-revert a{
-    margin-left: 0.5em;
+    margin-left: 0.8em;
     background: #681030;
+}
+
+.revision-history-revert.current-version a{
+    background: #D8C6CD;
+    cursor: default;
 }
 
 #preview-display-box{

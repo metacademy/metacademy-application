@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Metacademy - {{ roadmap.title|escape }}
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/roadmap.css" %}"> </link>
+{% endblock %}
+
+{% block main %}
+{% block roadmap-header %}
+<div class="roadmap-header {{ page_class }}">
+  <h1>
+  {% block roadmap-title %}
+  {{ roadmap.title }}
+  {% endblock %}
+  </h1>
+
+  {% block roadmap-nav %}
+  <div class="roadmap-header-nav" class="{{page_class}}">
+    <a href="{{ base_url }}" id="read-nav">Read</a>
+    <a href="{{ edit_url }}" id="source-nav">View source</a>
+    <a href="{{ history_url }}" id="history-nav">View history</a>
+  </div>
+  {% endblock %}
+</div>
+{% endblock %}
+
+{% block roadmap-content %}
+
+{% endblock %}
+
+{% endblock %}

@@ -2,7 +2,7 @@
     width: 75%;
     padding-bottom: 3em;
     margin: 2em auto;
-    font: 16px Helvetica, arial, freesans, clean, sans-serif;
+    font-size: 16px;
     color: #23240D;
 }
 
@@ -11,10 +11,49 @@
     margin-bottom: 0.58em;
 }
 
-.title {
-    font-size: 2.2em;
+.no-edit-inform{
+    padding: 1em;
+    background: rgb(245, 200, 200);
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.roadmap-header {
+    margin: 1.5em auto 1em auto;
+    width: 75%;
+}
+
+.roadmap-header h1{
+    margin-top: 0;
+    font-size: 1.8em;
     font-weight: bold;
-    margin-bottom: 0.4em;
+    display: inline-block;
+}
+
+.roadmap-header-nav{
+    margin-top: 0.5em;
+}
+
+.roadmap-header-nav a{
+    padding: 0.5em;
+    border: 1px solid #333;
+    border-radius: 5px;
+    margin: 0 0.1em;
+    font-size: 8pt;
+    display: inline-block;
+    text-decoration: none;
+    color: #333;
+}
+
+.roadmap-header-nav a:hover{
+    background-color: #eeeeee;
+}
+
+.edit #source-nav, .view #read-nav, .history #history-nav{
+    background-color: #333;
+    color: white;
+    cursor: default;
 }
 
 a.external-link{
@@ -35,7 +74,6 @@ a.external-link{
 }
 
 .content {
-    font-family: Arial, sans-serif;
     font-size: 1.0em;
     overflow: hidden;
     color: #23240D;
@@ -43,12 +81,18 @@ a.external-link{
 }
 
 .content p{
-    margin: 0.2em 0 0 0;
+    margin: 0.4em 0 0 0;
     padding: 0;
 }
 
 .content p + p, .content ul + p {
-    margin: 0.7em 0 0 0;
+    margin: 1.3em 0 0 0;
+}
+
+.history-header{
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
 }
 
 .content h1 {
@@ -63,7 +107,7 @@ a.external-link{
 .content h2 {
     font-weight: bold;
     font-size: 1.3em;
-    margin-top:  0.8em;
+    margin-top:  1.3em;
     margin-bottom: 0.3em;
     padding-bottom: 0.3em;
     border-bottom: 1px solid #E6E6E6;
@@ -122,6 +166,19 @@ a.external-link{
     padding-bottom: 3em;
 }
 
+.form-wrapper input, .form-wrapper textarea{
+    border-radius: 3px;
+    border: 1px solid #ABACB4;
+    padding: 0.1em;
+    width: 100%;
+    max-width: 70em;
+}
+
+#id_blurb{
+    width: 70%;
+    height: 6em;
+}
+
 .form-title {
     font-size: 1.8em;
     padding-bottom: 0.5em;
@@ -154,12 +211,22 @@ a.external-link{
 }
 
 .body-button-wrapper{
-    float: left;
     padding-bottom: 1em;
+    width: 100%;
 }
 
 .buttons{
-    float: right;
+    text-align: right;
+}
+
+#edit-summary{
+    margin: 0.5em 0;    
+}
+#edit-summary input{
+    width: 100%;
+}
+#edit-summary label{
+    float: none;
 }
 
 #preview-button, #submit-button{
@@ -168,24 +235,93 @@ a.external-link{
     padding-right: 0.5em;
     padding-top: 0.25em;
     padding-bottom: 0.25em;
+    width: 8em;
 }
 
 #preview-button{
-    background-color: #009;
+    background-color: #70404F;
     color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #submit-button{
-    background-color: #905;
+    background-color: #413C3E;
     color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #preview-area{
     clear: both;
 }
 
+ol.history-list{
+    width: 70%;
+    margin: auto;
+}
+
+.history-list li {
+    border: 1px solid #B6ADAD;
+    margin: 1em auto;
+    border-radius: 5px;
+    padding: 0.5em;
+    max-width: 40em;    
+}
+
+.history-list li.current{
+    background-color: #FFF7FD;
+}
+
+.revision-history-comment{
+    color: #818288;
+    font-size: 0.8em;
+    margin-top: 0.4em;
+}
+
+.revision-history-preview, .revision-history-revert{
+    float: right;
+}
+
+.revision-history-preview a, .revision-history-revert a{
+    min-width: 3.5em;
+    text-align: center;
+    color: white;
+    padding: 0.7em;
+    display: inline-block;
+    text-decoration: none;
+    background: #474949;
+    cursor: pointer;
+    padding: 0.7em;
+    font-size: 0.9em;
+    border-radius: 5px;
+    border: none;
+}
+
+.revision-history-revert a{
+    margin-left: 0.8em;
+    background: #681030;
+}
+
+.current .revision-history-revert a{
+    background: #D8C6CD;
+    cursor: default;
+}
+
+#preview-display-box{
+    display: none;
+}
+
 @media only screen and (max-width: 769px){
     div.container{
         width: 95%;        
+    }
+    ol.history-list{
+        width: 90%;
+    }
+    .history-header{
+        margin-left: 5%;
     }
 }

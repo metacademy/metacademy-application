@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
-from django.db.models import CharField, ForeignKey, Model, SlugField, TextField
+from django.db.models import CharField, ForeignKey, Model, SlugField, TextField, IntegerField
+
+import reversion
 
 MAX_USERNAME_LENGTH = 30   # max length in Django's User class
-
 
 
 class Roadmap(Model):
@@ -13,6 +14,7 @@ class Roadmap(Model):
     audience = CharField('Target audience', max_length=100)
     blurb = TextField('Blurb', blank=True)
     body = TextField()
+    version_num = IntegerField(default=0)
 
     VIS_PRIVATE = 'PRIVATE'
     VIS_PUBLIC = 'PUBLIC'
@@ -40,7 +42,8 @@ class Roadmap(Model):
 
     def editable_by(self, user):
         return user.is_authenticated() and self.user.username == user.username
-
+# use version control with roadmaps        
+reversion.register(Roadmap)
     
     
 def load_roadmap(username, roadmap_name):

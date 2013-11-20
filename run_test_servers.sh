@@ -11,7 +11,7 @@ fp=$4
 
 python content_server/server.py $ci:$cp &
 cserver_id=$!
-python app_server/manage.py runserver $fi:$fp --forked
+python app_server/manage.py runserver $fi:$fp
 
 # stop both servers on exit (this may not be desirable)
 pkill -TERM -P $cserver_id

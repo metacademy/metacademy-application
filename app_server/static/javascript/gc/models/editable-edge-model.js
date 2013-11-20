@@ -6,7 +6,8 @@ define(["backbone", "underscore", "agfk/models/directed-edge-model"], function(B
         target: {},
         path: "",
         isNew: 1,
-        editNote: ""
+        editNote: "",
+        middlePts: []
       };
       return _.extend({}, DetailedEdgeModel.prototype.defaults, enDef);
     }

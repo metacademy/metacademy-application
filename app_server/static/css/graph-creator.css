@@ -100,7 +100,7 @@ g.conceptG.hover-g circle.to-edit-circle{
 path.link {
     fill: none;
     stroke: #333;
-    stroke-width: 6px;
+    stroke-width: 4px;
     cursor: default;
 }
 

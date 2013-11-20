@@ -34,7 +34,7 @@ urlpatterns = patterns('',
                        url(r'^feedback/?$',  ContactView.as_view()),
                        url(r'^thanks/?$',  TemplateView.as_view(template_name='feedback_thanks.html')),
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^tests/link_checker/', include('apps.link_checker.urls', namespace="tests") ),
+                       url(r'^browser-tests', include('apps.browser_tests.urls', namespace="btests")),
 )
 
 urlpatterns += staticfiles_urlpatterns()

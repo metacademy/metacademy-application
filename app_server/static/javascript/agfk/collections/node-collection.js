@@ -1,5 +1,6 @@
 /*
  * This file contains the node collection
+ * it is a basic collection that should not depend on aux 
  */
 define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(Backbone, _, $, NodeModel){
   "use strict";
@@ -14,9 +15,11 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
      * parse incoming json data
      */
     parse: function(response){
-    if (response.hasOwnProperty("titles")){
-      window.agfkGlobals.auxModel.set("titles", response.titles);
-    }
+      // set aux if present (does not induce a strict dependency)
+      if (window.agfkGlobals && window.agfkGlobals.auxModel && response.hasOwnProperty("titles")){
+        window.agfkGlobals.auxModel.set("titles", response.titles);
+      }
+      
       var ents = [],
           nodes = response.hasOwnProperty("nodes") ? response.nodes : response;
       
@@ -25,24 +28,6 @@ define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(
         ents.push(_.extend(nodes[key],{sid: nodes[key].id, id: nodes[key].tag})); 
       }
       return ents;
-    },
-
-    /* Learning time estimate for the given node collection */
-    getTimeEstimate: function(){
-      var aux = window.agfkGlobals.auxModel,
-          total = 0;
-      
-      this.each(function(node) {
-        if (!aux.conceptIsLearned(node.id) && !node.getImplicitLearnStatus()) {
-          if (node.get("time")) {
-            total += node.get("time");
-          } else {
-            total += 1;     // reasonable guess when the time is unknown
-          }
-        }
-      });
-      return total;
-    }
-    
+    }    
   });
 });

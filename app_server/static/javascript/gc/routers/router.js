@@ -1,4 +1,4 @@
-window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/editable-graph-model", "gc/views/concept-editor-view"], function($, Backbone, GraphEditorView, GraphEditorModel, ConceptEditorView){
+window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/editable-graph-model", "gc/views/concept-editor-view"], function($, Backbone, GraphEditorView, EditableGraphModel, ConceptEditorView){
   return Backbone.Router.extend({
     routes: {
       "": "showGCEditor",
@@ -38,7 +38,7 @@ window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/ed
       var thisRoute = this;
       
       thisRoute.removeOtherView();
-      thisRoute.geModel = thisRoute.geModel || new GraphEditorModel();
+      thisRoute.geModel = thisRoute.geModel || new EditableGraphModel();
       thisRoute.geView = this.geView || new GraphEditorView({model: thisRoute.geModel});
       thisRoute.geView.render();
       thisRoute.geView.$el.show();
@@ -46,7 +46,7 @@ window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/ed
 
     openEditorView: function(concept_id){
       var thisRoute = this;      
-      thisRoute.geModel = thisRoute.geModel || new GraphEditorModel();
+      thisRoute.geModel = thisRoute.geModel || new EditableGraphModel();
       var model = thisRoute.geModel.get("nodes").get(concept_id);
       if (model){
         var editorView = new ConceptEditorView({model: model});

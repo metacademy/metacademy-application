@@ -79,7 +79,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
     thisView.state.selectedNode = nodeData;
   };
 
-  pvt.removeSelectFromNode = function(){
+  pvt.removeSelectFromNode = function() {
     var thisView = this;
     thisView.circles.filter(function(cd){
       return cd.id === thisView.state.selectedNode.id;
@@ -87,7 +87,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
     thisView.state.selectedNode = null;
   };
 
-  pvt.removeSelectFromEdge = function(){
+  pvt.removeSelectFromEdge = function() {
     var thisView = this;
     thisView.paths.filter(function(cd){
       return cd === thisView.state.selectedEdge;
@@ -104,7 +104,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       "click #toolbox": "optimizeGraphPlacement"
     },
     
-    initialize: function(){
+    initialize: function() {
       var thisView = this;
       thisView.state = {
         selectedNode: null,
@@ -115,7 +115,9 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
         justScaleTransGraph: false,
         lastKeyDown: -1,
         shiftNodeDrag: false,
-        selectedText: null
+        selectedText: null,
+        doCircleTrans: false,
+        doPathsTrans: false
       };
 
       thisView.idct = 0;
@@ -172,15 +174,15 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
           thisView.state.justDragged = true;
           pvt.dragmove.call(thisView, args);
         })
-        .on("dragstart", function(){
+        .on("dragstart", function() {
           // remove connecting intermediate pts
           var state = thisView.state;
           if (!state.shiftNodeDrag){
             state.mouseDownNode.get("dependencies").each(function(d){
-              d.ibtPts = [];
+              d.set("middlePts", []);
             });
             state.mouseDownNode.get("outlinks").each(function(d){
-              d.ibtPts = [];
+              d.set("middlePts", []);
             });
           }
         })
@@ -189,10 +191,10 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
         });
 
       // listen for key events
-      d3Svg.on("keydown", function(){ // TODO figure out deletes
+      d3Svg.on("keydown", function() { // TODO figure out deletes
         thisView.svgKeyDown.call(thisView);
       })
-        .on("keyup", function(){
+        .on("keyup", function() {
           thisView.svgKeyUp.call(thisView);
         });
 
@@ -201,7 +203,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       d3Svg.on("mouseup", function(d){thisView.svgMouseUp.call(thisView, d);});
 
       // zoomed function used for dragging behavior below
-      function zoomed(){
+      function zoomed() {
         thisView.state.justScaleTransGraph = true;
         d3.select("." + pvt.consts.graphClass)
           .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); 
@@ -209,7 +211,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
 
       // listen for dragging
       var dragSvg = d3.behavior.zoom()
-            .on("zoom", function(){
+            .on("zoom", function() {
               if (d3.event.sourceEvent.shiftKey){
                 // TODO  the internal d3 state is still changing
                 return false;
@@ -218,14 +220,14 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
               }
               return true;
             })
-            .on("zoomstart", function(){
+            .on("zoomstart", function() {
               var ael = d3.select("#" + pvt.consts.activeEditId).node();
               if (ael){
                 ael.blur();
               }
               if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
             })
-            .on("zoomend", function(){
+            .on("zoomend", function() {
               d3.select('body').style("cursor", "auto");
             });
       
@@ -233,7 +235,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
     },
 
 
-    render: function(){
+    render: function() {
       
       var thisView = this,
           consts = pvt.consts,
@@ -249,8 +251,16 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       paths.style('marker-end', 'url(#end-arrow)')
         .classed(consts.selectedClass, function(d){
           return d === state.selectedEdge;
-        })
-        .attr("d", getEdgePath);
+        });
+
+      if (thisView.state.doPathsTrans){
+        paths.transition()
+          .attr("d", getEdgePath);
+        thisView.state.doPathsTrans = false;
+      }
+      else{
+        paths.attr("d", getEdgePath);
+      }
 
       // add new paths
       paths.enter()
@@ -260,18 +270,16 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
         .attr("d", getEdgePath )
         .on("mousedown", function(d){
           thisView.pathMouseDown.call(thisView, d3.select(this), d);
-        }
-           )
+        })
         .on("mouseup", function(d){
           state.mouseDownLink = null;
         });
 
       function getEdgePath(d){
-          var ibtPts = d.ibtPts === undefined ? [] : [].concat(d.ibtPts);
-        
-          ibtPts.unshift(d.get("source"));        
-          ibtPts.push(computeEndPt(ibtPts[ibtPts.length-1], d.get("target"))); // TODO only compute if node position changed
-          return pvt.d3Line(ibtPts);
+          var pathPts = [].concat(d.get("middlePts"));        
+          pathPts.unshift(d.get("source"));        
+          pathPts.push(computeEndPt(pathPts[pathPts.length-1], d.get("target"))); // TODO only compute if node position changed
+          return pvt.d3Line(pathPts);
       }
 
       // computes intersection points for two circular nodes (simple geometry)
@@ -296,7 +304,20 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       thisView.circles = thisView.circles.data(thisView.model.get("nodes").models, function(d){
         return d.id;
       });
-      thisView.circles.attr("transform", function(d){return "translate(" + d.get("x") + "," + d.get("y") + ")";});
+      if (thisView.state.doCircleTrans){
+        thisView.circles
+          .transition()
+          .attr("transform", function(d){
+            return "translate(" + d.get("x") + "," + d.get("y") + ")";
+          });
+        thisView.state.doCircleTrans = false;
+      }
+      else {
+        thisView.circles
+            .attr("transform", function(d){
+            return "translate(" + d.get("x") + "," + d.get("y") + ")";
+          });
+      }
 
       // add new nodes
       var newGs= thisView.circles.enter()
@@ -327,7 +348,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       // setup event listener for changing title
       newGs.each(function(d){
         var d3el = d3.select(this);
-        thisView.listenTo(d, "change:title", function(){
+        thisView.listenTo(d, "change:title", function() {
           d3el.selectAll("text").remove();
           pvt.insertTitleLinebreaks(d3el, d.get("title"));
         });
@@ -412,16 +433,12 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
         var newEdge = {source: mouseDownNode, target: d, id: thisView.idct++};
         var filtRes = thisView.paths.filter(function(d){
           if (d.get("source") === newEdge.target && d.get("target") === newEdge.source){
-            thisView.model.get("edges").remove(d);
+            thisView.model.removeEdge(d);
           }
           return d.source === newEdge.source && d.target === newEdge.target;
         });
         if (!filtRes[0].length){
-          thisView.model.get("edges").add(newEdge); // todo switch to create
-          newEdge = thisView.model.get("edges").get(newEdge.id);
-          // add dependency to appropriate node
-          d.get("dependencies").add(newEdge);
-          mouseDownNode.get("outlinks").add(newEdge);
+          thisView.model.addEdge(newEdge); // todo switch to create
           thisView.render();
         }
       } else{
@@ -496,26 +513,28 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       return d3txt;
     },
 
-    svgMouseDown: function(){
+    svgMouseDown: function() {
       this.state.graphMouseDown = true;
     },
 
     // mouseup on main svg
-    svgMouseUp: function(){
+    svgMouseUp: function() {
       var thisView = this,
           state = thisView.state;
+
       if (state.justScaleTransGraph) {
         // dragged not clicked
         state.justScaleTransGraph = false;
       } else if (state.graphMouseDown && d3.event.shiftKey){
         // clicked not dragged from svg
         var xycoords = d3.mouse(thisView.d3SvgG.node()),
-            d = {id: thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]};
-        var nodes = thisView.model.get("nodes");
-        nodes.add(d); // todo switch to create once server is up
-        d = nodes.get(d.id);
+            d = {id: thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]},
+            model = thisView.model;
+
+        // add new node and make title immediently editable
+        model.addNode(d); // todo switch to create once server is up
+        d = model.getNode(d.id);
         thisView.render();
-        // make title of text immediently editable
         var d3txt = thisView.changeTextOfNode(thisView.circles.filter(function(dval){
           return dval.id === d.id;
         }), d),
@@ -547,24 +566,11 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       case consts.DELETE_KEY:
         d3.event.preventDefault();
         if (selectedNode){
-          thisView.model.get("nodes").remove(selectedNode);
-          // remove associate edges
-          var edges = thisView.model.get("edges");
-          selectedNode.get("dependencies").each(function(d){
-            edges.remove(d);
-            d.get("source").get("outlinks").remove(d);
-          });
-          selectedNode.get("outlinks").each(function(d){
-            edges.remove(d);
-            d.get("target").get("dependencies").remove(d);
-          });
-
+          thisView.model.removeNode(selectedNode);
           state.selectedNode = null;
           thisView.render();
         } else if (selectedEdge){
-          thisView.model.get("edges").remove(selectedEdge);
-          selectedEdge.get("source").get("outlinks").remove(selectedEdge);
-          selectedEdge.get("target").get("dependencies").remove(selectedEdge);
+          thisView.model.removeEdge(selectedEdge);
           state.selectedEdge = null;
           thisView.render();
         }
@@ -580,7 +586,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
     /**
      * Optimize graph placement using dagre
      */
-    optimizeGraphPlacement: function(){
+    optimizeGraphPlacement: function() {
       var thisView = this,
           dagreGraph = new dagre.Digraph(),
           nodeWidth = pvt.consts.nodeRadius,
@@ -604,7 +610,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       
       layout.eachEdge(function(e, u, v, value) {
           var plen = value.points.length;
-          edges.get(e).ibtPts = plen > 1 ? value.points : [];//value.points.splice(0, -1);
+          edges.get(e).set("middlePts",  plen > 1 ? value.points : []);//value.points.splice(0, -1);
       });
 
       layout.eachNode(function(n, inp){
@@ -612,6 +618,10 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
         node.set("x", inp.x);
         node.set("y", inp.y);
       });
+
+      thisView.state.doCircleTrans = true;
+      thisView.state.doPathsTrans = true;
+          
       thisView.render();
     }
     

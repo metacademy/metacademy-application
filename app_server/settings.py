@@ -130,14 +130,13 @@ INSTALLED_APPS = (
     'apps.user_management',
     'apps.cserver_comm',
     'apps.roadmaps',
-    'apps.link_checker',
+    'apps.browser_tests',
     'haystack',
     'captcha',
     'south',
     'compressor',
     'lazysignup',
     'reversion',
-    'devtools',
 )
 
 # apps settings

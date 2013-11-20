@@ -435,13 +435,13 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
           if (d.get("source") === newEdge.target && d.get("target") === newEdge.source){
             thisView.model.removeEdge(d);
           }
-          return d.source === newEdge.source && d.target === newEdge.target;
+          return d.get("source") === newEdge.source && d.get("target") === newEdge.target;
         });
         if (!filtRes[0].length){
           thisView.model.addEdge(newEdge); // todo switch to create
           thisView.render();
-        }
-      } else{
+        } // RIGHT NOW: I'm trying to figure out why multiple edges keep occuring
+      } else {
         // we're in the same node
         if (state.justDragged) {
           // dragged, not clicked

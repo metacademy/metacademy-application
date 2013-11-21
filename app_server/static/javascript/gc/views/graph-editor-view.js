@@ -1,5 +1,5 @@
 // FIXME remove window
-window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
+window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, dagre){
 
   var pvt = {};
 
@@ -101,7 +101,11 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
     el: document.getElementById(pvt.consts.gcWrapId),
 
     events: {
-      "click #toolbox": "optimizeGraphPlacement"
+      "click #optimize": "optimizeGraphPlacement",
+      "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
+      "change #hidden-file-upload": "uploadGraph",
+      "click #download-input": "downloadGraph",
+      "click #delete-graph": "clearGraph"
     },
     
     initialize: function() {
@@ -440,7 +444,7 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
         if (!filtRes[0].length){
           thisView.model.addEdge(newEdge); // todo switch to create
           thisView.render();
-        } // RIGHT NOW: I'm trying to figure out why multiple edges keep occuring
+        } 
       } else {
         // we're in the same node
         if (state.justDragged) {
@@ -623,9 +627,43 @@ window.define(["backbone", "d3", "dagre"], function(Backbone, d3, dagre){
       thisView.state.doPathsTrans = true;
           
       thisView.render();
-    }
-    
-  });
+    },
+
+    uploadGraph: function(evt){
+      if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+        alert("Your browser won't let you load a graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
+        return;
+      }
+      var thisGraph = this,
+          uploadFile = evt.currentTarget.files[0],
+          filereader = new window.FileReader();
+      
+      filereader.onload = function(){
+        var txtRes = filereader.result;        
+        try{
+          var jsonObj = JSON.parse(txtRes);
+          // thisGraph.deleteGraph(true);
+          thisGraph.model.addJsonNodesToGraph(jsonObj);
+          thisGraph.render();
+        }catch(err){
+          // FIXME better/more-informative error handling
+          alert("Error parsing uploaded file\nerror message: " + err.message);
+          return;
+        }
+      };
+      filereader.readAsText(uploadFile);
+    },
+
+    downloadGraph: function(){
+      var outStr = JSON.stringify(this.model.toJSON()),
+          blob = new window.Blob([outStr], {type: "text/plain;charset=utf-8"});
+      window.saveAs(blob, "mygraph.json"); // TODO replace with title once available
+    },
+
+    clearGraph: function(){
+      // TODO confirmation
+    }    
+  }); // end GraphEditor definition
 
 
   return GraphEditor;

@@ -1,9 +1,11 @@
 define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection"], function(Backbone, EditableEdgeCollection, EditableNodeCollection){
   var EditableGraph = Backbone.Model.extend({
-    defaults: {
-      nodes: new EditableNodeCollection(),
-      edges: new EditableEdgeCollection(),
-      graphDiscussion: ""
+    defaults:function(){
+      return {
+        nodes: new EditableNodeCollection(),
+        edges: new EditableEdgeCollection(),
+        graphDiscussion: ""
+      };
     },
     
     // resource url
@@ -12,17 +14,28 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
     /**
      * Make/extend this graph from a json obj 
      *
-     * @param {json object} jsonObj: json string with attributes:
-     *   nodes: array of objs:
-     *     each contains at least node title and id (optional coordinates)
-     *   edges: array of objs:
-     *     each contains at least a source node id and target node id (optional path coordinates)
-     * @param {boolean} addToExisting: optional parameter to add the json object to the existing graph
+     * @param {json object} jsonObj: json string with attribute:
+     *   nodes: array of objects: each contains at least node title and id (optional coordinates) and dependencies
      * @return {backbone model} this model altered by the jsonObj (allows chaining)
      */
-    genGraphFromJsonObj: function(jsonObj, addToExisting) {
-      addToExisting = addToExisting || false;
-      // TODO: put it here?
+    addJsonNodesToGraph: function(jsonNodeArr) {
+
+      // FIXME: arrays are not being parsed to collections when uploading graphs
+      var thisGraph = this,
+          tmpEdges = [];
+      
+      jsonNodeArr.forEach(function(node) {
+        node.dependencies.forEach(function(dep) {
+          tmpEdges.push({source: dep.source, target: node.id, reason: dep.reason, middlePts: dep.middlePts, id: dep.id});
+        });
+        node.dependencies = undefined;
+        thisGraph.addNode(node);
+      });
+
+      // add edges
+      tmpEdges.forEach(function(edge){
+        thisGraph.addEdge.call(thisGraph, edge);
+      });
 
       return this;
     },
@@ -34,7 +47,8 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
      *   that can be directly converted into a string
      */
     toJSON: function() {
-      return this.toJSON(); // FIXME
+      // returning nodes AND edges is redundant, since nodes contain dep info
+      return this.get("nodes").toJSON(); 
     },
 
     /**
@@ -43,7 +57,7 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
      * @param {node id} nodeId: the node id of the desired node
      * @return {node} the desired node object or undefined if not present
      */
-    getNode: function(nodeId){
+    getNode: function(nodeId) {
       return this.get("nodes").get(nodeId);
     },
 
@@ -53,7 +67,7 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
      * @param {edge id} edgeId: the edge id of the desired edge
      * @return {edge} the desired edge object or undefined if not present
      */
-    getEdge: function(edgeId){
+    getEdge: function(edgeId) {
       return this.get("edges").get(edgeId);
     },
 
@@ -64,6 +78,14 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
      * @param {edge object} edge: the edge to be added to the model
      */
     addEdge: function(edge) {
+      // check if source/target are ids and switch to nodes if necessary
+      edge.source = typeof edge.source === "number" ? this.getNode(edge.source) : edge.source;
+      edge.target = typeof edge.target === "number" ? this.getNode(edge.target) : edge.target;
+
+      if (!edge.source  || !edge.target) {
+        throw new Error("source or target was not given correctly for input or does not exist in graph");
+      }
+      
       var edges = this.get("edges");
       edges.add(edge);
       var mEdge = edges.get(edge.id);
@@ -105,8 +127,7 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
       node = typeof node === "number" ? nodes.get(node) : node;
       node.get("dependencies").forEach(function(edge){ thisGraph.removeEdge(edge);});
       node.get("outlinks").forEach(function(edge){ thisGraph.removeEdge(edge);});
-      nodes.remove(node);
-      
+      nodes.remove(node);      
     }
     
   });

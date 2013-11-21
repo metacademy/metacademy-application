@@ -11,9 +11,13 @@ requirejs.config({
     d3: "lib/d3",
     "btouch": "lib/backbone.touch",
     "sidr": "lib/jquery.sidr.min",
-    "dagre": "lib/dagre"
+    "dagre": "lib/dagre",
+    "filesaver": "lib/FileSaver"    
   },
   shim: {
+    filesaver: {
+      exports: "Blob"
+    },
     dagre: {
       exports: "dagre"
     },

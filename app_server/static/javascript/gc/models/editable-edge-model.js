@@ -4,7 +4,6 @@ define(["backbone", "underscore", "agfk/models/directed-edge-model"], function(B
       var enDef = {
         source: {},
         target: {},
-        path: "",
         isNew: 1,
         editNote: "",
         middlePts: []

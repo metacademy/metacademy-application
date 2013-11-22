@@ -24,7 +24,8 @@ define(["backbone", "underscore"], function(Backbone, _){
         var thisView = this;
         pvt.state.visId = pvt.state.visId || "summary";
 
-        thisView.$el.html(thisView.template(thisView.model.toJSON()));
+        // use attributes since toJSON changes the structure
+        thisView.$el.html(thisView.template(thisView.model.attributes));
         pvt.state.rendered = true;
 
         thisView.$el.find("#" + pvt.state.visId).addClass("active");

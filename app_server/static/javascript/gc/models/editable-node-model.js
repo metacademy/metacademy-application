@@ -1,5 +1,9 @@
 define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collections/editable-edge-collection"], function(Backbone, _, DetailedNodeModel, EditableEdgeCollection) {
   var EditableNode = DetailedNodeModel.extend({
+      collFields: ["questions", "dependencies", "outlinks", "resources"],
+      
+      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote"],
+
     defaults: function() {
       var enDef = {
         x: 0,

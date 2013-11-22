@@ -121,7 +121,8 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
         shiftNodeDrag: false,
         selectedText: null,
         doCircleTrans: false,
-        doPathsTrans: false
+        doPathsTrans: false,
+        toNodeEdit: false
       };
 
       thisView.idct = 0;
@@ -194,12 +195,12 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
           // todo check if edge-mode is selected
         });
 
-      // listen for key events
-      d3Svg.on("keydown", function() { // TODO figure out deletes
-        thisView.svgKeyDown.call(thisView);
+      // listen for key events on the window
+      d3.select(window).on("keydown", function() { 
+        thisView.windowKeyDown.call(thisView);
       })
         .on("keyup", function() {
-          thisView.svgKeyUp.call(thisView);
+          thisView.windowKeyUp.call(thisView);
         });
 
       // Place these listeners using backbone!
@@ -233,8 +234,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
             })
             .on("zoomend", function() {
               d3.select('body').style("cursor", "auto");
-            });
-      
+            });      
       d3Svg.call(dragSvg).on("dblclick.zoom", null);
     },
 
@@ -370,8 +370,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
         .classed(consts.toEditCircleClass, true)
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
-            // send to editor TODO make this less hacky
-            d3.event.preventDefault();
+            thisView.state.toNodeEdit = true;
             document.location = document.location.pathname + "#" + d.get("id");
           }
         });
@@ -422,6 +421,13 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       var thisView = this,
           state = thisView.state,
           consts = pvt.consts;
+
+      // clicked edit node button
+      if (state.toNodeEdit){
+        state.toNodeEdit = false;
+        return;
+      }
+      
       // reset the states
       state.shiftNodeDrag = false;    
       d3node.classed(consts.connectClass, false);
@@ -554,7 +560,9 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
     },
 
     // keydown on main svg
-    svgKeyDown: function() {
+    windowKeyDown: function() {
+      if (!this.$el.is(":visible")) { return; }
+      
       var thisView = this,
           state = thisView.state,
           consts = pvt.consts;
@@ -570,20 +578,24 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       case consts.DELETE_KEY:
         d3.event.preventDefault();
         if (selectedNode){
-          thisView.model.removeNode(selectedNode);
-          state.selectedNode = null;
-          thisView.render();
+          if (confirm("delete node: " + selectedNode.get("title") + "?\nNote: all associated data will be removed")){
+            thisView.model.removeNode(selectedNode);
+            state.selectedNode = null;
+            thisView.render();
+          }
         } else if (selectedEdge){
-          thisView.model.removeEdge(selectedEdge);
-          state.selectedEdge = null;
-          thisView.render();
+          if (confirm("delete edge: " + selectedEdge.get("source").get("title") + " -> " + selectedEdge.get("target").get("title") + "?\nNote: all associated data will be removed")){
+            thisView.model.removeEdge(selectedEdge);
+            state.selectedEdge = null;
+            thisView.render();
+          }
         }
         break;
       }
     },
 
     // key up on main svg
-    svgKeyUp: function() {
+    windowKeyUp: function() {
       this.state.lastKeyDown = -1;
     },
 
@@ -660,8 +672,11 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       window.saveAs(blob, "mygraph.json"); // TODO replace with title once available
     },
 
-    clearGraph: function(){
-      // TODO confirmation
+    clearGraph: function(confirmDelete){
+      if (!confirmDelete || confirm("Press OK to clear this graph")){
+        this.model.clear().set(this.model.defaults());
+        this.render();
+      }
     }    
   }); // end GraphEditor definition
 

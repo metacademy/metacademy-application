@@ -18,6 +18,20 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         grandparentToUncle: idCt++,
         uncleToCousin: idCt++,
         grandparentToChild: idCt++
+      },
+      exampleResource = {
+        title: "some title",
+        location: "some loc",
+        url: "http://www.example.com",
+        resource_type: "example book",
+        free: 0,
+        core: 0,
+        edition: "4",
+        level: "advanced examplar",
+        authors: ["Colorado Reed", "Albert Einstoon"],
+        dependencies: ["some dep", "some dep 2"],
+        extra: ["This is an example", "really this text doesn't matter"],
+        note: ["You should enjoy making examples for tests"]
       };
   
   var should = window.should,
@@ -105,7 +119,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         .should.deep.equal(graphObj.getNode(nodeIds.cousin));
     });
 
-    it('should be able to remove node', function(){
+    it('should be able to remove node with 1 outlink and 1 dep', function(){
       graphObj.removeNode(nodeIds.uncle);
       should.not.exist(graphObj.getNode(nodeIds.uncle));
     });
@@ -144,7 +158,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
                        .get("dependencies").get(edgeIds.grandparentToChild));
     });
 
-    it('should be able to readd gp-uncle-cousin chain and gp-to-child', function(){
+    it('should be able to re-add gp-uncle-cousin chain and gp-to-child', function(){
       graphObj.addNode({id: nodeIds.uncle, title: "uncle"});
       graphObj.addNode({id: nodeIds.cousin, title: "cousin"});
       graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
@@ -156,21 +170,30 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
     });
 
+    it('should be able to remove grandparent and have all 3 associated edges removed', function(){
+      graphObj.removeNode(nodeIds.grandparent);
+      should.not.exist(graphObj.getNode(nodeIds.grandparent));
+      should.not.exist(graphObj.getEdge(edgeIds.grandparentToParent));
+      should.not.exist(graphObj.getEdge(edgeIds.grandparentToUncle));
+      should.not.exist(graphObj.getEdge(edgeIds.grandparentToChild));
+      graphObj.get("nodes").length.should.equal(4);
+      graphObj.get("edges").length.should.equal(2);
+    });
+
+    it('should be able to re-add gp and associated edges', function(){
+      graphObj.addNode({id: nodeIds.grandparent, title: "grandparent"});
+      graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
+                        target: graphObj.getNode(nodeIds.uncle), id: edgeIds.grandparentToUncle});
+      graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
+                        target: graphObj.getNode(nodeIds.parent), id: edgeIds.grandparentToParent});
+      graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
+                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});      
+
+    });
+
+
     it('should be able to add resources to a node', function(){
-      graphObj.getNode(nodeIds.parent).get("resources").add({
-        title: "some title",
-        location: "some loc",
-        url: "http://www.example.com",
-        resource_type: "example book",
-        free: 0,
-        core: 0,
-        edition: "4",
-        level: "advanced examplar",
-        authors: ["Colorado Reed", "Albert Einstoon"],
-        dependencies: ["some dep", "some dep 2"],
-        extra: ["This is an example", "really this text doesn't matter"],
-        note: ["You should enjoy making examples for tests"]
-      });
+      graphObj.getNode(nodeIds.parent).get("resources").add(exampleResource);
     });
   });
 
@@ -271,7 +294,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       }); // end it()
 
       it('should be able to add collection elements to the newGraph', function(){
-        // TODO
+        newGraph.get("nodes").get(nodeIds.parent).get("resources").add(exampleResource);
       });
       
     }); // end describe("import graph...

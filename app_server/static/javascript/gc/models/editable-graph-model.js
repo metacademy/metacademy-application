@@ -1,4 +1,4 @@
-define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection"], function(Backbone, EditableEdgeCollection, EditableNodeCollection){
+define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "gc/models/editable-node-model"], function(Backbone, EditableEdgeCollection, EditableNodeCollection, EditableNode){
   var EditableGraph = Backbone.Model.extend({
     defaults:function(){
       return {
@@ -99,6 +99,9 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
      * @param {node object} node: the node to be added to the model
      */
     addNode: function(node) {
+      if (! (node instanceof EditableNode)){
+        node = new EditableNode(node, {parse: true});
+      }
       this.get("nodes").add(node);
     },
 
@@ -125,8 +128,8 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
       var thisGraph = this,
           nodes = this.get("nodes");
       node = typeof node === "number" ? nodes.get(node) : node;
-      node.get("dependencies").forEach(function(edge){ thisGraph.removeEdge(edge);});
-      node.get("outlinks").forEach(function(edge){ thisGraph.removeEdge(edge);});
+      node.get("dependencies").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
+      node.get("outlinks").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
       nodes.remove(node);      
     }
     

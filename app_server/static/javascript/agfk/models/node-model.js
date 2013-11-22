@@ -44,7 +44,7 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections", 
         var i = this.txtFields.length;
         while (i--) {
           var tv = this.txtFields[i];
-          if (resp[tv]) {
+          if (resp[tv] !== undefined) {
             output[tv] = resp[tv];
           }
         }
@@ -54,7 +54,7 @@ define(["backbone", "underscore", "agfk/collections/node-property-collections", 
         while (i--) {
           var cv = this.collFields[i];
           output[cv].parent = this;
-          if (resp[cv]) {
+          if (resp[cv] !== undefined) {
             output[cv].add(resp[cv]);
           }
         }

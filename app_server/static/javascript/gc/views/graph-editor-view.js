@@ -89,7 +89,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
 
   pvt.removeSelectFromEdge = function() {
     var thisView = this;
-    thisView.paths.filter(function(cd){
+    thisView.gPaths.filter(function(cd){
       return cd === thisView.state.selectedEdge;
     }).classed(pvt.consts.selectedClass, false);
     thisView.state.selectedEdge = null;
@@ -168,7 +168,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
         .style('marker-end', 'url(#mark-end-arrow)');
 
       // svg nodes and edges 
-      thisView.paths = d3SvgG.append("g").selectAll("g");
+      thisView.gPaths = d3SvgG.append("g").selectAll("g");
       thisView.circles = d3SvgG.append("g").selectAll("g");
       
       thisView.drag = d3.behavior.drag()
@@ -239,51 +239,72 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
     },
 
 
-    render: function() {
-      
+    render: function() {      
       var thisView = this,
           consts = pvt.consts,
           state = thisView.state;
 
-      // NOWTODO fix all paths and circles and nodes and edges to use models
-      thisView.paths = thisView.paths.data(thisView.model.get("edges").models, function(d){
-        return d.id;
-      });
-      var paths = thisView.paths;
+      thisView.gPaths = thisView.gPaths.data(thisView.model.get("edges").models,
+        function(d){
+          return d.id;
+        });
+      
+      var gPaths = thisView.gPaths;
       
       // update existing paths
-      paths.style('marker-end', 'url(#end-arrow)')
-        .classed(consts.selectedClass, function(d){
-          return d === state.selectedEdge;
-        });
+      gPaths.classed(consts.selectedClass, function(d){
+        return d === state.selectedEdge;
+      });
 
       if (thisView.state.doPathsTrans){
-        paths.transition()
-          .attr("d", getEdgePath);
+        gPaths.each(function(d){
+          var d3el = d3.select(this),
+              edgePath = getEdgePath(d);
+          d3el.selectAll("path")
+            .transition()
+            .attr("d", edgePath);
+        });
         thisView.state.doPathsTrans = false;
       }
       else{
-        paths.attr("d", getEdgePath);
+        gPaths.each(function(d){
+          // FIXME: remove code repetition with above conditional
+          var d3el = d3.select(this),
+              edgePath = getEdgePath(d);
+          d3el.selectAll("path")
+            .attr("d", edgePath);
+        });
       }
 
       // add new paths
-      paths.enter()
-        .append("path")
-        .style('marker-end','url(#end-arrow)')
-        .classed("link", true)
-        .attr("d", getEdgePath )
-        .on("mousedown", function(d){
-          thisView.pathMouseDown.call(thisView, d3.select(this), d);
-        })
-        .on("mouseup", function(d){
-          state.mouseDownLink = null;
-        });
+      gPaths.enter()
+        .append("g")
+        .each(function(d){
+        var d3el = d3.select(this),
+            edgePath = getEdgePath(d);
+
+        // apend display path
+        d3el.append("path")
+          .style('marker-end','url(#end-arrow)')
+          .classed("link", true)
+          .attr("d", edgePath );
+        // append onhover path
+        d3el.append("path")
+          .attr("d", edgePath )          
+          .classed("link-wrapper", true)
+          .on("mousedown", function(d){
+            thisView.pathMouseDown.call(thisView, d3el, d);
+          })
+          .on("mouseup", function(d){
+            state.mouseDownLink = null;
+          });
+      });
 
       function getEdgePath(d){
-          var pathPts = [].concat(d.get("middlePts"));        
-          pathPts.unshift(d.get("source"));        
-          pathPts.push(computeEndPt(pathPts[pathPts.length-1], d.get("target"))); // TODO only compute if node position changed
-          return pvt.d3Line(pathPts);
+        var pathPts = [].concat(d.get("middlePts"));        
+        pathPts.unshift(d.get("source"));        
+        pathPts.push(computeEndPt(pathPts[pathPts.length-1], d.get("target"))); // TODO only compute if node position changed
+        return pvt.d3Line(pathPts);
       }
 
       // computes intersection points for two circular nodes (simple geometry)
@@ -302,7 +323,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       }
 
       // remove old links
-      paths.exit().remove();
+      gPaths.exit().remove();
       
       // update existing nodes
       thisView.circles = thisView.circles.data(thisView.model.get("nodes").models, function(d){
@@ -441,7 +462,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       if (mouseDownNode !== d){
         // we're in a different node: create new edge for mousedown edge and add to graph
         var newEdge = {source: mouseDownNode, target: d, id: thisView.idct++};
-        var filtRes = thisView.paths.filter(function(d){
+        var filtRes = thisView.gPaths.filter(function(d){
           if (d.get("source") === newEdge.target && d.get("target") === newEdge.source){
             thisView.model.removeEdge(d);
           }

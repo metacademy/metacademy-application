@@ -104,9 +104,17 @@ path.link {
     cursor: default;
 }
 
-path.link:hover{
-    stroke: rgb(94, 196, 204);
+path.link-wrapper{
+    fill: none;
+    stroke: rgb(22, 76, 216);
+    stroke-width: 24px;
+    opacity: 0;
 }
+
+path.link-wrapper:hover{
+    opacity: 0.15;
+}
+
 
 g.connect-node circle{
     fill: #BEFFFF;
@@ -116,7 +124,7 @@ path.link.hidden{
     stroke-width: 0;
 }
 
-path.link.selected {
+.selected path.link {
     stroke: rgb(229, 172, 247);
 }
 

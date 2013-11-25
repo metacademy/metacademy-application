@@ -197,14 +197,197 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
     });
   });
 
-  // TODO: add content to the nodes and edges and make sure it's reconstructed appropriately
+
+  describe('Graph operations', function(){
+    describe('contract deps', function(){
+      describe('contract cousin', function(){
+        it('should be able to contract cousin and have uncle become invisible', function(){
+          graphObj.getNode(nodeIds.cousin).contractDeps();
+          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(false);
+        });
+        
+        it('should have uncle-cousin edge be invisible', function(){
+          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
+        });
+
+        it('should have gp-uncle edge be invisible', function(){
+          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(false);
+        });
+        
+
+        ["grandparent", "parent", "child"].forEach(function(title){
+          it( title + ' should still be visible', function(){
+            graphObj.getNode(nodeIds[title]).isVisible().should.equal(true);
+          });
+        });
+
+        ["grandparentToParent", "parentToChild", "grandparentToChild"].forEach(function(title){
+          it( title + ' should still be visible', function(){
+            graphObj.getEdge(edgeIds[title]).isVisible().should.equal(true);
+          });
+        });
+      });
+
+      describe('contract child', function(){
+        it('should be able to contract child and have all nodes except child and cousin invisible', function(){
+          graphObj.getNode(nodeIds.child).contractDeps();
+          graphObj.get("nodes").every(function(node){
+            return node.get("title") === "cousin"
+              || node.get("title") === "child"
+              || ! node.isVisible();
+          }).should.equal(true);
+        });
+
+        it('all edges should be invisible', function(){
+          var allHidden = graphObj.get("edges").every(function(edge){
+            return !edge.isVisible();
+          });
+          allHidden.should.equal(true);
+        });
+      });
+    }); // end contract nodes
+
+    describe('expand deps', function(){
+      describe('expand cousin', function(){
+        it('should be able to expand cousin deps', function(){          
+          graphObj.getNode(nodeIds.cousin).expandDeps();
+        });
+        
+        it('uncle and gp should be visible', function(){          
+          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(true);
+          graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
+        });
+
+        it('edge from uncle to cousin should be visible', function(){          
+          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(true);
+        });
+
+        it('edge from gp to uncle should be visible', function(){          
+          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(true);
+        });
+
+        it('parent should be invisible', function(){ 
+          graphObj.getNode(nodeIds.parent).isVisible().should.equal(false);        
+        });
+
+        it('edges from gp to child and parent should be invisible', function(){
+          graphObj.getEdge(edgeIds.grandparentToChild).isVisible().should.equal(false);
+          graphObj.getEdge(edgeIds.grandparentToParent).isVisible().should.equal(false);
+        });
+      }); // end describe('expand cousin')
+
+      describe('expand child', function(){
+        it('should be able to expand child deps', function(){          
+          graphObj.getNode(nodeIds.child).expandDeps();
+        });
+
+        it('all nodes should be visible', function(){
+          graphObj.get("nodes").every(function(n){return n.isVisible();}).should.equal(true);
+        });
+
+        it('all edges should be visible', function(){
+          var allVisible = graphObj.get("edges").every(function(edge){
+            return edge.isVisible();
+          });
+          allVisible.should.equal(true);
+        });
+      });      
+    }); // end describe('expand deps')
+
+    describe('contract outlinks', function(){
+      describe('contract outlinks', function(){
+        it('should be able to contract parent outlinks', function(){
+          graphObj.getNode(nodeIds.parent).contractOutlinks();
+        });
+
+        it('child should still be visible since gp-to-child edge exists', function(){
+          graphObj.getNode(nodeIds.child).isVisible().should.equal(true);
+        });
+
+        it('parent -> child should be hidden', function(){
+          graphObj.getEdge(edgeIds.parentToChild).isVisible().should.equal(false);
+        });
+
+        it('all nodes should be visible', function(){
+          graphObj.get("nodes").each(function(node){
+              node.isVisible().should.equal(true);
+          });
+        });
+
+        it('all non parent->child edges should be visible', function(){
+          graphObj.get("edges").each(function(edge){
+            if (edge.id !== edgeIds.parentToChild){
+              edge.isVisible().should.equal(true);
+            }
+          });
+        });
+
+        it('should be able to contract uncle outlinks', function(){
+          graphObj.getNode(nodeIds.uncle).contractOutlinks();
+        });
+        
+        it('cousin should be invisible', function(){
+          graphObj.getNode(nodeIds.cousin).isVisible().should.equal(false);
+        });
+
+        it('uncle -> cousin should be hidden', function(){
+          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
+        });
+
+        it('should be able to contract grandparent outlinks', function(){
+          graphObj.getNode(nodeIds.grandparent).contractOutlinks();
+        });
+
+        it('gp should be visible', function(){
+          graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
+        });
+
+        it('all non-gp nodes should be hidden', function(){
+          graphObj.get("nodes").each(function(node){
+            if (node.id !== nodeIds.grandparent){
+              node.isVisible().should.equal(false);
+            }
+          });
+        });
+
+        it('all edges should be hidden', function(){
+          graphObj.get("edges").each(function(edge){
+              edge.isVisible().should.equal(false);
+          });
+        });
+
+      }); // end describe('contract outlinks')
+
+      describe('expand outlinks', function(){
+        it('should be able to expand grandparent', function(){
+          graphObj.getNode(nodeIds.grandparent).expandOutlinks();
+        });
+
+        it('all edges should be visible', function(){
+          graphObj.get("edges").each(function(edge){
+              edge.isVisible().should.equal(true);
+          });
+        });
+
+        it('all nodes should be visible', function(){
+          graphObj.get("nodes").each(function(node){
+              node.isVisible().should.equal(true);
+          });
+        });
+
+      });
+
+    });
+
+  }); // end describe('graph operations')
   
+
   // IO test vars
   var jsonObj,
       jsonStr,
       newJsonObj,
       newGraph = new EditableGraphModel();
-  
+
   describe('Graph IO', function(){
     describe('export graph', function(){
       it('should obtain a valid json representation of the graph', function(){
@@ -300,105 +483,6 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
     }); // end describe("import graph...
   }); // end describe ("graph IO..
 
-  describe('graph operations', function(){
-    describe('contract nodes', function(){
-      describe('contract cousin', function(){
-        it('should be able to contract cousin and have uncle become invisible', function(){
-          graphObj.getNode(nodeIds.cousin).contractDeps();
-          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(false);
-        });
-        
-        it('should have uncle-cousin edge be invisible', function(){
-          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
-        });
-
-        it('should have gp-uncle edge be invisible', function(){
-          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(false);
-        });
-        
-
-        ["grandparent", "parent", "child"].forEach(function(title){
-          it( title + ' should still be visible', function(){
-            graphObj.getNode(nodeIds[title]).isVisible().should.equal(true);
-          });
-        });
-
-        ["grandparentToParent", "parentToChild", "grandparentToChild"].forEach(function(title){
-          it( title + ' should still be visible', function(){
-            graphObj.getEdge(edgeIds[title]).isVisible().should.equal(true);
-          });
-        });
-      });
-
-      describe('contract child', function(){
-        it('should be able to contract child and have all nodes except child and cousin invisible', function(){
-          graphObj.getNode(nodeIds.child).contractDeps();
-          graphObj.get("nodes").every(function(node){
-            return node.get("title") === "cousin"
-              || node.get("title") === "child"
-              || ! node.isVisible();
-          }).should.equal(true);
-        });
-
-        it('all edges should be invisible', function(){
-          var allHidden = graphObj.get("edges").every(function(edge){
-            return !edge.isVisible();
-          });
-          allHidden.should.equal(true);
-        });
-      });
-    }); // end contract nodes
-
-    describe('expand nodes', function(){
-      describe('expand cousin', function(){
-        it('should be able to expand cousin deps', function(){          
-          graphObj.getNode(nodeIds.cousin).expandDeps();
-        });
-        
-        it('uncle and gp should be visible', function(){          
-          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(true);
-          graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
-        });
-
-        it('edge from uncle to cousin should be visible', function(){          
-          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(true);
-        });
-
-        it('edge from gp to uncle should be visible', function(){          
-          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(true);
-        });
-
-        it('parent should be invisible', function(){ 
-          graphObj.getNode(nodeIds.parent).isVisible().should.equal(false);        
-        });
-
-        it('edges from gp to child and parent should be invisible', function(){
-          graphObj.getEdge(edgeIds.grandparentToChild).isVisible().should.equal(false);
-          graphObj.getEdge(edgeIds.grandparentToParent).isVisible().should.equal(false);
-        });
-      }); // end describe('expand cousin')
-
-      describe('expand child', function(){
-        it('should be able to expand child deps', function(){          
-          graphObj.getNode(nodeIds.child).expandDeps();
-        });
-
-        it('all nodes should be visible', function(){
-          graphObj.get("nodes").every(function(n){return n.isVisible();}).should.equal(true);
-        });
-
-        it('all edges should be visible', function(){
-          var allVisible = graphObj.get("edges").every(function(edge){
-            return edge.isVisible();
-          });
-          allVisible.should.equal(true);
-        });
-
-
-      });
-      
-    });
-  });
-  
 }); // end define
+
 

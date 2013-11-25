@@ -10,6 +10,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
     selectedClass: "selected",
     connectClass: "connect-node",
     depIconGClass: "dep-icon-g",
+    olIconGClass: "ol-icon-g",
     toEditCircleRadius: 10,
     toEditCircleClass: "to-edit-circle",
     gHoverClass: "hover-g",
@@ -45,7 +46,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
     .x(function(d){return d.x === undefined ? d.get("x") : d.x;})
     .y(function(d){return d.y === undefined ? d.get("y") : d.y;})
     .interpolate('bundle')
-                 .tension(1);
+    .tension(1);
 
   pvt.dragmove = function(d) {
     var thisView = this;
@@ -113,6 +114,76 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       return cd === thisView.state.selectedEdge;
     }).classed(pvt.consts.selectedClass, false);
     thisView.state.selectedEdge = null;
+  };
+
+  // helper function for addNodeIcons
+  pvt.addExpContIcon = function(d3Icon, iconGClass, hasExpOrContrName, expandFun, contractFun, placeAtBottom, d3this, thisView, d, consts){
+    if (d.get(hasExpOrContrName) 
+        && (!d3Icon.node() || !d3Icon.classed(consts.expandCrossClass))) {
+      // place plus sign
+      d3Icon.remove();
+      d3Icon = d3this.append("g")
+        .classed(iconGClass, true)
+        .classed(consts.expandCrossClass, true);
+      var yplace = placeAtBottom ? (consts.nodeRadius - consts.minusRectH*3 - 8) : (-consts.nodeRadius + consts.minusRectH*3 - 8);
+      d3Icon.append("polygon")
+        .attr("points", pvt.plusPts)
+        .attr("transform", "translate(" + (-consts.exPlusWidth/2) + ","
+              + yplace + ")")
+        .on("mouseup", function(){
+          if (!thisView.state.justDragged) {
+            thisView.state.expOrContrNode = true;
+            expandFun.call(d);
+            thisView.optimizeGraphPlacement(false, d.id);
+          }
+        });
+    } else if (!d.get(hasExpOrContrName) && (!d3Icon.node() || !d3Icon.classed(consts.contractMinusClass))) {
+      // place minus sign
+      d3Icon.remove();
+      d3Icon = d3this.append("g")
+        .classed(iconGClass, true)
+        .classed(consts.contractMinusClass, true);
+      d3Icon.append("rect")
+        .attr("x", -consts.minusRectW/2)
+        .attr("y", placeAtBottom ? consts.nodeRadius - consts.minusRectH*3 : -consts.nodeRadius + consts.minusRectH*3)
+        .attr("width", consts.minusRectW)
+        .attr("height", consts.minusRectH)
+        .on("mouseup", function(){
+          if (!thisView.state.justDragged) {
+            thisView.state.expOrContrNode = true;
+            contractFun.call(d);
+            thisView.optimizeGraphPlacement(false, d.id);
+          }
+        });
+    }
+  };
+
+  // add node icons (e.g. expand/contract) to the circle
+  pvt.addNodeIcons = function(thisView, d){
+    if (!d.isVisible()) return;
+
+    var d3this = d3.select(this),
+        hasDeps = d.get("dependencies").length > 0,
+        hasOLs =  d.get("outlinks").length > 0,
+        consts = pvt.consts,
+        state = thisView.state,
+        d3DepIcon = d3this.selectAll("." + consts.depIconGClass),
+        d3OLIcon = d3this.selectAll("." + consts.olIconGClass);
+
+    // expand/contract dependencies icon
+    if (hasDeps){
+      pvt.addExpContIcon(d3DepIcon, consts.depIconGClass, "hasContractedDeps",
+                         d.expandDeps, d.contractDeps, true, d3this, thisView, d, consts);
+    } else {
+      d3DepIcon.remove();
+    }
+    // expand/contract outlinks icon
+    if (hasOLs) {
+      pvt.addExpContIcon(d3OLIcon, consts.olIconGClass, "hasContractedOLs",
+                         d.expandOLs, d.contractOLs, false, d3this, thisView, d, consts);
+    } else {
+      d3OLIcon.remove();
+    }
   };
 
 
@@ -291,25 +362,25 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       gPaths.enter()
         .append("g")
         .each(function(d){
-        var d3el = d3.select(this),
-            edgePath = getEdgePath(d);
+          var d3el = d3.select(this),
+              edgePath = getEdgePath(d);
 
-        // apend display path
-        d3el.append("path")
-          .style('marker-end','url(#end-arrow)')
-          .classed("link", true)
-          .attr("d", edgePath );
-        // append onhover path
-        d3el.append("path")
-          .attr("d", edgePath )          
-          .classed("link-wrapper", true)
-          .on("mousedown", function(d){
-            thisView.pathMouseDown.call(thisView, d3el, d);
-          })
-          .on("mouseup", function(d){
-            state.mouseDownLink = null;
-          });
-      });
+          // apend display path
+          d3el.append("path")
+            .style('marker-end','url(#end-arrow)')
+            .classed("link", true)
+            .attr("d", edgePath );
+          // append onhover path
+          d3el.append("path")
+            .attr("d", edgePath )          
+            .classed("link-wrapper", true)
+            .on("mousedown", function(d){
+              thisView.pathMouseDown.call(thisView, d3el, d);
+            })
+            .on("mouseup", function(d){
+              state.mouseDownLink = null;
+            });
+        });
 
       function getEdgePath(d){
         var pathPts = [].concat(d.get("middlePts"));        
@@ -356,8 +427,8 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
             offX = r/Math.sqrt(1 + ratio) * (srcX > tgtX ? -1 : 1),
             offY = r/Math.sqrt(1 + 1/ratio) * (srcY > tgtY ? -1 : 1);
 
-            // keep source at origin since we don't have an end marker
-            return {x: tgtX - offX, y: tgtY - offY};
+        // keep source at origin since we don't have an end marker
+        return {x: tgtX - offX, y: tgtY - offY};
       }
 
       // remove old links
@@ -370,7 +441,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
                 return d.id;
               });
       
-        thisView.circles.exit().remove(); // TODO add appropriate animation
+      thisView.circles.exit().remove(); // TODO add appropriate animation
       
       if (thisView.state.doCircleTrans){
         thisView.circles
@@ -382,7 +453,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       }
       else {
         thisView.circles
-            .attr("transform", function(d){
+          .attr("transform", function(d){
             return "translate(" + d.get("x") + "," + d.get("y") + ")";
           });
       }
@@ -444,63 +515,9 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       });
 
 
-      thisView.circles.each(addNodeIcons);
-      // helper function to add appropriate icons to the nodes
-      // FIXME this needs to be refactored
-      function addNodeIcons(d){
-        if (!d.isVisible()) return;
-
-        // if has deps and not collapsed and isn't displaying minus sign
-        // remove other icon and add minus sign
-        var d3this = d3.select(this),
-            hasDeps = d.get("dependencies").length > 0,
-            consts = pvt.consts,
-            
-            d3DepIcon = d3this.selectAll("." + consts.depIconGClass);
-
-        if (hasDeps) {
-          if (d.get("hasContractedDeps")
-              && (!d3DepIcon.node() || !d3DepIcon.classed(consts.expandCrossClass))) {
-            d3DepIcon.remove();
-            d3DepIcon = d3this.append("g")
-              .classed(consts.depIconGClass, true)
-              .classed(consts.expandCrossClass, true);
-            d3DepIcon.append("polygon")
-              .attr("points", pvt.plusPts)
-              .attr("transform", "translate(" + (-consts.exPlusWidth/2) + "," +  
-                (consts.nodeRadius - consts.minusRectH*3 - 8) + ")")
-              .on("mouseup", function(){
-                if (!thisView.state.justDragged) {
-                  state.expOrContrNode = true;
-                  d.expandDeps();
-                  thisView.optimizeGraphPlacement(false, d.id);
-                  // thisView.render();
-                }
-              });
-          } else if (!d.get("hasContractedDeps") && (!d3DepIcon.node() || !d3DepIcon.classed(consts.contractMinusClass))) {
-            d3DepIcon.remove();
-            d3DepIcon = d3this.append("g")
-              .classed(consts.depIconGClass, true)
-              .classed(consts.contractMinusClass, true);
-            d3DepIcon.append("rect")
-              .attr("x", -consts.minusRectW/2)
-              .attr("y", consts.nodeRadius - consts.minusRectH*3)
-              .attr("width", consts.minusRectW)
-              .attr("height", consts.minusRectH)
-              .on("mouseup", function(){
-                if (!thisView.state.justDragged) {
-                  state.expOrContrNode = true;
-                  d.contractDeps();
-                  thisView.optimizeGraphPlacement(false, d.id);
-                  // thisView.render();
-                }
-              });
-          }
-        } else {
-          d3DepIcon.remove();
-        }   
-        
-      };
+      thisView.circles.each(function(d){
+        pvt.addNodeIcons.call(this, thisView, d);
+      });
     },
 
     pathMouseDown: function(d3path, d){
@@ -749,17 +766,17 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       });
 
       var layout = dagre.layout()
-                     .rankSep(100)
-                     .nodeSep(20)
-                     .rankDir("BT").run(dagreGraph);
+            .rankSep(100)
+            .nodeSep(20)
+            .rankDir("BT").run(dagreGraph);
 
       // determine average x and y movement
       if (noMoveNodeId === undefined && minSSDist) {
-          layout.eachNode(function(n, inp){
-            var node = nodes.get(n);
-            transX +=  node.get("x") - inp.x;
-            transY += node.get("y") - inp.y;
-          });
+        layout.eachNode(function(n, inp){
+          var node = nodes.get(n);
+          transX +=  node.get("x") - inp.x;
+          transY += node.get("y") - inp.y;
+        });
         transX /= nodes.length;
         transY /= nodes.length;
         
@@ -787,7 +804,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
 
       thisView.state.doCircleTrans = true;
       thisView.state.doPathsTrans = true;
-          
+      
       thisView.render();
     },
 

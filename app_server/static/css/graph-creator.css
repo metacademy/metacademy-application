@@ -248,25 +248,25 @@ path.link.hidden{
     width: 70%;
 }
 
-.dep-icon-g rect{
+.dep-icon-g rect, .ol-icon-g rect{
     fill: #333;
     stroke-width: 0;
     stroke: #333;
     display: none;
 }
-.dep-icon-g rect:hover{
+.dep-icon-g rect:hover, .ol-icon-g rect:hover{
     stroke-width: 5px;
 }
 
-.hover-g .dep-icon-g rect{
+.hover-g .dep-icon-g rect, .hover-g .ol-icon-g rect {
     display: block;
 }
 
-.dep-icon-g polygon{
+.dep-icon-g polygon, .ol-icon-g polygon{
     stroke-width: 0px;
     stroke: #333;
     fill: #333;
 }
-.dep-icon-g polygon:hover{
+.dep-icon-g polygon:hover, .ol-icon-g polygon:hover{
     stroke-width: 3px;
 }

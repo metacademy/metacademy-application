@@ -40,16 +40,15 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         this.set(hasContractedEdgesName, true);
       }
       this.get(edgeType)
-        .each(function(dep){          
-          dep.set("isContracted", true);
-          var srcNode = dep.get(edgeEnding);
+        .each(function(edge){          
+          edge.set("isContracted", true);
+          var srcNode = edge.get(edgeEnding);
           if (pvt.nodeShouldBeContracted.call(srcNode, otherEdgeType)){
             srcNode.set("isContracted", true);
             srcNode.set(hasContractedEdgesName, false);
             pvt.contractFromNode.call(srcNode, true, hasContractedEdgesName, edgeType, otherEdgeType, edgeEnding);
           }
         });
-
     };
 
     
@@ -143,11 +142,11 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         pvt.expandFromNode.call(this, notStart, "hasContractedDeps", "dependencies", "source");
       },
 
-      contractOutlinks: function(notStart){
+      contractOLs: function(notStart){
           pvt.contractFromNode.call(this, notStart, "hasContractedOLs", "outlinks", "dependencies", "target");
       },
 
-      expandOutlinks: function(notStart){
+      expandOLs: function(notStart){
         pvt.expandFromNode.call(this, notStart, "hasContractedOLs", "outlinks", "target");
       }            
     }); // end DetailedNodeModel.extend(

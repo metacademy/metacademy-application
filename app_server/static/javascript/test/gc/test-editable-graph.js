@@ -297,7 +297,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
     describe('contract outlinks', function(){
       describe('contract outlinks', function(){
         it('should be able to contract parent outlinks', function(){
-          graphObj.getNode(nodeIds.parent).contractOutlinks();
+          graphObj.getNode(nodeIds.parent).contractOLs();
         });
 
         it('child should still be visible since gp-to-child edge exists', function(){
@@ -323,7 +323,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('should be able to contract uncle outlinks', function(){
-          graphObj.getNode(nodeIds.uncle).contractOutlinks();
+          graphObj.getNode(nodeIds.uncle).contractOLs();
         });
         
         it('cousin should be invisible', function(){
@@ -335,7 +335,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('should be able to contract grandparent outlinks', function(){
-          graphObj.getNode(nodeIds.grandparent).contractOutlinks();
+          graphObj.getNode(nodeIds.grandparent).contractOLs();
         });
 
         it('gp should be visible', function(){
@@ -360,7 +360,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
       describe('expand outlinks', function(){
         it('should be able to expand grandparent', function(){
-          graphObj.getNode(nodeIds.grandparent).expandOutlinks();
+          graphObj.getNode(nodeIds.grandparent).expandOLs();
         });
 
         it('all edges should be visible', function(){

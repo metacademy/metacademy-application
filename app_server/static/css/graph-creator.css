@@ -100,7 +100,7 @@ g.conceptG.hover-g circle.to-edit-circle{
 path.link {
     fill: none;
     stroke: #333;
-    stroke-width: 4px;
+    stroke-width: 2px;
     cursor: default;
 }
 
@@ -183,7 +183,7 @@ path.link.hidden{
 .ec-tabs {
    width:100%;
    background:#fff;
-   border-bottom:4px solid #000;
+   border-bottom: 4px solid #000;
    overflow:hidden;
    position:relative;
 }
@@ -246,4 +246,27 @@ path.link.hidden{
 
 .dep-entry input{
     width: 70%;
+}
+
+.dep-icon-g rect{
+    fill: #333;
+    stroke-width: 0;
+    stroke: #333;
+    display: none;
+}
+.dep-icon-g rect:hover{
+    stroke-width: 5px;
+}
+
+.hover-g .dep-icon-g rect{
+    display: block;
+}
+
+.dep-icon-g polygon{
+    stroke-width: 0px;
+    stroke: #333;
+    fill: #333;
+}
+.dep-icon-g polygon:hover{
+    stroke-width: 3px;
 }

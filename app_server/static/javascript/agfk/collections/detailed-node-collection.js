@@ -20,7 +20,7 @@ define(['agfk/collections/node-collection', 'agfk/models/detailed-node-model', '
       // TODO cache learned/implicit learned nodes
       var thisCollection = this,
           aux = window.agfkGlobals.auxModel,
-          depRoot = aux.get("depRoot"),
+          depRoot = aux.get("depRoot"), // this is not general enough to also include visibility
           isShortcut = thisCollection.get(depRoot).get("is_shortcut"),
           unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depRoot, isShortcut), function(tagO){return tagO.from_tag;});
 

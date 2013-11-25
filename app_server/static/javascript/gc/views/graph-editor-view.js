@@ -9,22 +9,42 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
     toolboxId: "toolbox",
     selectedClass: "selected",
     connectClass: "connect-node",
+    depIconGClass: "dep-icon-g",
     toEditCircleRadius: 10,
     toEditCircleClass: "to-edit-circle",
     gHoverClass: "hover-g",
     circleGClass: "conceptG",
     graphClass: "graph",
     activeEditId: "active-editing",
+    expandCrossClass: "exp-cross",
+    contractMinusClass: "contract-minus",
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
     ENTER_KEY: 13,
-    nodeRadius: 50
+    nodeRadius: 50,
+    exPlusWidth: 5, // expand plus sign width in pixels
+    minusRectW: 11,
+    minusRectH: 5.5
   };
 
+  pvt.plusPts = "0,0 " +
+    pvt.consts.exPlusWidth + ",0 " +
+    pvt.consts.exPlusWidth + "," + pvt.consts.exPlusWidth + " " +
+    (2 * pvt.consts.exPlusWidth) + "," + pvt.consts.exPlusWidth + " " +
+    (2 * pvt.consts.exPlusWidth) + "," + (2 * pvt.consts.exPlusWidth) + " " +
+    pvt.consts.exPlusWidth + "," + (2 * pvt.consts.exPlusWidth) + " " +
+    pvt.consts.exPlusWidth + "," + (3 * pvt.consts.exPlusWidth) + " " +
+    "0," + (3 * pvt.consts.exPlusWidth) + " " +
+    "0," + (2 * pvt.consts.exPlusWidth) + " " +
+    (-pvt.consts.exPlusWidth) + "," + (2 * pvt.consts.exPlusWidth) + " " +
+    (-pvt.consts.exPlusWidth) + "," + pvt.consts.exPlusWidth + " " +
+    "0," + pvt.consts.exPlusWidth + " " +
+    "0,0";
+
   pvt.d3Line = d3.svg.line()
-                 .x(function(d){return d.x === undefined ? d.get("x") : d.x;})
-                 .y(function(d){return d.y === undefined ? d.get("y") : d.y;})
-                 .interpolate('bundle')
+    .x(function(d){return d.x === undefined ? d.get("x") : d.x;})
+    .y(function(d){return d.y === undefined ? d.get("y") : d.y;})
+    .interpolate('bundle')
                  .tension(1);
 
   pvt.dragmove = function(d) {
@@ -96,7 +116,6 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
   };
 
 
-
   var GraphEditor = Backbone.View.extend({
     el: document.getElementById(pvt.consts.gcWrapId),
 
@@ -120,6 +139,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
         lastKeyDown: -1,
         shiftNodeDrag: false,
         selectedText: null,
+        expOrContrNode: false,
         doCircleTrans: false,
         doPathsTrans: false,
         toNodeEdit: false
@@ -135,20 +155,9 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       defs.append('svg:marker')
         .attr('id', 'end-arrow')
         .attr('viewBox', '0 -5 10 10')
-        .attr('markerWidth', 3.5)
-        .attr('markerHeight', 3.5)
+        .attr('markerWidth', 5.5)
+        .attr('markerHeight', 5.5)
         .attr('refX', 8)
-        .attr('orient', 'auto')
-        .append('svg:path')
-        .attr('d', 'M0,-5L10,0L0,5');
-
-      // define arrow markers for leading arrow
-      defs.append('svg:marker')
-        .attr('id', 'mark-end-arrow')
-        .attr('viewBox', '0 -5 10 10')
-        .attr('refX', 7)
-        .attr('markerWidth', 3.5)
-        .attr('markerHeight', 3.5)
         .attr('orient', 'auto')
         .append('svg:path')
         .attr('d', 'M0,-5L10,0L0,5');
@@ -165,7 +174,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       thisView.dragLine = d3SvgG.append('svg:path')
         .attr('class', 'link dragline hidden')
         .attr('d', 'M0,0L0,0')
-        .style('marker-end', 'url(#mark-end-arrow)');
+        .style('marker-end', 'url(#end-arrow)');
 
       // svg nodes and edges 
       thisView.gPaths = d3SvgG.append("g").selectAll("g");
@@ -244,8 +253,10 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
           consts = pvt.consts,
           state = thisView.state;
 
-      thisView.gPaths = thisView.gPaths.data(thisView.model.get("edges").models,
-        function(d){
+      thisView.gPaths = thisView.gPaths
+        .data(thisView.model.get("edges").filter(function(mdl){
+          return mdl.isVisible();
+        }), function(d){
           return d.id;
         });
       
@@ -260,9 +271,9 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
         gPaths.each(function(d){
           var d3el = d3.select(this),
               edgePath = getEdgePath(d);
-          d3el.selectAll("path")
+          d3el.selectAll("path") // TODO don't transition the invisible path
             .transition()
-            .attr("d", edgePath);
+            .attrTween("d", pathTween(edgePath, 4));
         });
         thisView.state.doPathsTrans = false;
       }
@@ -303,8 +314,35 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       function getEdgePath(d){
         var pathPts = [].concat(d.get("middlePts"));        
         pathPts.unshift(d.get("source"));        
-        pathPts.push(computeEndPt(pathPts[pathPts.length-1], d.get("target"))); // TODO only compute if node position changed
+        // TODO only compute if node position changed
+        pathPts.push(computeEndPt(pathPts[pathPts.length-1], d.get("target"))); 
         return pvt.d3Line(pathPts);
+      }
+
+      // from http://bl.ocks.org/mbostock/3916621
+      function pathTween(d1, precision) {
+        return function() {
+          var path0 = this,
+              path1 = path0.cloneNode(),
+              n0 = path0.getTotalLength(),
+              n1 = (path1.setAttribute("d", d1), path1).getTotalLength();
+
+          // Uniform sampling of distance based on specified precision.
+          var distances = [0], i = 0, dt = precision / Math.max(n0, n1);
+          while ((i += dt) < 1) distances.push(i);
+          distances.push(1);
+
+          // Compute point-interpolators at each distance.
+          var points = distances.map(function(t) {
+            var p0 = path0.getPointAtLength(t * n0),
+                p1 = path1.getPointAtLength(t * n1);
+            return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
+          });
+
+          return function(t) {
+            return t < 1 ? "M" + points.map(function(p) { return p(t); }).join("L") : d1;
+          };
+        };
       }
 
       // computes intersection points for two circular nodes (simple geometry)
@@ -323,12 +361,17 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       }
 
       // remove old links
-      gPaths.exit().remove();
+      gPaths.exit().remove(); // TODO add appropriate animation
       
       // update existing nodes
-      thisView.circles = thisView.circles.data(thisView.model.get("nodes").models, function(d){
-        return d.id;
-      });
+      thisView.circles = thisView.circles
+        .data(thisView.model.get("nodes").filter(function(mdl){return mdl.isVisible();}),
+              function(d){
+                return d.id;
+              });
+      
+        thisView.circles.exit().remove(); // TODO add appropriate animation
+      
       if (thisView.state.doCircleTrans){
         thisView.circles
           .transition()
@@ -345,7 +388,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
       }
 
       // add new nodes
-      var newGs= thisView.circles.enter()
+      var newGs = thisView.circles.enter()
             .append("g");
 
       newGs.classed(consts.circleGClass, true)
@@ -400,11 +443,65 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
         pvt.insertTitleLinebreaks(d3.select(this), d.get("title"));
       });
 
-      // remove old nodes
-      thisView.circles.exit().remove();
+
+      thisView.circles.each(addNodeIcons);
+      // helper function to add appropriate icons to the nodes
+      // FIXME this needs to be refactored
+      function addNodeIcons(d){
+        if (!d.isVisible()) return;
+
+        // if has deps and not collapsed and isn't displaying minus sign
+        // remove other icon and add minus sign
+        var d3this = d3.select(this),
+            hasDeps = d.get("dependencies").length > 0,
+            consts = pvt.consts,
+            
+            d3DepIcon = d3this.selectAll("." + consts.depIconGClass);
+
+        if (hasDeps) {
+          if (d.get("hasContractedDeps")
+              && (!d3DepIcon.node() || !d3DepIcon.classed(consts.expandCrossClass))) {
+            d3DepIcon.remove();
+            d3DepIcon = d3this.append("g")
+              .classed(consts.depIconGClass, true)
+              .classed(consts.expandCrossClass, true);
+            d3DepIcon.append("polygon")
+              .attr("points", pvt.plusPts)
+              .attr("transform", "translate(" + (-consts.exPlusWidth/2) + "," +  
+                (consts.nodeRadius - consts.minusRectH*3 - 8) + ")")
+              .on("mouseup", function(){
+                if (!thisView.state.justDragged) {
+                  state.expOrContrNode = true;
+                  d.expandDeps();
+                  thisView.optimizeGraphPlacement(false, d.id);
+                  // thisView.render();
+                }
+              });
+          } else if (!d.get("hasContractedDeps") && (!d3DepIcon.node() || !d3DepIcon.classed(consts.contractMinusClass))) {
+            d3DepIcon.remove();
+            d3DepIcon = d3this.append("g")
+              .classed(consts.depIconGClass, true)
+              .classed(consts.contractMinusClass, true);
+            d3DepIcon.append("rect")
+              .attr("x", -consts.minusRectW/2)
+              .attr("y", consts.nodeRadius - consts.minusRectH*3)
+              .attr("width", consts.minusRectW)
+              .attr("height", consts.minusRectH)
+              .on("mouseup", function(){
+                if (!thisView.state.justDragged) {
+                  state.expOrContrNode = true;
+                  d.contractDeps();
+                  thisView.optimizeGraphPlacement(false, d.id);
+                  // thisView.render();
+                }
+              });
+          }
+        } else {
+          d3DepIcon.remove();
+        }   
+        
+      };
     },
-
-
 
     pathMouseDown: function(d3path, d){
       var thisView = this,
@@ -443,8 +540,9 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
           state = thisView.state,
           consts = pvt.consts;
 
-      // clicked edit node button
-      if (state.toNodeEdit){
+      // clicked edit node button or expand/contract node
+      if (state.toNodeEdit || state.expOrContrNode){
+        state.expOrContrNode = false;
         state.toNodeEdit = false;
         return;
       }
@@ -622,14 +720,24 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
 
     /**
      * Optimize graph placement using dagre
+     * TODO should this be moved to the graph object?
+     *
+     * @param <boolean> minSSDist: whether to miminize the squared distance of the
+     * nodes moved in the graph by adding the mean distance moved in each direction -- defaults to true
+     * @param <id> noMoveNodeId: node id of node that should not move during optimization
+     * note: noMoveNodeId has precedent over minSSDist
      */
-    optimizeGraphPlacement: function() {
+    optimizeGraphPlacement: function(minSSDist, noMoveNodeId) {
       var thisView = this,
           dagreGraph = new dagre.Digraph(),
           nodeWidth = pvt.consts.nodeRadius,
           nodeHeight = nodeWidth,
           nodes = thisView.model.get("nodes"),
-          edges = thisView.model.get("edges");
+          edges = thisView.model.get("edges"),
+          transX = 0,
+          transY = 0;
+
+      minSSDist = minSSDist === undefined ? true : minSSDist;
       
       // input graph into dagre
       nodes.each(function(node){
@@ -644,16 +752,37 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
                      .rankSep(100)
                      .nodeSep(20)
                      .rankDir("BT").run(dagreGraph);
-      
+
+      // determine average x and y movement
+      if (noMoveNodeId === undefined && minSSDist) {
+          layout.eachNode(function(n, inp){
+            var node = nodes.get(n);
+            transX +=  node.get("x") - inp.x;
+            transY += node.get("y") - inp.y;
+          });
+        transX /= nodes.length;
+        transY /= nodes.length;
+        
+      }
+      else if (noMoveNodeId !== undefined) {
+        var node = nodes.get(noMoveNodeId),
+            inp = layout._strictGetNode(noMoveNodeId);
+        transX = node.get("x") - inp.value.x;
+        transY = node.get("y") - inp.value.y;
+      }
+
       layout.eachEdge(function(e, u, v, value) {
-          var plen = value.points.length;
-          edges.get(e).set("middlePts",  plen > 1 ? value.points : []);//value.points.splice(0, -1);
+        var addPts = [];
+        value.points.forEach(function(pt){
+          addPts.push({x: pt.x + transX, y: pt.y + transY});
+        });
+        edges.get(e).set("middlePts",  addPts); // plen > 1 ? value.points : []);//value.points.splice(0, -1);
       });
 
       layout.eachNode(function(n, inp){
         var node = nodes.get(n);
-        node.set("x", inp.x);
-        node.set("y", inp.y);
+        node.set("x", inp.x + transX);
+        node.set("y", inp.y + transY);
       });
 
       thisView.state.doCircleTrans = true;

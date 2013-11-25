@@ -20,13 +20,12 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
      */
     addJsonNodesToGraph: function(jsonNodeArr) {
 
-      // FIXME: arrays are not being parsed to collections when uploading graphs
       var thisGraph = this,
           tmpEdges = [];
       
       jsonNodeArr.forEach(function(node) {
         node.dependencies.forEach(function(dep) {
-          tmpEdges.push({source: dep.source, target: node.id, reason: dep.reason, middlePts: dep.middlePts, id: dep.id});
+          tmpEdges.push({source: dep.source, target: node.id, reason: dep.reason, middlePts: dep.middlePts, id: dep.id, isContracted: dep.isContracted});
         });
         node.dependencies = undefined;
         thisGraph.addNode(node);
@@ -132,7 +131,9 @@ define(["backbone", "gc/collections/editable-edge-collection", "gc/collections/e
       node.get("outlinks").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
       nodes.remove(node);      
     }
-    
   });
   return EditableGraph;
+
+
+
 });

@@ -6,9 +6,14 @@ define(["backbone", "underscore", "agfk/models/directed-edge-model"], function(B
         target: {},
         isNew: 1,
         editNote: "",
-        middlePts: []
+        middlePts: [],
+        isContracted: false
       };
       return _.extend({}, DetailedEdgeModel.prototype.defaults, enDef);
+    },
+
+    isVisible: function(){
+      return !this.get("isContracted");
     }
   });
 

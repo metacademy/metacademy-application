@@ -299,5 +299,106 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       
     }); // end describe("import graph...
   }); // end describe ("graph IO..
+
+  describe('graph operations', function(){
+    describe('contract nodes', function(){
+      describe('contract cousin', function(){
+        it('should be able to contract cousin and have uncle become invisible', function(){
+          graphObj.getNode(nodeIds.cousin).contractDeps();
+          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(false);
+        });
+        
+        it('should have uncle-cousin edge be invisible', function(){
+          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
+        });
+
+        it('should have gp-uncle edge be invisible', function(){
+          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(false);
+        });
+        
+
+        ["grandparent", "parent", "child"].forEach(function(title){
+          it( title + ' should still be visible', function(){
+            graphObj.getNode(nodeIds[title]).isVisible().should.equal(true);
+          });
+        });
+
+        ["grandparentToParent", "parentToChild", "grandparentToChild"].forEach(function(title){
+          it( title + ' should still be visible', function(){
+            graphObj.getEdge(edgeIds[title]).isVisible().should.equal(true);
+          });
+        });
+      });
+
+      describe('contract child', function(){
+        it('should be able to contract child and have all nodes except child and cousin invisible', function(){
+          graphObj.getNode(nodeIds.child).contractDeps();
+          graphObj.get("nodes").every(function(node){
+            return node.get("title") === "cousin"
+              || node.get("title") === "child"
+              || ! node.isVisible();
+          }).should.equal(true);
+        });
+
+        it('all edges should be invisible', function(){
+          var allHidden = graphObj.get("edges").every(function(edge){
+            return !edge.isVisible();
+          });
+          allHidden.should.equal(true);
+        });
+      });
+    }); // end contract nodes
+
+    describe('expand nodes', function(){
+      describe('expand cousin', function(){
+        it('should be able to expand cousin deps', function(){          
+          graphObj.getNode(nodeIds.cousin).expandDeps();
+        });
+        
+        it('uncle and gp should be visible', function(){          
+          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(true);
+          graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
+        });
+
+        it('edge from uncle to cousin should be visible', function(){          
+          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(true);
+        });
+
+        it('edge from gp to uncle should be visible', function(){          
+          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(true);
+        });
+
+        it('parent should be invisible', function(){ 
+          graphObj.getNode(nodeIds.parent).isVisible().should.equal(false);        
+        });
+
+        it('edges from gp to child and parent should be invisible', function(){
+          graphObj.getEdge(edgeIds.grandparentToChild).isVisible().should.equal(false);
+          graphObj.getEdge(edgeIds.grandparentToParent).isVisible().should.equal(false);
+        });
+      }); // end describe('expand cousin')
+
+      describe('expand child', function(){
+        it('should be able to expand child deps', function(){          
+          graphObj.getNode(nodeIds.child).expandDeps();
+        });
+
+        it('all nodes should be visible', function(){
+          graphObj.get("nodes").every(function(n){return n.isVisible();}).should.equal(true);
+        });
+
+        it('all edges should be visible', function(){
+          var allVisible = graphObj.get("edges").every(function(edge){
+            return edge.isVisible();
+          });
+          allVisible.should.equal(true);
+        });
+
+
+      });
+      
+    });
+  });
+  
 }); // end define
 

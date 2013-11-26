@@ -1,7 +1,7 @@
 // FIXME remove window
-window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, dagre){
+window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
 
-  var pvt = {};
+  var pvt = {}; 
 
   pvt.consts = {
     gcWrapId: "gc-wrap",
@@ -152,7 +152,8 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
           if (!thisView.state.justDragged) {
             thisView.state.expOrContrNode = true;
             contractFun.call(d);
-            thisView.optimizeGraphPlacement(false, d.id);
+            //thisView.optimizeGraphPlacement(false, d.id);
+            thisView.render();
           }
         });
     }
@@ -283,7 +284,7 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
           thisView.windowKeyUp.call(thisView);
         });
 
-      // Place these listeners using backbone!
+      // TODO place these listeners using backbone?
       d3Svg.on("mousedown", function(d){thisView.svgMouseDown.call(thisView, d);});
       d3Svg.on("mouseup", function(d){thisView.svgMouseUp.call(thisView, d);});
 
@@ -316,6 +317,9 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
               d3.select('body').style("cursor", "auto");
             });      
       d3Svg.call(dragSvg).on("dblclick.zoom", null);
+
+      // rerender when the graph model changes from server data
+      thisView.listenTo(thisView.model, "loadedServerData", thisView.render);
     },
 
 
@@ -745,67 +749,12 @@ window.define(["backbone", "d3", "dagre", "filesaver"], function(Backbone, d3, d
      * note: noMoveNodeId has precedent over minSSDist
      */
     optimizeGraphPlacement: function(minSSDist, noMoveNodeId) {
-      var thisView = this,
-          dagreGraph = new dagre.Digraph(),
-          nodeWidth = pvt.consts.nodeRadius,
-          nodeHeight = nodeWidth,
-          nodes = thisView.model.get("nodes"),
-          edges = thisView.model.get("edges"),
-          transX = 0,
-          transY = 0;
-
-      minSSDist = minSSDist === undefined ? true : minSSDist;
-      
-      // input graph into dagre
-      nodes.each(function(node){
-        dagreGraph.addNode(node.id, {width: nodeWidth*2, height: nodeHeight});
-      });
-
-      edges.each(function(edge){
-        dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
-      });
-
-      var layout = dagre.layout()
-            .rankSep(100)
-            .nodeSep(20)
-            .rankDir("BT").run(dagreGraph);
-
-      // determine average x and y movement
-      if (noMoveNodeId === undefined && minSSDist) {
-        layout.eachNode(function(n, inp){
-          var node = nodes.get(n);
-          transX +=  node.get("x") - inp.x;
-          transY += node.get("y") - inp.y;
-        });
-        transX /= nodes.length;
-        transY /= nodes.length;
-        
-      }
-      else if (noMoveNodeId !== undefined) {
-        var node = nodes.get(noMoveNodeId),
-            inp = layout._strictGetNode(noMoveNodeId);
-        transX = node.get("x") - inp.value.x;
-        transY = node.get("y") - inp.value.y;
-      }
-
-      layout.eachEdge(function(e, u, v, value) {
-        var addPts = [];
-        value.points.forEach(function(pt){
-          addPts.push({x: pt.x + transX, y: pt.y + transY});
-        });
-        edges.get(e).set("middlePts",  addPts); // plen > 1 ? value.points : []);//value.points.splice(0, -1);
-      });
-
-      layout.eachNode(function(n, inp){
-        var node = nodes.get(n);
-        node.set("x", inp.x + transX);
-        node.set("y", inp.y + transY);
-      });
-
+      var thisView = this;
       thisView.state.doCircleTrans = true;
       thisView.state.doPathsTrans = true;
-      
+      thisView.model.optimizePlacement(pvt.consts.nodeRadius, minSSDist, noMoveNodeId);
       thisView.render();
+
     },
 
     uploadGraph: function(evt){

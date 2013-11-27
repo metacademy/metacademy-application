@@ -28,6 +28,14 @@ body{
 
 #gc-wrap{
     display: none;
+    width: inherit;
+    height: inherit;
+}
+
+#gc-wrap svg{
+    height: 100%;
+    width: 100%;
+    position: absolute;
 }
 
 #concept-editor-wrap{
@@ -63,7 +71,7 @@ body{
     margin: 0 0.5em;
 }
 
-.conceptG text{
+.concept-g text{
     pointer-events: none;
 }
 
@@ -71,13 +79,13 @@ marker{
     fill: #333;
 }
 
-g.conceptG circle{
+g.concept-g circle{
     fill: #F6FBFF;
     stroke: #333;
     stroke-width: 2px;
 }
 
-g.conceptG:hover circle{
+g.concept-g:hover circle{
     fill: rgb(200, 238, 241);
 }
 
@@ -88,12 +96,12 @@ g.selected:hover circle{
     fill: rgb(250, 232, 255);
 }
 
-g.conceptG circle.to-edit-circle{
+g.concept-g circle.to-edit-circle{
     fill: #C2DBFC;
     display: none;
 }
 
-g.conceptG.hover-g circle.to-edit-circle{
+g.concept-g.hover-g circle.to-edit-circle{
     display: block;
 }
 

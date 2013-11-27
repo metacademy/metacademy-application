@@ -1,9 +1,9 @@
 // FIXME remove window
-window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
+window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesaver"], function(Backbone, d3, _, GraphView){
 
-  var pvt = {}; 
+  var pvt = (new GraphView()).getBasePvt(); 
 
-  pvt.consts = {
+  pvt.consts = _.extend(pvt.consts, {
     gcWrapId: "gc-wrap",
     svgId: "gc-svg",
     toolboxId: "toolbox",
@@ -11,42 +11,15 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
     connectClass: "connect-node",
     depIconGClass: "dep-icon-g",
     olIconGClass: "ol-icon-g",
-    toEditCircleRadius: 10,
     toEditCircleClass: "to-edit-circle",
-    gHoverClass: "hover-g",
-    circleGClass: "conceptG",
     graphClass: "graph",
     activeEditId: "active-editing",
-    expandCrossClass: "exp-cross",
-    contractMinusClass: "contract-minus",
+    toEditCircleRadius: 10,
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
-    ENTER_KEY: 13,
-    nodeRadius: 50,
-    exPlusWidth: 5, // expand plus sign width in pixels
-    minusRectW: 11,
-    minusRectH: 5.5
-  };
+    ENTER_KEY: 13
+  });
 
-  pvt.plusPts = "0,0 " +
-    pvt.consts.exPlusWidth + ",0 " +
-    pvt.consts.exPlusWidth + "," + pvt.consts.exPlusWidth + " " +
-    (2 * pvt.consts.exPlusWidth) + "," + pvt.consts.exPlusWidth + " " +
-    (2 * pvt.consts.exPlusWidth) + "," + (2 * pvt.consts.exPlusWidth) + " " +
-    pvt.consts.exPlusWidth + "," + (2 * pvt.consts.exPlusWidth) + " " +
-    pvt.consts.exPlusWidth + "," + (3 * pvt.consts.exPlusWidth) + " " +
-    "0," + (3 * pvt.consts.exPlusWidth) + " " +
-    "0," + (2 * pvt.consts.exPlusWidth) + " " +
-    (-pvt.consts.exPlusWidth) + "," + (2 * pvt.consts.exPlusWidth) + " " +
-    (-pvt.consts.exPlusWidth) + "," + pvt.consts.exPlusWidth + " " +
-    "0," + pvt.consts.exPlusWidth + " " +
-    "0,0";
-
-  pvt.d3Line = d3.svg.line()
-    .x(function(d){return d.x === undefined ? d.get("x") : d.x;})
-    .y(function(d){return d.y === undefined ? d.get("y") : d.y;})
-    .interpolate('bundle')
-    .tension(1);
 
   pvt.dragmove = function(d) {
     var thisView = this;
@@ -67,20 +40,6 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
     sel.addRange(range);
   };
 
-  /* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
-  pvt.insertTitleLinebreaks = function (gEl, title) {
-    var words = title.split(/\s+/g),
-        nwords = words.length;
-    var el = gEl.append("text")
-          .attr("text-anchor","middle")
-          .attr("dy", "-" + (nwords-1)*7.5);
-
-    for (var i = 0; i < words.length; i++) {
-      var tspan = el.append('tspan').text(words[i]);
-      if (i > 0)
-        tspan.attr('x', 0).attr('dy', '15');
-    }
-  };
 
   pvt.replaceSelectEdge = function(d3Path, edgeData){
     var thisView = this;
@@ -102,7 +61,7 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
 
   pvt.removeSelectFromNode = function() {
     var thisView = this;
-    thisView.circles.filter(function(cd){
+    thisView.gCircles.filter(function(cd){
       return cd.id === thisView.state.selectedNode.id;
     }).classed(pvt.consts.selectedClass, false);
     thisView.state.selectedNode = null;
@@ -116,7 +75,8 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
     thisView.state.selectedEdge = null;
   };
 
-  // helper function for addNodeIcons
+  // helper function for addNodeIcons FIXME this function is difficult to understand -- should have a simple deps/outlinks flag that determines the icon type
+  // TODO move to graph-view
   pvt.addExpContIcon = function(d3Icon, iconGClass, hasExpOrContrName, expandFun, contractFun, placeAtBottom, d3this, thisView, d, consts){
     if (d.get(hasExpOrContrName) 
         && (!d3Icon.node() || !d3Icon.classed(consts.expandCrossClass))) {
@@ -187,8 +147,75 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
     }
   };
 
+  pvt.firstRender = function(){
+    var thisView = this,
+        d3Svg = thisView.d3Svg,
+        d3SvgG = thisView.d3SvgG;
 
-  var GraphEditor = Backbone.View.extend({
+    // displayed when dragging between nodes
+    thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")
+      .attr('class', 'link dragline hidden')
+      .attr('d', 'M0,0L0,0')
+      .style('marker-end', 'url(#end-arrow)');
+
+    // dragging particular to edit view
+    thisView.drag = d3.behavior.drag()
+      .origin(function(d){
+        return {x: d.x, y: d.y};
+      })
+      .on("drag", function(args){
+        thisView.state.justDragged = true;
+        pvt.dragmove.call(thisView, args);
+      })
+      .on("dragstart", function() {
+        // remove connecting intermediate pts
+        var state = thisView.state;
+        if (!state.shiftNodeDrag){
+          state.mouseDownNode.get("dependencies").each(function(d){
+            d.set("middlePts", []);
+          });
+          state.mouseDownNode.get("outlinks").each(function(d){
+            d.set("middlePts", []);
+          });
+        }
+      })
+      .on("dragend", function() {
+        // todo check if edge-mode is selected
+      });
+
+    // listen for dragging
+    var dragSvg = d3.behavior.zoom()
+          .on("zoom", function() {
+            if (d3.event.sourceEvent.shiftKey){
+              // TODO  the internal d3 state is still changing
+              return false;
+            } else{
+              zoomed.call(thisView);
+            }
+            return true;
+          })
+          .on("zoomstart", function() {
+            var ael = d3.select("#" + pvt.consts.activeEditId).node();
+            if (ael){
+              ael.blur();
+            }
+            if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
+          })
+          .on("zoomend", function() {
+            d3.select('body').style("cursor", "auto");
+          });      
+    d3Svg.call(dragSvg).on("dblclick.zoom", null);
+
+    // zoomed function used for dragging behavior above
+    function zoomed() {
+      thisView.state.justScaleTransGraph = true;
+      d3.select("." + pvt.consts.graphClass)
+        .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); 
+    };
+  };
+
+
+  var GraphEditor = GraphView.extend({
     el: document.getElementById(pvt.consts.gcWrapId),
 
     events: {
@@ -198,10 +225,10 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
       "click #download-input": "downloadGraph",
       "click #delete-graph": "clearGraph"
     },
-    
-    initialize: function() {
+
+    postinitialize: function() {
       var thisView = this;
-      thisView.state = {
+      thisView.state = _.extend(thisView.state, {
         selectedNode: null,
         selectedEdge: null,
         mouseDownNode: null,
@@ -212,262 +239,50 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
         shiftNodeDrag: false,
         selectedText: null,
         expOrContrNode: false,
-        doCircleTrans: false,
-        doPathsTrans: false,
         toNodeEdit: false
-      };
+      });
 
-      thisView.idct = 0;
-
-      // get svg and append static content
-      thisView.d3Svg = d3.select("#" + pvt.consts.svgId);
-      var d3Svg = thisView.d3Svg;
-      // define arrow markers for graph links
-      var defs = d3Svg.append('svg:defs');
-      defs.append('svg:marker')
-        .attr('id', 'end-arrow')
-        .attr('viewBox', '0 -5 10 10')
-        .attr('markerWidth', 5.5)
-        .attr('markerHeight', 5.5)
-        .attr('refX', 8)
-        .attr('orient', 'auto')
-        .append('svg:path')
-        .attr('d', 'M0,-5L10,0L0,5');
-
-      thisView.d3SvgG = thisView.d3Svg.append("g")
-        .classed(pvt.consts.graphClass, true);
-      var d3SvgG = thisView.d3SvgG;
+      thisView.idct = 0; // TODO this shouldn't be handled in the view
 
       /******
        * Setup d3-based event listeners
        ******/
-
-      // displayed when dragging between nodes
-      thisView.dragLine = d3SvgG.append('svg:path')
-        .attr('class', 'link dragline hidden')
-        .attr('d', 'M0,0L0,0')
-        .style('marker-end', 'url(#end-arrow)');
-
-      // svg nodes and edges 
-      thisView.gPaths = d3SvgG.append("g").selectAll("g");
-      thisView.circles = d3SvgG.append("g").selectAll("g");
-      
-      thisView.drag = d3.behavior.drag()
-        .origin(function(d){
-          return {x: d.x, y: d.y};
-        })
-        .on("drag", function(args){
-          thisView.state.justDragged = true;
-          pvt.dragmove.call(thisView, args);
-        })
-        .on("dragstart", function() {
-          // remove connecting intermediate pts
-          var state = thisView.state;
-          if (!state.shiftNodeDrag){
-            state.mouseDownNode.get("dependencies").each(function(d){
-              d.set("middlePts", []);
-            });
-            state.mouseDownNode.get("outlinks").each(function(d){
-              d.set("middlePts", []);
-            });
-          }
-        })
-        .on("dragend", function() {
-          // todo check if edge-mode is selected
-        });
-
-      // listen for key events on the window
-      d3.select(window).on("keydown", function() { 
-        thisView.windowKeyDown.call(thisView);
-      })
-        .on("keyup", function() {
-          thisView.windowKeyUp.call(thisView);
-        });
-
-      // TODO place these listeners using backbone?
-      d3Svg.on("mousedown", function(d){thisView.svgMouseDown.call(thisView, d);});
-      d3Svg.on("mouseup", function(d){thisView.svgMouseUp.call(thisView, d);});
-
-      // zoomed function used for dragging behavior below
-      function zoomed() {
-        thisView.state.justScaleTransGraph = true;
-        d3.select("." + pvt.consts.graphClass)
-          .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); 
-      };
-
-      // listen for dragging
-      var dragSvg = d3.behavior.zoom()
-            .on("zoom", function() {
-              if (d3.event.sourceEvent.shiftKey){
-                // TODO  the internal d3 state is still changing
-                return false;
-              } else{
-                zoomed.call(thisView);
-              }
-              return true;
-            })
-            .on("zoomstart", function() {
-              var ael = d3.select("#" + pvt.consts.activeEditId).node();
-              if (ael){
-                ael.blur();
-              }
-              if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
-            })
-            .on("zoomend", function() {
-              d3.select('body').style("cursor", "auto");
-            });      
-      d3Svg.call(dragSvg).on("dblclick.zoom", null);
-
-      // rerender when the graph model changes from server data
+      // rerender when the graph model changes from server data TOMOVE
       thisView.listenTo(thisView.model, "loadedServerData", thisView.render);
+
+      d3.select(window).on("keydown",  function(){
+        thisView.windowKeyDown.call(thisView);
+      });
+      d3.select(window).on("keyup",  function(){
+        thisView.windowKeyUp.call(thisView);
+      });
     },
 
-
-    render: function() {      
-      var thisView = this,
-          consts = pvt.consts,
-          state = thisView.state;
-
-      thisView.gPaths = thisView.gPaths
-        .data(thisView.model.get("edges").filter(function(mdl){
-          return mdl.isVisible();
-        }), function(d){
-          return d.id;
-        });
+    postrender: function() {
+      var thisView = this;
       
-      var gPaths = thisView.gPaths;
-      
-      // update existing paths
-      gPaths.classed(consts.selectedClass, function(d){
-        return d === state.selectedEdge;
+      thisView.gPaths.classed(pvt.consts.selectedClass, function(d){
+        return d === thisView.state.selectedEdge;
       });
+    },
 
-      if (thisView.state.doPathsTrans){
-        gPaths.each(function(d){
-          var d3el = d3.select(this),
-              edgePath = getEdgePath(d);
-          d3el.selectAll("path") // TODO don't transition the invisible path
-            .transition()
-            .attrTween("d", pathTween(edgePath, 4));
+    handleNewPaths: function(newGs){
+      var thisView = this;      
+      newGs
+        .on("mousedown", function(d){
+          thisView.pathMouseDown.call(this, d, thisView); 
+        })
+        .on("mouseup", function(d){
+          thisView.state.mouseDownLink = null;
         });
-        thisView.state.doPathsTrans = false;
-      }
-      else{
-        gPaths.each(function(d){
-          // FIXME: remove code repetition with above conditional
-          var d3el = d3.select(this),
-              edgePath = getEdgePath(d);
-          d3el.selectAll("path")
-            .attr("d", edgePath);
-        });
-      }
+    },
 
-      // add new paths
-      gPaths.enter()
-        .append("g")
-        .each(function(d){
-          var d3el = d3.select(this),
-              edgePath = getEdgePath(d);
-
-          // apend display path
-          d3el.append("path")
-            .style('marker-end','url(#end-arrow)')
-            .classed("link", true)
-            .attr("d", edgePath );
-          // append onhover path
-          d3el.append("path")
-            .attr("d", edgePath )          
-            .classed("link-wrapper", true)
-            .on("mousedown", function(d){
-              thisView.pathMouseDown.call(thisView, d3el, d);
-            })
-            .on("mouseup", function(d){
-              state.mouseDownLink = null;
-            });
-        });
-
-      function getEdgePath(d){
-        var pathPts = [].concat(d.get("middlePts"));        
-        pathPts.unshift(d.get("source"));        
-        // TODO only compute if node position changed
-        pathPts.push(computeEndPt(pathPts[pathPts.length-1], d.get("target"))); 
-        return pvt.d3Line(pathPts);
-      }
-
-      // from http://bl.ocks.org/mbostock/3916621
-      function pathTween(d1, precision) {
-        return function() {
-          var path0 = this,
-              path1 = path0.cloneNode(),
-              n0 = path0.getTotalLength(),
-              n1 = (path1.setAttribute("d", d1), path1).getTotalLength();
-
-          // Uniform sampling of distance based on specified precision.
-          var distances = [0], i = 0, dt = precision / Math.max(n0, n1);
-          while ((i += dt) < 1) distances.push(i);
-          distances.push(1);
-
-          // Compute point-interpolators at each distance.
-          var points = distances.map(function(t) {
-            var p0 = path0.getPointAtLength(t * n0),
-                p1 = path1.getPointAtLength(t * n1);
-            return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
-          });
-
-          return function(t) {
-            return t < 1 ? "M" + points.map(function(p) { return p(t); }).join("L") : d1;
-          };
-        };
-      }
-
-      // computes intersection points for two circular nodes (simple geometry)
-      function computeEndPt(src, tgt){
-        var srcX = src.x === undefined ? src.get("x") : src.x,
-            srcY =  src.y === undefined ? src.get("y") : src.y,
-            tgtX = tgt.get("x"),
-            tgtY = tgt.get("y"),
-            ratio = Math.pow((srcY - tgtY)/(srcX - tgtX), 2),
-            r = pvt.consts.nodeRadius,
-            offX = r/Math.sqrt(1 + ratio) * (srcX > tgtX ? -1 : 1),
-            offY = r/Math.sqrt(1 + 1/ratio) * (srcY > tgtY ? -1 : 1);
-
-        // keep source at origin since we don't have an end marker
-        return {x: tgtX - offX, y: tgtY - offY};
-      }
-
-      // remove old links
-      gPaths.exit().remove(); // TODO add appropriate animation
+    handleNewCircles: function(newGs){
+      var thisView = this,
+          state = thisView.state,
+          consts = pvt.consts;
       
-      // update existing nodes
-      thisView.circles = thisView.circles
-        .data(thisView.model.get("nodes").filter(function(mdl){return mdl.isVisible();}),
-              function(d){
-                return d.id;
-              });
-      
-      thisView.circles.exit().remove(); // TODO add appropriate animation
-      
-      if (thisView.state.doCircleTrans){
-        thisView.circles
-          .transition()
-          .attr("transform", function(d){
-            return "translate(" + d.get("x") + "," + d.get("y") + ")";
-          });
-        thisView.state.doCircleTrans = false;
-      }
-      else {
-        thisView.circles
-          .attr("transform", function(d){
-            return "translate(" + d.get("x") + "," + d.get("y") + ")";
-          });
-      }
-
-      // add new nodes
-      var newGs = thisView.circles.enter()
-            .append("g");
-
-      newGs.classed(consts.circleGClass, true)
-        .attr("transform", function(d){return "translate(" + d.get("x") + "," + d.get("y") + ")";})
+      newGs
         .on("mouseover", function(d){        
           if (state.shiftNodeDrag){
             d3.select(this).classed(consts.connectClass, true);
@@ -496,10 +311,6 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
           pvt.insertTitleLinebreaks(d3el, d.get("title"));
         });
       });
-      
-      // add big circle to represent the concept node
-      newGs.append("circle")
-        .attr("r", consts.nodeRadius);
 
       // add small circle link for editing
       newGs.append("circle")
@@ -519,14 +330,14 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
       });
 
 
-      thisView.circles.each(function(d){
+      thisView.gCircles.each(function(d){
         pvt.addNodeIcons.call(this, thisView, d);
       });
     },
 
-    pathMouseDown: function(d3path, d){
-      var thisView = this,
-          state = thisView.state;
+    pathMouseDown: function(d, thisView){
+      var state = thisView.state,
+          d3path = d3.select(this); // FIXME this is a problem !
       d3.event.stopPropagation();
       state.mouseDownLink = d;
 
@@ -685,7 +496,7 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
         model.addNode(d); // todo switch to create once server is up
         d = model.getNode(d.id);
         thisView.render();
-        var d3txt = thisView.changeTextOfNode(thisView.circles.filter(function(dval){
+        var d3txt = thisView.changeTextOfNode(thisView.gCircles.filter(function(dval){
           return dval.id === d.id;
         }), d),
             txtNode = d3txt.node();
@@ -739,24 +550,6 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
       this.state.lastKeyDown = -1;
     },
 
-    /**
-     * Optimize graph placement using dagre
-     * TODO should this be moved to the graph object?
-     *
-     * @param <boolean> minSSDist: whether to miminize the squared distance of the
-     * nodes moved in the graph by adding the mean distance moved in each direction -- defaults to true
-     * @param <id> noMoveNodeId: node id of node that should not move during optimization
-     * note: noMoveNodeId has precedent over minSSDist
-     */
-    optimizeGraphPlacement: function(minSSDist, noMoveNodeId) {
-      var thisView = this;
-      thisView.state.doCircleTrans = true;
-      thisView.state.doPathsTrans = true;
-      thisView.model.optimizePlacement(pvt.consts.nodeRadius, minSSDist, noMoveNodeId);
-      thisView.render();
-
-    },
-
     uploadGraph: function(evt){
       if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
         alert("Your browser won't let you load a graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
@@ -795,7 +588,6 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3){
       }
     }    
   }); // end GraphEditor definition
-
 
   return GraphEditor;
   

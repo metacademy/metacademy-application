@@ -1,4 +1,4 @@
-define(['agfk/collections/node-collection', 'agfk/models/detailed-node-model', 'underscore'], function(NodeCollection, DetailedNodeModel, _){
+define(['base/collections/node-collection', 'agfk/models/detailed-node-model', 'underscore'], function(NodeCollection, DetailedNodeModel, _){
   return NodeCollection.extend({
     model: DetailedNodeModel,
 

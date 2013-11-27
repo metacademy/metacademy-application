@@ -1,4 +1,4 @@
-define(["backbone", "underscore", "agfk/models/directed-edge-model"], function(Backbone, _, DetailedEdgeModel){
+define(["backbone", "underscore", "base/models/directed-edge-model"], function(Backbone, _, DetailedEdgeModel){
   var EditableEdge = DetailedEdgeModel.extend({
     defaults: function(){
       var enDef = {

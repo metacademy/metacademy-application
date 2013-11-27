@@ -2,7 +2,7 @@
  * This file contains the node collection
  * it is a basic collection that should not depend on aux 
  */
-define(['backbone', 'underscore', 'jquery', 'agfk/models/node-model'], function(Backbone, _, $, NodeModel){
+define(['backbone', 'underscore', 'jquery', 'base/models/node-model'], function(Backbone, _, $, NodeModel){
   "use strict";
   
   /**

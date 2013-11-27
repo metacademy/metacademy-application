@@ -1,4 +1,4 @@
-define(["underscore", "agfk/models/node-model", "agfk/collections/node-property-collections"], function(_, Node, NodePropertyCollections){
+define(["underscore", "base/models/node-model", "base/collections/node-property-collections"], function(_, Node, NodePropertyCollections){
 
   var pvt = {};
 

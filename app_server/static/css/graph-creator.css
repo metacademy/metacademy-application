@@ -86,7 +86,7 @@ g.concept-g circle{
 }
 
 g.concept-g:hover circle{
-    fill: rgb(200, 238, 241);
+    fill: #ECF6FF;
 }
 
 g.selected circle{

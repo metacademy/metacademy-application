@@ -22,9 +22,8 @@ window.define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-coll
      * Add dependency graph from server to the current graph
      * TODO handle id problems
      */
-    addServerDepGraphToGraph: function() {
-      var thisGraph = this,
-          tag = "logistic_regression";
+    addServerDepGraphToGraph: function(tag) {
+      var thisGraph = this;
       $.getJSON(window.CONTENT_SERVER + "/dependencies?concepts=" + tag, function(resp){
         var deps = [],
             nodes = resp.nodes,

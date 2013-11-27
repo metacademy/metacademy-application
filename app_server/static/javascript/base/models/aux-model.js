@@ -1,4 +1,4 @@
-define(["backbone", "underscore", "agfk/collections/node-collection"], function(Backbone, _, NodeCollection){
+define(["backbone", "underscore", "base/collections/node-collection"], function(Backbone, _, NodeCollection){
   /**
    * AuxModel: model to store all auxiliary information used throughout metacademy
    * All data associated with the aux model should be read only

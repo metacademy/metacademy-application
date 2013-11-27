@@ -1,4 +1,5 @@
-window.define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "base/models/graph-model"], function($, Backbone, dagre, EditableEdgeCollection, EditableNodeCollection, GraphModel){
+/*global define */
+define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "base/models/graph-model"], function($, Backbone, dagre, EditableEdgeCollection, EditableNodeCollection, GraphModel){
 
   return GraphModel.extend({
 

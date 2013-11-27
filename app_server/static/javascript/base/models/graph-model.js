@@ -1,4 +1,5 @@
-window.define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, dagre, BaseEdgeCollection, BaseNodeCollection){
+/*global define */
+define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, dagre, BaseEdgeCollection, BaseNodeCollection){
 
   return Backbone.Model.extend({
 
@@ -12,7 +13,11 @@ window.define(["jquery", "backbone", "dagre", "base/collections/edge-collection"
     initialize: function(){
       this.edgeModel = this.get("edges").model;
       this.nodeModel = this.get("nodes").model;
+      this.postinitialize();
     },
+
+    // override in subclass
+    postinitialize: function(){},
 
     /**
      * TODO only grab a single node (where would we use this?)

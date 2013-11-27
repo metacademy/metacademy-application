@@ -1,3 +1,4 @@
+/*global define */
 define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collections/editable-edge-collection"], function(Backbone, _, DetailedNodeModel, EditableEdgeCollection) {
   
   var EditableNode = (function(){

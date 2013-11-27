@@ -36,9 +36,9 @@ require.config({
       }
     },
     "sidr": ["jquery"]
-  }
+  },
 
-//urlArgs: 'bust=' + (new Date()).getTime()
+  urlArgs: 'bust=' + (new Date()).getTime()
 });
  
 require(['require', 'chai', 'mocha', 'jquery'], function(require, chai, mocha){

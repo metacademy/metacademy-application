@@ -1,11 +1,12 @@
 /*
  This file contains the graph-data model
  */
-
-define(["backbone", "underscore", "base/collections/node-property-collections", "agfk/collections/detailed-node-collection", "agfk/utils/errors"], function(Backbone, _, NodePropertyCollections, DetailedNodeCollection, ErrorHandler){
+/*global define */
+define(["backbone", "underscore", "base/models/graph-model", "base/collections/node-property-collections", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "agfk/utils/errors"], function(Backbone, _, GraphModel, NodePropertyCollections, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
+   * FIXME this is an awkward model
    */
   var GraphOptionsModel =  (function(){
     return Backbone.Model.extend({
@@ -35,26 +36,16 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
    */
   return (function(){
     var pvt = {};
-    return Backbone.Model.extend({
+    return GraphModel.extend({
       /**
        * default user states
        */
       defaults: function(){
         return {
           nodes: new DetailedNodeCollection(),
+          edges: new DetailedEdgeCollection(),
           options: new GraphOptionsModel()
         };
-      },
-
-      /**
-       * initialize graph data (place parentModel field in child models)
-       */
-      initialize: function(){
-        var nodes = this.get("nodes"),
-            options = this.get("options");
-
-        nodes.parentModel = this;
-        options.parentModel = this;
       }
     });
   })();

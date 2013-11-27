@@ -1,7 +1,9 @@
 /**
  * Main function, set to data-main with require.js
  */
-
+  
+/*global requirejs */
+  
 // configure require.js
 requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
@@ -10,12 +12,16 @@ requirejs.config({
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
+    "dagre": "lib/dagre",
     "btouch": "lib/backbone.touch",
     "sidr": "lib/jquery.sidr.min"
   },
   shim: {
     d3: {
       exports: "d3"
+    },
+    dagre: {
+      exports: "dagre"
     },
     underscore: {
       exports: "_"

@@ -40,7 +40,7 @@ window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/ed
       thisRoute.removeOtherView();
       if (!thisRoute.geModel) {
         thisRoute.geModel = new EditableGraphModel();
-        // thisRoute.geModel.addServerDepGraphToGraph("reversible_jump_mcmc");
+//        thisRoute.geModel.addServerDepGraphToGraph("adaptive_rejection_sampling");
       }
       thisRoute.geView = this.geView || new GraphEditorView({model: thisRoute.geModel});
       thisRoute.geView.render();

@@ -1,13 +1,13 @@
-define(["backbone", "underscore", "base/models/directed-edge-model"], function(Backbone, _, DetailedEdgeModel){
+define(["backbone", "underscore", "agfk/models/detailed-edge-model"], function(Backbone, _, DetailedEdgeModel){
   var EditableEdge = DetailedEdgeModel.extend({
     defaults: function(){
       var enDef = {
         source: {},
         target: {},
-        isNew: 1,
-        editNote: "",
         middlePts: [],
-        isContracted: false
+        isContracted: false,
+        isNew: 1,
+        editNote: ""
       };
       return _.extend({}, DetailedEdgeModel.prototype.defaults, enDef);
     },

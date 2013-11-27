@@ -2,7 +2,7 @@ define(["backbone"], function(Backbone){
   /**
    * general directed edge model
    */
-  var DirectedEdge = Backbone.Model.extend({
+    return Backbone.Model.extend({
 
     /**
      * default values -- underscore attribs used to match data from server
@@ -35,6 +35,4 @@ define(["backbone"], function(Backbone){
       }
     }
   });
-
-  return DirectedEdge;
 });

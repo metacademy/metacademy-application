@@ -54,15 +54,10 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
     return DetailedNodeModel.extend({
       collFields: ["questions", "dependencies", "outlinks", "resources"],
       
-      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "isContracted", "hasContractedDeps", "hasContractedOLs"],
+      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
 
       defaults: function() {
         var enDef = {
-          x: 0,
-          y: 0,
-          isContracted: false,
-          hasContractedDeps: false, 
-          hasContractedOLs: false, 
           isNew: 1,
           editNote: "",
           dependencies: new EditableEdgeCollection(),

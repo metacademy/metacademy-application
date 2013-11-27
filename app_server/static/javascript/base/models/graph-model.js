@@ -1,4 +1,4 @@
-window.define(["jquery", "backbone", "dagre", "base/collections/directed-edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, dagre, BaseEdgeCollection, BaseNodeCollection){
+window.define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, dagre, BaseEdgeCollection, BaseNodeCollection){
 
   return Backbone.Model.extend({
 

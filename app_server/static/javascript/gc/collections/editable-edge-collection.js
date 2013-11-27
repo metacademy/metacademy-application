@@ -1,6 +1,5 @@
-define(["backbone", "base/collections/directed-edge-collection", "gc/models/editable-edge-model"], function(Backbone, DirectedEdgeCollection, EditableEdge){
-  var EditableEdgeCollection = DirectedEdgeCollection.extend({
+define(["backbone", "agfk/collections/detailed-edge-collection", "gc/models/editable-edge-model"], function(Backbone, DetailedEdgeCollection, EditableEdge){
+  return DetailedEdgeCollection.extend({
     model: EditableEdge
   });
-  return EditableEdgeCollection;
 });

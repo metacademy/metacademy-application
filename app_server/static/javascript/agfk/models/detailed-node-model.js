@@ -1,4 +1,4 @@
-define(["underscore", "base/models/node-model", "base/collections/node-property-collections"], function(_, Node, NodePropertyCollections){
+define(["underscore", "base/models/node-model", "base/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
 
   var pvt = {};
 
@@ -16,15 +16,22 @@ define(["underscore", "base/models/node-model", "base/collections/node-property-
   var DetailedNode = Node.extend({
       collFields: ["questions", "dependencies", "outlinks", "resources"],
       
-      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time"],
+      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "hasContractedDeps", "hasContractedOLs"],
 
     defaults: function(){
       var dnDefaults = {
+        dependencies: new DetailedEdgeCollection(),
+        outlinks: new DetailedEdgeCollection(),
         questions: new NodePropertyCollections.QuestionCollection(),
         resources: new NodePropertyCollections.ResourceCollection(),
         flags: [],
         goals: "",
-        pointers: ""
+        pointers: "",
+        x: 0,
+        y: 0,
+        isContracted: false,
+        hasContractedDeps: false, 
+        hasContractedOLs: false
       };
       return _.extend({}, Node.prototype.defaults(), dnDefaults);
     },

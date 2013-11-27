@@ -20,19 +20,8 @@ define(["backbone"], function(Backbone){
      * Initialize the DE (currently sets the id properly)
      */
     initialize: function(inp){
+      // FIXME does this handle all cases?
       this.id = inp.id || inp.from_tag + inp.to_tag;
-    },
-
-    /**
-     * return a dot (graphviz) representation of the edge
-     */
-    getDotStr: function(){
-      if (this.get("from_tag")){
-        return this.get("from_tag") + "->" + this.get("to_tag") + ';';
-      }
-      else{
-        return "";
-      }
     }
   });
 });

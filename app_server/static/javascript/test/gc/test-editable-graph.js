@@ -479,9 +479,12 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       it('should be able to add collection elements to the newGraph', function(){
         newGraph.get("nodes").get(nodeIds.parent).get("resources").add(exampleResource);
       });
+
+      // TODO add server grabbing test! -- how to tell when it's finished parsing? -- use trigger events
       
     }); // end describe("import graph...
   }); // end describe ("graph IO..
+  
 
 }); // end define
 

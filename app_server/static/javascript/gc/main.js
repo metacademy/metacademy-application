@@ -12,7 +12,7 @@ requirejs.config({
     "btouch": "lib/backbone.touch",
     "sidr": "lib/jquery.sidr.min",
     "dagre": "lib/dagre",
-    "filesaver": "lib/FileSaver"    
+    "filesaver": "lib/FileSaver"
   },
   shim: {
     filesaver: {
@@ -62,7 +62,7 @@ if (window.PRODUCTION){
 
 
 // agfk app & gen-utils
-require(["backbone","agfk/utils/utils", "gen-utils", "agfk/models/aux-model", "gc/routers/router", "jquery", "btouch", "sidr"], function(Backbone, Utils, GenPageUtils, AuxModel, Router, $){
+require(["backbone","base/utils/utils", "gen-utils", "agfk/models/aux-model", "gc/routers/router", "jquery", "btouch", "sidr"], function(Backbone, Utils, GenPageUtils, AuxModel, Router, $){
   "use strict";
 
   // initialize global auxData ( TODO is this necessary? maybe...could probably use all titles for autocompletion...)
@@ -78,7 +78,7 @@ require(["backbone","agfk/utils/utils", "gen-utils", "agfk/models/aux-model", "g
     };
     return oldSync(method, model, options);
   };
-  
+
   GenPageUtils.prep();
 
   // automatically resize window when viewport changes

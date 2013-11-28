@@ -5,7 +5,7 @@ define(["backbone", "underscore", "agfk/models/detailed-edge-model"], function(B
         isNew: 1,
         editNote: ""
       };
-      return _.extend({}, DetailedEdgeModel.prototype.defaults, enDef);
+      return _.extend({}, DetailedEdgeModel.prototype.defaults(), enDef);
     }
   });
 });

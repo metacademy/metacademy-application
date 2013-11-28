@@ -4,9 +4,9 @@
  */
 
 
-define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbone, _, $, Utils){
+define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbone, _, $, Utils){
   "use strict";
-  
+
   /**
    * Display the model as an item in the node list
    */
@@ -15,7 +15,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
     var pvt = {};
 
     pvt.parentView = null;
-    
+
     pvt.viewConsts = {
       templateId: "node-title-view-template", // name of view template (warning: hardcoded in html)
       implicitLearnedClass: "implicit-learned-concept-title",
@@ -65,7 +65,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
           thisView.changeTitleClass(implicitLearnedClass, status);
         });
       },
-      
+
       /**
        * Render the learning view given the supplied model
        */
@@ -130,7 +130,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       events: {
         'click .more-resource-info': 'toggleAdditionalInfo'
       },
-      
+
       /**
        * Render the learning view given the supplied model
        */
@@ -168,7 +168,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.options.conceptId;},
       className: pvt.viewConsts.viewClass,
-      
+
       /**
        * Render the learning view given the supplied model
        */
@@ -239,7 +239,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
       className: pvt.viewConsts.viewClass,
       tagName: "li",
-      
+
       /**
        * Render the learning view given the supplied model
        */
@@ -247,14 +247,14 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         var thisView = this,
             thisModel = thisView.model;
         // TODO this seems awkward
-        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), 
-                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))}))); 
+        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(),
+                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))})));
         return thisView;
       }
 
     });
   })();
-  
+
 
   /**
    * Wrapper view to display all dependencies
@@ -272,7 +272,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
     return Backbone.View.extend({
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
       className: pvt.viewConsts.viewClass,
-      
+
       /**
        * Render the learning view given the supplied model
        */
@@ -340,7 +340,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
     return Backbone.View.extend({
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
       className: pvt.viewConsts.viewClass,
-      
+
       /**
        * Render the view given the supplied model
        */
@@ -387,14 +387,14 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       return result;
     };
 
-    
+
 
     // return public object
     return Backbone.View.extend({
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return this.prefix + "-view-" + this.model.cid; },
       className: function() { return this.prefix + "-view"; },
-      
+
       /**
        * Render the learning view given the supplied model
        */
@@ -417,7 +417,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         // array depth corresponds to list depth
         for (i = 0; i < lines.length; i++){
           var line = lines[i];
-          
+
           var depth = line.depth;
           while (depth < prevDepth){
             htmlStr += '</ul>\n';
@@ -430,9 +430,9 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
           }
           liStr = pvt.lineToStr(line.items);
           htmlStr += "<li>" + liStr + "</li>\n";
-            
+
           prevDepth = line.depth;
-          
+
         }
 
         while (prevDepth--){
@@ -443,7 +443,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       }
     });
   })();
-  
+
 
   /**
    * Displays detailed node information
@@ -480,7 +480,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             thisModel = thisView.model,
             id = thisModel.id,
             aux = window.agfkGlobals.auxModel;
-        
+
         return pvt.viewConsts.viewClass
           + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
           + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
@@ -526,13 +526,13 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             outlinkLocClass = "." + viewConsts.outlinkLocClass,
             ptrLocClass = "." + viewConsts.ptrLocClass,
             goalsLocClass = "." + viewConsts.goalsLocClass;
-        
+
         var templateVars = _.extend(thisView.model.toJSON(), {"neededFor": thisView.model.computeNeededFor(),
                                                               "notes": thisView.notesList(),
                                                               "time": Utils.formatTimeEstimate(thisView.model.get("time")),
                                                               "displayTitle": thisView.model.getLearnViewTitle()});
         thisView.$el.html(thisView.template(templateVars));
-        thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"), 
+        thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"),
                                                                              conceptId: thisView.model.get("id")});
         thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
         thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
@@ -657,7 +657,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
     pvt.$expandedTitle = null;
 
     pvt.idToTitleView = {};
-    
+
     pvt.nodeOrdering = null;
 
     pvt.viewConsts = {
@@ -726,7 +726,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         }
         $titleEl.addClass(clickedItmClass);
         titleId = $titleEl.attr("id");
-        
+
         nid = titleId.split("-").pop();
         var dnode = thisView.showConceptDetails(thisView.model.get("nodes").get(nid));
         pvt.expandedNode = dnode;
@@ -757,7 +757,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         this.listenTo(window.agfkGlobals.auxModel, gConsts.learnedTrigger, this.updateTimeEstimate);
         this.listenTo(this.model.get("nodes"), "sync", this.updateTimeEstimate);
       },
-      
+
       /**
        * Render the learning view given the supplied collection
        * TODO rerender (the appropriate section) when the model changes
@@ -776,13 +776,13 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         $div.attr("id", (pvt.viewConsts.titleListId));
         pvt.nodeOrdering = thisView.getTopoSortedConcepts();
         var titlesTitle = document.createElement("h1");
-        titlesTitle.textContent = "Learning Plan"; 
+        titlesTitle.textContent = "Learning Plan";
         thisView.$el.prepend(titlesTitle);
         $div.append(titlesTitle);
         var timeEstimateEl = document.createElement("div");
         timeEstimateEl.className = viewConsts.timeEstimateClass;
         var timeEstimate = thisView.model.get("nodes").getTimeEstimate();
-        
+
         var lpButton = document.createElement("div");
         lpButton.id = viewConsts.lpButtonId;
         lpButton.className = "small-vp-button";
@@ -791,7 +791,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         $(lpButton).on("click", function(){
           $div.toggleClass(viewConsts.showClass);
           $(this).toggleClass("expanded");
-        });                
+        });
         $el.append(lpButton);
 
         $div.append(timeEstimateEl);
@@ -805,7 +805,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
         thisView.$el.append(pvt.conceptDisplayWrap);
         // recapture previous expand/collapse state TODO is this desirable behavior?
         if ($expandedTitle){
-          // check that new title is in group         
+          // check that new title is in group
           var $newTitle = thisView.$el.find("#" + $expandedTitle.attr("id"));
           if ($newTitle.length > 0){
             pvt.$expandedTitle = $newTitle;
@@ -823,7 +823,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
       },
 
       /**
-       * Render the learning view titles 
+       * Render the learning view titles
        */
       renderTitles: function(){
         var thisView = this,
@@ -835,13 +835,13 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
             $list = $(document.createElement("ol")),
             thisModel = thisView.model,
             nodes = thisModel.get("nodes");
-       
+
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
           nliview = new NodeListItemView({model: curNode});
           nliview.setParentView(thisView);
           pvt.idToTitleView[curNode.get("id")] = nliview;
-          $list.append(nliview.render().el); 
+          $list.append(nliview.render().el);
         }
         return $list;
       },
@@ -869,7 +869,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
 
       /**
        * Compute the learning view ordering (topological sort)
-       * TODO this function may be migrated 
+       * TODO this function may be migrated
        * if the view ordering is user-dependent
        */
       getTopoSortedConcepts: function(){
@@ -921,7 +921,7 @@ define(["backbone", "underscore", "jquery", "agfk/utils/utils"], function(Backbo
           }
           return returnArr;
         };
-        
+
         return dfsTopSort(startRootNodes);
       },
 

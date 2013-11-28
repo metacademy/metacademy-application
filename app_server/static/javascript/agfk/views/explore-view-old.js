@@ -6,7 +6,9 @@
 // carefully refactor variables to distinguish nodes from tags
 // -fully separate graph generation logic from view
 
-define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
+/*global define*/
+
+define(["backbone", "d3", "jquery", "underscore", "base/utils/utils", "base/utils/errors"], function(Backbone, d3, $, _, Utils, ErrorHandler){
   "use strict";
 
   /*
@@ -17,14 +19,17 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
     /**
      * Private methods and variables
      */
-    var pvt = {};
-    pvt.viewConsts = {
+
+    var pvt = (new GraphView()).getBasePvt();
+
+    // FIXME refactor these names given the names in graph-view.js, also look for unused css
+    pvt.consts = _.extend(pvt.consts, {
       // ----- class and id names ----- //
-      viewId: "explore-view", // id of view element (div by default) must change in CSS as well
-      // WARNING some changes must be propagated to the css file 
-      graphClass: "graph", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
-      nodeClass: "node", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
-      edgeClass: "edge", // WARNING currently determined by graph generation -- chaning this property will not change the class TODO fix
+      viewId: "explore-graph-view", // id of view element (div by default) must change in CSS as well
+      // WARNING some changes must be propagated to the css file
+      graphClass: "graph", // WARNING currently determined by graph generation -- changing this property will not change the class TODO fix
+      nodeClass: "node", // WARNING currently determined by graph generation -- changing this property will not change the class TODO fix
+      edgeClass: "edge", // WARNING currently determined by graph generation -- changing this property will not change the class TODO fix
       exploreSvgId: "explore-svg",
       hoveredClass: "hovered",
       useExpandClass: "use-expand",
@@ -64,7 +69,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       numCharLineDisplayNode: 14, // max number of characters to display per title line of graph nodes
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
-      summaryArrowTop: 28, // top distance to triangle apex 
+      summaryArrowTop: 28, // top distance to triangle apex
       summaryAppearDelay: 250, // delay before summary appears (makes smoother navigation)
       summaryHideDelay: 100,
       summaryFadeInTime: 50, // summary fade in time (ms)
@@ -86,19 +91,19 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       checkGScale: 0.79, // relative size of "completed" check group
       nodeIconsConstYOffset: 28, // constant y offset for the node icons
       nodeIconsPerYOffset: 9 // y offset for each text element for the node icons
-    };
+    });
     pvt.summaryDisplays = {};
     pvt.summaryTOKillList = {};
     pvt.summaryTOStartList = {};
     pvt.isRendered = false;
 
-    pvt.$hoverTxtButtonEl = $("#" + pvt.viewConsts.hoverTextButtonsId);
+    pvt.$hoverTxtButtonEl = $("#" + pvt.consts.hoverTextButtonsId);
 
     /**
      * Get summary box placement (top left) given node placement
      */
     pvt.getSummaryBoxPlacement = function(nodeRect, placeLeft){
-      var viewConsts = pvt.viewConsts,
+      var viewConsts = pvt.consts,
           leftMultSign = placeLeft ? -1: 1,
           shiftDiff = (1 + leftMultSign*viewConsts.SQRT2DIV2)*nodeRect.width/2 + leftMultSign*viewConsts.summaryArrowWidth;
       if (placeLeft){shiftDiff -= viewConsts.summaryWidth;}
@@ -114,19 +119,19 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
      */
     pvt.preprocessNodesEdges = function(d3Sel){
       d3Sel.attr('id', function(){
-        return d3.select(this).select('title').text().replace(/->/g, "TO"); 
+        return d3.select(this).select('title').text().replace(/->/g, "TO");
       });
       d3Sel.selectAll("title").remove(); // remove the title for a cleaner hovering experience
       return true;
     };
-    
+
     /**
      * Helper function to attach the summary div and add an event listener for leaving the summary
      */
     pvt.attachNodeSummary = function(d3node){
       // display the node summary
       var $wrapDiv = this.showNodeSummary(d3node);
-      var hoveredClass = pvt.viewConsts.hoveredClass;
+      var hoveredClass = pvt.consts.hoveredClass;
 
       $wrapDiv.on("mouseenter", function(){
         $(this).addClass(hoveredClass);
@@ -136,18 +141,19 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         $(this).removeClass(hoveredClass);
         Utils.simulate(d3node.node(), "mouseout", {
           relatedTarget: evt.relatedTarget
-        }); 
+        });
       });
     };
+
 
     /**
      * Adds the explore-to-learn node icons
      */
     pvt.addEToLIcon = function(d3node, svgSpatialInfo){
       var thisView = this,
-          viewConsts = pvt.viewConsts;
+          viewConsts = pvt.consts;
           svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
-      
+
       var iconG = d3node.append("svg:image")
                   .attr("xlink:href", window.STATIC_PATH + "images/list-icon.png") // TODO move hardcoding
                   .attr("class", viewConsts.elIconClass)
@@ -160,25 +166,25 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           elIconX = svgSpatialInfo.cx + viewConsts.elIconXOffset,
           elIconY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset
             + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.elIconYOffset;
-      iconG.attr("transform", 
+      iconG.attr("transform",
                 "translate(" + elIconX + "," + elIconY + ") "
-                + "scale(" + viewConsts.elIconScale + ")");      
-      
+                + "scale(" + viewConsts.elIconScale + ")");
+
     };
-    
+
     /**
      * Add bookmark star and associated properties to the given node
      * TODO refactor with addCheckMark
      */
     pvt.addStar = function(d3node, svgSpatialInfo){
       var thisView = this,
-          viewConsts = pvt.viewConsts,
+          viewConsts = pvt.consts,
           nodeId = d3node.attr("id"),
           mnode = thisView.model.get("nodes").get(nodeId),
           starHoveredClass = viewConsts.starHoveredClass,
           aux = window.agfkGlobals.auxModel;
       svgSpatialInfo = svgSpatialInfo || Utils.getSpatialNodeInfo(d3node.node());
-      
+
       var starG = d3node.append("g")
                   .attr("class", viewConsts.starClass)
                   .attr("id", pvt.getStarIdForNode.call(thisView, d3node))
@@ -201,17 +207,17 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           starX = svgSpatialInfo.cx + viewConsts.starXOffset,
           starY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset
             + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.starYOffset;
-      starG.attr("transform", 
+      starG.attr("transform",
                 "translate(" + starX + "," + starY + ") "
-                + "scale(" + viewConsts.starGScale + ")");      
+                + "scale(" + viewConsts.starGScale + ")");
     };
-    
+
     /**
      * Add the check mark and associated properties to the given node
      * TODO refactor with addStar
      */
     pvt.addCheckMark = function(d3node, svgSpatialInfo){
-      var viewConsts = pvt.viewConsts,
+      var viewConsts = pvt.consts,
           thisView = this,
           nodeId = d3node.attr("id"),
           mnode = thisView.model.get("nodes").get(nodeId),
@@ -240,22 +246,22 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         .attr("r", viewConsts.checkCircleR);
       chkG.append("path")
         .attr("d", viewConsts.checkPath);
-      
+
       var numEls = d3node.selectAll("text")[0].length,
           chkX = svgSpatialInfo.cx + viewConsts.checkXOffset,
           chkY = svgSpatialInfo.cy + viewConsts.nodeIconsConstYOffset
             + (numEls-1)*viewConsts.nodeIconsPerYOffset; // TODO move hardcoding
-      chkG.attr("transform", 
+      chkG.attr("transform",
                 "translate(" + chkX + "," + chkY + ") "
-                + "scale(" + viewConsts.checkGScale + ")");      
+                + "scale(" + viewConsts.checkGScale + ")");
     };
-    
+
     /**
      * Add visual mouse over properties to the explore nodes
      */
     pvt.nodeMouseOver = function(nodeEl) {
       var thisView = this,
-          viewConsts = pvt.viewConsts,
+          viewConsts = pvt.consts,
           hoveredClass = viewConsts.hoveredClass,
           d3node = d3.select(nodeEl);
 
@@ -265,7 +271,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       }
 
       var nodeId = nodeEl.id;
-      
+
       // add the appropriate class
       d3node.classed(hoveredClass, true);
 
@@ -305,7 +311,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
      */
     pvt.nodeMouseOut = function(nodeEl) {
       var relTarget = d3.event.relatedTarget;
-      
+
       // check if we're in a semantically related el
       if (!relTarget || $.contains(nodeEl, relTarget) || (relTarget.id && relTarget.id.match(nodeEl.id))){
         return;
@@ -314,7 +320,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       var thisView = this,
           d3node = d3.select(nodeEl),
           summId = pvt.getSummaryIdForDivWrap.call(thisView, d3node),
-          viewConsts = pvt.viewConsts,
+          viewConsts = pvt.consts,
           hoveredClass = viewConsts.hoveredClass,
           nodeId = nodeEl.id;
 
@@ -336,9 +342,9 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       }
     };
 
-     
+
     /**
-     * Return a dot string array from the specified keyNode 
+     * Return a dot string array from the specified keyNode
      * depth: desired depth of dot string
      * keyNode: root keynode, defaults to graph keynode (if exists, otherwise throws an error)
      * checkVisible: true will only add nodes that are not already visible, defaults to false
@@ -351,7 +357,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           curEndNodes = [keyNode], // this should generalize easily to multiple end nodes
           curNode,
           tag;
-      
+
       _.each(curEndNodes, function(node) {
         tag = node.get("id");
         curNode = thisNodes.get(tag);
@@ -416,42 +422,42 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       if (node.get("is_shortcut")) {
         optionStr += ",style=dashed";
       }
-      return node.get("id") + ' [label="' + node.getNodeDisplayTitle(pvt.viewConsts.numCharLineDisplayNode) + '"' + optionStr + '];';
+      return node.get("id") + ' [label="' + node.getNodeDisplayTitle(pvt.consts.numCharLineDisplayNode) + '"' + optionStr + '];';
     };
 
     /**
      * Helper function to obtain checkmark element for the given node
      */
     pvt.getCheckIdForNode = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.checkNodeIdSuffix;
+      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.checkNodeIdSuffix;
     };
 
     /**
      * Helper function to obtain el-icon element for the given node
      */
     pvt.getELIconIdForNode = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.elIconNodeIdSuffix;
+      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.elIconNodeIdSuffix;
     };
 
     /**
      * Helper function to obtain checkmark element for the given node
      */
     pvt.getStarIdForNode = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.starNodeIdSuffix;
+      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.starNodeIdSuffix;
     };
 
     /**
      * Helper function to obtain id of summary txt div for a given node in the exporation view
      */
     pvt.getSummaryIdForDivTxt = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.summaryDivSuffix;
+      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.summaryDivSuffix;
     };
 
     /**
      * Helper function to obtain id of wrapper div of summary txt for a given node in the exporation view
      */
     pvt.getSummaryIdForDivWrap = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.viewConsts.summaryWrapDivSuffix;
+      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.summaryWrapDivSuffix;
     };
 
     /**
@@ -467,7 +473,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
      */
     return Backbone.View.extend({
       // id of view element (div unless tagName is specified)
-      id: pvt.viewConsts.viewId,
+      id: pvt.consts.viewId,
 
       // most events are handled via d3; this is awkward for backbone, but jQuery isn't as reliable/east for SVG events
       // TODO try to be consistent with event handling
@@ -477,22 +483,22 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
 
       // hack to call appRouter from view (must pass in approuter)
       appRouter: null,
-      
+
       /**
        * Obtain initial kmap coordinates and render results
        */
-      initialize: function(inp) {
+      postinitialize: function(inp) {
         // build initial graph based on input collection
         var thisView = this,
-            d3this = thisView.getd3El(),
+            d3this = thisView.getd3El(), // FIXME
             nodes = thisView.model.get("nodes"),
             aux = window.agfkGlobals.auxModel,
             gConsts = aux.getConsts();
 
         this.appRouter = inp.appRouter;
-        
+
         // TODO this initialization won't work when expanding graphs
-        
+
         // dim nodes that are [implicitly] learned
         thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, nodeSid, status){
           var d3El = d3this.select("#" + nodeId);
@@ -512,126 +518,127 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             thisView.toggleNodeProps(d3El, status, "implicitLearned", d3this);
           }
         });
-        
+
         // rerender graph (for now) when clearing learned nodes
         // TODO do we need to clean up this view to avoid zombies?
         thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.render);
-        
+
       },
-      
-      /** 
-       * Initial rendering for view (necessary because of particular d3 use case)
-       */
-      initialRender: function() {
-        // unambiguous thisView reference
-        var  thisView = this,
-            // performace: grab object constants that are used multiple times
-            viewConsts = pvt.viewConsts,
-            nodeClass = viewConsts.nodeClass,
-            edgeClass  = viewConsts.edgeClass,
-            exploreSvgId = viewConsts.exploreSvgId,
-            exPlusWidth = viewConsts.exPlusWidth,
-            graphClass = viewConsts.graphClass,
-            // other needed vars
-            d3this = thisView.getd3El(),
-            gelems = d3this.selectAll("." + nodeClass + ", ." + edgeClass);
 
 
-        // remove unneeded background polygon from graphviz TODO make sure this is the correct polygon
-        d3this.select("polygon").remove();
+      // /**
+      //  * Initial rendering for view (necessary because of particular d3 use case)
+      //  */
+      // initialRender: function() {
+      //   // unambiguous thisView reference
+      //   var  thisView = this,
+      //       // performace: grab object constants that are used multiple times
+      //       viewConsts = pvt.consts,
+      //       nodeClass = viewConsts.nodeClass,
+      //       edgeClass  = viewConsts.edgeClass,
+      //       exploreSvgId = viewConsts.exploreSvgId,
+      //       exPlusWidth = viewConsts.exPlusWidth,
+      //       graphClass = viewConsts.graphClass,
+      //       // other needed vars
+      //       d3this = thisView.getd3El(),
+      //       gelems = d3this.selectAll("." + nodeClass + ", ." + edgeClass);
 
-        // sort the svg such that the edges come before the nodes so mouseover on node doesn't activate edge
-        var gdata = gelems[0].map(function(itm) {
-            return d3.select(itm).classed(nodeClass);
-        });
-        // return if graph is empty (e.g. clear nodes after all nodes were learned)
-        if (gdata.length === 0){
-          return false;
-        }
-        gelems.data(gdata).sort();
-        // change id to title, remove title, then
-        pvt.preprocessNodesEdges(gelems);
-        d3this.select('g').selectAll("title").remove(); // also remove title from graph
 
-        // make the svg canvas fill the entire enclosing element
-        d3this.select('svg')
-          .attr('width', '100%')
-          .attr('height', '100%')
-          .attr('id', exploreSvgId);
+      //   // remove unneeded background polygon from graphviz TODO make sure this is the correct polygon
+      //   d3this.select("polygon").remove();
 
-        // add node properties
-        thisView.addGraphProps(d3this);
+      //   // sort the svg such that the edges come before the nodes so mouseover on node doesn't activate edge
+      //   var gdata = gelems[0].map(function(itm) {
+      //       return d3.select(itm).classed(nodeClass);
+      //   });
+      //   // return if graph is empty (e.g. clear nodes after all nodes were learned)
+      //   if (gdata.length === 0){
+      //     return false;
+      //   }
+      //   gelems.data(gdata).sort();
+      //   // change id to title, remove title, then
+      //   pvt.preprocessNodesEdges(gelems);
+      //   d3this.select('g').selectAll("title").remove(); // also remove title from graph
 
-        // -- post processing of initial SVG -- //
+      //   // make the svg canvas fill the entire enclosing element
+      //   d3this.select('svg')
+      //     .attr('width', '100%')
+      //     .attr('height', '100%')
+      //     .attr('id', exploreSvgId);
 
-        // obtain orginal transformation since graphviz produces unnormalized coordinates
-        var d3graph =  d3this.select("." + graphClass),
-            scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : viewConsts.defaultScale;
+      //   // add node properties
+      //   thisView.addGraphProps(d3this);
 
-        var keyNode = window.agfkGlobals.auxModel.get("depRoot"),
-            newtrans = new Array(2);
-        if (keyNode) {
-          var keyNodeLoc = Utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
-              swx = window.innerWidth/scaleVal,
-              swy = window.innerHeight/scaleVal;
-          // set x coordinate so key node is centered on screen
-          newtrans[0] = (swx / 2 - keyNodeLoc.cx)*scaleVal;
-          newtrans[1] = (keyNodeLoc.ry + 5 - keyNodeLoc.cy)*scaleVal;
-          // maintain the scale of the previous graph (helps transitions feel more fluid)
-          var scale = thisView.prevScale || 0.2;
-          d3this.select("." + graphClass)
-            .attr("transform", "translate(" + newtrans[0] + "," + newtrans[1] + ") scale(" + scaleVal + ")");
+      //   // -- post processing of initial SVG -- //
 
-          // add original transformation to the zoom behavior
-          var dzoom = d3.behavior.zoom();
-          dzoom.translate(newtrans).scale(scaleVal);
-        }
+      //   // obtain orginal transformation since graphviz produces unnormalized coordinates
+      //   var d3graph =  d3this.select("." + graphClass),
+      //       scaleVal = thisView.prevScale ? (thisView.prevScale > 1 ? 1 : thisView.prevScale) : viewConsts.defaultScale;
 
-        // make graph zoomable/translatable
-        var vis = d3this.select("svg")
-              .attr("pointer-events", "all")
-              .attr("viewBox", null)
-              .call(dzoom.on("zoom", redraw))
-              .select("." + graphClass);
+      //   var keyNode = window.agfkGlobals.auxModel.get("depRoot"),
+      //       newtrans = new Array(2);
+      //   if (keyNode) {
+      //     var keyNodeLoc = Utils.getSpatialNodeInfo(d3this.select("#" + keyNode).node()),
+      //         swx = window.innerWidth/scaleVal,
+      //         swy = window.innerHeight/scaleVal;
+      //     // set x coordinate so key node is centered on screen
+      //     newtrans[0] = (swx / 2 - keyNodeLoc.cx)*scaleVal;
+      //     newtrans[1] = (keyNodeLoc.ry + 5 - keyNodeLoc.cy)*scaleVal;
+      //     // maintain the scale of the previous graph (helps transitions feel more fluid)
+      //     var scale = thisView.prevScale || 0.2;
+      //     d3this.select("." + graphClass)
+      //       .attr("transform", "translate(" + newtrans[0] + "," + newtrans[1] + ") scale(" + scaleVal + ")");
 
-        // set the zoom scale
-        dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
-        var summaryDisplays = pvt.summaryDisplays,
-            nodeLoc,
-            d3event,
-            currentScale;
-        // helper function to redraw svg graph with correct coordinates
-        function redraw() {
-          // transform the graph
-          d3event = d3.event;
-          currentScale = d3event.scale;
-          thisView.prevScale = currentScale;
-          vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + currentScale + ")");
-          // move the summary divs if needed
-          $.each(summaryDisplays, function(key, val){
-            nodeLoc = pvt.getSummaryBoxPlacement(val.d3node.node().getBoundingClientRect(), val.placeLeft);
-            val.$wrapDiv.css(nodeLoc);
-          });
-        }
-        return true;
-      },
+      //     // add original transformation to the zoom behavior
+      //     var dzoom = d3.behavior.zoom();
+      //     dzoom.translate(newtrans).scale(scaleVal);
+      //   }
+
+      //   // make graph zoomable/translatable
+      //   var vis = d3this.select("svg")
+      //         .attr("pointer-events", "all")
+      //         .attr("viewBox", null)
+      //         .call(dzoom.on("zoom", redraw))
+      //         .select("." + graphClass);
+
+      //   // set the zoom scale
+      //   dzoom.scaleExtent([viewConsts.minZoomScale, viewConsts.maxZoomScale]);
+      //   var summaryDisplays = pvt.summaryDisplays,
+      //       nodeLoc,
+      //       d3event,
+      //       currentScale;
+      //   // helper function to redraw svg graph with correct coordinates
+      //   function redraw() {
+      //     // transform the graph
+      //     d3event = d3.event;
+      //     currentScale = d3event.scale;
+      //     thisView.prevScale = currentScale;
+      //     vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + currentScale + ")");
+      //     // move the summary divs if needed
+      //     $.each(summaryDisplays, function(key, val){
+      //       nodeLoc = pvt.getSummaryBoxPlacement(val.d3node.node().getBoundingClientRect(), val.placeLeft);
+      //       val.$wrapDiv.css(nodeLoc);
+      //     });
+      //   }
+      //   return true;
+      // },
 
       /**
        * Use D3 to add dynamic properties to the graph
        */
       addGraphProps: function(d3selection) {
         var thisView = this,
-            viewConsts = pvt.viewConsts,
+            viewConsts = pvt.consts,
             d3this = d3selection || this.getd3El(),
             d3Nodes = d3this.selectAll("." + viewConsts.nodeClass),
             thisNodes = thisView.model.get("nodes"),
             aux = window.agfkGlobals.auxModel;
-        
-        // add nodes to observed list TODO move this somewhere else
-        d3Nodes.each(function(){
-          thisNodes.get(this.id).setVisibleStatus(true);
-        });
-        
+
+        // add nodes to observed list FIXME move this somewhere else
+        // d3Nodes.each(function(){
+        //   thisNodes.get(this.id).setVisibleStatus(true);
+        // });
+
         // class the learned nodes TODO consider using node models as d3 data
         d3Nodes.on("mouseover", function() {
           pvt.nodeMouseOver.call(thisView, this);
@@ -640,14 +647,14 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             pvt.nodeMouseOut.call(thisView, this);
           });
 
-            // short helper function only needed below
-            var addPropFunction = function(nid, prop){
-              var d3node = d3this.select("#" + nid);
-              
-              if (d3node.node() !== null){
-                thisView.toggleNodeProps(d3node, true, prop, d3this);
-              } 
-            };
+        // short helper function only needed below
+        var addPropFunction = function(nid, prop){
+          var d3node = d3this.select("#" + nid);
+
+          if (d3node.node() !== null){
+            thisView.toggleNodeProps(d3node, true, prop, d3this);
+          }
+        };
 
 
         _.each(thisNodes.filter(function(nde){return aux.conceptIsLearned(nde.id);}), function(mnode){
@@ -660,25 +667,25 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
           addPropFunction(mnode.get("id"), "starred");
         });
       },
-      
+
       /**
        * Toggle propType properties for the given explore node
        * d3node: d3 selection for the given node
        * toggleOn: whether to toggle on (true) or off (false) the learned properties
        * propType: specify the property type: "learned", "implicitLearned", "starred"
-       * d3sel: d3selection with graph nodes/edges as children (defaults to thisView.getd3El()
        */
-      toggleNodeProps: function(d3node, toggleOn, propType, d3Sel){
-        var viewConsts = pvt.viewConsts,
+      toggleNodeProps: function(d3node, toggleOn, propType){
+        var viewConsts = pvt.consts,
             thisView = this,
             mnode = thisView.model.get("nodes").get(d3node.attr("id")),
-            changeLearnStatus = propType === "learned" || propType === "implicitLearned";
+            changeLearnStatus = propType === "learned" || propType === "implicitLearned",
+            d3Svg = thisView.d3Svg;
         var propClass = {"learned": viewConsts.nodeLearnedClass,
                          "implicitLearned": viewConsts.nodeImplicitLearnedClass,
                          "starred": viewConsts.starredClass
                         }[propType];
-        d3Sel = d3Sel || thisView.getd3El();
-        
+
+
         if (changeLearnStatus){
           var hasCheck = d3node.select("." + viewConsts.checkClass).node() !== null;
           // insert checkmark if needed
@@ -686,8 +693,8 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             pvt.addCheckMark.call(thisView, d3node);
           }
           // toggle appropriate class for outlinks and inlinks
-          thisView.changeEdgesClass(mnode.get("outlinks"), propClass, toggleOn, d3Sel);
-          thisView.changeEdgesClass(mnode.get("dependencies"), propClass, toggleOn, d3Sel);
+          thisView.changeEdgesClass(mnode.get("outlinks"), propClass, toggleOn, d3Svg);
+          thisView.changeEdgesClass(mnode.get("dependencies"), propClass, toggleOn, d3Svg);
         }
         else{
           var hasStar =  d3node.select("." + viewConsts.starClass).node() !== null;
@@ -695,10 +702,10 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
             pvt.addStar.call(thisView, d3node);
           }
         }
-        
+
         d3node.classed(propClass, toggleOn);
-      },      
-      
+      },
+
       /**
        * Change the class of the provided edge models
        * edgeCollections: a collection of DirectedEdge models
@@ -708,7 +715,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       changeEdgesClass: function(edgeCollections, className, addClass, d3Sel){
         var d3edge,
             edgeId;
-        d3Sel = d3Sel || d3.select("." + pvt.viewConsts.graphClass);
+        d3Sel = d3Sel || d3.select("." + pvt.consts.graphClass);
         edgeCollections.each(function(edge){
           edgeId = edge.get("from_tag") + "TO" + edge.get("to_tag");
           d3edge = d3Sel.select("#" + edgeId);
@@ -718,64 +725,64 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         });
         return true;
       },
-      
+
       /**
        * Renders the explore view using the supplied collection
        */
-      render: function() {
-        var thisView = this,
-            dotStr = thisView.collToDot(),
-            d3this = thisView.getd3El();
-        thisView.$el.empty();
-        pvt.isRendered = false; // do async rendering to accomodate big Viz.js file
-        thisView.initialSvg = true;
-        thisView.createSvgGV(dotStr);
-        thisView.delegateEvents();
+//      render: function() {
+        // var thisView = this,
+        //     dotStr = thisView.collToDot(),
+        //     d3this = thisView.getd3El();
+        // thisView.$el.empty();
+        // pvt.isRendered = false; // do async rendering to accomodate big Viz.js file
+        // thisView.initialSvg = true;
+        // thisView.createSvgGV(dotStr);
+        // thisView.delegateEvents();
 
-        return thisView;
-      },
+        // return thisView;
+//      },
 
       /**
        * Create dot string from the model
-       * depth: depth from keyNode (if present); pvt.viewConsts.defaultGraphDepth
-       * graphOrient: orientation of graph ("BT", "TB", "LR", or "RL"); default pvt.viewConsts.defaultGraphOrient
+       * depth: depth from keyNode (if present); pvt.consts.defaultGraphDepth
+       * graphOrient: orientation of graph ("BT", "TB", "LR", or "RL"); default pvt.consts.defaultGraphOrient
        * nodeWidth: width of node
        * nodeSep: node separation
        */
-      collToDot: function(args){ 
-        var thisView = this,
-            thisModel = thisView.model,
-            viewConsts = pvt.viewConsts,
-            showLearned = thisModel.get("options").get("showLearnedConcepts"),
-            dgArr;
-            args = args || {};
-            var depth = args.depth || viewConsts.defaultGraphDepth,
-                graphOrient = args.graphOrient || viewConsts.defaultGraphOrient,
-                nodeSep = args.nodeSep || viewConsts.defaultNodeSepDist,
-                nodeWidth = args.nodeWidth || viewConsts.defaultNodeWidth,
-                keyNode = args.keyNode || thisModel.get("nodes").get(window.agfkGlobals.auxModel.get("depRoot")),
-                remVisible = args.remVisible || false; // TODO describe these params
+      // collToDot: function(args){
+      //   var thisView = this,
+      //       thisModel = thisView.model,
+      //       viewConsts = pvt.consts,
+      //       showLearned = thisModel.get("options").get("showLearnedConcepts"),
+      //       dgArr;
+      //       args = args || {};
+      //       var depth = args.depth || viewConsts.defaultGraphDepth,
+      //           graphOrient = args.graphOrient || viewConsts.defaultGraphOrient,
+      //           nodeSep = args.nodeSep || viewConsts.defaultNodeSepDist,
+      //           nodeWidth = args.nodeWidth || viewConsts.defaultNodeWidth,
+      //           keyNode = args.keyNode || thisModel.get("nodes").get(window.agfkGlobals.auxModel.get("depRoot")),
+      //           remVisible = args.remVisible || false; // TODO describe these params
 
-        dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible, showLearned);
-        // include digraph options
-        dgArr.unshift("rankdir=" + graphOrient);
-        dgArr.unshift("nodesep=" + nodeSep); 
-        dgArr.unshift("node [shape=circle, fixedsize=true, width=" + nodeWidth + "];");
+      //   dgArr = pvt.getDSFromKeyArr.call(this, depth, keyNode, remVisible, showLearned);
+      //   // include digraph options
+      //   dgArr.unshift("rankdir=" + graphOrient);
+      //   dgArr.unshift("nodesep=" + nodeSep);
+      //   dgArr.unshift("node [shape=circle, fixedsize=true, width=" + nodeWidth + "];");
 
-        return "digraph G{\n" + dgArr.join("\n") + "}";
-      },
+      //   return "digraph G{\n" + dgArr.join("\n") + "}";
+      // },
 
       /**
        * Handle explore-to-learn view event that focuses on the clicked concept
        */
       handleEToLConceptClick: function(evt){
         var imgEl = evt.currentTarget,
-            conceptTag = imgEl.getAttribute(pvt.viewConsts.dataConceptTagProp);
+            conceptTag = imgEl.getAttribute(pvt.consts.dataConceptTagProp);
         this.transferToLearnViewForConcept(conceptTag);
-        // simulate mouseout for explore-view consistency
+        // simulate mouseout for explore-graph-view consistency
         Utils.simulate(imgEl.parentNode, "mouseout", {
           relatedTarget: document
-        }); 
+        });
       },
 
       /**
@@ -784,14 +791,16 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       transferToLearnViewForConcept: function(conceptTag){
         this.appRouter.changeUrlParams({mode: "learn", lfocus: conceptTag});
       },
-      
+
+
+
       /**
        * Show the node summary in "hover box" next to the node
        * TODO consider making this a view that monitors the nodes (i.e. event driven)
-       */  
+       */
       showNodeSummary: function(node) {
         var thisView = this,
-            viewConsts = pvt.viewConsts,
+            viewConsts = pvt.consts,
             // add content div
             div = document.createElement("div"),
             nodeId = node.attr("id"),
@@ -801,7 +810,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         // add summary
         summaryTxt = this.model.get("nodes").get(nodeId).get("summary");
         summaryP.textContent = summaryTxt.length > 0 ? summaryTxt : viewConsts.NO_SUMMARY_MSG;
-        
+
         div.appendChild(summaryP);
         div.id = pvt.getSummaryIdForDivTxt.call(thisView, node);
         var $div = $(div);
@@ -838,39 +847,39 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
         return $wrapDiv;
       },
 
-      /**
-       * Finish rendering the view after obtaining the svg output from graphviz
-       */
-      finishRender: function(dot){
-        var thisView = this;
-        thisView.$el.html(thisView.svgGraph);
-        thisView.initialRender();
-        // trigger an event for the listening router
-        pvt.isRendered = true;
-        thisView.$el.trigger(pvt.viewConsts.renderEvt); // todo: this feels hacky, better way?
-      },
-      
-      /**
-       * Return an SVG representation of graph given a dot string
-       * this function uses relies on the asynchronous loading
-       * of Viz within router.js
-       */
-      createSvgGV: function(dotStr) {
-        var thisView = this;
-        
-        function vizStr(){
-          thisView.svgGraph = window.Viz(dotStr, "svg");
-          thisView.finishRender();
-        }
-        
-        if (typeof window.Viz === "function"){
-          vizStr();
-        }
-        else{
-          ErrorHandler.assert(window.vizPromise !== undefined, "vizPromise was not initalized before createSvgGv");
-          window.vizPromise.done(vizStr);
-        }
-      },
+      // /**
+      //  * Finish rendering the view after obtaining the svg output from graphviz
+      //  */
+      // finishRender: function(dot){
+      //   var thisView = this;
+      //   thisView.$el.html(thisView.svgGraph);
+      //   thisView.initialRender();
+      //   // trigger an event for the listening router
+      //   pvt.isRendered = true;
+      //   thisView.$el.trigger(pvt.consts.renderEvt); // todo: this feels hacky, better way?
+      // },
+
+      // /**
+      //  * Return an SVG representation of graph given a dot string
+      //  * this function uses relies on the asynchronous loading
+      //  * of Viz within router.js
+      //  */
+      // createSvgGV: function(dotStr) {
+      //   var thisView = this;
+
+      //   function vizStr(){
+      //     thisView.svgGraph = window.Viz(dotStr, "svg");
+      //     thisView.finishRender();
+      //   }
+
+      //   if (typeof window.Viz === "function"){
+      //     vizStr();
+      //   }
+      //   else{
+      //     ErrorHandler.assert(window.vizPromise !== undefined, "vizPromise was not initalized before createSvgGv");
+      //     window.vizPromise.done(vizStr);
+      //   }
+      // },
 
       /**
        * Return true if the view has been rendered
@@ -878,7 +887,7 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
       isRendered: function(){
         return pvt.isRendered;
       },
-      
+
       /**
        * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
        */
@@ -899,11 +908,11 @@ define(["backbone", "d3", "jquery", "underscore", "agfk/utils/utils", "agfk/util
        * return the specified view constant
        */
       getViewConst: function(vc){
-        return pvt.viewConsts[vc];
+        return pvt.consts[vc];
       }
     });
   })();
 
-  // return for require.js 
+  // return for require.js
   return ExploreView;
 });

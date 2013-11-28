@@ -1,4 +1,5 @@
 /*global define */
+
 define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "base/models/graph-model"], function($, Backbone, dagre, EditableEdgeCollection, EditableNodeCollection, GraphModel){
 
   return GraphModel.extend({
@@ -10,12 +11,12 @@ define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-collection"
         graphDiscussion: ""
       };
     },
-    
+
     // resource url
     url: "/gc/save", // FIXME
 
     /**
-     * Make/extend this graph from a json obj 
+     * Make/extend this graph from a json obj
      *
      * @param {json object} jsonObj: json string with attribute:
      *   nodes: array of objects: each contains at least node title and id (optional coordinates) and dependencies
@@ -25,7 +26,7 @@ define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-collection"
 
       var thisGraph = this,
           tmpEdges = [];
-      
+
       jsonNodeArr.forEach(function(node) {
         node.dependencies.forEach(function(dep) {
           tmpEdges.push({source: dep.source, target: node.id, reason: dep.reason, middlePts: dep.middlePts, id: dep.id, isContracted: dep.isContracted});

@@ -7,7 +7,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
       return {
         edges: new BaseEdgeCollection(),
         nodes: new BaseNodeCollection()
-      };      
+      };
     },
 
     initialize: function(){
@@ -41,11 +41,11 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
             var tmpNode = nodes[nodeTag];
             tmpNode.sid = tmpNode.id;
             tmpNode.id = nodeTag;
-            
+
             // contract the incoming graph
             tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
             if (tag === tmpNode.tag) {
-              tmpNode.x = 100; 
+              tmpNode.x = 100;
               tmpNode.y = 100;
               tmpNode.hasContractedDeps = true;
               tmpNode.isContracted = false;
@@ -62,8 +62,8 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
         }
         deps.forEach(function(dep){
           thisGraph.addEdge(dep);
-        });        
-        thisGraph.trigger("loadedServerData"); 
+        });
+        thisGraph.trigger("loadedServerData");
       })
         .fail(function(){
           console.err("Unable to obtain dependency graph for " + tag); // FIXME
@@ -78,7 +78,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
      */
     toJSON: function() {
       // returning nodes AND edges is redundant, since nodes contain dep info
-      return this.get("nodes").toJSON(); 
+      return this.get("nodes").toJSON();
     },
 
     /**
@@ -101,7 +101,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
           transY = 0;
 
       minSSDist = minSSDist === undefined ? true : minSSDist;
-      
+
       // input graph into dagre
       nodes.filter(function(n){return n.isVisible();}).forEach(function(node){
         dagreGraph.addNode(node.id, {width: nodeWidth*2, height: nodeHeight});
@@ -124,7 +124,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
           transY += node.get("y") - inp.y;
         });
         transX /= nodes.length;
-        transY /= nodes.length;        
+        transY /= nodes.length;
       }
 
       else if (noMoveNodeId !== undefined) {
@@ -147,6 +147,24 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
         node.set("x", inp.x + transX);
         node.set("y", inp.y + transY);
       });
+    },
+
+    /**
+     * Get a nodes from the graph
+     *
+     * @return {node collection} the node collection of the model
+     */
+    getNodes: function() {
+      return this.get("nodes");
+    },
+
+    /**
+     * Get a edges from the graph
+     *
+     * @return {edge collection} the edge collection of the model
+     */
+    getEdges: function() {
+      return this.get("edges");
     },
 
     /**
@@ -178,8 +196,8 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
     addEdge: function(edge) {
       var thisGraph = this;
       // check if source/target are ids and switch to nodes if necessary
-      edge.source =  edge.source instanceof thisGraph.edgeModel ? edge.source : this.getNode(edge.source);
-      edge.target = edge.target instanceof thisGraph.edgeModel ? edge.target : this.getNode(edge.target);
+      edge.source =  edge.source instanceof thisGraph.nodeModel ? edge.source : this.getNode(edge.source);
+      edge.target = edge.target instanceof thisGraph.nodeModel ? edge.target : this.getNode(edge.target);
 
       if (!edge.source  || !edge.target) {
         throw new Error("source or target was not given correctly for input or does not exist in graph");
@@ -188,12 +206,12 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
       if (edge.id === undefined) {
         edge.id = String(edge.source.id) + String(edge.target.id);
       }
-      
-      var edges = this.get("edges");
+
+      var edges = thisGraph.getEdges();
       edges.add(edge);
       var mEdge = edges.get(edge.id);
       edge.source.get("outlinks").add(mEdge);
-      edge.target.get("dependencies").add(mEdge);        
+      edge.target.get("dependencies").add(mEdge);
     },
 
     /**
@@ -218,7 +236,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
     removeEdge: function(edge) {
       var thisGraph = this,
           edges = thisGraph.get("edges");
-          
+
       edge = edge instanceof thisGraph.edgeModel ? edge : edges.get(edge);
       edge.get("source").get("outlinks").remove(edge);
       edge.get("target").get("dependencies").remove(edge);
@@ -236,7 +254,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
       node =  node instanceof thisGraph.nodeModel ? node : nodes.get(node);
       node.get("dependencies").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
       node.get("outlinks").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
-      nodes.remove(node);      
+      nodes.remove(node);
     }
   });
 });

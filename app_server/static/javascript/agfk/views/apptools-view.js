@@ -1,4 +1,4 @@
-define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorHandler){
+define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**
@@ -35,11 +35,11 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
         $el.prop("disabled", true);
       }
     };
-    
+
     pvt.enableHide = function(){
       pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, true);
     };
-    
+
     pvt.disableHide = function(){
       pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, false);
     };
@@ -51,9 +51,9 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
     pvt.enableShow = function(){
       pvt.changeShowHideButtons(pvt.viewConsts.showLearnedId, true);
     };
-    
-    pvt.isRendered = true; // view is prerendered 
-    
+
+    pvt.isRendered = true; // view is prerendered
+
     return Backbone.View.extend({
       appRouter: null,
 
@@ -127,7 +127,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
           }
         }
       },
-      
+
       /**
        * Return true if the view has been rendered
        */
@@ -176,7 +176,7 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
                             "changeActiveELButtonFromName did not obtain the correct dom element from name:" + name);
         this.changeActiveELButtonFromDomEl($domEl.get(0));
       },
-      
+
       /**
        * Change the active button to the input dom element (must be one of the EL buttons)
        */
@@ -184,10 +184,10 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
         if (pvt.prevButtonEl === null || buttonEl.id !== pvt.prevButtonEl.id){
           var activeClass = pvt.viewConsts.activeClass,
               $prevButton = $(pvt.prevButtonEl);
-          
+
           $prevButton.toggleClass(activeClass);
           $prevButton.prop("disabled", false);
-          
+
           var $buttonEl = $(buttonEl);
           $buttonEl.toggleClass(activeClass);
           $buttonEl.prop("disabled", true);
@@ -204,13 +204,13 @@ define(["jquery", "backbone", "agfk/utils/errors"], function($, Backbone, ErrorH
       },
 
       /**
-       * Close and unbind views to avoid memory leaks 
+       * Close and unbind views to avoid memory leaks
        */
       close: function() {
         this.remove();
         this.unbind();
       }
-      
+
     });
   })();
 

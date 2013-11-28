@@ -9,6 +9,21 @@ from apps.user_management.models import Profile
 
 
 def get_agfk_app(request):
+    concepts = get_user_data(request)
+    concept_tag = request.path.split("/")[-1].split("#")[0]
+    concept_data = get_concept_data(concept_tag)
+    # pdb.set_trace()
+    return render_to_response("agfk-app.html",
+                              {"full_graph_skeleton": get_full_graph_json_str(), "user_data": json.dumps(concepts), "concept_data": concept_data},
+                              context_instance=RequestContext(request))
+
+
+def get_graph_creator(request):
+    concepts = get_user_data(request)
+    full_graph_json = get_full_graph_json_str()
+    return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts)}, context_instance=RequestContext(request))
+
+def get_user_data(request):
     if request.user.is_authenticated():
         uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
         lset = set()
@@ -18,11 +33,4 @@ def get_agfk_app(request):
         concepts = {"concepts": [{"id": uid, "learned": uid in lset, "starred": uid in sset} for uid in lset.union(sset)]}
     else:
         concepts = {"concepts": []}
-
-    concept_tag = request.path.split("/")[-1].split("#")[0]
-    concept_data = get_concept_data(concept_tag)
-    # pdb.set_trace()
-    return render_to_response("agfk-app.html",
-                              {"full_graph_skeleton": get_full_graph_json_str(), "user_data": json.dumps(concepts), "concept_data": concept_data},
-                              context_instance=RequestContext(request))
-
+    return concepts

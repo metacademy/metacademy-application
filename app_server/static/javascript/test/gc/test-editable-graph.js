@@ -33,11 +33,11 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         extra: ["This is an example", "really this text doesn't matter"],
         note: ["You should enjoy making examples for tests"]
       };
-  
+
   var should = window.should,
       it = window.it,
       describe = window.describe;
-  
+
   describe('Graph Creation and Editing', function(){
     var ntitle,
         parentDeps,
@@ -45,10 +45,10 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         gpToParentEdge,
         parentToChildEdge,
         gpOls;
-    
+
     it('should create the graph', function(){
       graphObj = new EditableGraphModel();
-      
+
       // add nodes to graph
       for (ntitle in nodeIds) {
         if (nodeIds.hasOwnProperty(ntitle)) {
@@ -56,7 +56,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         }
       }
 
-      // add edges to graph      
+      // add edges to graph
       graphObj.addEdge({source: graphObj.getNode(nodeIds.parent),
                         target: graphObj.getNode(nodeIds.child), id: edgeIds.parentToChild, reason: "parentToChild is the reason for the test"});
       graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
@@ -68,7 +68,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
 
     });
-    
+
     it('should have the correct node titles', function(){
       // test node properties -- title
       for (ntitle in nodeIds) {
@@ -96,7 +96,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
     });
 
     it('gp to parent edge should have correct relationships', function(){
-      
+
       // check source and target specification for the dep
       gpToParentEdge.should.deep.equal(graphObj.getEdge(edgeIds.grandparentToParent));
       gpToParentEdge.get("source").get("title").should.equal("grandparent");
@@ -128,21 +128,21 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       should.not.exist(graphObj.getNode(nodeIds.grandparent).get("outlinks").get(edgeIds.grandparentToUncle));
       should.not.exist(graphObj.getNode(nodeIds.cousin).get("dependencies").get(edgeIds.uncleToCousin));
     });
-    
+
     it('should be able to delete node by reference', function(){
       graphObj.removeNode(graphObj.getNode(nodeIds.cousin));
       should.not.exist(graphObj.getNode(nodeIds.cousin));
     });
 
     it('should have three nodes and two edges', function(){
-      graphObj.get("nodes").length.should.equal(3);
-      graphObj.get("edges").length.should.equal(2);
+      graphObj.getNodes().length.should.equal(3);
+      graphObj.getEdges().length.should.equal(2);
     });
-    
+
     it('should be able to add edge between grandparent and child and propagate changes to the nodes', function(){
       graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
-                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});      
-      graphObj.get("edges").length.should.equal(3);
+                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});
+      graphObj.getEdges().length.should.equal(3);
       graphObj.getNode(nodeIds.grandparent).get("outlinks").get(edgeIds.grandparentToChild)
         .should.deep.equal(graphObj.getEdge(edgeIds.grandparentToChild));
       graphObj.getNode(nodeIds.child).get("dependencies").get(edgeIds.grandparentToChild)
@@ -166,7 +166,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       graphObj.addEdge({source: graphObj.getNode(nodeIds.uncle),
                         target: graphObj.getNode(nodeIds.cousin), id: edgeIds.uncleToCousin});
       graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
-                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});      
+                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});
 
     });
 
@@ -176,8 +176,8 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       should.not.exist(graphObj.getEdge(edgeIds.grandparentToParent));
       should.not.exist(graphObj.getEdge(edgeIds.grandparentToUncle));
       should.not.exist(graphObj.getEdge(edgeIds.grandparentToChild));
-      graphObj.get("nodes").length.should.equal(4);
-      graphObj.get("edges").length.should.equal(2);
+      graphObj.getNodes().length.should.equal(4);
+      graphObj.getEdges().length.should.equal(2);
     });
 
     it('should be able to re-add gp and associated edges', function(){
@@ -187,7 +187,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
                         target: graphObj.getNode(nodeIds.parent), id: edgeIds.grandparentToParent});
       graphObj.addEdge({source: graphObj.getNode(nodeIds.grandparent),
-                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});      
+                        target: graphObj.getNode(nodeIds.child), id: edgeIds.grandparentToChild});
 
     });
 
@@ -205,7 +205,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
           graphObj.getNode(nodeIds.cousin).contractDeps();
           graphObj.getNode(nodeIds.uncle).isVisible().should.equal(false);
         });
-        
+
         it('should have uncle-cousin edge be invisible', function(){
           graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
         });
@@ -213,7 +213,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         it('should have gp-uncle edge be invisible', function(){
           graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(false);
         });
-        
+
 
         ["grandparent", "parent", "child"].forEach(function(title){
           it( title + ' should still be visible', function(){
@@ -231,7 +231,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       describe('contract child', function(){
         it('should be able to contract child and have all nodes except child and cousin invisible', function(){
           graphObj.getNode(nodeIds.child).contractDeps();
-          graphObj.get("nodes").every(function(node){
+          graphObj.getNodes().every(function(node){
             return node.get("title") === "cousin"
               || node.get("title") === "child"
               || ! node.isVisible();
@@ -239,7 +239,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('all edges should be invisible', function(){
-          var allHidden = graphObj.get("edges").every(function(edge){
+          var allHidden = graphObj.getEdges().every(function(edge){
             return !edge.isVisible();
           });
           allHidden.should.equal(true);
@@ -249,25 +249,25 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
     describe('expand deps', function(){
       describe('expand cousin', function(){
-        it('should be able to expand cousin deps', function(){          
+        it('should be able to expand cousin deps', function(){
           graphObj.getNode(nodeIds.cousin).expandDeps();
         });
-        
-        it('uncle and gp should be visible', function(){          
+
+        it('uncle and gp should be visible', function(){
           graphObj.getNode(nodeIds.uncle).isVisible().should.equal(true);
           graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
         });
 
-        it('edge from uncle to cousin should be visible', function(){          
+        it('edge from uncle to cousin should be visible', function(){
           graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(true);
         });
 
-        it('edge from gp to uncle should be visible', function(){          
+        it('edge from gp to uncle should be visible', function(){
           graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(true);
         });
 
-        it('parent should be invisible', function(){ 
-          graphObj.getNode(nodeIds.parent).isVisible().should.equal(false);        
+        it('parent should be invisible', function(){
+          graphObj.getNode(nodeIds.parent).isVisible().should.equal(false);
         });
 
         it('edges from gp to child and parent should be invisible', function(){
@@ -277,21 +277,21 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       }); // end describe('expand cousin')
 
       describe('expand child', function(){
-        it('should be able to expand child deps', function(){          
+        it('should be able to expand child deps', function(){
           graphObj.getNode(nodeIds.child).expandDeps();
         });
 
         it('all nodes should be visible', function(){
-          graphObj.get("nodes").every(function(n){return n.isVisible();}).should.equal(true);
+          graphObj.getNodes().every(function(n){return n.isVisible();}).should.equal(true);
         });
 
         it('all edges should be visible', function(){
-          var allVisible = graphObj.get("edges").every(function(edge){
+          var allVisible = graphObj.getEdges().every(function(edge){
             return edge.isVisible();
           });
           allVisible.should.equal(true);
         });
-      });      
+      });
     }); // end describe('expand deps')
 
     describe('contract outlinks', function(){
@@ -309,13 +309,13 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('all nodes should be visible', function(){
-          graphObj.get("nodes").each(function(node){
+          graphObj.getNodes().each(function(node){
               node.isVisible().should.equal(true);
           });
         });
 
         it('all non parent->child edges should be visible', function(){
-          graphObj.get("edges").each(function(edge){
+          graphObj.getEdges().each(function(edge){
             if (edge.id !== edgeIds.parentToChild){
               edge.isVisible().should.equal(true);
             }
@@ -325,7 +325,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         it('should be able to contract uncle outlinks', function(){
           graphObj.getNode(nodeIds.uncle).contractOLs();
         });
-        
+
         it('cousin should be invisible', function(){
           graphObj.getNode(nodeIds.cousin).isVisible().should.equal(false);
         });
@@ -343,7 +343,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('all non-gp nodes should be hidden', function(){
-          graphObj.get("nodes").each(function(node){
+          graphObj.getNodes().each(function(node){
             if (node.id !== nodeIds.grandparent){
               node.isVisible().should.equal(false);
             }
@@ -351,7 +351,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('all edges should be hidden', function(){
-          graphObj.get("edges").each(function(edge){
+          graphObj.getEdges().each(function(edge){
               edge.isVisible().should.equal(false);
           });
         });
@@ -364,13 +364,13 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('all edges should be visible', function(){
-          graphObj.get("edges").each(function(edge){
+          graphObj.getEdges().each(function(edge){
               edge.isVisible().should.equal(true);
           });
         });
 
         it('all nodes should be visible', function(){
-          graphObj.get("nodes").each(function(node){
+          graphObj.getNodes().each(function(node){
               node.isVisible().should.equal(true);
           });
         });
@@ -380,7 +380,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
     });
 
   }); // end describe('graph operations')
-  
+
 
   // IO test vars
   var jsonObj,
@@ -396,9 +396,9 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
       it('should be able to obtain a string representation of the graph', function(){
         jsonStr = JSON.stringify(jsonObj);
-      });            
+      });
     });
-    
+
     describe('import graph', function(){
       it('should be able to parse string to json', function(){
         newJsonObj = JSON.parse(jsonStr);
@@ -409,15 +409,15 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       });
 
       it('should have same number of nodes', function(){
-        newGraph.get("nodes").length.should.equal(graphObj.get("nodes").length);
+        newGraph.getNodes().length.should.equal(graphObj.getNodes().length);
       });
 
       it('should have same number of edges', function(){
-        newGraph.get("edges").length.should.equal(graphObj.get("edges").length);
+        newGraph.getEdges().length.should.equal(graphObj.getEdges().length);
       });
 
       it('should have the same nodes as the original graph', function(){
-        graphObj.get("nodes").forEach(function(oldNode) {
+        graphObj.getNodes().forEach(function(oldNode) {
           var node = graphObj.getNode(oldNode.id),
               attribs = oldNode.attributes,
               collFields = oldNode.collFields;
@@ -427,7 +427,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
               oldNode.get(attr).should.equal(node.get(attr));
             }
           }
-          
+
           // compare dependencies and outlinks
           ["dependencies", "outlinks"].forEach(function(edgeType) {
             node.get(edgeType).forEach(function(dep) {
@@ -453,15 +453,15 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
               }
               return true;
             });
-            filtRes.length.should.equal(1);            
+            filtRes.length.should.equal(1);
           });
-          // TODO compare questions once the schema is figured out          
-        }); // end forEach node comparison        
+          // TODO compare questions once the schema is figured out
+        }); // end forEach node comparison
       }); // end it()
 
       it('should have the same edges as the original graph', function(){
-        graphObj.get("edges").forEach(function(oldEdge) {
-          var matchEdge = newGraph.get("edges").filter(function(edge) {
+        graphObj.getEdges().forEach(function(oldEdge) {
+          var matchEdge = newGraph.getEdges().filter(function(edge) {
             if (oldEdge.id !== edge.id){ return false;}
             for (var attr in oldEdge.attributes) {
               if (oldEdge.attributes.hasOwnProperty(attr)) {
@@ -477,15 +477,13 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       }); // end it()
 
       it('should be able to add collection elements to the newGraph', function(){
-        newGraph.get("nodes").get(nodeIds.parent).get("resources").add(exampleResource);
+        newGraph.getNodes().get(nodeIds.parent).get("resources").add(exampleResource);
       });
 
       // TODO add server grabbing test! -- how to tell when it's finished parsing? -- use trigger events
-      
+
     }); // end describe("import graph...
   }); // end describe ("graph IO..
-  
+
 
 }); // end define
-
-

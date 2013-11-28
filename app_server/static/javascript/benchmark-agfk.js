@@ -3,6 +3,8 @@
  TODO: automate this benchmarking with a cron job on the server and save results
  */
 
+//  FIXME this file is deprecated
+
 // need to load jquery and requirejs in the main html page
 jQuery.noConflict();
 

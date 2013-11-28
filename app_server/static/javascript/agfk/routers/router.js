@@ -1,10 +1,10 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
-define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "agfk/utils/errors", "agfk/views/error-view"],
+define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view"],
   function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, GraphModel, UserData, ErrorHandler, ErrorMessageView){
   "use strict";
-  
+
   /**
    * Central router to control URL state
    */
@@ -22,7 +22,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
       leftPanelId: "leftpanel,",
       rightPanelId: "rightpanel",
       lViewId: "learn-view-wrapper", // id for main learn view div
-      eViewId: "explore-view-wrapper", // id for main explore view div
+      eViewId: "explore-graph-view-wrapper", // id for main explore view div
       loadViewId: "load-view-wrapper",
       noContentErrorKey: "nocontent", // must also change in error-view.js
       ajaxErrorKey: "ajax", // must also change in error-view.js
@@ -41,7 +41,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
     pvt.elTransition = false;
 
     // first learning view transition
-    pvt.firstLTrans = true; 
+    pvt.firstLTrans = true;
 
     /**
      * Asynchronously load Viz.js
@@ -55,7 +55,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         if (pvt.viewMode === pvt.routeConsts.pExploreMode){
           // only show the error for the explore mode
           // learn mode should work with IE 9 and popups will notify IE < 9
-          thisRoute.showErrorMessageView(pvt.routeConsts.unsupportedBrowserKey); 
+          thisRoute.showErrorMessageView(pvt.routeConsts.unsupportedBrowserKey);
         }
       } else{
 
@@ -110,7 +110,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         else{
           window.console.warn("Parameter key/value is not length 2 and not included "
                        + "in routing (separate key/value using an '=' sign), input: " + splitTxt[slen]);
-        } 
+        }
       }
       return params;
     };
@@ -232,10 +232,10 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
             qLearnScrollConcept = routeConsts.qLearnScrollConcept,
             pExploreMode = routeConsts.pExploreMode,
             pLearnMode = routeConsts.pLearnMode,
-            keyNodeChanged = nodeId !== pvt.prevNodeId, 
+            keyNodeChanged = nodeId !== pvt.prevNodeId,
             loadViewRender = false,
             doRender;
-        
+
         // set view-mode (defaults to learn view)
         paramsObj[qViewMode] = paramsObj[qViewMode] || pLearnMode;
         pvt.viewMode = paramsObj[qViewMode];
@@ -251,7 +251,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
           thisRoute.userModel = userModel;
           thisRoute.graphModel = graphModel;
         }
-                
+
         // show app tools
         thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
         thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
@@ -276,7 +276,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
         if (loadViz && preLoadViz){
           pvt.loadViz.call(thisRoute);
         }
-        
+
         // check if/how we need to acquire more data from the server
         if(thisRoute.graphModel.get("nodes").length === 0){
           thisRoute.graphModel.get("nodes").fetch({
@@ -306,7 +306,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
 
           // set the document title to be the key concept
           document.title = window.agfkGlobals.auxModel.getTitleFromId(nodeId) + " - Metacademy";
-         
+
           switch (paramsObj[qViewMode]){
           case pExploreMode:
             if (doRender){
@@ -328,7 +328,7 @@ define(["backbone", "jquery", "agfk/views/explore-view", "agfk/views/learning-vi
             paramQLearnScrollConcept = nodeId;
           }
 
-          if (paramsObj[qViewMode] === pLearnMode && (!pvt.elTransition || pvt.firstLTrans)){ 
+          if (paramsObj[qViewMode] === pLearnMode && (!pvt.elTransition || pvt.firstLTrans)){
               thisRoute.lview.expandConcept(paramQLearnScrollConcept);
               pvt.firstLTrans = false;
           }

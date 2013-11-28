@@ -1,9 +1,9 @@
 /**
  * Main function, set to data-main with require.js
  */
-  
+
 /*global requirejs */
-  
+
 // configure require.js
 requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
@@ -59,7 +59,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","base/models/aux-model", "jquery", "btouch", "sidr"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "base/utils/utils", "agfk/routers/router", "gen-utils","base/models/aux-model", "jquery", "btouch", "sidr"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // handle noscript content
@@ -78,7 +78,7 @@ requirejs(["backbone", "agfk/utils/utils", "agfk/routers/router", "gen-utils","b
     };
     return oldSync(method, model, options);
   };
-  
+
   GenPageUtils.prep();
 
   // automatically resize window when viewport changes

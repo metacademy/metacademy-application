@@ -2,7 +2,7 @@
  This file contains the graph-data model
  */
 /*global define */
-define(["backbone", "underscore", "base/models/graph-model", "base/collections/node-property-collections", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "agfk/utils/errors"], function(Backbone, _, GraphModel, NodePropertyCollections, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
+define(["backbone", "underscore", "base/models/graph-model", "base/collections/node-property-collections", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "base/utils/errors"], function(Backbone, _, GraphModel, NodePropertyCollections, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
@@ -30,7 +30,7 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
     });
   })();
 
-  
+
   /**
    * GraphData: model to store all graph related data
    */

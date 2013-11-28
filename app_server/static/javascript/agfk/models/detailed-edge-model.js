@@ -1,3 +1,4 @@
+/*global define*/
 define(["backbone", "underscore", "base/models/edge-model"], function(Backbone, _, EdgeModel){
   return EdgeModel.extend({
     defaults: function(){
@@ -7,7 +8,7 @@ define(["backbone", "underscore", "base/models/edge-model"], function(Backbone, 
         middlePts: [],
         isContracted: false
       };
-      return _.extend({}, EdgeModel.prototype.defaults, enDef);
+      return _.extend({}, EdgeModel.prototype.defaults(), enDef);
     },
 
     isVisible: function(){
@@ -25,6 +26,6 @@ define(["backbone", "underscore", "base/models/edge-model"], function(Backbone, 
         return "";
       }
     }
-    
+
   });
 });

@@ -8,13 +8,14 @@
 {% block jscript-extend %}
     <script>
       window.agfkGlobals = {};
+      agfkGlobals.userInitData = {{ user_data|safe }};
+      agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
       agfkGlobals.auxModel = null; // init in main js app
     </script>
     <script src="{% static "javascript/lib/d3.js" %}"></script>
     <script data-main="{% static "javascript/gc/main.js" %}" src="{% static "javascript/lib/require-min.js" %}"></script>
-    <script src="{% static "javascript/lib/xrayquire.js" %}"></script>
 {% endblock %}
-    
+
 {% block main %}
 
     <div id="gc-wrap">
@@ -34,5 +35,3 @@
     {% include "full-screen-content-editor.html" %}
 
 {% endblock %}
-
-

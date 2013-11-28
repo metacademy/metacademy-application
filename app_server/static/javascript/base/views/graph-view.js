@@ -10,17 +10,17 @@
  * After first render (even in prerender on first render) the following elements are available
  * - this.d3Svg
  * - this.gPaths: block g element for the paths
- *    (paths when dealing with svg and edges when dealing with data model) 
+ *    (paths when dealing with svg and edges when dealing with data model)
  *    where you can append a new g with this.gPaths.data(someData).append("g")
  * - this.gCircles: block g element for the circles
- *    (circles when dealing with svg and nodes when dealing with data model) 
+ *    (circles when dealing with svg and nodes when dealing with data model)
  *    where you can append a new g with this.gCircles.data(someData).append("g")
  *
  * Some general notes:
  * + d3 should handle all svg-related events, while backbone should handle all other events
  * + use handleNewPaths and handleNewCircles to attach listeners during calls to render
  */
-window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {  
+window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone, d3, _) {
 
   /**********************
    * private class vars *
@@ -34,15 +34,18 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
     minusRectH: 5.5,
     exPlusWidth: 5,
     nodeRadius: 50,
+    graphClass: "graph",
     pathWrapClass: "link-wrapper",
     pathClass: "link",
     expandCrossClass: "exp-cross",
     contractMinusClass: "contract-minus",
     gHoverClass: "hover-g",
-    circleGClass: "concept-g"
+    circleGClass: "concept-g",
+    circleGIdPrefix: "circlgG-",
+    edgeGIdPrefix: "edgeG-"
   };
 
-  pvt.plusPts = "0,0 " +
+  pvt.consts.plusPts = "0,0 " +
     pvt.consts.exPlusWidth + ",0 " +
     pvt.consts.exPlusWidth + "," + pvt.consts.exPlusWidth + " " +
     (2 * pvt.consts.exPlusWidth) + "," + pvt.consts.exPlusWidth + " " +
@@ -66,28 +69,12 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
    * private methods *
    *******************/
 
-  /* insert svg line breaks: taken from
-   http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
-  pvt.insertTitleLinebreaks = function (gEl, title) {
-    var words = title.split(/\s+/g),
-        nwords = words.length;
-    var el = gEl.append("text")
-          .attr("text-anchor","middle")
-          .attr("dy", "-" + (nwords-1)*7.5);
-
-    for (var i = 0; i < words.length; i++) {
-      var tspan = el.append('tspan').text(words[i]);
-      if (i > 0)
-        tspan.attr('x', 0).attr('dy', '15');
-    }
-  };
-
   /**
    * First render renders the svg and sets up all of the listeners
    */
   pvt.firstRenderBase = function(){
     var thisView = this;
-    
+
     var d3Svg = d3.select(thisView.el).append("svg:svg");
     thisView.d3Svg = d3Svg;
 
@@ -107,18 +94,15 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
 
     var d3SvgG = thisView.d3SvgG;
 
-    // svg nodes and edges 
+    // svg nodes and edges
     thisView.gPaths = d3SvgG.append("g").selectAll("g");
-    thisView.gCircles = d3SvgG.append("g").selectAll("g");    
+    thisView.gCircles = d3SvgG.append("g").selectAll("g");
 
     // svg listeners
     d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
     d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
-        
-  };
 
-  // override in "subclass"
-  pvt.firstRender = function(){};
+  };
 
   // from http://bl.ocks.org/mbostock/3916621
   pvt.pathTween = function (d1, precision) {
@@ -148,10 +132,10 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
 
 
   pvt.getEdgePath = function(d){
-    var pathPts = [].concat(d.get("middlePts"));        
-    pathPts.unshift(d.get("source"));        
+    var pathPts = [].concat(d.get("middlePts"));
+    pathPts.unshift(d.get("source"));
     // TODO only compute if node position changed
-    pathPts.push(pvt.computeEndPt(pathPts[pathPts.length-1], d.get("target"))); 
+    pathPts.push(pvt.computeEndPt(pathPts[pathPts.length-1], d.get("target")));
     return pvt.d3Line(pathPts);
   };
 
@@ -173,21 +157,29 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
 
   return Backbone.View.extend({
 
+
+    // hack to call appRouter from view (must pass in approuter)
+    appRouter: null,
+
     /**
      * Initialize function
      * This function should not be overwritten in subclasses
      * Use preinitialize and postinitialize to perform the desired actions
      * TODO throw error if in subclass version (how?)
      */
-    initialize: function(){
+    initialize: function(inp){
       this.preinitialize();
       this.isFirstRender = true;
+      this.isRendered = false;
       this.state = {
         doCircleTrans: false,
         doPathsTrans: false
       };
+      if (inp !== undefined){
+        this.appRouter = inp.appRouter;
+      }
       this.postinitialize();
-    },  
+    },
 
     /**
      * Base render function
@@ -201,7 +193,7 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
 
       if (thisView.isFirstRender) {
         pvt.firstRenderBase.call(thisView);
-        pvt.firstRender.call(thisView);
+        thisView.firstRender.call(thisView);
         thisView.isFirstRender = false;
       }
 
@@ -230,7 +222,7 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
         gPaths.each(function(d){
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
-          d3el.selectAll("path." + consts.pathClass) 
+          d3el.selectAll("path." + consts.pathClass)
             .transition()
             .attrTween("d", pvt.pathTween(edgePath, 4));
           d3el.selectAll("path." + consts.pathWrapClass)
@@ -251,17 +243,18 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
       // add new paths
       var newPathsG = gPaths.enter().append("g");
       newPathsG
+        .attr("id", function (d) { thisView.getPathGId(d); })
         .each(function(d){
           var d3el = d3.select(this),
-              edgePath = pvt.getEdgePath(d);          
+              edgePath = pvt.getEdgePath(d);
           // apend display path
           d3el.append("path")
             .style('marker-end','url(#end-arrow)')
             .classed(consts.pathClass, true)
-            .attr("d", edgePath );          
+            .attr("d", edgePath );
           // append onhover path
           d3el.append("path")
-            .attr("d", edgePath )          
+            .attr("d", edgePath )
             .classed(pvt.consts.pathWrapClass, true);
         });
 
@@ -280,9 +273,9 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
               function(d){
                 return d.id;
               });
-      
+
       thisView.gCircles.exit().remove(); // TODO add appropriate animation
-      
+
       if (thisView.state.doCircleTrans){
         thisView.gCircles
           .transition()
@@ -296,24 +289,27 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
           .attr("transform", function(d){
             return "translate(" + d.get("x") + "," + d.get("y") + ")";
           });
-      }
+        }
 
       // add new nodes
-      var newGs = thisView.gCircles.enter()
+      var newGs = thisView.gCircles
+            .enter()
             .append("g");
 
       newGs.classed(consts.circleGClass, true)
+        .attr("id", function (d) { thisView.getCircleGId (d); })
         .attr("transform", function(d){return "translate(" + d.get("x") + "," + d.get("y") + ")";})
         .append("circle")
         .attr("r", consts.nodeRadius);
 
       thisView.handleNewCircles(newGs);
-        
+
       //***********
       // POSTRENDER
       //***********
       thisView.postrender();
       //***********
+      thisView.isRendered = false;
     },
 
     /**
@@ -335,13 +331,74 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
     },
 
     /**
-     * Returns the base private object
+     * Return the g element of the path from the given model
+     *
+     * @param eModel: the edge model
+     */
+    getD3PathGFromModel: function(eModel){
+      return d3.select("#" + this.getPathGId(eModel));
+    },
+
+    /**
+     * Return the g element for the circle from the given model
+     *
+     * @param nModel: the node model
+     */
+    getD3CircleGFromModel: function(nModel){
+      return d3.select("#" + this.getCircleGId(nModel));
+    },
+
+    /**
+     * Return the circleG id for a a nodeModel
+     *
+     * @return <string> the id of circleG
+     */
+    getCircleGId: function  (nodeModel) {
+      return pvt.consts.circleGIdPrefix + nodeModel.id;
+    },
+
+    /**
+     * Return the edgeG id for a a nodeModel
+     *
+     * @return <string> the id of edgeG
+     */
+    getPathGId: function  (edgeModel) {
+      return pvt.consts.edgeGIdPrefix + edgeModel.id;
+    },
+
+
+    /**
+     * Returns a clone of the base private object
      *
      * @return {object} the base private object
      */
-    getBasePvt: function() {
-      return pvt;
+    getConstsClone: function() {
+      return _.clone(pvt.consts);
     },
+
+    /**
+     * Return true if the view has been rendered
+     */
+    isRendered: function(){
+      return this.isRendered;
+    },
+
+    /**
+     * return the specified view constant
+     */
+    getViewConst: function(vc){
+      return pvt.consts[vc];
+    },
+
+      /**
+       * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
+       */
+      close: function() {
+        this.remove();
+        this.unbind();
+      },
+
+
 
     //********************
     // ABSTRACT METHODS
@@ -378,8 +435,12 @@ window.define(["backbone", "d3",  "filesaver"], function(Backbone, d3) {
     windowKeyUp: function() {},
 
     // override in subclass
-    handleNewPaths: function() {}
-    
+    handleNewPaths: function() {},
+
+    // override in subclass
+    firstRender: function(){
+
+    }
   });
-  
+
 });

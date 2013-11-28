@@ -1,9 +1,9 @@
 // FIXME remove window
-window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesaver"], function(Backbone, d3, _, GraphView){
+window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
 
-  var pvt = (new GraphView()).getBasePvt(); 
+  var pvt = {};
 
-  pvt.consts = _.extend(pvt.consts, {
+  pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
     gcWrapId: "gc-wrap",
     svgId: "gc-svg",
     toolboxId: "toolbox",
@@ -12,7 +12,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
     depIconGClass: "dep-icon-g",
     olIconGClass: "ol-icon-g",
     toEditCircleClass: "to-edit-circle",
-    graphClass: "graph",
     activeEditId: "active-editing",
     toEditCircleRadius: 10,
     BACKSPACE_KEY: 8,
@@ -78,7 +77,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
   // helper function for addNodeIcons FIXME this function is difficult to understand -- should have a simple deps/outlinks flag that determines the icon type
   // TODO move to graph-view
   pvt.addExpContIcon = function(d3Icon, iconGClass, hasExpOrContrName, expandFun, contractFun, placeAtBottom, d3this, thisView, d, consts){
-    if (d.get(hasExpOrContrName) 
+    if (d.get(hasExpOrContrName)
         && (!d3Icon.node() || !d3Icon.classed(consts.expandCrossClass))) {
       // place plus sign
       d3Icon.remove();
@@ -87,7 +86,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
         .classed(consts.expandCrossClass, true);
       var yplace = placeAtBottom ? (consts.nodeRadius - consts.minusRectH*3 - 8) : (-consts.nodeRadius + consts.minusRectH*3 - 8);
       d3Icon.append("polygon")
-        .attr("points", pvt.plusPts)
+        .attr("points", consts.plusPts)
         .attr("transform", "translate(" + (-consts.exPlusWidth/2) + ","
               + yplace + ")")
         .on("mouseup", function(){
@@ -147,7 +146,52 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
     }
   };
 
-  pvt.firstRender = function(){
+  var GraphEditor = GraphView.extend({
+    el: document.getElementById(pvt.consts.gcWrapId),
+
+    events: {
+      "click #optimize": "optimizeGraphPlacement",
+      "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
+      "change #hidden-file-upload": "uploadGraph",
+      "click #download-input": "downloadGraph",
+      "click #delete-graph": "clearGraph"
+    },
+
+    // @override
+    postinitialize: function() {
+      var thisView = this;
+      thisView.state = _.extend(thisView.state, {
+        selectedNode: null,
+        selectedEdge: null,
+        mouseDownNode: null,
+        mouseDownLink: null,
+        justDragged: false,
+        justScaleTransGraph: false,
+        lastKeyDown: -1,
+        shiftNodeDrag: false,
+        selectedText: null,
+        expOrContrNode: false,
+        toNodeEdit: false
+      });
+
+      thisView.idct = 0; // TODO this shouldn't be handled in the view
+
+      /******
+       * Setup d3-based event listeners
+       ******/
+      // rerender when the graph model changes from server data TOMOVE
+      thisView.listenTo(thisView.model, "loadedServerData", thisView.render);
+
+      d3.select(window).on("keydown",  function(){
+        thisView.windowKeyDown.call(thisView);
+      });
+      d3.select(window).on("keyup",  function(){
+        thisView.windowKeyUp.call(thisView);
+      });
+    },
+
+    // @override
+    firstRender: function(){
     var thisView = this,
         d3Svg = thisView.d3Svg,
         d3SvgG = thisView.d3SvgG;
@@ -203,87 +247,46 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
           })
           .on("zoomend", function() {
             d3.select('body').style("cursor", "auto");
-          });      
+          });
     d3Svg.call(dragSvg).on("dblclick.zoom", null);
 
     // zoomed function used for dragging behavior above
     function zoomed() {
       thisView.state.justScaleTransGraph = true;
       d3.select("." + pvt.consts.graphClass)
-        .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); 
+        .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
     };
-  };
+  },
 
-
-  var GraphEditor = GraphView.extend({
-    el: document.getElementById(pvt.consts.gcWrapId),
-
-    events: {
-      "click #optimize": "optimizeGraphPlacement",
-      "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
-      "change #hidden-file-upload": "uploadGraph",
-      "click #download-input": "downloadGraph",
-      "click #delete-graph": "clearGraph"
-    },
-
-    postinitialize: function() {
-      var thisView = this;
-      thisView.state = _.extend(thisView.state, {
-        selectedNode: null,
-        selectedEdge: null,
-        mouseDownNode: null,
-        mouseDownLink: null,
-        justDragged: false,
-        justScaleTransGraph: false,
-        lastKeyDown: -1,
-        shiftNodeDrag: false,
-        selectedText: null,
-        expOrContrNode: false,
-        toNodeEdit: false
-      });
-
-      thisView.idct = 0; // TODO this shouldn't be handled in the view
-
-      /******
-       * Setup d3-based event listeners
-       ******/
-      // rerender when the graph model changes from server data TOMOVE
-      thisView.listenTo(thisView.model, "loadedServerData", thisView.render);
-
-      d3.select(window).on("keydown",  function(){
-        thisView.windowKeyDown.call(thisView);
-      });
-      d3.select(window).on("keyup",  function(){
-        thisView.windowKeyUp.call(thisView);
-      });
-    },
-
+    // @override
     postrender: function() {
       var thisView = this;
-      
+
       thisView.gPaths.classed(pvt.consts.selectedClass, function(d){
         return d === thisView.state.selectedEdge;
       });
     },
 
+    // @override
     handleNewPaths: function(newGs){
-      var thisView = this;      
+      var thisView = this;
       newGs
         .on("mousedown", function(d){
-          thisView.pathMouseDown.call(this, d, thisView); 
+          thisView.pathMouseDown.call(this, d, thisView);
         })
         .on("mouseup", function(d){
           thisView.state.mouseDownLink = null;
         });
     },
 
+    // @override
     handleNewCircles: function(newGs){
       var thisView = this,
           state = thisView.state,
           consts = pvt.consts;
-      
+
       newGs
-        .on("mouseover", function(d){        
+        .on("mouseover", function(d){
           if (state.shiftNodeDrag){
             d3.select(this).classed(consts.connectClass, true);
           }
@@ -308,7 +311,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
         var d3el = d3.select(this);
         thisView.listenTo(d, "change:title", function() {
           d3el.selectAll("text").remove();
-          pvt.insertTitleLinebreaks(d3el, d.get("title"));
+          Utils.insertTitleLinebreaks(d3el, d.get("title"));
         });
       });
 
@@ -321,12 +324,12 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
             thisView.state.toNodeEdit = true;
-            document.location = document.location.pathname + "#" + d.get("id");
+            document.location = document.location.pathname + "#/edit=" + d.get("id");
           }
         });
 
       newGs.each(function(d){
-        pvt.insertTitleLinebreaks(d3.select(this), d.get("title"));
+        Utils.insertTitleLinebreaks(d3.select(this), d.get("title"));
       });
 
 
@@ -344,8 +347,8 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
       if (state.selectedNode){
         pvt.removeSelectFromNode.call(thisView);
       }
-      
-      var prevEdge = state.selectedEdge;  
+
+      var prevEdge = state.selectedEdge;
       if (!prevEdge || prevEdge !== d){
         pvt.replaceSelectEdge.call(thisView, d3path, d);
       } else{
@@ -378,13 +381,13 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
         state.toNodeEdit = false;
         return;
       }
-      
+
       // reset the states
-      state.shiftNodeDrag = false;    
+      state.shiftNodeDrag = false;
       d3node.classed(consts.connectClass, false);
-      
+
       var mouseDownNode = state.mouseDownNode;
-      
+
       if (!mouseDownNode) return;
 
       thisView.dragLine.classed("hidden", true);
@@ -401,7 +404,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
         if (!filtRes[0].length){
           thisView.model.addEdge(newEdge); // todo switch to create
           thisView.render();
-        } 
+        }
       } else {
         // we're in the same node
         if (state.justDragged) {
@@ -420,8 +423,8 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
             if (state.selectedEdge){
               pvt.removeSelectFromEdge.call(thisView);
             }
-            var prevNode = state.selectedNode;            
-            
+            var prevNode = state.selectedNode;
+
             if (!prevNode || prevNode.id !== d.id){
               pvt.replaceSelectNode.call(thisView, d3node, d);
             } else{
@@ -432,7 +435,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
       }
       state.mouseDownNode = null;
       return;
-      
+
     }, // end of circles mouseup
 
     changeTextOfNode: function(d3node, d){
@@ -513,7 +516,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
     // keydown on main svg
     windowKeyDown: function() {
       if (!this.$el.is(":visible")) { return; }
-      
+
       var thisView = this,
           state = thisView.state,
           consts = pvt.consts;
@@ -558,9 +561,9 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
       var thisGraph = this,
           uploadFile = evt.currentTarget.files[0],
           filereader = new window.FileReader();
-      
+
       filereader.onload = function(){
-        var txtRes = filereader.result;        
+        var txtRes = filereader.result;
         try{
           var jsonObj = JSON.parse(txtRes);
           // thisGraph.deleteGraph(true);
@@ -586,9 +589,9 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "filesa
         this.model.clear().set(this.model.defaults());
         this.render();
       }
-    }    
+    }
   }); // end GraphEditor definition
 
   return GraphEditor;
-  
+
 });

@@ -2,7 +2,7 @@
  This file contains the central application model, which is a wrapper model for the other models in the agfk application
  */
 
-define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "agfk/utils/errors"], function(Backbone, GraphData, UserData, ErrorHandler){
+define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors"], function(Backbone, GraphData, UserData, ErrorHandler){
   "use strict";
 
   /**
@@ -32,10 +32,10 @@ define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-mo
       graphData.parentModel = thisModel;
       userData.parentModel = thisModel;
 
-      // Update user data when aux node data changes 
-      // TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph 
+      // Update user data when aux node data changes
+      // TODO: this is nonstandard but it follow the idea that the userData should reflect user-specific changes to the graph
       // (there may be a better way to do this, but aux fields on the nodes themselves, such as "learnStatus,"
-      // make it easy to trigger changes in the views for the specific node rather than the entire collection 
+      // make it easy to trigger changes in the views for the specific node rather than the entire collection
       userData.listenTo(nodes, "change:learnStatus", userData.updateLearnedConcept);
       userData.listenTo(nodes, "change:starStatus", userData.updateStarredConcept);
       userData.listenTo(nodes, "change:implicitLearnStatus", userData.updateImplicitLearnedNodes);
@@ -44,7 +44,7 @@ define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-mo
       var aux = graphData.get("aux");
       aux.listenTo(userData, "change:learnedConcepts", aux.resetEstimates);
     },
-    
+
     /**
      * Aux function to set graph data from wrapper model (TODO this function may not be necessary)
      */
@@ -100,7 +100,7 @@ define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-mo
 
       // build node set
       nodes.add(response.nodes, {parse: true});
-      
+
       delete response.nodes;
       return response;
     },
@@ -109,10 +109,10 @@ define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-mo
      * Specify URL for HTTP verbs (GET/POST/etc)
      */
     url: function(){
-      var thisModel = this, 
+      var thisModel = this,
           depTag = thisModel.get("graphData").get("aux").get("depRoot");
       // TODO post CR-Restruct handle different types of input (aggregated graphs) based on url
-      ErrorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request"); 
+      ErrorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request");
       return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;
     }
   });

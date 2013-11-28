@@ -1,15 +1,16 @@
-window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/editable-graph-model", "gc/views/concept-editor-view"], function($, Backbone, GraphEditorView, EditableGraphModel, ConceptEditorView){
+window.define(["jquery", "backbone", "gc/views/editor-graph-view", "gc/models/editable-graph-model", "gc/views/concept-editor-view", "agfk/views/explore-graph-view"], function($, Backbone, GraphEditorView, EditableGraphModel, ConceptEditorView, ExploreGraphView){
   return Backbone.Router.extend({
     routes: {
       "": "showGCEditor",
-      ":nodeid": "openEditorView"
+      "/preview": "previewGraph",
+      "/edit=:nodeid": "openEditorView"
     },
 
     // function to handle non-ge-view switching
     showView: function(view){
       var thisRoute = this;
 
-      // remove/hide old views safely      
+      // remove/hide old views safely
       thisRoute.removeOtherView();
       if (thisRoute.geView){
         thisRoute.geView.$el.hide();
@@ -32,11 +33,11 @@ window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/ed
       }
       thisRoute.currentView = null;
     },
-    
+
     showGCEditor: function(){
       // feed graph creator into the appropriate view
       var thisRoute = this;
-      
+
       thisRoute.removeOtherView();
       if (!thisRoute.geModel) {
         thisRoute.geModel = new EditableGraphModel();
@@ -47,8 +48,14 @@ window.define(["jquery", "backbone", "gc/views/graph-editor-view", "gc/models/ed
       thisRoute.geView.$el.show();
     },
 
+    previewGraph: function () {
+      // need to pull in the explore view now...
+
+      // and pass the graph to it
+    },
+
     openEditorView: function(concept_id){
-      var thisRoute = this;      
+      var thisRoute = this;
       thisRoute.geModel = thisRoute.geModel || new EditableGraphModel();
       var model = thisRoute.geModel.getNode(concept_id);
       if (model){

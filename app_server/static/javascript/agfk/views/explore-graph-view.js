@@ -372,13 +372,41 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       firstRender: function(){
       // build initial graph based on input collection
       var thisView = this,
+          consts = pvt.consts,
           nodes = thisView.model.getNodes(),
           aux = window.agfkGlobals.auxModel,
           gConsts = aux.getConsts(),
           thisModel = thisView.model;
 
       thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
-    },
+        var dzoom = d3.behavior.zoom();
+        // make graph zoomable/translatable
+        var vis = thisView.d3Svg
+              .attr("pointer-events", "all")
+              .attr("viewBox", null)
+              .call(dzoom.on("zoom", redraw))
+              .select("g");
+
+        // set the zoom scale
+        dzoom.scaleExtent([consts.minZoomScale, consts.maxZoomScale]);
+        var summaryDisplays = pvt.summaryDisplays,
+            nodeLoc,
+            d3event,
+            currentScale;
+        // helper function to redraw svg graph with correct coordinates
+        function redraw() {
+          // transform the graph
+          d3event = d3.event;
+          currentScale = d3event.scale;
+          thisView.prevScale = currentScale;
+          vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + currentScale + ")");
+          // move the summary divs if needed
+          $.each(summaryDisplays, function(key, val){
+            nodeLoc = pvt.getSummaryBoxPlacement(val.d3circle.node().getBoundingClientRect(), val.placeLeft);
+            val.$wrapDiv.css(nodeLoc);
+          });
+        }
+      },
 
       /**
        * Toggle propType properties for the given explore node

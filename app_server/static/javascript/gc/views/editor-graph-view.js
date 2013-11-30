@@ -121,7 +121,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
   // add node icons (e.g. expand/contract) to the circle
   // TOMOVE exp and cont icons should be in graph view
   pvt.addNodeIcons = function(thisView, d){
-    if (!d.isVisible()) return;
+    if (!thisView.isNodeVisible(d)) return;
 
     var d3this = d3.select(this),
         hasDeps = d.get("dependencies").length > 0,
@@ -589,7 +589,24 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
         this.model.clear().set(this.model.defaults());
         this.render();
       }
+    },
+
+    /**
+     * @Override
+     * @return {boolean} true if the node is visible
+     */
+    isNodeVisible: function(node){
+      return !node.get("isContracted"); // TODO add learned/hidden properties as well
+    },
+
+    /**
+     * @Override
+     * @return {boolean} true if the edge path is visible
+     */
+    isEdgeVisible: function(edge){
+      return !edge.get("isContracted"); // TODO add learned/hidden properties as well
     }
+
   }); // end GraphEditor definition
 
   return GraphEditor;

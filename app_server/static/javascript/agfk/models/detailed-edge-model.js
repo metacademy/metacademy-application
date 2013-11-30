@@ -11,10 +11,6 @@ define(["backbone", "underscore", "base/models/edge-model"], function(Backbone, 
       return _.extend({}, EdgeModel.prototype.defaults(), enDef);
     },
 
-    isVisible: function(){
-      return !this.get("isContracted");
-    },
-
     /**
      * return a dot (graphviz) representation of the edge
      */

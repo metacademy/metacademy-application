@@ -20,8 +20,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       dataHoveredProp: "data-hovered",
       elIconClass: "e-to-l-icon",
       starClass: "node-star",
-      starredClass: "node-starred",
       starHoveredClass: "node-star-hovered",
+      starredClass: "starred",
       checkClass: "checkmark",
       checkHoveredClass: "checkmark-hovered",
       summaryDivSuffix: "-summary-txt",
@@ -145,10 +145,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
       var numEls = d3node.selectAll("tspan")[0].length;
       yOff += viewConsts.nodeIconsConstYOffset
-            + (numEls-1)*viewConsts.nodeIconsPerYOffset;
+        + (numEls-1)*viewConsts.nodeIconsPerYOffset;
       gEl.attr("transform",
-                 "translate(" + xOff + "," + yOff + ") "
-                 + "scale(" + scale + ")");
+               "translate(" + xOff + "," + yOff + ") "
+               + "scale(" + scale + ")");
     };
 
     /**
@@ -369,15 +369,15 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        * setup the appropriate event listers -- this should probably be called on initial render?
        */
       firstRender: function(){
-      // build initial graph based on input collection
-      var thisView = this,
-          consts = pvt.consts,
-          nodes = thisView.model.getNodes(),
-          aux = window.agfkGlobals.auxModel,
-          gConsts = aux.getConsts(),
-          thisModel = thisView.model;
+        // build initial graph based on input collection
+        var thisView = this,
+            consts = pvt.consts,
+            nodes = thisView.model.getNodes(),
+            aux = window.agfkGlobals.auxModel,
+            gConsts = aux.getConsts(),
+            thisModel = thisView.model;
 
-      thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
+        thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
         var dzoom = d3.behavior.zoom();
         // make graph zoomable/translatable
         var vis = thisView.d3Svg
@@ -561,15 +561,38 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
               attr: "d",
               attrVal: consts.checkPath
             },
-            {
-              svgEl: "circle",
-              attr: "r",
-              attrVal: consts.checkCircleR
-            }],
+                         {
+                           svgEl: "circle",
+                           attr: "r",
+                           attrVal: consts.checkCircleR
+                         }],
             xOff = consts.checkXOffset,
             yOff = consts.checkYOffset;
-        pvt.attachIconToNode.call(this, d3node, d, window.agfkGlobals.auxModel.toggleLearnedStatus, appendObj, xOff, yOff, consts.checkGScale, consts.checkClass);
+        pvt.attachIconToNode.call(this, d3node, d,
+        window.agfkGlobals.auxModel.toggleLearnedStatus, appendObj,
+        xOff, yOff, consts.checkGScale, consts.checkClass);
+      },
+
+      /**
+       * @Override
+       * @return {boolean} true if the node is visible
+       */
+      isNodeVisible: function(node){
+        var aux = window.agfkGlobals.auxModel,
+            thisView = this;
+        return !node.get("isContracted")
+          && ( !node.isLearnedOrImplicitLearned() ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
+      },
+
+      /**
+       * @Override
+       * @return {boolean} true if the edge path is visible
+       */
+      isEdgeVisible: function(edge){
+        var thisView = this;
+        return thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target"));
       }
+
     }); // end Backbone.View.extend({
   })();
 

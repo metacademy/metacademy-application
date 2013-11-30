@@ -20,7 +20,7 @@
  * + d3 should handle all svg-related events, while backbone should handle all other events
  * + use handleNewPaths and handleNewCircles to attach listeners during calls to render
  */
-window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Utils, Backbone, d3, _) {
+window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], function(Utils, Backbone, d3, _, dagre) {
 
   /**********************
    * private class vars *
@@ -131,9 +131,9 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
     // TODO only compute if node position changed
     var srcPt = d.get("source"),
         targetPt = d.get("target"),
-//        secPt = pathPts.length ? pathPts[0] : targetPt,
+        //        secPt = pathPts.length ? pathPts[0] : targetPt,
         penUltPt = pathPts.length ? pathPts[pathPts.length - 1] : srcPt;
-//    var srcEndPt = pvt.computeEndPt(srcPt, secPt).source,
+    //    var srcEndPt = pvt.computeEndPt(srcPt, secPt).source,
     var targetEndPt = pvt.computeEndPt(penUltPt, targetPt).target;
     pathPts.unshift(srcPt);
     pathPts.push(targetEndPt);
@@ -214,7 +214,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
       // set the paths to only contain visible paths FIXME do edges always have ids?
       thisView.gPaths = thisView.gPaths
         .data(thisView.model.get("edges").filter(function(mdl){
-          return mdl.isVisible();
+          return thisView.isEdgeVisible(mdl);
         }), function(d){
           return d.id;
         });
@@ -270,9 +270,9 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
       //***************
       // Render Circles
       //***************
-     // update existing nodes
+      // update existing nodes
       thisView.gCircles = thisView.gCircles
-        .data(thisView.model.get("nodes").filter(function(mdl){return mdl.isVisible();}),
+        .data(thisView.model.getNodes().filter(function(mdl){return thisView.isNodeVisible(mdl);}),
               function(d){
                 return d.id;
               });
@@ -292,7 +292,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
           .attr("transform", function(d){
             return "translate(" + d.get("x") + "," + d.get("y") + ")";
           });
-        }
+      }
 
       // add new nodes
       var newGs = thisView.gCircles
@@ -305,8 +305,8 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
         .append("circle")
         .attr("r", consts.nodeRadius);
       newGs.each(function(d){
-          Utils.insertTitleLinebreaks(d3.select(this), d.get("title"));
-        });
+        Utils.insertTitleLinebreaks(d3.select(this), d.get("title"));
+      });
 
 
 
@@ -322,22 +322,81 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
 
     /**
      * Optimize graph placement using dagre
-     * TODO should this be moved to the graph object?
      *
+     * @param nodeWidth <number>: the width in px of each node
      * @param <boolean> minSSDist: whether to miminize the squared distance of the
      * nodes moved in the graph by adding the mean distance moved in each direction -- defaults to true
      * @param <id> noMoveNodeId: node id of node that should not move during optimization
      * note: noMoveNodeId has precedent over minSSDist
      */
     optimizeGraphPlacement: function(doRender, minSSDist, noMoveNodeId) {
-      var thisView = this;
+
+      var thisView = this,
+          thisGraph = thisView.model,
+          dagreGraph = new dagre.Digraph(),
+          nodeWidth = pvt.consts.nodeRadius,
+          nodeHeight = pvt.consts.nodeRadius,
+          nodes = thisGraph.get("nodes"),
+          edges = thisGraph.get("edges"),
+          transX = 0,
+          transY = 0;
+
       thisView.state.doCircleTrans = true;
       thisView.state.doPathsTrans = true;
-      thisView.model.optimizePlacement(pvt.consts.nodeRadius, minSSDist, noMoveNodeId);
+
+      minSSDist = minSSDist === undefined ? true : minSSDist;
+
+      // input graph into dagre
+      nodes.filter(function(n){return thisView.isNodeVisible(n);}).forEach(function(node){
+        dagreGraph.addNode(node.id, {width: nodeWidth, height: nodeHeight});
+      });
+
+      edges.filter(function(e){return thisView.isEdgeVisible(e);}).forEach(function(edge){
+        dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
+      });
+
+      var layout = dagre.layout()
+            .rankSep(80)
+            .nodeSep(100) // TODO move defaults to consts
+            .rankDir("BT").run(dagreGraph);
+
+      // determine average x and y movement
+      if (noMoveNodeId === undefined && minSSDist) {
+        layout.eachNode(function(n, inp){
+          var node = nodes.get(n);
+          transX +=  node.get("x") - inp.x;
+          transY += node.get("y") - inp.y;
+        });
+        transX /= nodes.length;
+        transY /= nodes.length;
+      }
+      // else, don't move a given node
+      else if (noMoveNodeId !== undefined) {
+        var node = nodes.get(noMoveNodeId),
+            inp = layout._strictGetNode(noMoveNodeId);
+        transX = node.get("x") - inp.value.x;
+        transY = node.get("y") - inp.value.y;
+      }
+
+      layout.eachEdge(function(e, u, v, value) {
+        var addPts = [];
+        value.points.forEach(function(pt){
+          addPts.push({x: pt.x + transX, y: pt.y + transY});
+        });
+        edges.get(e).set("middlePts",  addPts);
+      });
+
+      layout.eachNode(function(n, inp){
+        var node = nodes.get(n);
+        node.set("x", inp.x + transX);
+        node.set("y", inp.y + transY);
+      });
+
       if (doRender) {
         thisView.render();
       }
     },
+
 
     /**
      * Return the g element of the path from the given model
@@ -378,7 +437,6 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
       return pvt.consts.edgeGIdPrefix + edgeModel.id;
     },
 
-
     /**
      * Returns a clone of the base private object
      *
@@ -402,15 +460,27 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
       return pvt.consts[vc];
     },
 
-      /**
-       * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
-       */
-      close: function() {
-        this.remove();
-        this.unbind();
-      },
+    /**
+     * Close and unbind views to avoid memory leaks TODO make sure to unbind any listeners
+     */
+    close: function() {
+      this.remove();
+      this.unbind();
+    },
 
+    /**
+     * @return {boolean} true if the node circle is visible
+     */
+    isNodeVisible: function(node){
+      return true;
+    },
 
+    /**
+     * @return {boolean} true if the edge path is visible
+     */
+    isEdgeVisible: function(edge){
+      return true;
+    },
 
     //********************
     // ABSTRACT METHODS

@@ -203,27 +203,27 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       describe('contract cousin', function(){
         it('should be able to contract cousin and have uncle become invisible', function(){
           graphObj.getNode(nodeIds.cousin).contractDeps();
-          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(false);
+          (!graphObj.getNode(nodeIds.uncle).get("isContracted")).should.equal(false);
         });
 
         it('should have uncle-cousin edge be invisible', function(){
-          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
+          (!graphObj.getEdge(edgeIds.uncleToCousin).get("isContracted")).should.equal(false);
         });
 
         it('should have gp-uncle edge be invisible', function(){
-          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(false);
+          (!graphObj.getEdge(edgeIds.grandparentToUncle).get("isContracted")).should.equal(false);
         });
 
 
         ["grandparent", "parent", "child"].forEach(function(title){
           it( title + ' should still be visible', function(){
-            graphObj.getNode(nodeIds[title]).isVisible().should.equal(true);
+            (!graphObj.getNode(nodeIds[title]).get("isContracted")).should.equal(true);
           });
         });
 
         ["grandparentToParent", "parentToChild", "grandparentToChild"].forEach(function(title){
           it( title + ' should still be visible', function(){
-            graphObj.getEdge(edgeIds[title]).isVisible().should.equal(true);
+            (!graphObj.getEdge(edgeIds[title]).get("isContracted")).should.equal(true);
           });
         });
       });
@@ -234,13 +234,13 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
           graphObj.getNodes().every(function(node){
             return node.get("title") === "cousin"
               || node.get("title") === "child"
-              || ! node.isVisible();
+              || node.get("isContracted");
           }).should.equal(true);
         });
 
         it('all edges should be invisible', function(){
           var allHidden = graphObj.getEdges().every(function(edge){
-            return !edge.isVisible();
+            return edge.get("isContracted");
           });
           allHidden.should.equal(true);
         });
@@ -254,25 +254,25 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('uncle and gp should be visible', function(){
-          graphObj.getNode(nodeIds.uncle).isVisible().should.equal(true);
-          graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
+          (!graphObj.getNode(nodeIds.uncle).get("isContracted")).should.equal(true);
+          (!graphObj.getNode(nodeIds.grandparent).get("isContracted")).should.equal(true);
         });
 
         it('edge from uncle to cousin should be visible', function(){
-          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(true);
+          (!graphObj.getEdge(edgeIds.uncleToCousin).get("isContracted")).should.equal(true);
         });
 
         it('edge from gp to uncle should be visible', function(){
-          graphObj.getEdge(edgeIds.grandparentToUncle).isVisible().should.equal(true);
+          (!graphObj.getEdge(edgeIds.grandparentToUncle).get("isContracted")).should.equal(true);
         });
 
         it('parent should be invisible', function(){
-          graphObj.getNode(nodeIds.parent).isVisible().should.equal(false);
+          (!graphObj.getNode(nodeIds.parent).get("isContracted")).should.equal(false);
         });
 
         it('edges from gp to child and parent should be invisible', function(){
-          graphObj.getEdge(edgeIds.grandparentToChild).isVisible().should.equal(false);
-          graphObj.getEdge(edgeIds.grandparentToParent).isVisible().should.equal(false);
+          (!graphObj.getEdge(edgeIds.grandparentToChild).get("isContracted")).should.equal(false);
+          (!graphObj.getEdge(edgeIds.grandparentToParent).get("isContracted")).should.equal(false);
         });
       }); // end describe('expand cousin')
 
@@ -282,12 +282,12 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('all nodes should be visible', function(){
-          graphObj.getNodes().every(function(n){return n.isVisible();}).should.equal(true);
+          graphObj.getNodes().every(function(n){return !n.get("isContracted");}).should.equal(true);
         });
 
         it('all edges should be visible', function(){
           var allVisible = graphObj.getEdges().every(function(edge){
-            return edge.isVisible();
+            return !edge.get("isContracted");
           });
           allVisible.should.equal(true);
         });
@@ -301,23 +301,23 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('child should still be visible since gp-to-child edge exists', function(){
-          graphObj.getNode(nodeIds.child).isVisible().should.equal(true);
+          (!graphObj.getNode(nodeIds.child).get("isContracted")).should.equal(true);
         });
 
         it('parent -> child should be hidden', function(){
-          graphObj.getEdge(edgeIds.parentToChild).isVisible().should.equal(false);
+          (!graphObj.getEdge(edgeIds.parentToChild).get("isContracted")).should.equal(false);
         });
 
         it('all nodes should be visible', function(){
           graphObj.getNodes().each(function(node){
-              node.isVisible().should.equal(true);
+              (!node.get("isContracted")).should.equal(true);
           });
         });
 
         it('all non parent->child edges should be visible', function(){
           graphObj.getEdges().each(function(edge){
             if (edge.id !== edgeIds.parentToChild){
-              edge.isVisible().should.equal(true);
+              (!edge.get("isContracted")).should.equal(true);
             }
           });
         });
@@ -327,11 +327,11 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('cousin should be invisible', function(){
-          graphObj.getNode(nodeIds.cousin).isVisible().should.equal(false);
+          (!graphObj.getNode(nodeIds.cousin).get("isContracted")).should.equal(false);
         });
 
         it('uncle -> cousin should be hidden', function(){
-          graphObj.getEdge(edgeIds.uncleToCousin).isVisible().should.equal(false);
+          (!graphObj.getEdge(edgeIds.uncleToCousin).get("isContracted")).should.equal(false);
         });
 
         it('should be able to contract grandparent outlinks', function(){
@@ -339,20 +339,20 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         });
 
         it('gp should be visible', function(){
-          graphObj.getNode(nodeIds.grandparent).isVisible().should.equal(true);
+          (!graphObj.getNode(nodeIds.grandparent).get("isContracted")).should.equal(true);
         });
 
         it('all non-gp nodes should be hidden', function(){
           graphObj.getNodes().each(function(node){
             if (node.id !== nodeIds.grandparent){
-              node.isVisible().should.equal(false);
+              (!node.get("isContracted")).should.equal(false);
             }
           });
         });
 
         it('all edges should be hidden', function(){
           graphObj.getEdges().each(function(edge){
-              edge.isVisible().should.equal(false);
+              (!edge.get("isContracted")).should.equal(false);
           });
         });
 
@@ -365,13 +365,13 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
         it('all edges should be visible', function(){
           graphObj.getEdges().each(function(edge){
-              edge.isVisible().should.equal(true);
+              (!edge.get("isContracted")).should.equal(true);
           });
         });
 
         it('all nodes should be visible', function(){
           graphObj.getNodes().each(function(node){
-              node.isVisible().should.equal(true);
+              (!node.get("isContracted")).should.equal(true);
           });
         });
 

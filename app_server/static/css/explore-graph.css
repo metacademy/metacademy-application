@@ -62,7 +62,7 @@
     stroke: #759466;
     visibility: visible;
 }
-.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle, .hovered .node-star polygon, .clicked .node-star-polygon, .node-starred polygon, .hovered .e-to-l-icon{
+.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle, .hovered .node-star polygon, .clicked .node-star-polygon, .starred polygon, .hovered .e-to-l-icon{
     visibility: visible;
 }
 
@@ -81,9 +81,10 @@
     fill: #D4C4E7;
     Stroke: #56574D;
 }
-.node-star.node-starred polygon{
+.starred .node-star polygon{
     fill: #F8F8C9;
     stroke: #56574D;
+    visibility: visible;
 }
 
 /* node e-to-l icon */

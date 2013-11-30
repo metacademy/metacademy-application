@@ -1,5 +1,5 @@
 /*global define */
-define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, dagre, BaseEdgeCollection, BaseNodeCollection){
+define(["jquery", "backbone", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, BaseEdgeCollection, BaseNodeCollection){
 
   return Backbone.Model.extend({
 
@@ -94,80 +94,11 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
     },
 
     /**
-     * Optimize graph placement using dagre
-     *
-     * @param nodeWidth <number>: the width in px of each node
-     * @param <boolean> minSSDist: whether to miminize the squared distance of the
-     * nodes moved in the graph by adding the mean distance moved in each direction -- defaults to true
-     * @param <id> noMoveNodeId: node id of node that should not move during optimization
-     * note: noMoveNodeId has precedent over minSSDist
-     */
-    optimizePlacement: function(nodeWidth, minSSDist, noMoveNodeId) {
-
-      var thisGraph = this,
-          dagreGraph = new dagre.Digraph(),
-          nodeHeight = nodeWidth,
-          nodes = thisGraph.get("nodes"),
-          edges = thisGraph.get("edges"),
-          transX = 0,
-          transY = 0;
-
-      minSSDist = minSSDist === undefined ? true : minSSDist;
-
-      // input graph into dagre
-      nodes.filter(function(n){return n.isVisible();}).forEach(function(node){
-        dagreGraph.addNode(node.id, {width: nodeWidth*2, height: nodeHeight});
-      });
-
-      edges.filter(function(e){return e.isVisible();}).forEach(function(edge){
-        dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
-      });
-
-      var layout = dagre.layout()
-            .rankSep(80)
-            .nodeSep(60) // TODO move defaults to consts
-            .rankDir("BT").run(dagreGraph);
-
-      // determine average x and y movement
-      if (noMoveNodeId === undefined && minSSDist) {
-        layout.eachNode(function(n, inp){
-          var node = nodes.get(n);
-          transX +=  node.get("x") - inp.x;
-          transY += node.get("y") - inp.y;
-        });
-        transX /= nodes.length;
-        transY /= nodes.length;
-      }
-
-      else if (noMoveNodeId !== undefined) {
-        var node = nodes.get(noMoveNodeId),
-            inp = layout._strictGetNode(noMoveNodeId);
-        transX = node.get("x") - inp.value.x;
-        transY = node.get("y") - inp.value.y;
-      }
-
-      layout.eachEdge(function(e, u, v, value) {
-        var addPts = [];
-        value.points.forEach(function(pt){
-          addPts.push({x: pt.x + transX, y: pt.y + transY});
-        });
-        edges.get(e).set("middlePts",  addPts); // plen > 1 ? value.points : []);//value.points.splice(0, -1);
-      });
-
-      layout.eachNode(function(n, inp){
-        var node = nodes.get(n);
-        node.set("x", inp.x + transX);
-        node.set("y", inp.y + transY);
-      });
-    },
-
-    /**
      * @return <boolean> true if the graph is populated
      */
      isPopulated: function(){
        return this.getEdges().length > 0 || this.getNodes().length > 0;
      },
-
 
     /**
      * Get a nodes from the graph

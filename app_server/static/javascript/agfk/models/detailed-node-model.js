@@ -75,15 +75,7 @@ define(["underscore", "base/models/node-model", "base/collections/node-property-
         this.nodeDisplayTitle = this.wrapNodeText(title, numCharNodeLine || 9);
       }
       return this.nodeDisplayTitle;
-    },
-
-    /**
-     * @return {boolean} true if the node is visible
-     */
-    isVisible: function(){
-      return !this.get("isContracted"); // TODO add learned/hidden properties as well
     }
-
   });
 
   return DetailedNode;

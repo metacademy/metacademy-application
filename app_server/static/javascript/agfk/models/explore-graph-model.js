@@ -46,6 +46,44 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
           edges: new DetailedEdgeCollection(),
           options: new GraphOptionsModel()
         };
+      },
+
+      /**
+       * @Override
+       */
+      postinitialize: function () {
+        // setup listeners
+        var thisGraph = this,
+            aux = window.agfkGlobals.auxModel;
+        // Implicit learned listeners
+        if (aux) {
+          thisGraph.listenTo(aux, aux.getConsts().learnedTrigger, thisGraph.changeILNodesFromTag);
+        }
+        thisGraph.on("sync", function(){
+          thisGraph.changeILNodesFromTag();
+        });
+      },
+
+      /**
+       * DFS to change the implicit learned status of the dependencies of rootTag
+       * TODO does not have test coverage
+       */
+      changeILNodesFromTag: function(){
+        // TODO cache learned/implicit learned nodes
+        var thisGraph = this,
+            nodes = thisGraph.getNodes(),
+            aux = window.agfkGlobals.auxModel,
+            depRoot = thisGraph.get("root"),
+            isShortcut = nodes.get(depRoot).get("is_shortcut"),
+            unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depRoot, isShortcut), function(tagO){return tagO.from_tag;});
+
+        nodes.each(function(node){
+          if (unlearnedDepTags.indexOf(node.id) > -1){
+            node.setImplicitLearnStatus(false);
+          } else if (node.id !== depRoot){
+            node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
+          }
+        });
       }
     });
   })();

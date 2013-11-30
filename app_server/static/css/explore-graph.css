@@ -1,12 +1,15 @@
-
-
-/* properties for learned nodes */
-.node-learned.concept-g > circle, .implicit-learned.concept-g > circle{
-    stroke: #868686;;
+/* properties for learned circles */
+.learned.concept-g > circle, .implicit-learned.concept-g > circle{
+    stroke: #868686;
 }
 
-.node-learned text, .implicit-learned text{
+.learned text, .implicit-learned text{
     fill: #868686;
+}
+
+/* properties for learned paths */
+.learned path.link, .implicit-learned path.link{
+    opacity: 0.5;
 }
 
 /*********
@@ -28,7 +31,7 @@
     stroke-width: 3;
     visibility: hidden;
 }
-.concept-g .node-learned .checkmark circle{
+.concept-g .learned .checkmark circle{
     fill: transparent;
     stroke: #759466;
     stroke-width: 4;
@@ -48,13 +51,13 @@
     visibility: visible;
 }
 
-.concept-g.node-learned .checkmark circle{
+.concept-g.learned .checkmark circle{
     visibility: visible;
     stroke: #759466;
     stroke-width: 4;
 }
 
-.concept-g.node-learned .checkmark path{
+.concept-g.learned .checkmark path{
     stroke-width: 5;
     stroke: #759466;
     visibility: visible;

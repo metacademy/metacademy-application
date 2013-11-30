@@ -15,9 +15,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       // WARNING some changes must be propagated to the css file
       exploreSvgId: "explore-svg",
       hoveredClass: "hovered",
-      useExpandClass: "use-expand",
-      nodeLearnedClass: "node-learned",
-      nodeImplicitLearnedClass: "implicit-learned",
+      learnedClass: "learned",
+      implicitLearnedClass: "implicit-learned",
       dataHoveredProp: "data-hovered",
       elIconClass: "e-to-l-icon",
       starClass: "node-star",
@@ -210,7 +209,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             gConsts = aux.getConsts(),
             thisModel = thisView.model;
 
-        // dim nodes that are [implicitly] learned
+        // dim nodes that are [implicitly] learned or starred
         thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, nodeSid, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
@@ -419,8 +418,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             thisView = this,
             changeLearnStatus = propType === "learned" || propType === "implicitLearned",
             d3Svg = thisView.d3Svg;
-        var propClass = {"learned": viewConsts.nodeLearnedClass,
-                         "implicitLearned": viewConsts.nodeImplicitLearnedClass,
+        var propClass = {"learned": viewConsts.learnedClass,
+                         "implicitLearned": viewConsts.implicitLearnedClass,
                          "starred": viewConsts.starredClass
                         }[propType];
 

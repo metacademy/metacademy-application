@@ -70,11 +70,10 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
         var thisModel = this;
 
         // ***** Add private instance variable workaround ***** //
+        // FIXME these need to be refactored given the new base inheritance structure
         var nodePvt = {};
         nodePvt.visible = false;
         nodePvt.implicitLearn = false;
-        nodePvt.learned = false;
-        nodePvt.starred = false;
 
         thisModel.setVisibleStatus = function(status){
           if (nodePvt.visible !== nodePvt.visible){

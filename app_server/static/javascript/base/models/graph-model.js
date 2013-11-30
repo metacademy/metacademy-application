@@ -59,7 +59,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
         thisGraph.addEdge(dep);
       });
       //thisGraph.optimizePlacement();
-      thisGraph.trigger("loadedServerData"); // TODO use "sync" events instead (they're standard)
+      // thisGraph.trigger("loadedServerData"); // TODO use "sync" events instead (they're standard)
     },
 
     // override in subclass

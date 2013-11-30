@@ -246,7 +246,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
       // add new paths
       var newPathsG = gPaths.enter().append("g");
       newPathsG
-        .attr("id", function (d) { thisView.getPathGId(d); })
+        .attr("id", function (d) { return  thisView.getPathGId(d); })
         .each(function(d){
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
@@ -345,7 +345,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
      * @param eModel: the edge model
      */
     getD3PathGFromModel: function(eModel){
-      return d3.select("#" + this.getPathGId(eModel));
+      return this.d3Svg.select("#" + this.getPathGId(eModel));
     },
 
     /**
@@ -354,7 +354,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Uti
      * @param nModel: the node model
      */
     getD3CircleGFromModel: function(nModel){
-      return d3.select("#" + this.getCircleGId(nModel));
+      return this.d3Svg.select("#" + this.getCircleGId(nModel));
     },
 
     /**

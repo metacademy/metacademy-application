@@ -1,8 +1,10 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
  */
+
+/*global define */
 define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view"],
-  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, GraphModel, UserData, ErrorHandler, ErrorMessageView){
+  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView){
   "use strict";
 
   /**
@@ -47,34 +49,34 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
      * Asynchronously load Viz.js
      * Note: must call with "this = router instance"
      */
-    pvt.loadViz = function(){
-      var thisRoute = this;
-      // Viz.js requires types arrays; no available for IE < 10
-      if (typeof Int32Array === "undefined"){
-        // we're dealing with IE < 10 or an early mobile browser
-        if (pvt.viewMode === pvt.routeConsts.pExploreMode){
-          // only show the error for the explore mode
-          // learn mode should work with IE 9 and popups will notify IE < 9
-          thisRoute.showErrorMessageView(pvt.routeConsts.unsupportedBrowserKey);
-        }
-      } else{
+    // pvt.loadViz = function(){
+    //   var thisRoute = this;
+    //   // Viz.js requires types arrays; no available for IE < 10
+    //   if (typeof Int32Array === "undefined"){
+    //     // we're dealing with IE < 10 or an early mobile browser
+    //     if (pvt.viewMode === pvt.routeConsts.pExploreMode){
+    //       // only show the error for the explore mode
+    //       // learn mode should work with IE 9 and popups will notify IE < 9
+    //       thisRoute.showErrorMessageView(pvt.routeConsts.unsupportedBrowserKey);
+    //     }
+    //   } else{
 
-        if(typeof window.Viz === "undefined" && window.vizPromise === undefined){
-          window.vizPromise = $.ajax({
-            url: window.STATIC_PATH + "javascript/lib/viz.js",
-            dataType: "script",
-            cache: true,
-            async: true,
-            type: "GET",
-            error: function(jxhr, opts, errorThrown){
-              window.vizPromise = undefined;
-              thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
-              ErrorHandler.reportAjaxError(jxhr, opts, errorThrown);
-            }
-          });
-        }
-      }
-    };
+    //     if(typeof window.Viz === "undefined" && window.vizPromise === undefined){
+    //       window.vizPromise = $.ajax({
+    //         url: window.STATIC_PATH + "javascript/lib/viz.js",
+    //         dataType: "script",
+    //         cache: true,
+    //         async: true,
+    //         type: "GET",
+    //         error: function(jxhr, opts, errorThrown){
+    //           window.vizPromise = undefined;
+    //           thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
+    //           ErrorHandler.reportAjaxError(jxhr, opts, errorThrown);
+    //         }
+    //       });
+    //     }
+    //   }
+    // };
 
     /**
      * Clean up active views
@@ -125,7 +127,7 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
       /**
        * Show the input view in the input selector and maintain a reference for correct clean up
        */
-      showView: function (view, doRender, selector, removeOldView) {
+      showView: function (inView, doRender, selector, removeOldView) {
         var thisRoute = this;
         removeOldView = removeOldView === undefined ? true : removeOldView;
 
@@ -137,30 +139,30 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
 
           if (doRender){
             if (typeof selector === "string"){
-              $(selector).html(view.$el).show();
+              $(selector).html(inView.$el).show();
             } else{
-              window.document.body.appendChild(view.el);
+              window.document.body.appendChild(inView.el);
             }
           } else{
-            view.$el.parent().show();
+            inView.$el.parent().show();
           }
 
           if (removeOldView){
-            thisRoute.currentView = view;
+            thisRoute.currentView = inView;
           }
         }
 
         if (doRender){
-          view = view.render();
+          inView.render();
         }
 
-        // TODO don't use window object -- breaks with multiple async views
-        view.isRendered() ? swapViews() : view.$el.on("viewRendered", function(){
-          view.$el.off("viewRendered");
+        // TODO don't use window object -- breaks with multiple async inViews
+        inView.isViewRendered() ? swapViews() : inView.$el.on("viewRendered", function(){
+          inView.$el.off("viewRendered");
           swapViews();
         });
 
-        return view;
+        return inView;
       },
 
       /**
@@ -246,7 +248,7 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
           aux.setDepRoot(nodeId);
 
           var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true}),
-              graphModel = new GraphModel();
+              graphModel = new ExploreGraphModel({root: nodeId});
           aux.setUserModel(userModel);
           thisRoute.userModel = userModel;
           thisRoute.graphModel = graphModel;
@@ -270,16 +272,16 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
           thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + routeConsts.loadViewId);
         }
 
-        var loadViz = typeof window.Viz === "undefined" && window.vizPromise === undefined,
-            preLoadViz = paramsObj[qViewMode] === pExploreMode; // async start loading Viz before the view, else load after the view
+        //var loadViz = typeof window.Viz === "undefined" && window.vizPromise === undefined,
+        //preLoadViz = paramsObj[qViewMode] === pExploreMode; // async start loading Viz before the view, else load after the view
 
-        if (loadViz && preLoadViz){
-          pvt.loadViz.call(thisRoute);
-        }
+        // if (loadViz && preLoadViz){
+        //   pvt.loadViz.call(thisRoute);
+        // }
 
         // check if/how we need to acquire more data from the server
-        if(thisRoute.graphModel.get("nodes").length === 0){
-          thisRoute.graphModel.get("nodes").fetch({
+        if(!thisRoute.graphModel.isPopulated()){
+          thisRoute.graphModel.fetch({
             success: postNodePop,
             error: function(emodel, eresp, eoptions){
               thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
@@ -336,9 +338,9 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
           pvt.prevUrlParams = $.extend({}, paramsObj);
           pvt.prevNodeId = nodeId;
 
-          if (loadViz && !preLoadViz && window.vizPromise === undefined){
-            pvt.loadViz.call(thisRoute);
-          }
+          // if (loadViz && !preLoadViz && window.vizPromise === undefined){
+          //   pvt.loadViz.call(thisRoute);
+          // }
         }
       }
     });

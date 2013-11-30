@@ -1,6 +1,6 @@
 /*global define */
 define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collections/editable-edge-collection"], function(Backbone, _, DetailedNodeModel, EditableEdgeCollection) {
-  
+
   var EditableNode = (function(){
 
     var pvt = {};
@@ -20,7 +20,7 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
     // expand from a node FIXME: DRY with contractFromNode
     pvt.expandFromNode = function(notStart, hasContractedEdgesName, edgeType, edgeEnding){
       if (!notStart){
-        this.set(hasContractedEdgesName, false);     
+        this.set(hasContractedEdgesName, false);
       }
       this.get(edgeType)
         .each(function(dep) {
@@ -40,7 +40,7 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         this.set(hasContractedEdgesName, true);
       }
       this.get(edgeType)
-        .each(function(edge){          
+        .each(function(edge){
           edge.set("isContracted", true);
           var srcNode = edge.get(edgeEnding);
           if (pvt.nodeShouldBeContracted.call(srcNode, otherEdgeType)){
@@ -51,10 +51,10 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         });
     };
 
-    
+
     return DetailedNodeModel.extend({
       collFields: ["questions", "dependencies", "outlinks", "resources"],
-      
+
       txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
 
       defaults: function() {
@@ -72,14 +72,14 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
             attrs = thisModel.attributes,
             attrib,
             retObj = {};
-        
+
         // handle flat attributes
         for (attrib in attrs) {
           if (attrs.hasOwnProperty(attrib) && thisModel.collFields.indexOf(attrib) === -1) {
             retObj[attrib] = thisModel.get(attrib);
           }
         }
-        
+
         // handle collection attributes (don't pass outlinks -- redundant)
         var dependencies = [];
         thisModel.get("dependencies").forEach(function(dep) {
@@ -96,13 +96,6 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         retObj.questions = thisModel.get("questions").toJSON();
 
         return retObj;
-      },
-
-      /**
-       * @return {boolean} true if the node is visible
-       */
-      isVisible: function(){
-        return !this.get("isContracted");
       },
 
       /**
@@ -143,7 +136,7 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
 
       expandOLs: function(notStart){
         pvt.expandFromNode.call(this, notStart, "hasContractedOLs", "outlinks", "target");
-      }            
+      }
     }); // end DetailedNodeModel.extend(
   })(); // end private function
   return EditableNode;

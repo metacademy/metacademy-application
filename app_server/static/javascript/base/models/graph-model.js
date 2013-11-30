@@ -5,6 +5,7 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
 
     defaults: function(){
       return {
+        root: null, // TODO make this more general (multiple roots)
         edges: new BaseEdgeCollection(),
         nodes: new BaseNodeCollection()
       };
@@ -14,6 +15,51 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
       this.edgeModel = this.get("edges").model;
       this.nodeModel = this.get("nodes").model;
       this.postinitialize();
+    },
+
+    url: function(){
+      var root = this.get("root");
+      if (!root){
+        throw new Error("Must set graph root in graph-model to fetch graph data");
+      }
+      return window.CONTENT_SERVER + "/dependencies?concepts=" + this.get("root");
+    },
+
+    parse: function(resp, xhr){
+      var thisGraph = this,
+          deps = [],
+          nodes = resp.nodes,
+          tag = this.get("root"),
+          nodeTag;
+      for (nodeTag in nodes) {
+        if (nodes.hasOwnProperty(nodeTag)) {
+          var tmpNode = nodes[nodeTag];
+          tmpNode.sid = tmpNode.id;
+          tmpNode.id = nodeTag;
+
+          // contract the incoming graph
+          // tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
+//          if (tag === tmpNode.tag) {
+            tmpNode.x = 400; // TODO come up with better solution
+            tmpNode.y = 100;
+            // tmpNode.hasContractedDeps = true;
+            // tmpNode.isContracted = false;
+//          }
+
+          // parse deps separately (outlinks will be readded)
+          tmpNode.dependencies.forEach(function(dep){
+            deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, from_tag: dep.from_tag, to_tag: dep.to_tag});
+          });
+          delete tmpNode.dependencies;
+          delete tmpNode.outlinks;
+          thisGraph.addNode(tmpNode);
+        }
+      }
+      deps.forEach(function(dep){
+        thisGraph.addEdge(dep);
+      });
+      //thisGraph.optimizePlacement();
+      thisGraph.trigger("loadedServerData"); // TODO use "sync" events instead (they're standard)
     },
 
     // override in subclass
@@ -31,43 +77,9 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
      * TODO handle id problems
      */
     addServerDepGraphToGraph: function(tag) {
+      // FIXME this should be integrated into the fetch role -- this is hacky!
       var thisGraph = this;
-      $.getJSON(window.CONTENT_SERVER + "/dependencies?concepts=" + tag, function(resp){
-        var deps = [],
-            nodes = resp.nodes,
-            nodeTag;
-        for (nodeTag in nodes) {
-          if (nodes.hasOwnProperty(nodeTag)) {
-            var tmpNode = nodes[nodeTag];
-            tmpNode.sid = tmpNode.id;
-            tmpNode.id = nodeTag;
-
-            // contract the incoming graph
-            tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
-            if (tag === tmpNode.tag) {
-              tmpNode.x = 100;
-              tmpNode.y = 100;
-              tmpNode.hasContractedDeps = true;
-              tmpNode.isContracted = false;
-            }
-
-            // parse deps separately (outlinks will be readded)
-            tmpNode.dependencies.forEach(function(dep){
-              deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, isContracted: true});
-            });
-            delete tmpNode.dependencies;
-            delete tmpNode.outlinks;
-            thisGraph.addNode(tmpNode);
-          }
-        }
-        deps.forEach(function(dep){
-          thisGraph.addEdge(dep);
-        });
-        thisGraph.trigger("loadedServerData");
-      })
-        .fail(function(){
-          console.err("Unable to obtain dependency graph for " + tag); // FIXME
-        });
+      $.getJSON(window.CONTENT_SERVER + "/dependencies?concepts=" + tag, thisGraph.parse);
     },
 
     /**
@@ -112,8 +124,8 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
       });
 
       var layout = dagre.layout()
-            .rankSep(100)
-            .nodeSep(20)
+            .rankSep(80)
+            .nodeSep(60) // TODO move defaults to consts
             .rankDir("BT").run(dagreGraph);
 
       // determine average x and y movement
@@ -148,6 +160,14 @@ define(["jquery", "backbone", "dagre", "base/collections/edge-collection", "base
         node.set("y", inp.y + transY);
       });
     },
+
+    /**
+     * @return <boolean> true if the graph is populated
+     */
+     isPopulated: function(){
+       return this.getEdges().length > 0 || this.getNodes().length > 0;
+     },
+
 
     /**
      * Get a nodes from the graph

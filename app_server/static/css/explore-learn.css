@@ -32,8 +32,8 @@ body {
     -webkit-box-shadow: 1px 1px 2px #463838;
     -moz-box-shadow: 1px 1px 2px #463838;
     box-shadow: 1px 1px 2px #463838;
-    -webkit-border-radius: 5px;  
-    -moz-border-radius: 5px;  
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
     border-radius: 5px;
     border: 2px #5C4A56 solid;
     background-color: transparent;
@@ -180,7 +180,7 @@ body {
     float: left;
     border-right: 1px solid #333;
     -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;   
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
     overflow: auto;
     height: inherit;
@@ -233,7 +233,7 @@ body {
 }
 
 .node-detail-view{
-   background-color: white; 
+   background-color: white;
    color: #23240D;
    padding: 0.3em 0 1em 1.5em;
    width: 75%;
@@ -376,7 +376,7 @@ h1 .learn-view-star{
     font-size: 0.8em;
 }
 
-.more-resource-info{ 
+.more-resource-info{
     display: inline-block;
     cursor: pointer;
 }
@@ -496,7 +496,7 @@ h1 .learn-view-star{
     overflow: auto;
     font-size: 1em;
     line-height: 1.4em;
-    max-height: 12em; 
+    max-height: 12em;
     min-height: 4em;
     border-radius: 0.7em 0.7em;
     -moz-box-sizing: border-box; /* Firefox */
@@ -589,131 +589,6 @@ h1 .learn-view-star{
     box-shadow: none;
 }
 
-/* ---------------------------------------------------*/
-/* ---------->>> Explore Graph Svg Style<<<-----------*/
-/* ---------------------------------------------------*/
-
-/* set default properties for common svg elements */
-line, polygon, path {
-    stroke: #333333;
-    fill: #333333;
-}
-
-/* edge path in digraph */
-path {
-    stroke-width: 4;
-    fill: transparent;
-}
-
-/* node ellipse */
-ellipse{
-    stroke: #333333;
-    stroke-width: 3;
-    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
-}
-.hovered ellipse{
-    fill: #f1f3f9;
-}
-.clicked ellipse{
-    fill: #f1f3f9;
-}
-
-.node {
-    cursor: default;
-}
-.node text{
-    font-family: "Lato", Arial, sans-serif;
-    font-weight: bold;
-    font-size: 1.2em;
-    stroke-width: 0;
-    fill: #333
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* node e-to-l icon */
-.e-to-l-icon{
-    opacity: 0.3;
-    visibility: hidden;
-}
-
-.e-to-l-icon:hover{
-    opacity: 1;
-    cursor: pointer;
-}
-
-/* node star */
-.node-star polygon{
-   fill: transparent;
-   stroke: #868686;
-   stroke-width: 20;
-   visibility: hidden;
-}
-.node-star-hovered polygon{
-    fill: #D4C4E7;
-    Stroke: #56574D;
-}
-.node-starred .node-star polygon{
-   fill: #F8F8C9;
-   stroke: #56574D;
-}
-
-/* completed checkmark for learned nodes */
-.checkmark path{
-    fill: transparent;
-    stroke: #868686;
-    stroke-width: 4;
-    visibility: hidden;
-}
-.checkmark circle{
-    fill: transparent;
-    stroke: #868686;
-    stroke-width: 3;
-    visibility: hidden;
-}
-.node-learned .checkmark circle{
-    fill: transparent;
-    stroke: #759466;
-    stroke-width: 4;
-    visibility: visible;
-}
-
-.checkmark-hovered circle{
-   fill: transparent;
-   stroke: #9987AF;
-   stroke-width: 4;
-   visibility: visible;
-}
-
-
-.checkmark-hovered path{
-    stroke-width: 5;
-    stroke: #9987AF;
-    visibility: visible;
-}
-
-.node-learned .checkmark path{
-    stroke-width: 5;
-    stroke: #759466;
-    visibility: visible;
-}
-.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle, .hovered .node-star polygon, .clicked .node-star-polygon, .node-starred polygon, .hovered .e-to-l-icon{
-    visibility: visible;
-}
-/* properties for learned nodes */
-.node-learned{
-    opacity: 0.5;
-}
-
-.implicit-learned{
-    opacity: 0.6;
-}
-
-
 .small-vp-button{
     display: none;
     cursor: pointer;
@@ -735,7 +610,7 @@ ellipse{
     border-radius: 5px 5px 0 0;
     border-width: 1px 1px 0 1px;
     -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;   
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 #apptools-button.expanded{

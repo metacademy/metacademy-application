@@ -1,0 +1,70 @@
+/* Concept Gs */
+.concept-g{
+    cursor: default;
+}
+
+.concept-g text{
+    pointer-events: none;
+    font-family: "Lato", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 0.8em;
+    stroke-width: 0;
+    fill: #333
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+.concept-g circle{
+    stroke: #333333;
+    stroke-width: 2px;
+    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
+}
+
+.concept-g:hover circle{
+    fill: #ECF6FF;
+}
+
+.selected circle{
+    fill: rgb(250, 232, 255);
+}
+.selected:hover circle{
+    fill: rgb(250, 232, 255);
+}
+
+
+ /* Path Gs */
+marker{
+    fill: #333;
+}
+
+path.link.hidden{
+    stroke-width: 0;
+}
+
+.selected path.link {
+    stroke: rgb(229, 172, 247);
+}
+
+
+path.link {
+    fill: transparent;
+    stroke: #333;
+    stroke-width: 2px;
+    cursor: default;
+}
+
+path.link-wrapper{
+    fill: none;
+    stroke: rgb(22, 76, 216);
+    stroke-width: 24px;
+    opacity: 0;
+}
+
+path.link-wrapper:hover{
+    opacity: 0.15;
+}

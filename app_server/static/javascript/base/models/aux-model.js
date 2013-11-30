@@ -1,3 +1,4 @@
+/*global define*/
 define(["backbone", "underscore", "base/collections/node-collection"], function(Backbone, _, NodeCollection){
   /**
    * AuxModel: model to store all auxiliary information used throughout metacademy
@@ -30,7 +31,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
     };
 
     return Backbone.Model.extend({
-      
+
       defaults: {
         depRoot: undefined,
         titles: {},
@@ -44,7 +45,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
           learnedTrigger: "change:learnedConcepts"
         };
       },
-      
+
       /**
        * parse aux data (data should be bootstrapped rather than ajaxed)
        */
@@ -54,11 +55,11 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
         }
 
         var retObj = this.defaults;
-        
+
         // depending on how aux is initialized, these may already be defined
         var nodes = retObj.nodes,
             shortcuts = retObj.shortcuts;
-        
+
         if (resp.hasOwnProperty("nodes")) {
           nodes.add(resp.nodes, {parse: true});
         }
@@ -79,9 +80,9 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
             gConsts = this.getConsts(),
             learnedTrigger = gConsts.learnedTrigger,
             starredTrigger = gConsts.starredTrigger;
-        
+
         thisModel.userModel = usm;
-        
+
         thisModel.listenTo(usm, learnedTrigger, function(nodeTag, nodeSid, status){
           thisModel.resetEstimates();
           thisModel.trigger(learnedTrigger, nodeTag, nodeSid, status);
@@ -156,7 +157,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
         }
         return false;
       },
-      
+
       /* Finds all (learned) dependendcies of input "tag" */
       computeAllDependencies: function(tag, isShortcut, onlyUnlearned){
         var nodes =  this.get("nodes"),
@@ -183,7 +184,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
         if (dependenciesObj.hasOwnProperty(tag)) {
           return dependenciesObj[tag];
         }
-        
+
         var result = [];
         dependenciesObj[tag] = result;     // so that we don't get into an infinite loop if there's a cycle
 
@@ -201,7 +202,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
       },
 
       /**
-       * Finds the unlearned dependencies of a concept with tag 'tag' 
+       * Finds the unlearned dependencies of a concept with tag 'tag'
        */
       computeUnlearnedDependencies: function(tag, isShortcut){
         return this.computeAllDependencies(tag, isShortcut, true);
@@ -255,7 +256,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
 
           pvt.timeEstimates[tag] = total;
         }
-        
+
         return pvt.timeEstimates[tag];
       },
 
@@ -263,7 +264,7 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
        * Get node display title from id
        */
       getTitleFromId: function(nid){
-        return this.get("titles")[nid]; 
+        return this.get("titles")[nid];
       }
     });
   })();

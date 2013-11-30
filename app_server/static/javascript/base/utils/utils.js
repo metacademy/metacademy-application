@@ -32,19 +32,6 @@ define(["jquery"], function($){
   };
 
   /**
-   * Get spatial information about input dom element that contains an svg ellipse
-   */
-  utils.getSpatialNodeInfo = function(inNode) {
-    var ellp = inNode.getElementsByTagName("ellipse")[0];
-    return {
-      cx: Number(ellp.getAttribute("cx")),
-      cy: Number(ellp.getAttribute("cy")),
-      ry: Number(ellp.getAttribute("ry")),
-      rx: Number(ellp.getAttribute("rx"))
-    };
-  };
-
-  /**
    * Simulate html/mouse events
    * modified code from http://stackoverflow.com/questions/6157929/how-to-simulate-mouse-click-using-javascript
    */

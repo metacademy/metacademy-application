@@ -1,4 +1,4 @@
-/*
+/*global define
  This file contains the node model, which contains the data for each concept TODO should this be renamed "concept-model"?
  */
 
@@ -28,7 +28,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
       },
 
       collFields: ["dependencies", "outlinks"],
-      
+
       txtFields: ["id", "sid", "title", "summary", "is_shortcut", "time"],
 
       /**
@@ -40,6 +40,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
           return {};
         }
         var output = this.defaults();
+
         // ---- parse the text values ---- //
         var i = this.txtFields.length;
         while (i--) {
@@ -96,7 +97,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
         thisModel.isLearned = function(){
           return window.agfkGlobals.auxModel.conceptIsLearned(thisModel.id);
         };
-        
+
         thisModel.getImplicitLearnStatus = function(){
           return nodePvt.implicitLearn;
         };
@@ -104,7 +105,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
         thisModel.getVisibleStatus = function(){
           return nodePvt.visible;
         };
-        
+
         thisModel.getCollFields = function(){
             return thisModel.collFields;
         };
@@ -140,8 +141,8 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
       },
 
       /**
-       * Obtain (and optionally return) a list of the ancestors of this node 
-       * side effect: creates a list of unique dependencies (dependencies not present as an 
+       * Obtain (and optionally return) a list of the ancestors of this node
+       * side effect: creates a list of unique dependencies (dependencies not present as an
        * ancestor of another dependency) which is stored in this.uniqueDeps
        */
       getAncestors: function(noReturn){
@@ -162,14 +163,14 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
       getAncestors: function(ulOnly){
         var thisModel = this;
         if (!thisModel.ancestors || ulOnly){
-          
+
           var ancests = {},
               coll = this.collection,
               aux = window.agfkGlobals.auxModel;
         thisModel.get("dependencies").each(function(dep){
           var depId = dep.get("from_tag");
           if (!ulOnly || !aux.conceptIsLearned(depId)){
-            var depNode = coll.get(depId),            
+            var depNode = coll.get(depId),
                 dAncests = depNode.getAncestors(ulOnly);
             for (var dAn in dAncests){
               if(dAncests.hasOwnProperty(dAn)){
@@ -196,7 +197,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
       getUniqueDeps: function(ulOnly){
         var thisModel = this,
             allDeps = thisModel.get("dependencies").pluck("from_tag"),
-            thisColl = thisModel.collection, 
+            thisColl = thisModel.collection,
             ulDeps = {},
             ulUniqueDeps = {},
             ulAcest,
@@ -206,7 +207,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
             if (!ulOnly || !thisColl.get(dep).isLearnedOrImplicitLearned()){
               ulDeps[dep] = 1;
               ulUniqueDeps[dep] = 1;
-            } 
+            }
           });
 
         // for each unlearned ancestor, check if any of its ancestors are in the unlearned ancestor list
@@ -254,4 +255,3 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
     });
   })();
 });
-

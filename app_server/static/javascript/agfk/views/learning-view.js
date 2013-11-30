@@ -3,6 +3,7 @@
  * after the models and collections
  */
 
+/*global define*/
 
 define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbone, _, $, Utils){
   "use strict";
@@ -928,7 +929,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
       /**
        * Return true if the view has been rendered
        */
-      isRendered: function(){
+      isViewRendered: function(){
         return pvt.isRendered;
       }
     });

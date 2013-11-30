@@ -20,7 +20,7 @@
  * + d3 should handle all svg-related events, while backbone should handle all other events
  * + use handleNewPaths and handleNewCircles to attach listeners during calls to render
  */
-window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone, d3, _) {
+window.define(["base/utils/utils", "backbone", "d3", "underscore"], function(Utils, Backbone, d3, _) {
 
   /**********************
    * private class vars *
@@ -63,7 +63,7 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
     .x(function(d) {return d.x === undefined ? d.get("x") : d.x;})
     .y(function(d) {return d.y === undefined ? d.get("y") : d.y;})
     .interpolate('bundle')
-    .tension(1);
+    .tension(0.85);
 
   /*******************
    * private methods *
@@ -97,11 +97,6 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
     // svg nodes and edges
     thisView.gPaths = d3SvgG.append("g").selectAll("g");
     thisView.gCircles = d3SvgG.append("g").selectAll("g");
-
-    // svg listeners
-    d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
-    d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
-
   };
 
   // from http://bl.ocks.org/mbostock/3916621
@@ -133,9 +128,15 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
 
   pvt.getEdgePath = function(d){
     var pathPts = [].concat(d.get("middlePts"));
-    pathPts.unshift(d.get("source"));
     // TODO only compute if node position changed
-    pathPts.push(pvt.computeEndPt(pathPts[pathPts.length-1], d.get("target")));
+    var srcPt = d.get("source"),
+        targetPt = d.get("target"),
+//        secPt = pathPts.length ? pathPts[0] : targetPt,
+        penUltPt = pathPts.length ? pathPts[pathPts.length - 1] : srcPt;
+//    var srcEndPt = pvt.computeEndPt(srcPt, secPt).source,
+    var targetEndPt = pvt.computeEndPt(penUltPt, targetPt).target;
+    pathPts.unshift(srcPt);
+    pathPts.push(targetEndPt);
     return pvt.d3Line(pathPts);
   };
 
@@ -143,15 +144,15 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
   pvt.computeEndPt = function (src, tgt){
     var srcX = src.x === undefined ? src.get("x") : src.x,
         srcY =  src.y === undefined ? src.get("y") : src.y,
-        tgtX = tgt.get("x"),
-        tgtY = tgt.get("y"),
+        tgtX = tgt.x === undefined ? tgt.get("x") : tgt.x,
+        tgtY =  tgt.y === undefined ? tgt.get("y") : tgt.y,
         ratio = Math.pow((srcY - tgtY)/(srcX - tgtX), 2),
         r = pvt.consts.nodeRadius,
         offX = r/Math.sqrt(1 + ratio) * (srcX > tgtX ? -1 : 1),
         offY = r/Math.sqrt(1 + 1/ratio) * (srcY > tgtY ? -1 : 1);
 
     // keep source at origin since we don't have an end marker
-    return {x: tgtX - offX, y: tgtY - offY};
+    return {source: {x: srcX + offX, y: srcY + offY}, target: {x: tgtX - offX, y: tgtY - offY}};
   };
 
 
@@ -190,6 +191,8 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
     render: function() {
       var thisView = this,
           consts = pvt.consts;
+
+      thisView.isRendered = false;
 
       if (thisView.isFirstRender) {
         pvt.firstRenderBase.call(thisView);
@@ -297,10 +300,15 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
             .append("g");
 
       newGs.classed(consts.circleGClass, true)
-        .attr("id", function (d) { thisView.getCircleGId (d); })
+        .attr("id", function (d) { return thisView.getCircleGId(d); })
         .attr("transform", function(d){return "translate(" + d.get("x") + "," + d.get("y") + ")";})
         .append("circle")
         .attr("r", consts.nodeRadius);
+      newGs.each(function(d){
+          Utils.insertTitleLinebreaks(d3.select(this), d.get("title"));
+        });
+
+
 
       thisView.handleNewCircles(newGs);
 
@@ -309,7 +317,7 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
       //***********
       thisView.postrender();
       //***********
-      thisView.isRendered = false;
+      thisView.isRendered = true;
     },
 
     /**
@@ -321,13 +329,14 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
      * @param <id> noMoveNodeId: node id of node that should not move during optimization
      * note: noMoveNodeId has precedent over minSSDist
      */
-    optimizeGraphPlacement: function(minSSDist, noMoveNodeId) {
+    optimizeGraphPlacement: function(doRender, minSSDist, noMoveNodeId) {
       var thisView = this;
       thisView.state.doCircleTrans = true;
       thisView.state.doPathsTrans = true;
       thisView.model.optimizePlacement(pvt.consts.nodeRadius, minSSDist, noMoveNodeId);
-      thisView.render();
-
+      if (doRender) {
+        thisView.render();
+      }
     },
 
     /**
@@ -353,8 +362,11 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
      *
      * @return <string> the id of circleG
      */
-    getCircleGId: function  (nodeModel) {
-      return pvt.consts.circleGIdPrefix + nodeModel.id;
+    getCircleGId: function  (nodeModelOrId) {
+      if (nodeModelOrId.id !== undefined){
+        nodeModelOrId = nodeModelOrId.id;
+      }
+      return pvt.consts.circleGIdPrefix + nodeModelOrId;
     },
 
     /**
@@ -379,7 +391,7 @@ window.define(["backbone", "d3", "underscore",  "filesaver"], function(Backbone,
     /**
      * Return true if the view has been rendered
      */
-    isRendered: function(){
+    isViewRendered: function(){
       return this.isRendered;
     },
 

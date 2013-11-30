@@ -1,8 +1,9 @@
-define(["backbone"], function(Backbone){ 
+/*global define*/
+define(["backbone"], function(Backbone){
   "use strict";
 
   /**
-   * Simple error view 
+   * Simple error view
    */
   var pvt = {};
   pvt.viewConsts = {
@@ -22,15 +23,15 @@ define(["backbone"], function(Backbone){
     button.textContent = "close message";
     return button;
   };
-  
+
   pvt.isRendered = false;
-  
+
   return Backbone.View.extend({
     className: pvt.viewConsts.errorWrapClass,
     events: {
       "click .close-error-message": "close"
     },
-    
+
     /**
      * Initialize the view
      * inp.errorType: type of error (see viewConsts *Key)
@@ -42,7 +43,7 @@ define(["backbone"], function(Backbone){
         this.extra = inp.extra;
       }
     },
-    
+
     /**
      * Render the error view
      * inp.errorType: type of error (see viewConsts *Key)
@@ -80,14 +81,14 @@ define(["backbone"], function(Backbone){
       thisView.$el.append(pel);
       thisView.$el.append(pvt.getCloseMessageEl());
       pvt.isRendered = true;
-      
+
       return thisView;
     },
 
     /**
      * Return true if the view has been rendered
      */
-    isRendered: function(){
+    isViewRendered: function(){
       return pvt.isRendered;
     },
 

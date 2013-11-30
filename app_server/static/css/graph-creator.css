@@ -3,8 +3,8 @@
     overflow-y: scroll;
 }
 
-p{ 
-     text-align: center; 
+p{
+     text-align: center;
      overflow: overlay;
      position: relative;
 }
@@ -71,31 +71,7 @@ body{
     margin: 0 0.5em;
 }
 
-.concept-g text{
-    pointer-events: none;
-}
-
-marker{
-    fill: #333;
-}
-
-g.concept-g circle{
-    fill: #F6FBFF;
-    stroke: #333;
-    stroke-width: 2px;
-}
-
-g.concept-g:hover circle{
-    fill: #ECF6FF;
-}
-
-g.selected circle{
-    fill: rgb(250, 232, 255);
-}
-g.selected:hover circle{
-    fill: rgb(250, 232, 255);
-}
-
+/* Graph editor specific styles */
 g.concept-g circle.to-edit-circle{
     fill: #C2DBFC;
     display: none;
@@ -105,37 +81,9 @@ g.concept-g.hover-g circle.to-edit-circle{
     display: block;
 }
 
-path.link {
-    fill: none;
-    stroke: #333;
-    stroke-width: 2px;
-    cursor: default;
-}
-
-path.link-wrapper{
-    fill: none;
-    stroke: rgb(22, 76, 216);
-    stroke-width: 24px;
-    opacity: 0;
-}
-
-path.link-wrapper:hover{
-    opacity: 0.15;
-}
-
-
 g.connect-node circle{
     fill: #BEFFFF;
 }
-
-path.link.hidden{
-    stroke-width: 0;
-}
-
-.selected path.link {
-    stroke: rgb(229, 172, 247);
-}
-
 
 /***************************
 *** Editable Content CSS ***

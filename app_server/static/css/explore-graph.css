@@ -1,0 +1,96 @@
+
+
+/* properties for learned nodes */
+.node-learned.concept-g > circle, .implicit-learned.concept-g > circle{
+    stroke: #868686;;
+}
+
+.node-learned text, .implicit-learned text{
+    fill: #868686;
+}
+
+/*********
+ node icons
+**********/
+/* checkmark */
+.concept-g .checkmark{
+    cursor: pointer;
+}
+.concept-g .checkmark path{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 4;
+    visibility: hidden;
+}
+.concept-g .checkmark circle{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 3;
+    visibility: hidden;
+}
+.concept-g .node-learned .checkmark circle{
+    fill: transparent;
+    stroke: #759466;
+    stroke-width: 4;
+    visibility: visible;
+}
+
+.concept-g .checkmark.hovered circle{
+    fill: transparent;
+    stroke: #9987AF;
+    stroke-width: 4;
+    visibility: visible;
+}
+
+.concept-g .checkmark.hovered path{
+    stroke-width: 5;
+    stroke: #9987AF;
+    visibility: visible;
+}
+
+.concept-g.node-learned .checkmark circle{
+    visibility: visible;
+    stroke: #759466;
+    stroke-width: 4;
+}
+
+.concept-g.node-learned .checkmark path{
+    stroke-width: 5;
+    stroke: #759466;
+    visibility: visible;
+}
+.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle, .hovered .node-star polygon, .clicked .node-star-polygon, .node-starred polygon, .hovered .e-to-l-icon{
+    visibility: visible;
+}
+
+/* star */
+.node-star{
+    cursor:pointer;
+}
+
+.node-star polygon{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 20;
+    visibility: hidden;
+}
+.node-star.hovered polygon{
+    fill: #D4C4E7;
+    Stroke: #56574D;
+}
+.node-star.node-starred polygon{
+    fill: #F8F8C9;
+    stroke: #56574D;
+}
+
+/* node e-to-l icon */
+.e-to-l-icon{
+    opacity: 0.3;
+    visibility: hidden;
+}
+
+.e-to-l-icon:hover{
+    opacity: 1;
+    cursor: pointer;
+
+}

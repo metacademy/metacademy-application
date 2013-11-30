@@ -19,7 +19,7 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
       disabledClass: "disabled",
       viewId: "apptools"
     };
-    pvt.numVisLearned = 0;
+    pvt.numVisLearned = 0; // FIXME don't define instance vars on private
     pvt.numLearned = 0;
 
     /**
@@ -131,8 +131,8 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
       /**
        * Return true if the view has been rendered
        */
-      isRendered: function(){
-        return pvt.isRendered();
+      isViewRendered: function(){
+        return pvt.isRendered;
       },
 
       /**

@@ -119,6 +119,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
   };
 
   // add node icons (e.g. expand/contract) to the circle
+  // TOMOVE exp and cont icons should be in graph view
   pvt.addNodeIcons = function(thisView, d){
     if (!d.isVisible()) return;
 
@@ -195,6 +196,10 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
     var thisView = this,
         d3Svg = thisView.d3Svg,
         d3SvgG = thisView.d3SvgG;
+
+      // svg listeners
+      d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
+      d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
 
     // displayed when dragging between nodes
     thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")
@@ -324,14 +329,9 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
             thisView.state.toNodeEdit = true;
-            document.location = document.location.pathname + "#/edit=" + d.get("id");
+            document.location = document.location.pathname + "#edit=" + d.get("id");
           }
         });
-
-      newGs.each(function(d){
-        Utils.insertTitleLinebreaks(d3.select(this), d.get("title"));
-      });
-
 
       thisView.gCircles.each(function(d){
         pvt.addNodeIcons.call(this, thisView, d);

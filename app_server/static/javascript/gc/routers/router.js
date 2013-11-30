@@ -1,9 +1,9 @@
-window.define(["jquery", "backbone", "gc/views/editor-graph-view", "gc/models/editable-graph-model", "gc/views/concept-editor-view", "agfk/views/explore-graph-view"], function($, Backbone, GraphEditorView, EditableGraphModel, ConceptEditorView, ExploreGraphView){
+window.define(["jquery", "backbone", "gc/views/editor-graph-view", "gc/models/editable-graph-model", "gc/views/concept-editor-view", "agfk/views/explore-graph-view", "agfk/models/explore-graph-model"], function($, Backbone, EditableGraphView, EditableGraphModel, ConceptEditorView, ExploreGraphView, ExploreGraphModel){
   return Backbone.Router.extend({
     routes: {
       "": "showGCEditor",
-      "/preview": "previewGraph",
-      "/edit=:nodeid": "openEditorView"
+      "preview": "previewGraph",
+      "edit=:nodeid": "openEditorView"
     },
 
     // function to handle non-ge-view switching
@@ -29,7 +29,7 @@ window.define(["jquery", "backbone", "gc/views/editor-graph-view", "gc/models/ed
       var thisRoute = this;
       if (thisRoute.currentView){
         thisRoute.currentView.$el.parent().hide();
-        thisRoute.currentView.remove(); // must implement remove function
+        thisRoute.currentView.remove(); // must implement remove function TODO do we want to always remove the view?
       }
       thisRoute.currentView = null;
     },
@@ -43,15 +43,17 @@ window.define(["jquery", "backbone", "gc/views/editor-graph-view", "gc/models/ed
         thisRoute.geModel = new EditableGraphModel();
 //        thisRoute.geModel.addServerDepGraphToGraph("adaptive_rejection_sampling");
       }
-      thisRoute.geView = this.geView || new GraphEditorView({model: thisRoute.geModel});
+      thisRoute.geView = this.geView || new EditableGraphView({model: thisRoute.geModel});
       thisRoute.geView.render();
       thisRoute.geView.$el.show();
     },
 
     previewGraph: function () {
-      // need to pull in the explore view now...
-
-      // and pass the graph to it
+      var thisRoute = this;
+      thisRoute.removeOtherView();
+      thisRoute.gePreviewModel = new ExploreGraphModel();
+      thisRoute.gePreviewView = new ExploreGraphView({model: thisRoute.gePreviewModel});
+      // and pass the graph to it ?
     },
 
     openEditorView: function(concept_id){

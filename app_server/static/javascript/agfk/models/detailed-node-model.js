@@ -1,3 +1,4 @@
+/*global define*/
 define(["underscore", "base/models/node-model", "base/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
 
   var pvt = {};
@@ -14,8 +15,9 @@ define(["underscore", "base/models/node-model", "base/collections/node-property-
   };
 
   var DetailedNode = Node.extend({
+      // FIXME these shouldn't be hardcoded
       collFields: ["questions", "dependencies", "outlinks", "resources"],
-      
+
       txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "hasContractedDeps", "hasContractedOLs"],
 
     defaults: function(){
@@ -30,14 +32,15 @@ define(["underscore", "base/models/node-model", "base/collections/node-property-
         x: 0,
         y: 0,
         isContracted: false,
-        hasContractedDeps: false, 
+        hasContractedDeps: false,
         hasContractedOLs: false
       };
       return _.extend({}, Node.prototype.defaults(), dnDefaults);
     },
-    
+
     /**
      * Wrap a long string to avoid elongated graph nodes. Translated/modified from server technique
+     * TOMOVE this should go in utils FIXME TODO
      */
     wrapNodeText: function(s, width) {
       if (!s) {
@@ -72,7 +75,15 @@ define(["underscore", "base/models/node-model", "base/collections/node-property-
         this.nodeDisplayTitle = this.wrapNodeText(title, numCharNodeLine || 9);
       }
       return this.nodeDisplayTitle;
+    },
+
+    /**
+     * @return {boolean} true if the node is visible
+     */
+    isVisible: function(){
+      return !this.get("isContracted"); // TODO add learned/hidden properties as well
     }
+
   });
 
   return DetailedNode;

@@ -12,6 +12,8 @@
 
 {% block extra-css %}
 <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
+<link rel="stylesheet" href="{% static "css/graphs.css" %}"/>
+<link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
 <link rel="stylesheet" href="{% static "css/ionicons.css" %}"/>
 {% endblock %}
 
@@ -25,11 +27,11 @@
 
   <div id="learn-view-wrapper">
   </div>
-  <div id="explore-view-wrapper">
+  <div id="explore-graph-view-wrapper">
   </div>
   <div id="load-view-wrapper">
   </div>
-  
+
   {% include "node-title-view.html" %}
   {% include "node-detail-view.html" %}
   {% include "resource-view.html" %}
@@ -50,7 +52,7 @@
       el.parentElement.removeChild(el);
     </script>
 {% endblock %}
-  
+
   {% block jscript %}
     <script>
       window.agfkGlobals = {};
@@ -66,4 +68,3 @@
   <script src="{% static "javascript/agfk/main-built.js" %}"></script>
   {% endif %}
   {% endblock %}
-

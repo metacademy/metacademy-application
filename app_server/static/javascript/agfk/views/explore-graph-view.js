@@ -78,6 +78,16 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
     pvt.$hoverTxtButtonEl = $("#" + pvt.consts.hoverTextButtonsId);
 
+    /**
+     * return <function> isEdgeVisible function with correct "this"
+     * and transitivity not taken into account
+     */
+    pvt.getEdgeVisibleNoTransFun = function(){
+      var thisView = this;
+      return function(e){
+        return thisView.isEdgeVisible.call(thisView,  e, false);
+      };
+    };
 
     /**
      * Get summary box placement (top left) given node placement
@@ -366,6 +376,14 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
       /**
        * @Override
+       */
+      prerender: function () {
+        var thisView = this;
+        thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
+      },
+
+      /**
+       * @Override
        * setup the appropriate event listers -- this should probably be called on initial render?
        */
       firstRender: function(){
@@ -377,7 +395,6 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             gConsts = aux.getConsts(),
             thisModel = thisView.model;
 
-        thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
         var dzoom = d3.behavior.zoom();
         // make graph zoomable/translatable
         var vis = thisView.d3Svg
@@ -587,11 +604,25 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
       /**
        * @Override
-       * @return {boolean} true if the edge path is visible
+       * @param edge
+       * @param <boolean> useTrans: take into account transitivity? {default: true}
+       * @return <boolean> true if the edge path is visible
        */
-      isEdgeVisible: function(edge){
+      isEdgeVisible: function(edge, useVisTrans){
         var thisView = this;
-        return !edge.get("isContracted") && !edge.get("isTransitive") && (thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target")));
+        useVisTrans = useVisTrans === undefined ? true : useVisTrans;
+        return !edge.get("isContracted")
+          && (!useVisTrans || !thisView.isEdgeVisiblyTransitive(edge))
+          && (thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target")));
+      },
+
+      /**
+       * Determines if an edge is transitive given that other edges may be hidden
+       */
+      isEdgeVisiblyTransitive: function (edge) {
+        var thisView = this;
+        return edge.get("isTransitive")
+          && thisView.model.checkIfTransitive(edge, pvt.getEdgeVisibleNoTransFun.call(thisView));
       }
     }); // end Backbone.View.extend({
   })();

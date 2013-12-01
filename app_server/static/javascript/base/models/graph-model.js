@@ -2,15 +2,7 @@
 define(["jquery", "backbone", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, BaseEdgeCollection, BaseNodeCollection){
   var pvt = {};
 
-  /* private function */
-  pvt.checkIfTransitive = function(edge){
-    var thisGraph = this,
-        edgeSource = edge.get("source");
-    return edgeSource.get("outlinks").any(
-      function(ol){
-        return edge.id !== ol.id && thisGraph.isPathBetweenNodes(ol.get("target"), edgeSource);
-      });
-  };
+  pvt.alwaysTrue = function(){return true;};
 
   return Backbone.Model.extend({
 
@@ -112,16 +104,41 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
      },
 
     /**
+     * @param stNode: the start node
+     * @param endNode: the end node
+     * @param checkFun: an optional function that dermines whether an edge
+     * is valid (e.g. an "is visible" function --defaults to a tautological function)
      * @return <boolean> true if there is a directed path from stNode to endNode (follows outlinks from stNode)
      */
-    isPathBetweenNodes: function (stNode, endNode) {
+    isPathBetweenNodes: function (stNode, endNode, checkFun) {
       var thisView = this,
           outlinks = stNode.get("outlinks");
+      checkFun = checkFun || pvt.alwaysTrue;
       // DFS recursive search
       return outlinks.length > 0
         && outlinks.any(function(ol){
           var olTar = ol.get("target");
-          return olTar.id === endNode.id || thisView.isPathBetweenNodes(olTar, endNode);
+          return checkFun(ol) && (olTar.id === endNode.id || thisView.isPathBetweenNodes(olTar, endNode, checkFun));
+        });
+    },
+
+    /**
+     * Checks if an edge is transitive by performing a DFS on it's source
+     *
+     * @param edge: the edge to be checked
+     * @param checkFun: a function that returns a boolean value indiciating
+     * whether a given edge should be counted in the traversal
+     * (e.g. an "is visible" function --defaults to a tautological function)
+     * @return <boolean> true if the edge is transitive
+     */
+    checkIfTransitive: function(edge, checkFun){
+      var thisGraph = this,
+          edgeSource = edge.get("source"),
+          edgeTarget = edge.get("target");
+      checkFun = checkFun || pvt.alwaysTrue;
+      return edgeSource.get("outlinks").any(
+        function(ol){
+          return edge.id !== ol.id && thisGraph.isPathBetweenNodes(ol.get("target"), edgeTarget, checkFun);
         });
     },
 
@@ -240,8 +257,8 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
       edges.remove(edge);
 
       // possibly change transitivity relationships of transitive edges
-      edges.filter(function(e){return e.get("isTransitive")}).forEach(function(transEdge){
-        var isTrans = pvt.checkIfTransitive.call(thisGraph, transEdge);
+      edges.filter(function(e){return e.get("isTransitive");}).forEach(function(transEdge){
+        var isTrans = thisGraph.checkIfTransitive(transEdge);
         if (!isTrans){
           transEdge.set("isTransitive", false);
         }

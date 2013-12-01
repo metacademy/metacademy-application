@@ -39,43 +39,12 @@ define(["underscore", "base/models/node-model", "base/collections/node-property-
     },
 
     /**
-     * Wrap a long string to avoid elongated graph nodes. Translated/modified from server technique
-     * TOMOVE this should go in utils FIXME TODO
+     * @return {boolean} true if the node is visible
      */
-    wrapNodeText: function(s, width) {
-      if (!s) {
-        return '';
-      }
-      s = s.replace(/-/g, " ");
-      var parts = s.split(" "),
-          result = [],
-          resArr = [],
-          total = 0;
-
-      for (var i = 0; i < parts.length; i++) {
-        if (total + parts[i].length + 1 > width && total !== 0) {
-          resArr.push(result.join(" "));
-          result = [];
-          total = 0;
-        }
-        result.push(pvt.wbr(parts[i], width));
-        total += parts[i].length + 1;
-      }
-      resArr.push(result.join(" "));
-      return resArr.join("\\n");
-    },
-
-    /**
-     * returns and caches the node display title
-     */
-    getNodeDisplayTitle: function(numCharNodeLine){
-      if (!this.nodeDisplayTitle){
-        var title = this.get("title") || this.id.replace(/_/g, " ");
-        title += this.get("is_shortcut") ? " (shortcut)" : "";
-        this.nodeDisplayTitle = this.wrapNodeText(title, numCharNodeLine || 9);
-      }
-      return this.nodeDisplayTitle;
+    isVisible: function(){
+      return !this.get("isContracted"); // TODO add learned/hidden properties as well
     }
+
   });
 
   return DetailedNode;

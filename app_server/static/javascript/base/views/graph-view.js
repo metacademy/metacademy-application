@@ -227,6 +227,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
               edgePath = pvt.getEdgePath(d);
           d3el.selectAll("path." + consts.pathClass)
             .transition()
+            .duration(500)
             .attrTween("d", pvt.pathTween(edgePath, 4));
           d3el.selectAll("path." + consts.pathWrapClass)
             .attr("d", edgePath);
@@ -282,6 +283,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       if (thisView.state.doCircleTrans){
         thisView.gCircles
           .transition()
+          .duration(500)
           .attr("transform", function(d){
             return "translate(" + d.get("x") + "," + d.get("y") + ")";
           });

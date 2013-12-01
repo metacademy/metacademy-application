@@ -204,18 +204,13 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
       // (will be transitive if there is already a path from the edge source to the edge target)
       edge.isTransitive = thisGraph.isPathBetweenNodes(edge.source, edge.target);
 
-      // check if the new edge changes transitivity of other edges
-      // (We check all of the outlinks of edge.source
-      // For each outlink, if there is a path from edge.target to outlink.target
-      // then outlink is now transitive)
+      // check if the new edge changes transitivity of other edges FIXME this is a trivial check
+
       if (!edge.isTransitive) {
-        edge.source.get("outlinks").each(function (srcOL) {
-          var srcOLTarget = srcOL.get("target"),
-              depIsTrans = srcOL.get("isTransitive");
-          if (!depIsTrans) {
-            if (thisGraph.isPathBetweenNodes(edge.target, srcOLTarget)){
-              srcOL.set("isTransitive", true);
-            }
+        thisGraph.getEdges().filter(function(e){return !e.get("isTransitive");}).forEach(function(notTransEdge){
+          var isTrans = thisGraph.checkIfTransitive(notTransEdge);
+          if (isTrans){
+            notTransEdge.set("isTransitive", true);
           }
         });
       }

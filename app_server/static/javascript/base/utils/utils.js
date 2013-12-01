@@ -15,21 +15,55 @@ define(["jquery"], function($){
     return tag.replace(/_/g," ");
   };
 
-  /* insert svg line breaks: taken from
-   http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
-  utils.insertTitleLinebreaks = function (gEl, title) {
+
+  /**
+   * Simple function to break long strings and insert a hyphen (idea from http://ejohn.org/blog/injecting-word-breaks-with-javascript/)
+   * str: string to be potentially hyphenated
+   * num: longest accecptable length -1 (single letters will not be broken)
+   */
+  utils.wbr = function(str, num) {
+    return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
+      return text + "- " + ch;
+    });
+  };
+
+  /**
+   * insert svg line breaks: taken from
+   * http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
+   * TODO this function has become far too large & needs to be refactored
+   */
+  utils.insertTitleLinebreaks = function (gEl, title, splLen) {
     var words = title.split(/\s+/g),
-        nwords = words.length;
+        total = 0,
+        result = [],
+        resArr = [],
+        i;
+    splLen = splLen || 14;
+
+    // determine break points for words TODO shrink font if necessary
+    for (i = 0; i < words.length; i++) {
+      if (total + words[i].length + 1 > splLen && total !== 0) {
+        resArr.push(result.join(" "));
+        result = [];
+        total = 0;
+      }
+      result.push(words[i]);
+      total += words[i].length + 1;
+    }
+    resArr.push(result.join(" "));
+
     var el = gEl.append("text")
           .attr("text-anchor","middle")
-          .attr("dy", "-" + (nwords-1)*7.5);
+          .attr("dy", "-" + (resArr.length-1)*6.5);
 
-    for (var i = 0; i < words.length; i++) {
-      var tspan = el.append('tspan').text(words[i]);
+
+    for (i = 0; i < resArr.length; i++) {
+      var tspan = el.append('tspan').text(resArr[i]);
       if (i > 0)
         tspan.attr('x', 0).attr('dy', '15');
     }
   };
+
 
   /**
    * Simulate html/mouse events

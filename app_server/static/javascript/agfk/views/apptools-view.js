@@ -81,8 +81,10 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         // enable/disable the hide/show buttons
         thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.changeShowHideState);
         thisView.listenTo(aux, "change:learnedConcepts", thisView.handleChLearnStatus ); // listen for check clicks
-        thisView.listenTo(thisView.model.get("nodes"), "sync", function(){
-          thisView.model.get("nodes").each(function(node){
+
+        // FIXME probable initialization problem
+        thisView.listenTo(thisView.model, "sync", function(){
+          thisView.model.getNodes().each(function(node){
             if (aux.conceptIsLearned(node.id)){
               thisView.handleChLearnStatus(node.id, node.get("sid"), true);
             };

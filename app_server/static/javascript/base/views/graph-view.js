@@ -357,7 +357,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
 
       var layout = dagre.layout()
             .rankSep(80)
-            .nodeSep(100) // TODO move defaults to consts
+            .nodeSep(120) // TODO move defaults to consts
             .rankDir("BT").run(dagreGraph);
 
       // determine average x and y movement

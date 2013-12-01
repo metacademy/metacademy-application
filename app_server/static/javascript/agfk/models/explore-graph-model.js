@@ -6,7 +6,9 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
-   * FIXME this is an awkward model
+   * FIXME this is an awkward model and the logic belongs in a view! --
+   * CR: Aye- but it handles state information for the graph that dictates several views,
+   * also, if we add more settings/options we'll place them here
    */
   var GraphOptionsModel =  (function(){
     return Backbone.Model.extend({
@@ -29,7 +31,6 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
       }
     });
   })();
-
 
   /**
    * GraphData: model to store all graph related data

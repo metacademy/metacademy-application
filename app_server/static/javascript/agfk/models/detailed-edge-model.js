@@ -6,7 +6,8 @@ define(["backbone", "underscore", "base/models/edge-model"], function(Backbone, 
         source: {},
         target: {},
         middlePts: [],
-        isContracted: false
+        isContracted: false,
+        isTransitive: false
       };
       return _.extend({}, EdgeModel.prototype.defaults(), enDef);
     },

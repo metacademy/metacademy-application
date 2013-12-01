@@ -36,21 +36,21 @@ require.config({
       }
     },
     "sidr": ["jquery"]
-  },
+  }
 
-  urlArgs: 'bust=' + (new Date()).getTime()
+//  urlArgs: 'bust=' + (new Date()).getTime()
 });
- 
+
 require(['require', 'chai', 'mocha', 'jquery'], function(require, chai, mocha){
- 
+
   // Chai TODO is this needed
   window.should = chai.should();
- 
+
   require([
     'test/trivial-test',
     'test/gc/test-editable-graph'
   ], function(require) {
     mocha.run();
   });
- 
+
 });

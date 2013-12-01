@@ -96,7 +96,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
     /**
      * Adds the explore-to-learn node icons TODO shouldn't be a pvt fun
      */
-    pvt.addEToLIcon = function(d3node){
+    pvt.addEToLIcon = function(d, d3node){
       var thisView = this,
           viewConsts = pvt.consts;
 
@@ -105,7 +105,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             .attr("class", viewConsts.elIconClass)
             .attr("height", viewConsts.elIconHeight + "px")
             .attr("width", viewConsts.elIconWidth + "px")
-            .attr(viewConsts.dataConceptTagProp, d3node.attr("id"));
+            .attr(viewConsts.dataConceptTagProp, d.id);
 
       var numEls = d3node.selectAll("tspan")[0].length,
           elIconX = viewConsts.elIconXOffset,
@@ -301,7 +301,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
           // add e-to-l button if not already present
           if (d3node.select("." + viewConsts.elIconClass).node() === null){
-            pvt.addEToLIcon.call(thisView, d3node);
+            pvt.addEToLIcon.call(thisView, d, d3node);
           }
           d3node.attr(viewConsts.dataHoveredProp, true);
         }
@@ -392,6 +392,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             nodeLoc,
             d3event,
             currentScale;
+
         // helper function to redraw svg graph with correct coordinates
         function redraw() {
           // transform the graph
@@ -590,9 +591,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       isEdgeVisible: function(edge){
         var thisView = this;
-        return thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target"));
+        return !edge.get("isContracted") && !edge.get("isTransitive") && (thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target")));
       }
-
     }); // end Backbone.View.extend({
   })();
 

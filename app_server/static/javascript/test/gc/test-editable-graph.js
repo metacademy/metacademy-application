@@ -310,7 +310,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
         it('all nodes should be visible', function(){
           graphObj.getNodes().each(function(node){
-              (!node.get("isContracted")).should.equal(true);
+            (!node.get("isContracted")).should.equal(true);
           });
         });
 
@@ -352,7 +352,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
         it('all edges should be hidden', function(){
           graphObj.getEdges().each(function(edge){
-              (!edge.get("isContracted")).should.equal(false);
+            (!edge.get("isContracted")).should.equal(false);
           });
         });
 
@@ -365,20 +365,19 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
         it('all edges should be visible', function(){
           graphObj.getEdges().each(function(edge){
-              (!edge.get("isContracted")).should.equal(true);
+            (!edge.get("isContracted")).should.equal(true);
           });
         });
 
         it('all nodes should be visible', function(){
           graphObj.getNodes().each(function(node){
-              (!node.get("isContracted")).should.equal(true);
+            (!node.get("isContracted")).should.equal(true);
           });
         });
 
       });
 
     });
-
   }); // end describe('graph operations')
 
 
@@ -485,5 +484,68 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
     }); // end describe("import graph...
   }); // end describe ("graph IO..
 
+  describe('Graph Computations', function(){
+
+    describe('Transitivity of edges', function(){
+      it('gp to child should be transitive', function(){
+        graphObj.getEdge(edgeIds.grandparentToChild).get("isTransitive").should.equal(true);
+      });
+
+      it('all other edges should not be transitive', function(){
+        graphObj.getEdges().all(function(edge){
+          return edge.id === edgeIds.grandparentToChild || !edge.get("isTransitive");
+        }).should.equal(true);
+      });
+
+      it('should be able to add ggp node and edge to cousin', function(){
+        nodeIds.ggp = idCt++;
+        edgeIds.ggpToCousin = idCt++;
+        edgeIds.ggpToGp = idCt++;
+        graphObj.addNode({title: "ggp", id: nodeIds.ggp});
+        graphObj.addEdge({source: graphObj.getNode(nodeIds.ggp),
+                          target: graphObj.getNode(nodeIds.cousin),
+                          id: edgeIds.ggpToCousin,
+                          reason: "ggpToCousin is the reason for the test"});
+      });
+
+      it('new edge from ggp to cousin should not be transitive (ggp is not connected to gp)', function(){
+        graphObj.getEdge(edgeIds.ggpToCousin).get("isTransitive").should.equal(false);
+      });
+
+      it('after adding edge ggp-gp, ggp-cousin should be transitive', function(){
+        graphObj.addEdge({source: graphObj.getNode(nodeIds.ggp),
+                          target: graphObj.getNode(nodeIds.grandparent),
+                          id: edgeIds.ggpToGp, reason: "ggpToGp is the reason for the test"});
+        graphObj.getEdge(edgeIds.ggpToCousin).get("isTransitive").should.equal(true);
+      });
+
+      it('after removing edge ggp-gp, ggp-cousin should NOT be transitive', function(){
+        graphObj.removeEdge(edgeIds.ggpToGp);
+        graphObj.getEdge(edgeIds.ggpToCousin).get("isTransitive").should.equal(false);
+      });
+    });
+  }); // end     describe('Transitivity of edges', function(){
+
+  describe('Determining paths between nodes', function(){
+    it('should have a path between gp and child', function(){
+      graphObj.isPathBetweenNodes(graphObj.getNode(nodeIds.grandparent), graphObj.getNode(nodeIds.child)).should.equal(true);
+    });
+
+    it('should have a path between gp and cousin', function(){
+      graphObj.isPathBetweenNodes(graphObj.getNode(nodeIds.grandparent), graphObj.getNode(nodeIds.cousin)).should.equal(true);
+    });
+
+    it('should have a path between uncle and cousin', function(){
+      graphObj.isPathBetweenNodes(graphObj.getNode(nodeIds.uncle), graphObj.getNode(nodeIds.cousin)).should.equal(true);
+    });
+
+    it('should NOT have a path between child and gp', function(){
+      graphObj.isPathBetweenNodes(graphObj.getNode(nodeIds.child), graphObj.getNode(nodeIds.grandparent)).should.equal(false);
+    });
+
+    it('should NOT have a path between cousin and parent', function(){
+      graphObj.isPathBetweenNodes(graphObj.getNode(nodeIds.cousin), graphObj.getNode(nodeIds.parent)).should.equal(false);
+    });
+  });
 
 }); // end define

@@ -1,5 +1,16 @@
 /*global define */
 define(["jquery", "backbone", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, BaseEdgeCollection, BaseNodeCollection){
+  var pvt = {};
+
+  /* private function */
+  pvt.checkIfTransitive = function(edge){
+    var thisGraph = this,
+        edgeSource = edge.get("source");
+    return edgeSource.get("outlinks").any(
+      function(ol){
+        return edge.id !== ol.id && thisGraph.isPathBetweenNodes(ol.get("target"), edgeSource);
+      });
+  };
 
   return Backbone.Model.extend({
 
@@ -101,6 +112,20 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
      },
 
     /**
+     * @return <boolean> true if there is a directed path from stNode to endNode (follows outlinks from stNode)
+     */
+    isPathBetweenNodes: function (stNode, endNode) {
+      var thisView = this,
+          outlinks = stNode.get("outlinks");
+      // DFS recursive search
+      return outlinks.length > 0
+        && outlinks.any(function(ol){
+          var olTar = ol.get("target");
+          return olTar.id === endNode.id || thisView.isPathBetweenNodes(olTar, endNode);
+        });
+    },
+
+    /**
      * Get a nodes from the graph
      *
      * @return {node collection} the node collection of the model
@@ -158,6 +183,27 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
         edge.id = String(edge.source.id) + String(edge.target.id);
       }
 
+      // check if this edge is transitive
+      // (will be transitive if there is already a path from the edge source to the edge target)
+      edge.isTransitive = thisGraph.isPathBetweenNodes(edge.source, edge.target);
+
+      // check if the new edge changes transitivity of other edges
+      // (We check all of the outlinks of edge.source
+      // For each outlink, if there is a path from edge.target to outlink.target
+      // then outlink is now transitive)
+      if (!edge.isTransitive) {
+        edge.source.get("outlinks").each(function (srcOL) {
+          var srcOLTarget = srcOL.get("target"),
+              depIsTrans = srcOL.get("isTransitive");
+          if (!depIsTrans) {
+            if (thisGraph.isPathBetweenNodes(edge.target, srcOLTarget)){
+              srcOL.set("isTransitive", true);
+            }
+          }
+        });
+      }
+
+      //
       var edges = thisGraph.getEdges();
       edges.add(edge);
       var mEdge = edges.get(edge.id);
@@ -192,6 +238,14 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
       edge.get("source").get("outlinks").remove(edge);
       edge.get("target").get("dependencies").remove(edge);
       edges.remove(edge);
+
+      // possibly change transitivity relationships of transitive edges
+      edges.filter(function(e){return e.get("isTransitive")}).forEach(function(transEdge){
+        var isTrans = pvt.checkIfTransitive.call(thisGraph, transEdge);
+        if (!isTrans){
+          transEdge.set("isTransitive", false);
+        }
+      });
     },
 
     /**

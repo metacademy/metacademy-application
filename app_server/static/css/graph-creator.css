@@ -77,7 +77,7 @@ g.concept-g circle.to-edit-circle{
     display: none;
 }
 
-g.concept-g.hover-g circle.to-edit-circle{
+g.concept-g.hovered circle.to-edit-circle{
     display: block;
 }
 
@@ -202,27 +202,4 @@ g.connect-node circle{
 
 .dep-entry input{
     width: 70%;
-}
-
-.dep-icon-g rect, .ol-icon-g rect{
-    fill: #333;
-    stroke-width: 0;
-    stroke: #333;
-    display: none;
-}
-.dep-icon-g rect:hover, .ol-icon-g rect:hover{
-    stroke-width: 5px;
-}
-
-.hover-g .dep-icon-g rect, .hover-g .ol-icon-g rect {
-    display: block;
-}
-
-.dep-icon-g polygon, .ol-icon-g polygon{
-    stroke-width: 0px;
-    stroke: #333;
-    fill: #333;
-}
-.dep-icon-g polygon:hover, .ol-icon-g polygon:hover{
-    stroke-width: 3px;
 }

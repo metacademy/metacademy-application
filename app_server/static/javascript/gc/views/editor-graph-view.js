@@ -9,8 +9,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
     toolboxId: "toolbox",
     selectedClass: "selected",
     connectClass: "connect-node",
-    depIconGClass: "dep-icon-g",
-    olIconGClass: "ol-icon-g",
     toEditCircleClass: "to-edit-circle",
     activeEditId: "active-editing",
     toEditCircleRadius: 10,
@@ -72,79 +70,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
       return cd === thisView.state.selectedEdge;
     }).classed(pvt.consts.selectedClass, false);
     thisView.state.selectedEdge = null;
-  };
-
-  // helper function for addNodeIcons FIXME this function is difficult to understand -- should have a simple deps/outlinks flag that determines the icon type
-  // TODO move to graph-view
-  pvt.addExpContIcon = function(d3Icon, iconGClass, hasExpOrContrName, expandFun, contractFun, placeAtBottom, d3this, thisView, d, consts){
-    if (d.get(hasExpOrContrName)
-        && (!d3Icon.node() || !d3Icon.classed(consts.expandCrossClass))) {
-      // place plus sign
-      d3Icon.remove();
-      d3Icon = d3this.append("g")
-        .classed(iconGClass, true)
-        .classed(consts.expandCrossClass, true);
-      var yplace = placeAtBottom ? (consts.nodeRadius - consts.minusRectH*3 - 8) : (-consts.nodeRadius + consts.minusRectH*3 - 8);
-      d3Icon.append("polygon")
-        .attr("points", consts.plusPts)
-        .attr("transform", "translate(" + (-consts.exPlusWidth/2) + ","
-              + yplace + ")")
-        .on("mouseup", function(){
-          if (!thisView.state.justDragged) {
-            thisView.state.expOrContrNode = true;
-            expandFun.call(d);
-            thisView.optimizeGraphPlacement(false, d.id);
-          }
-        });
-    } else if (!d.get(hasExpOrContrName) && (!d3Icon.node() || !d3Icon.classed(consts.contractMinusClass))) {
-      // place minus sign
-      d3Icon.remove();
-      d3Icon = d3this.append("g")
-        .classed(iconGClass, true)
-        .classed(consts.contractMinusClass, true);
-      d3Icon.append("rect")
-        .attr("x", -consts.minusRectW/2)
-        .attr("y", placeAtBottom ? consts.nodeRadius - consts.minusRectH*3 : -consts.nodeRadius + consts.minusRectH*3)
-        .attr("width", consts.minusRectW)
-        .attr("height", consts.minusRectH)
-        .on("mouseup", function(){
-          if (!thisView.state.justDragged) {
-            thisView.state.expOrContrNode = true;
-            contractFun.call(d);
-            //thisView.optimizeGraphPlacement(false, d.id);
-            thisView.render();
-          }
-        });
-    }
-  };
-
-  // add node icons (e.g. expand/contract) to the circle
-  // TOMOVE exp and cont icons should be in graph view
-  pvt.addNodeIcons = function(thisView, d){
-    if (!thisView.isNodeVisible(d)) return;
-
-    var d3this = d3.select(this),
-        hasDeps = d.get("dependencies").length > 0,
-        hasOLs =  d.get("outlinks").length > 0,
-        consts = pvt.consts,
-        state = thisView.state,
-        d3DepIcon = d3this.selectAll("." + consts.depIconGClass),
-        d3OLIcon = d3this.selectAll("." + consts.olIconGClass);
-
-    // expand/contract dependencies icon
-    if (hasDeps){
-      pvt.addExpContIcon(d3DepIcon, consts.depIconGClass, "hasContractedDeps",
-                         d.expandDeps, d.contractDeps, true, d3this, thisView, d, consts);
-    } else {
-      d3DepIcon.remove();
-    }
-    // expand/contract outlinks icon
-    if (hasOLs) {
-      pvt.addExpContIcon(d3OLIcon, consts.olIconGClass, "hasContractedOLs",
-                         d.expandOLs, d.contractOLs, false, d3this, thisView, d, consts);
-    } else {
-      d3OLIcon.remove();
-    }
   };
 
   var GraphEditor = GraphView.extend({
@@ -296,12 +221,12 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
             d3.select(this).classed(consts.connectClass, true);
           }
           else{
-            d3.select(this).classed(consts.gHoverClass, true);
+            d3.select(this).classed(consts.hoveredClass, true);
           }
         })
         .on("mouseout", function(d){
           d3.select(this).classed(consts.connectClass, false);
-          d3.select(this).classed(consts.gHoverClass, false);
+          d3.select(this).classed(consts.hoveredClass, false);
         })
         .on("mousedown", function(d){
           thisView.circleMouseDown.call(thisView, d3.select(this), d);
@@ -332,10 +257,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
             document.location = document.location.pathname + "#edit=" + d.get("id");
           }
         });
-
-      thisView.gCircles.each(function(d){
-        pvt.addNodeIcons.call(this, thisView, d);
-      });
     },
 
     pathMouseDown: function(d, thisView){

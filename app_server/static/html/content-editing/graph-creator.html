@@ -2,37 +2,42 @@
 {% load staticfiles %}
 
 {% block extra-css %}
-    <link rel="stylesheet" href="{% static "css/graphs.css" %}" />
-    <link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
+<link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
+<link rel="stylesheet" href="{% static "css/graphs.css" %}" />
+<link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
+<link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
 {% endblock %}
 
 {% block jscript-extend %}
-    <script>
-      window.agfkGlobals = {};
-      agfkGlobals.userInitData = {{ user_data|safe }};
-      agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
-      agfkGlobals.auxModel = null; // init in main js app
-    </script>
-    <script src="{% static "javascript/lib/d3.js" %}"></script>
-    <script data-main="{% static "javascript/gc/main.js" %}" src="{% static "javascript/lib/require-min.js" %}"></script>
+<script>
+  window.agfkGlobals = {};
+  agfkGlobals.userInitData = {{ user_data|safe }};
+  agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+  agfkGlobals.auxModel = null; // init in main js app
+</script>
+<script src="{% static "javascript/lib/d3.js" %}"></script>
+<script data-main="{% static "javascript/gc/main.js" %}" src="{% static "javascript/lib/require-min.js" %}"></script>
 {% endblock %}
 
 {% block main %}
 
-    <div id="gc-wrap">
-    <div id="toolbox">
-      <button id="optimize"> optimize </button>
-      <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="{% static "images/upload-icon.png" %}" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="{% static "images/download-icon.png" %}" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="{% static "images/trash-icon.png" %}" alt="delete graph">
-    </div>
+<div id="gc-wrap">
 
-    </div>
+  <div id="toolbox">
+    <button id="optimize"> optimize </button>
+    <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="{% static "images/upload-icon.png" %}" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="{% static "images/download-icon.png" %}" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="{% static "images/trash-icon.png" %}" alt="delete graph">
+  </div>
 
-    <div id="concept-editor-wrap">
-      <a id="back-to-graph-button" href="#">
-        Done
-      </a>
-    </div>
+</div>
 
-    {% include "full-screen-content-editor.html" %}
+{% include "agfk-structure-loader.html" %}
+
+<div id="concept-editor-wrap">
+  <a id="back-to-graph-button" href="#">
+    Done
+  </a>
+</div>
+
+{% include "full-screen-content-editor.html" %}
 
 {% endblock %}

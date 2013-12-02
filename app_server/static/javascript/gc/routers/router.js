@@ -50,9 +50,14 @@ window.define(["jquery", "backbone", "gc/views/editor-graph-view", "gc/models/ed
 
     previewGraph: function () {
       var thisRoute = this;
-      thisRoute.removeOtherView();
-      thisRoute.gePreviewModel = new ExploreGraphModel();
-      thisRoute.gePreviewView = new ExploreGraphView({model: thisRoute.gePreviewModel});
+      if (thisRoute.geModel) {
+        thisRoute.gePreviewView = new ExploreGraphView({model: thisRoute.geModel});
+        thisRoute.showView(thisRoute.gePreviewView);
+      }
+      // thisRoute.removeOtherView();
+      //thisRoute.gePreviewModel = new ExploreGraphModel();
+      // thisRoute.gePreviewModel.addDataFromEditorModel(thisRoute.geModel);
+
       // and pass the graph to it ?
     },
 

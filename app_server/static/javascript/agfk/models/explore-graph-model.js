@@ -86,6 +86,20 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
           }
         });
       }
+
+      // /**
+      //  * TODO does not have test coverage
+      //  */
+      // addDataFromEditorModel: function (edModel) {
+      //   // TODO
+      //   edModel.getNodes().each(function(node){
+      //     var tmpNode = _.clone(node);
+
+      //   });
+      //   // add nodes to model
+
+      //   // add edges
+      // }
     });
   })();
 });

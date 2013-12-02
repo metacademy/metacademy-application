@@ -307,7 +307,7 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
             }
 
           // set the document title to be the key concept
-          document.title = window.agfkGlobals.auxModel.getTitleFromId(nodeId) + " - Metacademy";
+          document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("root")).get("title") + " - Metacademy";
 
           switch (paramsObj[qViewMode]){
           case pExploreMode:

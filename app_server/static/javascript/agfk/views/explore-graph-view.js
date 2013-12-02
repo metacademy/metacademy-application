@@ -14,7 +14,6 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       viewId: "explore-graph-view", // id of view element (div by default) must change in CSS as well
       // WARNING some changes must be propagated to the css file
       exploreSvgId: "explore-svg",
-      hoveredClass: "hovered",
       learnedClass: "learned",
       implicitLearnedClass: "implicit-learned",
       dataHoveredProp: "data-hovered",

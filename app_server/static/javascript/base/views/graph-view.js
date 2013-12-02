@@ -35,14 +35,16 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     exPlusWidth: 5,
     nodeRadius: 50,
     graphClass: "graph",
+    hoveredClass: "hovered",
     pathWrapClass: "link-wrapper",
     pathClass: "link",
     expandCrossClass: "exp-cross",
     contractMinusClass: "contract-minus",
-    gHoverClass: "hover-g",
     circleGClass: "concept-g",
     circleGIdPrefix: "circlgG-",
-    edgeGIdPrefix: "edgeG-"
+    edgeGIdPrefix: "edgeG-",
+    depIconGClass: "dep-icon-g",
+    olIconGClass: "ol-icon-g"
   };
 
   pvt.consts.plusPts = "0,0 " +
@@ -125,6 +127,73 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     };
   };
 
+  pvt.addECIcon = function(d, d3el, isDeps){
+    var thisView = this,
+        consts = pvt.consts,
+        iconGClass,
+        hasExpOrContrName,
+        expandFun,
+        contractFun,
+        placeAtBottom,
+        d3Icon;
+
+    if (isDeps) {
+      iconGClass = consts.depIconGClass;
+      hasExpOrContrName = "hasContractedDeps";
+      expandFun = d.expandDeps;
+      contractFun = d.contractDeps;
+      placeAtBottom = true;
+      d3Icon = d3el.selectAll("." + consts.depIconGClass);
+    } else {
+      iconGClass = consts.olIconGClass;
+      hasExpOrContrName = "hasContractedOLs";
+      expandFun = d.expandOLs;
+      contractFun = d.contractOLs;
+      placeAtBottom = false,
+      d3Icon = d3el.selectAll("." + consts.olIconGClass);
+    }
+
+    if (d.get(hasExpOrContrName)
+        && (!d3Icon.node() || !d3Icon.classed(consts.expandCrossClass))) {
+      // place plus sign
+      d3Icon.remove();
+      d3Icon = d3el.append("g")
+        .classed(iconGClass, true)
+        .classed(consts.expandCrossClass, true);
+      var yplace = placeAtBottom ? (consts.nodeRadius - consts.minusRectH*3 - 8) : (-consts.nodeRadius + consts.minusRectH*3 - 8);
+      d3Icon.append("polygon")
+        .attr("points", consts.plusPts)
+        .attr("transform", "translate(" + (-consts.exPlusWidth/2) + ","
+              + yplace + ")")
+        .on("mouseup", function(){
+          if (!thisView.state.justDragged) {
+            thisView.state.expOrContrNode = true;
+            expandFun.call(d);
+            thisView.optimizeGraphPlacement(true, false, d.id);
+          }
+        });
+    } else if (!d.get(hasExpOrContrName) && (!d3Icon.node() || !d3Icon.classed(consts.contractMinusClass))) {
+      // place minus sign
+      d3Icon.remove();
+      d3Icon = d3el.append("g")
+        .classed(iconGClass, true)
+        .classed(consts.contractMinusClass, true);
+      d3Icon.append("rect")
+        .attr("x", -consts.minusRectW/2)
+        .attr("y", placeAtBottom ? consts.nodeRadius - consts.minusRectH*3 : -consts.nodeRadius + consts.minusRectH*3)
+        .attr("width", consts.minusRectW)
+        .attr("height", consts.minusRectH)
+        .on("mouseup", function(){
+          if (!thisView.state.justDragged) {
+            thisView.state.expOrContrNode = true;
+            contractFun.call(d);
+            //thisView.optimizeGraphPlacement(false, d.id);
+            thisView.render();
+          }
+        });
+    }
+  };
+
 
   pvt.getEdgePath = function(d){
     var pathPts = [].concat(d.get("middlePts"));
@@ -205,7 +274,6 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       //***********
       thisView.prerender();
       //***********
-
 
       //*************
       // Render Paths
@@ -306,13 +374,18 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
         .attr("transform", function(d){return "translate(" + d.get("x") + "," + d.get("y") + ")";})
         .append("circle")
         .attr("r", consts.nodeRadius);
+
       newGs.each(function(d){
-        Utils.insertTitleLinebreaks(d3.select(this), d.get("title"));
+        var d3this = d3.select(this);
+        Utils.insertTitleLinebreaks(d3this, d.get("title"));
       });
 
-
-
       thisView.handleNewCircles(newGs);
+
+      // handle expand contract icons last
+      thisView.gCircles.each(function(d){
+        thisView.addExpContIcons(d, d3.select(this), thisView);
+      });
 
       //***********
       // POSTRENDER
@@ -399,6 +472,35 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       }
     },
 
+    /**
+     * Add expand/contract icon to graph
+     * @param d: the data element
+     * @param d3el: d3 selection for the data element
+     * @param thisView: current view reference
+     * @param isDeps: set to true if working with dependencies (otherwise working with outlinks)
+     */
+
+    addExpContIcons: function(d, d3this, thisView){
+      if (!thisView.isNodeVisible(d)) return;
+
+      var hasDeps = d.get("dependencies").length > 0,
+          hasOLs =  d.get("outlinks").length > 0,
+          consts = pvt.consts,
+          state = thisView.state;
+
+      // expand/contract dependencies icon
+      if (hasDeps){
+        pvt.addECIcon.call(thisView, d, d3this, true);
+      } else {
+        d3this.selectAll("." + consts.depIconGClass).remove();
+      }
+      // expand/contract outlinks icon
+      if (hasOLs) {
+        pvt.addECIcon.call(thisView, d, d3this, false);
+      } else {
+        d3this.selectAll("." + consts.olIconGClass).remove();
+      }
+    },
 
     /**
      * Return the g element of the path from the given model

@@ -1,15 +1,16 @@
 /*global define */
 
-define(["jquery", "backbone", "dagre", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "base/models/graph-model"], function($, Backbone, dagre, EditableEdgeCollection, EditableNodeCollection, GraphModel){
+define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "agfk/models/explore-graph-model"], function($, Backbone, _, dagre, EditableEdgeCollection, EditableNodeCollection, ExploreGraphModel){
 
-  return GraphModel.extend({
+  return ExploreGraphModel.extend({
 
     defaults:function(){
-      return {
+      var exDef = {
         nodes: new EditableNodeCollection(),
         edges: new EditableEdgeCollection(),
         graphDiscussion: ""
       };
+      return _.extend({}, ExploreGraphModel.prototype.defaults(), exDef);
     },
 
     // resource url

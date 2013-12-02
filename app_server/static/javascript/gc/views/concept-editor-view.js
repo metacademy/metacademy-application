@@ -1,3 +1,4 @@
+/*global define*/
 define(["backbone", "underscore"], function(Backbone, _){
 
   var ConceptEditorView = (function(){
@@ -23,6 +24,7 @@ define(["backbone", "underscore"], function(Backbone, _){
       render: function(){
         var thisView = this;
         pvt.state.visId = pvt.state.visId || "summary";
+        thisView.isRendered = false;
 
         // use attributes since toJSON changes the structure
         thisView.$el.html(thisView.template(thisView.model.attributes));
@@ -30,6 +32,7 @@ define(["backbone", "underscore"], function(Backbone, _){
 
         thisView.$el.find("#" + pvt.state.visId).addClass("active");
         thisView.$el.find("#btn-" + pvt.state.visId).addClass("active");
+        thisView.isRendered = true;
         return thisView;
       },
 
@@ -53,8 +56,12 @@ define(["backbone", "underscore"], function(Backbone, _){
       changeDepReason: function(evt){
         var curTarget = evt.currentTarget,
             cid = curTarget.id.split("-")[0], // cid-reason
-            reason = curTarget.value;        
-        this.model.get("dependencies").get(cid).set("reason", reason);        
+            reason = curTarget.value;
+        this.model.get("dependencies").get(cid).set("reason", reason);
+      },
+
+      isViewRendered: function(){
+        return this.isRendered;
       }
 
     });

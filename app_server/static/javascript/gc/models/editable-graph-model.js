@@ -42,6 +42,11 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       });
 
       return this;
+    },
+
+    // FIXME should this always return true since we don't populate the graph?
+    isPopulated: function(){
+      return true;
     }
   });
 });

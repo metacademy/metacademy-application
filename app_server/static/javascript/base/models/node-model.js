@@ -195,7 +195,7 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
 
       getUniqueDeps: function(ulOnly){
         var thisModel = this,
-            allDeps = thisModel.get("dependencies").pluck("from_tag"),
+            allDeps = thisModel.get("dependencies").pluck("source"),
             thisColl = thisModel.collection,
             ulDeps = {},
             ulUniqueDeps = {},
@@ -203,9 +203,9 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
             dep;
 
           _.each(allDeps, function(dep){
-            if (!ulOnly || !thisColl.get(dep).isLearnedOrImplicitLearned()){
-              ulDeps[dep] = 1;
-              ulUniqueDeps[dep] = 1;
+            if (!ulOnly || !dep.isLearnedOrImplicitLearned()){
+              ulDeps[dep.id] = 1;
+              ulUniqueDeps[dep.id] = 1;
             }
           });
 

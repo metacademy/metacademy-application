@@ -499,7 +499,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        * @param conceptTag: the tag of the concept to show in the learn view
        */
       transferToLearnViewForConcept: function(conceptTag){
-        this.appRouter.changeUrlParams({mode: "learn", lfocus: conceptTag});
+        this.appRouter.changeUrlParams({mode: "learn", focus: conceptTag});
       },
 
       /**

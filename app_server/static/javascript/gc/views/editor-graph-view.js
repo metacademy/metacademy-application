@@ -4,7 +4,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
   var pvt = {};
 
   pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
-    gcWrapId: "gc-wrap",
     svgId: "gc-svg",
     toolboxId: "toolbox",
     selectedClass: "selected",
@@ -73,7 +72,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
   };
 
   var GraphEditor = GraphView.extend({
-    el: document.getElementById(pvt.consts.gcWrapId),
+    // el: document.getElementById(pvt.consts.gcWrapId),
 
     events: {
       "click #optimize": "optimizeGraphPlacement",
@@ -118,75 +117,74 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
 
     // @override
     firstRender: function(){
-    var thisView = this,
-        d3Svg = thisView.d3Svg,
-        d3SvgG = thisView.d3SvgG;
+      var thisView = this,
+          d3Svg = thisView.d3Svg,
+          d3SvgG = thisView.d3SvgG;
 
       // svg listeners
       d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
       d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
 
-    // displayed when dragging between nodes
-    thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")
-      .attr('class', 'link dragline hidden')
-      .attr('d', 'M0,0L0,0')
-      .style('marker-end', 'url(#end-arrow)');
+      // displayed when dragging between nodes
+      thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")
+        .attr('class', 'link dragline hidden')
+        .attr('d', 'M0,0L0,0')
+        .style('marker-end', 'url(#end-arrow)');
 
-    // dragging particular to edit view
-    thisView.drag = d3.behavior.drag()
-      .origin(function(d){
-        return {x: d.x, y: d.y};
-      })
-      .on("drag", function(args){
-        thisView.state.justDragged = true;
-        pvt.dragmove.call(thisView, args);
-      })
-      .on("dragstart", function() {
-        // remove connecting intermediate pts
-        var state = thisView.state;
-        if (!state.shiftNodeDrag){
-          state.mouseDownNode.get("dependencies").each(function(d){
-            d.set("middlePts", []);
-          });
-          state.mouseDownNode.get("outlinks").each(function(d){
-            d.set("middlePts", []);
-          });
-        }
-      })
-      .on("dragend", function() {
-        // todo check if edge-mode is selected
-      });
+      // dragging particular to edit view
+      thisView.drag = d3.behavior.drag()
+        .origin(function(d){
+          return {x: d.x, y: d.y};
+        })
+        .on("drag", function(args){
+          thisView.state.justDragged = true;
+          pvt.dragmove.call(thisView, args);
+        })
+        .on("dragstart", function() {
+          // remove connecting intermediate pts
+          var state = thisView.state;
+          if (!state.shiftNodeDrag){
+            state.mouseDownNode.get("dependencies").each(function(d){
+              d.set("middlePts", []);
+            });
+            state.mouseDownNode.get("outlinks").each(function(d){
+              d.set("middlePts", []);
+            });
+          }
+        })
+        .on("dragend", function() {
+          // todo check if edge-mode is selected
+        });
 
-    // listen for dragging
-    var dragSvg = d3.behavior.zoom()
-          .on("zoom", function() {
-            if (d3.event.sourceEvent.shiftKey){
-              // TODO  the internal d3 state is still changing
-              return false;
-            } else{
-              zoomed.call(thisView);
-            }
-            return true;
-          })
-          .on("zoomstart", function() {
-            var ael = d3.select("#" + pvt.consts.activeEditId).node();
-            if (ael){
-              ael.blur();
-            }
-            if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
-          })
-          .on("zoomend", function() {
-            d3.select('body').style("cursor", "auto");
-          });
-    d3Svg.call(dragSvg).on("dblclick.zoom", null);
+      // listen for dragging
+      var dragSvg = d3.behavior.zoom()
+            .on("zoom", function() {
+              if (d3.event.sourceEvent.shiftKey){
+                // TODO  the internal d3 state is still changing
+                return false;
+              } else{
+                zoomed.call(thisView);
+              }
+              return true;
+            })
+            .on("zoomstart", function() {
+              var ael = d3.select("#" + pvt.consts.activeEditId).node();
+              if (ael){
+                ael.blur();
+              }
+              if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
+            })
+            .on("zoomend", function() {
+              d3.select('body').style("cursor", "auto");
+            });
+      d3Svg.call(dragSvg).on("dblclick.zoom", null);
 
-    // zoomed function used for dragging behavior above
-    function zoomed() {
-      thisView.state.justScaleTransGraph = true;
-      d3.select("." + pvt.consts.graphClass)
-        .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
-    };
-  },
+      // zoomed function used for dragging behavior above
+      function zoomed() {
+        thisView.state.justScaleTransGraph = true;
+        d3SvgG.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+      };
+    },
 
     // @override
     postrender: function() {
@@ -254,7 +252,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
             thisView.state.toNodeEdit = true;
-            document.location = document.location.pathname + "#edit=" + d.get("id");
+            thisView.appRouter.changeUrlParams({mode: "edit", focus: d.id});
           }
         });
     },

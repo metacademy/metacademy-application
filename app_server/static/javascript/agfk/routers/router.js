@@ -1,10 +1,14 @@
 /**
  * This file contains the router and must be loaded after the models, collections, and views
+ * FIXME this router has become tortuous -CJR
  */
 
+
+// TODO normalize create/edit vocabulary
+
 /*global define */
-define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view"],
-  function(Backbone, $, ExploreView, LearnView, AppToolsView, LoadingView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView){
+define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view"],
+  function(Backbone, _, $, ExploreView, LearnView, AppToolsView, LoadingView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
   "use strict";
 
   /**
@@ -16,113 +20,81 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
     var pvt = {};
 
     // constants
-    pvt.routeConsts = {
+    pvt.consts = {
+      createName: "create", // /graphs/create <- url defines this value
       qViewMode: "mode",
-      qLearnScrollConcept: "lfocus",
+      qFocusConcept: "focus",
       pExploreMode: "explore",
       pLearnMode: "learn",
+      pEditMode: "edit",
+      pCreateMode: "create",
       leftPanelId: "leftpanel,",
       rightPanelId: "rightpanel",
       lViewId: "learn-view-wrapper", // id for main learn view div
-      eViewId: "explore-graph-view-wrapper", // id for main explore view div
+      createViewId: "gc-wrap",
+      expViewId: "explore-graph-view-wrapper", // id for main explore view div
+      editViewId: "concept-editor-wrap",
       loadViewId: "load-view-wrapper",
       noContentErrorKey: "nocontent", // must also change in error-view.js
       ajaxErrorKey: "ajax", // must also change in error-view.js
       unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
     };
 
-    pvt.prevUrlParams = {}; // url parameters
-
-    pvt.prevNodeId = undefined;
-
-    pvt.viewMode = -1; // current view mode
-
-    pvt.prevPurl = -1; // previous parameter url
-
-    // keeps track of Explore to Learn and Learn to Explore clicks
-    pvt.elTransition = false;
-
-    // first learning view transition
-    pvt.firstLTrans = true;
-
-    /**
-     * Asynchronously load Viz.js
-     * Note: must call with "this = router instance"
-     */
-    // pvt.loadViz = function(){
-    //   var thisRoute = this;
-    //   // Viz.js requires types arrays; no available for IE < 10
-    //   if (typeof Int32Array === "undefined"){
-    //     // we're dealing with IE < 10 or an early mobile browser
-    //     if (pvt.viewMode === pvt.routeConsts.pExploreMode){
-    //       // only show the error for the explore mode
-    //       // learn mode should work with IE 9 and popups will notify IE < 9
-    //       thisRoute.showErrorMessageView(pvt.routeConsts.unsupportedBrowserKey);
-    //     }
-    //   } else{
-
-    //     if(typeof window.Viz === "undefined" && window.vizPromise === undefined){
-    //       window.vizPromise = $.ajax({
-    //         url: window.STATIC_PATH + "javascript/lib/viz.js",
-    //         dataType: "script",
-    //         cache: true,
-    //         async: true,
-    //         type: "GET",
-    //         error: function(jxhr, opts, errorThrown){
-    //           window.vizPromise = undefined;
-    //           thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
-    //           ErrorHandler.reportAjaxError(jxhr, opts, errorThrown);
-    //         }
-    //       });
-    //     }
-    //   }
-    // };
-
     /**
      * Clean up active views
      */
     pvt.cleanUpViews = function(){
       var thisRoute = this;
-      if (thisRoute.eview instanceof ExploreView){
-        thisRoute.eview.close();
-        thisRoute.eview = undefined;
+      if (thisRoute.expView instanceof ExploreView){
+        thisRoute.expView.close();
+        thisRoute.expView = undefined;
       }
-      if (thisRoute.lview instanceof LearnView){
-        thisRoute.lview.close();
-        thisRoute.lview = undefined;
+      if (thisRoute.learnView instanceof LearnView){
+        thisRoute.learnView.close();
+        thisRoute.learnView = undefined;
       }
-    };
-
-    /**
-     * Get key/value parameter object from string with key1=val1&key2=val2 format
-     */
-    pvt.getParamsFromStr = function(inStr){
-      var params = {};
-      if (inStr.length === 0){
-        return params;
-      }
-      var splitTxt = $.trim(inStr).split("&"),
-          slen = splitTxt.length,
-          qpSplit;
-      while(slen--){
-        qpSplit = splitTxt[slen].split("=");
-        if (qpSplit.length === 2){
-          params[qpSplit[0]] = qpSplit[1];
-        }
-        else{
-          window.console.warn("Parameter key/value is not length 2 and not included "
-                       + "in routing (separate key/value using an '=' sign), input: " + splitTxt[slen]);
-        }
-      }
-      return params;
     };
 
     // return public object
     return Backbone.Router.extend({
-      routes: {
-        ":params": "routeParams",
-        "": "routeParams"
+      routes: function () {
+          return {
+            ":params": "routeParams",
+            "": "routeParams"
+          };
       },
+
+      initialize: function(){
+        var thisRoute = this;
+        // url parameters
+        thisRoute.prevUrlParams = {};
+
+        // id of previous node in explore/learn view
+        thisRoute.prevNodeId = undefined;
+
+        // current view mode
+        thisRoute.viewMode = -1;
+
+        // previous parameter url
+        thisRoute.prevPurl = -1;
+
+        // keeps track of Explore to Learn and Learn to Explore clicks
+        thisRoute.elTransition = false;
+
+        // first learning view transition
+        thisRoute.firstLTrans = true;
+
+        // default graph model
+        thisRoute.GraphModel = ExploreGraphModel;
+
+        // default mode
+        thisRoute.defaultMode = pvt.consts.pLearnMode;
+
+        thisRoute.postinitialize();
+      },
+
+      // override in subclass
+      postinitialize: function(){},
 
       /**
        * Show the input view in the input selector and maintain a reference for correct clean up
@@ -156,7 +128,6 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
           inView.render();
         }
 
-        // TODO don't use window object -- breaks with multiple async inViews
         inView.isViewRendered() ? swapViews() : inView.$el.on("viewRendered", function(){
           inView.$el.off("viewRendered");
           swapViews();
@@ -169,10 +140,13 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
        * Parse the URL parameters
        */
       routeParams: function(params){
-        var routeConsts = pvt.routeConsts,
-            nodeName = window.location.href.split('/').pop().split('#').shift(), // TODO replace this hack when rewriting the router
-            paramsObj = pvt.getParamsFromStr(params || "");
-        this.nodeRoute(nodeName, paramsObj);
+        var thisRoute = this,
+            nodeName = window.location.href.split('/').pop().split('#').shift(),
+            paramsObj = thisRoute.getParamsFromStr(params || ""),
+            consts = pvt.consts;
+        // default mode to learn view
+        paramsObj[consts.qViewMode] = paramsObj[consts.qViewMode] || thisRoute.defaultMode;
+        thisRoute.nodeRoute(nodeName, paramsObj);
       },
 
       /**
@@ -181,7 +155,7 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
        * note: unprovided parameters remain unchanged
        */
       changeUrlParams: function(paramsObj){
-        this.paramsToUrl($.extend({},  pvt.prevUrlParams, paramsObj));
+        this.paramsToUrl($.extend({},  this.prevUrlParams, paramsObj));
       },
 
       /**
@@ -198,11 +172,11 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
         }
         parr.sort();
         purl = parr.join("&");
-        if (purl === pvt.prevPurl){
+        if (purl === this.prevPurl){
           this.routeParams(purl);
         } else {
           this.navigate(purl, {trigger: true, replace: false});
-          pvt.prevPurl = purl;
+          this.prevPurl = purl;
         }
       },
 
@@ -210,7 +184,7 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
        * Change transfer-click state (boolean to indicate when explore (learn) view was directly accessed from a specific concept in the learn (explore) view
        */
       setELTransition: function(state){
-        pvt.elTransition = state;
+        this.elTransition = state;
       },
 
       /**
@@ -229,39 +203,46 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
        */
       nodeRoute: function(nodeId, paramsObj) {
         var thisRoute = this,
-            routeConsts = pvt.routeConsts,
-            qViewMode = routeConsts.qViewMode,
-            qLearnScrollConcept = routeConsts.qLearnScrollConcept,
-            pExploreMode = routeConsts.pExploreMode,
-            pLearnMode = routeConsts.pLearnMode,
-            keyNodeChanged = nodeId !== pvt.prevNodeId,
+            consts = pvt.consts,
+            isCreating = nodeId === consts.createName,
+            qViewMode = consts.qViewMode,
+            qFocusConcept = consts.qFocusConcept,
+            pExploreMode = consts.pExploreMode,
+            pLearnMode = consts.pLearnMode,
+            pEditMode = consts.pEditMode,
+            pCreateMode = consts.pCreateMode,
+            keyNodeChanged = !isCreating && nodeId !== thisRoute.prevNodeId,
             loadViewRender = false,
             doRender;
 
-        // set view-mode (defaults to learn view)
-        paramsObj[qViewMode] = paramsObj[qViewMode] || pLearnMode;
-        pvt.viewMode = paramsObj[qViewMode];
+        // set view-mode
+        thisRoute.viewMode = paramsObj[qViewMode];
 
         // // init main app model
-        if (!thisRoute.graphModel){
-          var aux = window.agfkGlobals.auxModel;
-          aux.setDepRoot(nodeId);
-
-          var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true}),
-              graphModel = new ExploreGraphModel({root: nodeId});
-          aux.setUserModel(userModel);
-          thisRoute.userModel = userModel;
-          thisRoute.graphModel = graphModel;
+        if (!thisRoute.graphModel) {
+          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {root: nodeId});
         }
 
-        // show app tools
-        thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
-        thisRoute.appToolsView.changeActiveELButtonFromName(pvt.viewMode);
+        if (!thisRoute.userModel) {
+          var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true});
+          var aux = window.agfkGlobals.auxModel;
+          isCreating || aux.setDepRoot(nodeId);
+          aux.setUserModel(userModel);
+          thisRoute.userModel = userModel;
+        }
+
+        // show app tools TODO UPDATE show different app tools depending on view mode
+        if (!isCreating) {
+          thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
+          thisRoute.appToolsView.changeActiveELButtonFromName(thisRoute.viewMode);
+        }
 
         // should we re-render the view?
-        doRender = keyNodeChanged
-          || (pvt.viewMode === pLearnMode && typeof thisRoute.lview === "undefined")
-          || (pvt.viewMode === pExploreMode && typeof thisRoute.eview === "undefined");
+        doRender = isCreating
+          || thisRoute.viewMode === pEditMode
+          || keyNodeChanged
+          || (thisRoute.viewMode === pLearnMode && typeof thisRoute.learnView === "undefined")
+          || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
 
         if (typeof thisRoute.loadingView === "undefined"){
           thisRoute.loadingView = new LoadingView();
@@ -269,79 +250,117 @@ define(["backbone", "jquery", "agfk/views/explore-graph-view", "agfk/views/learn
         }
         // show loading view if new view is rendered
         if (doRender){
-          thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + routeConsts.loadViewId);
+          thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + consts.loadViewId);
         }
 
-        //var loadViz = typeof window.Viz === "undefined" && window.vizPromise === undefined,
-        //preLoadViz = paramsObj[qViewMode] === pExploreMode; // async start loading Viz before the view, else load after the view
-
-        // if (loadViz && preLoadViz){
-        //   pvt.loadViz.call(thisRoute);
-        // }
-
-        // check if/how we need to acquire more data from the server
+        // check if/how we need to acquire more data from the server FIXME
         if(!thisRoute.graphModel.isPopulated()){
           thisRoute.graphModel.fetch({
             success: postNodePop,
             error: function(emodel, eresp, eoptions){
-              thisRoute.showErrorMessageView(pvt.routeConsts.ajaxErrorKey);
+              thisRoute.showErrorMessageView(pvt.consts.ajaxErrorKey);
               ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
             }
           });
         }
         else{
-          window.setTimeout(postNodePop, 10); // 10 ms delay for UI to update the loading view
+          postNodePop();
         }
 
         // helper function to route change parameters appropriately
         // necessary because of AJAX calls to obtain new data
         function postNodePop() {
          try{
-            ErrorHandler.assert(thisRoute.graphModel.get("nodes").length > 0,
+            !isCreating && ErrorHandler.assert(thisRoute.graphModel.get("nodes").length > 0,
             "Fetch did not populate graph nodes for fetch: " + nodeId);
          }
           catch(err){
             console.error(err.message);
-            thisRoute.showErrorMessageView(pvt.routeConsts.noContentErrorKey, nodeId);
+            thisRoute.showErrorMessageView(pvt.consts.noContentErrorKey, nodeId);
             return;
             }
 
           // set the document title to be the key concept
-          document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("root")).get("title") + " - Metacademy";
+          if (!isCreating){
+            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("root")).get("title") + " - Metacademy"; // UPDATE different in create
+          } else {
+            document.title = "Graph Creation - Metacademy";
+          }
 
           switch (paramsObj[qViewMode]){
           case pExploreMode:
-            if (doRender){
-              thisRoute.eview = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute});
+            if (doRender){ // UPDATE
+              thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute});
             }
-            thisRoute.showView(thisRoute.eview, doRender, "#" + routeConsts.eViewId);
+            thisRoute.showView(thisRoute.expView, doRender, "#" + consts.expViewId);
             break;
-          default:
+          case pEditMode:
+            thisRoute.editView = new ConceptEditorView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept])}); // FIXME handle non-existant ids better
+            thisRoute.showView(thisRoute.editView, doRender, "#" + consts.editViewId);
+            break;
+
+          case pCreateMode:
+            thisRoute.createView = thisRoute.createView || new EditorGraphView({model: thisRoute.graphModel, appRouter: thisRoute});
+            thisRoute.showView(thisRoute.createView, doRender, "#" + consts.createViewId);
+            break;
+
+          case pLearnMode:
             if (doRender){
-              thisRoute.lview = new LearnView({model: thisRoute.graphModel, appRouter: thisRoute});
+              thisRoute.learnView = new LearnView({model: thisRoute.graphModel, appRouter: thisRoute});
             }
-            thisRoute.showView(thisRoute.lview, doRender, "#" + routeConsts.lViewId);
-          }
-          // only scroll to intended node on when lview is rerendered or learn link is clicked,
-          // so that the user's scroll state is maintained when jumping between learn and explore view
-          var paramQLearnScrollConcept = paramsObj[qLearnScrollConcept];
-          if (!paramQLearnScrollConcept){
-            paramsObj[qLearnScrollConcept] = nodeId;
-            paramQLearnScrollConcept = nodeId;
+            thisRoute.showView(thisRoute.learnView, doRender, "#" + consts.lViewId);
+            if (isCreating && !paramsObj[qFocusConcept]){
+              paramsObj[qFocusConcept] = thisRoute.learnView.getLastElInTopoSort();;
+            }
+            break;
+
+          default:
+            console.error("Default mode reached in router -- this should not occur");
           }
 
-          if (paramsObj[qViewMode] === pLearnMode && (!pvt.elTransition || pvt.firstLTrans)){
-              thisRoute.lview.expandConcept(paramQLearnScrollConcept);
-              pvt.firstLTrans = false;
+          var paramQLearnConcept = paramsObj[qFocusConcept];
+          if (!paramQLearnConcept){
+            paramsObj[qFocusConcept] = nodeId;
+            paramQLearnConcept = nodeId;
+          }
+
+          // TODO what is the elTransition monitoring exactly? FIXME is this needed still?
+          if (paramsObj[qViewMode] === pLearnMode && (!thisRoute.elTransition || thisRoute.firstLTrans)){
+              thisRoute.learnView.expandConcept(paramQLearnConcept);
+              thisRoute.firstLTrans = false;
           }
           thisRoute.setELTransition(false); // reset the router state
-          pvt.prevUrlParams = $.extend({}, paramsObj);
-          pvt.prevNodeId = nodeId;
-
-          // if (loadViz && !preLoadViz && window.vizPromise === undefined){
-          //   pvt.loadViz.call(thisRoute);
-          // }
+          thisRoute.prevUrlParams = $.extend({}, paramsObj);
+          thisRoute.prevNodeId = nodeId;
         }
+      },
+
+      /**
+       * Get key/value parameter object from string with key1=val1&key2=val2 format
+       */
+      getParamsFromStr: function(inStr){
+        var params = {};
+        if (inStr.length === 0){
+          return params;
+        }
+        var splitTxt = $.trim(inStr).split("&"),
+            slen = splitTxt.length,
+            qpSplit;
+        while(slen--){
+          qpSplit = splitTxt[slen].split("=");
+          if (qpSplit.length === 2){
+            params[qpSplit[0]] = qpSplit[1];
+          }
+          else{
+            window.console.warn("Parameter key/value is not length 2 and not included "
+                                + "in routing (separate key/value using an '=' sign), input: " + splitTxt[slen]);
+          }
+        }
+        return params;
+      },
+
+      getConstsClone: function(){
+        return _.clone(pvt.consts);
       }
     });
   })();

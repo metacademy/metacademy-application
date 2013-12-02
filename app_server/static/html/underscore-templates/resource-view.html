@@ -3,7 +3,7 @@
     <% var titleDisp = title ? title : "-no title-" %>
     <span class="res-arrow">→ </span><%= titleDisp %>
   </div>
-  
+
   <div class="resource-content-wrap">
     <% if (location){ %>
     <div class="resource-location-display">
@@ -67,7 +67,7 @@
   <ul>
     <% for (var i = 0; i < dependencies.length; i++) { %>
        <li><span class="resource-dependencies-item">
-	   <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#lfocus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
+	   <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#focus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
        </span></li>
        <% } %>
   </ul>

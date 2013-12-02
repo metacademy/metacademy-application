@@ -248,8 +248,8 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         var thisView = this,
             thisModel = thisView.model;
         // TODO this seems awkward
-        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(),
-                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))})));
+        thisView.$el.html(thisView.template(thisModel.toJSON()));
+         // _.extend(thisModel.toJSON(),                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))})));
         return thisView;
       }
 
@@ -651,16 +651,6 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
     // define private variables and methods
     var pvt = {};
 
-    pvt.isRendered = false;
-
-    // keep track of expanded nodes: key: title node id, value: expanded view object
-    pvt.expandedNode = null;
-    pvt.$expandedTitle = null;
-
-    pvt.idToTitleView = {};
-
-    pvt.nodeOrdering = null;
-
     pvt.viewConsts = {
       viewId: "learn-view",
       clickedItmClass: "clicked-title",
@@ -703,7 +693,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         if (this.appRouter && !$curTarget.hasClass(clickedItmClass)){
           var titleId = $curTarget.attr("id"),
               nid = titleId.split("-").pop();
-          this.appRouter.changeUrlParams({lfocus: nid});
+          this.appRouter.changeUrlParams({focus: nid});
         } else{
           this.showConceptDetailsForTitleEl(null, $curTarget);
         }
@@ -721,17 +711,17 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         if ($titleEl.hasClass(clickedItmClass)){
           return false;
         }
-        if (pvt.expandedNode !== null){
-          pvt.$expandedTitle.removeClass(clickedItmClass);
-          pvt.expandedNode.close();
+        if (thisView.expandedNode !== null){
+          thisView.$expandedTitle.removeClass(clickedItmClass);
+          thisView.expandedNode.close();
         }
         $titleEl.addClass(clickedItmClass);
         titleId = $titleEl.attr("id");
 
         nid = titleId.split("-").pop();
-        var dnode = thisView.showConceptDetails(thisView.model.get("nodes").get(nid));
-        pvt.expandedNode = dnode;
-        pvt.$expandedTitle = $titleEl;
+        var dnode = thisView.showConceptDetails(thisView.model.getNodes().get(nid));
+        thisView.expandedNode = dnode;
+        thisView.$expandedTitle = $titleEl;
         return true;
       },
 
@@ -748,15 +738,24 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
       },
 
       expandConcept: function(conceptTag){
-        this.showConceptDetailsForTitleEl(null, pvt.idToTitleView[conceptTag].$el);
+        this.showConceptDetailsForTitleEl(null, this.idToTitleView[conceptTag].$el);
       },
 
       initialize: function(inp){
+        var thisView = this;
+
+        // init state
+        thisView.isRendered = false;
+        thisView.expandedNode = null;         // keep track of expanded node
+        thisView.$expandedTitle = null;
+        thisView.idToTitleView = {};
+        thisView.nodeOrdering = null;
+
         var gConsts = window.agfkGlobals.auxModel.getConsts();
-        this.appRouter = inp.appRouter;
-        this.listenTo(this.model.get("options"), "change:showLearnedConcepts", this.render); // TODO any zombie listeners?
-        this.listenTo(window.agfkGlobals.auxModel, gConsts.learnedTrigger, this.updateTimeEstimate);
-        this.listenTo(this.model.get("nodes"), "sync", this.updateTimeEstimate);
+        thisView.appRouter = inp.appRouter;
+        thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.render); // TODO any zombie listeners?
+        thisView.listenTo(window.agfkGlobals.auxModel, gConsts.learnedTrigger, thisView.updateTimeEstimate);
+        thisView.listenTo(thisView.model.getNodes(), "sync", thisView.updateTimeEstimate);
       },
 
       /**
@@ -764,25 +763,31 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
        * TODO rerender (the appropriate section) when the model changes
        */
       render: function(){
-        pvt.isRendered = false;
         var thisView = this,
             $el = thisView.$el,
-            $expandedTitle = pvt.$expandedTitle,
+            $expandedTitle = thisView.$expandedTitle,
             viewConsts = pvt.viewConsts,
-            clkItmClass = viewConsts.clickedItmClass;
+            clkItmClass = viewConsts.clickedItmClass,
+            nodes = thisView.model.getNodes(),
+            timeEstimate;
+        thisView.isRendered = false;
 
         $el.html('');
 
+        // build the sidebar TODO refactor into a view
         var $div = $(document.createElement("div"));
         $div.attr("id", (pvt.viewConsts.titleListId));
-        pvt.nodeOrdering = thisView.getTopoSortedConcepts();
+        thisView.nodeOrdering = thisView.getTopoSortedConcepts();
         var titlesTitle = document.createElement("h1");
         titlesTitle.textContent = "Learning Plan";
         thisView.$el.prepend(titlesTitle);
         $div.append(titlesTitle);
+
         var timeEstimateEl = document.createElement("div");
         timeEstimateEl.className = viewConsts.timeEstimateClass;
-        var timeEstimate = thisView.model.get("nodes").getTimeEstimate();
+        // if (nodes.getTimeEstimate){
+        //   timeEstimate = nodes.getTimeEstimate();
+        // }
 
         var lpButton = document.createElement("div");
         lpButton.id = viewConsts.lpButtonId;
@@ -809,17 +814,17 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
           // check that new title is in group
           var $newTitle = thisView.$el.find("#" + $expandedTitle.attr("id"));
           if ($newTitle.length > 0){
-            pvt.$expandedTitle = $newTitle;
+            thisView.$expandedTitle = $newTitle;
             thisView.showConceptDetailsForTitleEl(null, $newTitle);
           }
           else{
-            pvt.$expandedTitle = null;
-            pvt.expandedNode = null;
+            thisView.$expandedTitle = null;
+            thisView.expandedNode = null;
           }
         }
 
         thisView.delegateEvents();
-        pvt.isRendered = true;
+        thisView.isRendered = true;
         return thisView;
       },
 
@@ -830,18 +835,18 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         var thisView = this,
             inum,
             noLen,
-            nodeOrdering = pvt.nodeOrdering || thisView.getTopoSortedConcepts(),
+            nodeOrdering = thisView.nodeOrdering || thisView.getTopoSortedConcepts(),
             curNode,
             nliview,
             $list = $(document.createElement("ol")),
             thisModel = thisView.model,
-            nodes = thisModel.get("nodes");
+            nodes = thisModel.getNodes();
 
         for (inum = 0, noLen = nodeOrdering.length; inum < noLen; inum++){
           curNode = nodes.get(nodeOrdering[inum]);
           nliview = new NodeListItemView({model: curNode});
           nliview.setParentView(thisView);
-          pvt.idToTitleView[curNode.get("id")] = nliview;
+          thisView.idToTitleView[curNode.get("id")] = nliview;
           $list.append(nliview.render().el);
         }
         return $list;
@@ -849,12 +854,18 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
 
       updateTimeEstimate: function(){
         var thisView = this,
-            timeEstimate = thisView.model.get("nodes").getTimeEstimate(),
+            nodes = thisView.model.getNodes(),
+            timeEstimate,
             timeStr;
-        if (timeEstimate) {
-          timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
+        if (nodes.getTimeEstimate){
+          timeEstimate = nodes.getTimeEstimate();
+          if (timeEstimate) {
+            timeStr = "Completion Time: " + Utils.formatTimeEstimate(timeEstimate);
+          } else {
+            timeStr = "All done!";
+          }
         } else {
-          timeStr = "All done!";
+          timeStr = "---";
         }
         thisView.$el.find(".time-estimate").html(timeStr);
       },
@@ -863,7 +874,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
        * Clean up the view
        */
       close: function(){
-        pvt.expandedNode.close();
+        this.expandedNode.close();
         this.remove();
         this.unbind();
       },
@@ -877,7 +888,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         var thisView = this,
             thisModel = thisView.model,
             keyTag = window.agfkGlobals.auxModel.get("depRoot") || "",
-            nodes = thisModel.get("nodes"),
+            nodes = thisModel.getNodes(),
             traversedNodes = {}, // keep track of traversed nodes
             startRootNodes,
             includeLearned = thisModel.get("options").get("showLearnedConcepts"); // nodes already added to the list
@@ -899,6 +910,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         }
 
         // recursive dfs topological sort
+        // TODO this should be defined in pvt
         function dfsTopSort (rootNodeTags){
           var curRootNodeTagDepth,
               returnArr = [],
@@ -930,7 +942,11 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
        * Return true if the view has been rendered
        */
       isViewRendered: function(){
-        return pvt.isRendered;
+        return this.isRendered;
+      },
+
+      getLastElInTopoSort: function(){
+        return this.nodeOrdering && this.nodeOrdering[this.nodeOrdering.length - 1];
       }
     });
   })();

@@ -21,23 +21,11 @@
 
 {% block main %}
 
-<div id="gc-wrap">
-
   <div id="toolbox">
     <button id="optimize"> optimize </button>
     <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="{% static "images/upload-icon.png" %}" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="{% static "images/download-icon.png" %}" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="{% static "images/trash-icon.png" %}" alt="delete graph">
   </div>
 
-</div>
-
 {% include "agfk-structure-loader.html" %}
-
-<div id="concept-editor-wrap">
-  <a id="back-to-graph-button" href="#">
-    Done
-  </a>
-</div>
-
-{% include "full-screen-content-editor.html" %}
 
 {% endblock %}

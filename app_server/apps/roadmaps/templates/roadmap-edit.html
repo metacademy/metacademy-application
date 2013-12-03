@@ -10,7 +10,7 @@
 <script type="text/javascript" src="{% static "javascript/roadmap-edit.js" %}"></script>
 <script src="{% static "javascript/lib/jquery.colorbox-min.js" %}"></script>
 {% endblock %}
-  
+
 {% block roadmap-content %}
 
 
@@ -33,9 +33,9 @@
 	  {% endfor %}
 	</div>
       {% endif %}
-	
+
       {% block form-content %}
-	
+
 	<div class="form-field">
 	  {{ form.title.label_tag }}
 	  {{ form.title }}
@@ -68,7 +68,7 @@
             {{ form.body }}
           </div>
           {% if can_edit %}
-          <div id="edit-summary" class="form-field">            
+          <div id="edit-summary" class="form-field">
             <label for="commit-blurb">Edit Message</label>
             {{ form.commit_msg }}
           </div>
@@ -87,6 +87,5 @@
   </div>
 
 
-  
-{% endblock %}
 
+{% endblock %}

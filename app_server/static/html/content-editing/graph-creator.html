@@ -17,8 +17,7 @@
   agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
   agfkGlobals.auxModel = null; // init in main js app
 </script>
-<script src="{% static "javascript/lib/d3.js" %}"></script>
-<script data-main="{% static "javascript/gc/main.js" %}" src="{% static "javascript/lib/require-min.js" %}"></script>
+<script data-main="{% static "javascript/base/main.js" %}" src="{% static "javascript/lib/require-min.js" %}"></script>
 {% endblock %}
 
 {% block main %}

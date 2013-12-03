@@ -63,7 +63,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "base/utils/utils", "agfk/routers/router", "gen-utils","base/models/aux-model", "jquery", "btouch", "sidr"], function(Backbone, Utils, AppRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "base/utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","base/models/aux-model", "jquery", "btouch", "sidr"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // handle noscript content
@@ -105,8 +105,13 @@ requirejs(["backbone", "base/utils/utils", "agfk/routers/router", "gen-utils","b
     }
   });
 
-  // start the AGFK app
-  var appRouter = new AppRouter();
+  var appRouter;
+  // start the appropriate router
+  // FIXME hardcoded hack
+  if (window.location.pathname.split("/").pop() === "create"){
+    appRouter = new GCRouter();
+  } else {
+    appRouter = new AppRouter();  }
   Backbone.history.start();
 
 });

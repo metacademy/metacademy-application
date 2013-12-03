@@ -15,6 +15,10 @@
     text-align: center;
 }
 
+#apptools.edit{
+    display: none;
+}
+
 #explore-learn-tools{
     display: none;
 }

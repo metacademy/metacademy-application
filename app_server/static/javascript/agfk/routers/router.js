@@ -7,8 +7,8 @@
 // TODO normalize create/edit vocabulary
 
 /*global define */
-define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/views/loading-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view"],
-  function(Backbone, _, $, ExploreView, LearnView, AppToolsView, LoadingView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
+define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
+  function(Backbone, _, $, ExploreView, LearnView, AppToolsView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
   "use strict";
 
   /**
@@ -27,6 +27,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       pExploreMode: "explore",
       pLearnMode: "learn",
       pEditMode: "edit",
+      colorboxWidth: "80%",
+      colorboxHeight: "75%",
       pCreateMode: "create",
       leftPanelId: "leftpanel,",
       rightPanelId: "rightpanel",
@@ -34,14 +36,13 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       createViewId: "gc-wrap",
       expViewId: "explore-graph-view-wrapper", // id for main explore view div
       editViewId: "concept-editor-wrap",
-      loadViewId: "load-view-wrapper",
       noContentErrorKey: "nocontent", // must also change in error-view.js
       ajaxErrorKey: "ajax", // must also change in error-view.js
       unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
     };
 
     /**
-     * Clean up active views
+     * Clean up active views TODO where/when do we use this?
      */
     pvt.cleanUpViews = function(){
       var thisRoute = this;
@@ -99,24 +100,41 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       /**
        * Show the input view in the input selector and maintain a reference for correct clean up
        */
-      showView: function (inView, doRender, selector, removeOldView) {
+      showView: function (inView, doRender, selector, removeOldView, useColorBox) {
         var thisRoute = this;
         removeOldView = removeOldView === undefined ? true : removeOldView;
 
         // helper function for async rendering views
+        // TODO move to private
         function swapViews(){
           if (thisRoute.currentView && removeOldView) {
             thisRoute.currentView.$el.parent().hide();
           }
 
+          // FIXME this if/else structure is hiddeous -CJR (I wrote it)
           if (doRender){
             if (typeof selector === "string"){
-              $(selector).html(inView.$el).show();
+              if (useColorBox){
+                $.colorbox({inline: true,
+                  href: inView.$el,
+                  transition: "elastic",
+                  width: pvt.consts.colorboxWidth,
+                  height: pvt.consts.colorboxHeight,
+                  onClosed: function(){
+                    thisRoute.navigate(""); // TODO this may not always be true
+                  }}); // TODO move hardcoding to consts
+              } else {
+                $(selector).html(inView.$el).show();
+              }
             } else{
               window.document.body.appendChild(inView.el);
             }
           } else{
-            inView.$el.parent().show();
+            if (useColorBox) {
+              $.colorbox({inline: true, href: inView.$el, transition: "elastic", width: pvt.consts.colorboxWidth, height: pvt.consts.colorboxHeight});
+            } else {
+              inView.$el.parent().show();
+            }
           }
 
           if (removeOldView){
@@ -212,7 +230,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             pEditMode = consts.pEditMode,
             pCreateMode = consts.pCreateMode,
             keyNodeChanged = !isCreating && nodeId !== thisRoute.prevNodeId,
-            loadViewRender = false,
             doRender;
 
         nodeId = isCreating ? undefined : nodeId;
@@ -246,14 +263,14 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
           || (thisRoute.viewMode === pLearnMode && typeof thisRoute.learnView === "undefined")
           || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
 
-        if (typeof thisRoute.loadingView === "undefined"){
-          thisRoute.loadingView = new LoadingView();
-          loadViewRender = true;
-        }
+        // if (typeof thisRoute.loadingView === "undefined"){
+        //   thisRoute.loadingView = new LoadingView();
+        //   loadViewRender = true;
+        // }
         // show loading view if new view is rendered
-        if (doRender){
-          thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + consts.loadViewId);
-        }
+        // if (doRender){
+        //   thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + consts.loadViewId);
+        // }
 
         // check if/how we need to acquire more data from the server FIXME
         if(!thisRoute.graphModel.isPopulated()){
@@ -297,8 +314,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             thisRoute.showView(thisRoute.expView, doRender, "#" + consts.expViewId);
             break;
           case pEditMode:
-            thisRoute.editView = new ConceptEditorView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept])}); // FIXME handle non-existant ids better
-            thisRoute.showView(thisRoute.editView, doRender, "#" + consts.editViewId);
+            thisRoute.editView = new ConceptEditorView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept])});
+            thisRoute.showView(thisRoute.editView, doRender, "#" + consts.editViewId, false, true);
             break;
 
           case pCreateMode:

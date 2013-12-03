@@ -2,9 +2,11 @@
 {% load staticfiles %}
 
 {% block extra-css %}
+<link rel="stylesheet" href="{% static "css/ionicons.css" %}"/>
 <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
 <link rel="stylesheet" href="{% static "css/graphs.css" %}" />
 <link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
+<link rel="stylesheet" href="{% static "css/apptools.css" %}" />
 <link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
 {% endblock %}
 
@@ -20,11 +22,6 @@
 {% endblock %}
 
 {% block main %}
-
-  <div id="toolbox">
-    <button id="optimize"> optimize </button>
-    <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="{% static "images/upload-icon.png" %}" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="{% static "images/download-icon.png" %}" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="{% static "images/trash-icon.png" %}" alt="delete graph">
-  </div>
 
 {% include "agfk-structure-loader.html" %}
 

@@ -215,6 +215,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             loadViewRender = false,
             doRender;
 
+        nodeId = isCreating ? undefined : nodeId;
+
         // set view-mode
         thisRoute.viewMode = paramsObj[qViewMode];
 
@@ -232,10 +234,10 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
         }
 
         // show app tools TODO UPDATE show different app tools depending on view mode
-        if (!isCreating) {
           thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
-          thisRoute.appToolsView.changeActiveELButtonFromName(thisRoute.viewMode);
-        }
+        thisRoute.appToolsView.setMode(thisRoute.viewMode);
+          //thisRoute.appToolsView.changeActiveELButtonFromName(thisRoute.viewMode);
+
 
         // should we re-render the view?
         doRender = isCreating
@@ -300,7 +302,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             break;
 
           case pCreateMode:
-            thisRoute.createView = thisRoute.createView || new EditorGraphView({model: thisRoute.graphModel, appRouter: thisRoute});
+            thisRoute.createView = thisRoute.createView
+                                     || new EditorGraphView({model: thisRoute.graphModel, appRouter: thisRoute});
             thisRoute.showView(thisRoute.createView, doRender, "#" + consts.createViewId);
             break;
 
@@ -309,7 +312,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
               thisRoute.learnView = new LearnView({model: thisRoute.graphModel, appRouter: thisRoute});
             }
             thisRoute.showView(thisRoute.learnView, doRender, "#" + consts.lViewId);
-            if (isCreating && !paramsObj[qFocusConcept]){
+            if (isCreating && paramsObj[qFocusConcept] === undefined){
               paramsObj[qFocusConcept] = thisRoute.learnView.getLastElInTopoSort();;
             }
             break;

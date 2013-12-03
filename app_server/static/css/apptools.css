@@ -1,0 +1,224 @@
+/* App tools */
+
+#apptools{
+    width: 15%;
+    max-width: 180px;
+    margin: 0.5em;
+    padding: 0.5em 0.5em;
+    position: absolute;
+    z-index: 10;
+    top: 2em;
+    right: 0;
+    background: rgba(253, 253, 253, 0.98);
+    border: 2px solid #CE94BC;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#explore-learn-tools{
+    display: none;
+}
+
+#content-editing-tools{
+    display: none;
+}
+
+.create #content-editing-tools{
+    display: block;
+}
+
+#apptools input{
+    width: 30px;
+    opacity: 0.4;
+}
+
+#apptools input:hover{
+    opacity: 1;
+    cursor: pointer;
+}
+
+#hidden-file-upload{
+    display: none;
+}
+
+#download-input{
+    margin: 0 0.5em;
+}
+
+#content-editing-tools button{
+    border: none;
+    background: inherit;
+}
+
+#content-editing-tools .icon{
+    color: #5C5C5C;
+    font-size: 2.2em;
+    cursor: pointer;
+}
+
+#content-editing-tools input{
+    width: 90%;
+    padding: 0.3em;
+    margin-bottom: 0.2em;
+}
+
+#content-editing-tools input:hover{
+    width: 90%;
+    cursor: default;
+}
+
+
+#content-editing-tools .icon:hover{
+    color: #333;
+}
+
+.explore #explore-learn-tools, .learn #explore-learn-tools{
+    display: block;
+}
+
+#apptools.explore button, #apptools.learn button, #hovertext-buttons button{
+    -webkit-box-shadow: 1px 1px 2px #463838;
+    -moz-box-shadow: 1px 1px 2px #463838;
+    box-shadow: 1px 1px 2px #463838;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 2px #5C4A56 solid;
+    background-color: transparent;
+    padding: 1.5px;
+    cursor: pointer;
+}
+
+#apptools.learn button:hover, #apptools.explore button:hover{
+    border: 2px #D145CC solid;
+}
+
+#apptools #back-to-editing{
+    display: none;
+    padding: 1em;
+    margin-top: 1em;
+    background-color: rgba(255, 211, 241, 0.39);
+}
+
+.apptools-title{
+    text-align: center;
+    font-size: 0.95em;
+    font-weight: bold;
+}
+
+/* Explore-Learn Navigation Button */
+.e-to-l-summary-link{
+    color: blueviolet;
+    margin-right: 0.5em;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.el-nav-button img{
+    width: 30px;
+    height: 30px;
+}
+
+#apptools .el-nav-button.active{
+    opacity: 0.7;
+    border: 2px #5C4A56 solid;
+    cursor: default;
+   -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+#apptools .el-nav-button.active:hover{
+    cursor: default;
+    border: 2px #5C4A56 solid;
+}
+
+#explore-learn-button-wrapper{
+    text-align: center;
+    margin: 0.3em 0px 0.6em;
+}
+
+/* apptools action buttons */
+
+#apptools .toggle-lc-button{
+    width: 5em;
+    margin: 0.5em 0.4em;
+    line-height: 1.3em;
+    font-size: 0.8em;
+ }
+
+#apptools button.toggle-lc-button.disabled{
+    opacity: 0.4;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+#apptools button.toggle-lc-button.disabled:hover{
+    border: 2px #5C4A56 solid;
+    cursor: default;
+}
+
+#apptools .apptools-lc-buttons-wrap{
+    display: inline-block;
+    margin: 0 auto;
+}
+
+
+#apptools-button{
+    right: 1.5em;
+    width: 100px;
+    bottom: 0;
+    padding-right: 1em;
+    border-radius: 5px 5px 0 0;
+    border-width: 1px 1px 0 1px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#apptools-button.expanded{
+    bottom: 135px;
+    border-bottom: 2px #75526A solid;
+}
+
+#learning-plan-button{
+    left: 0;
+    bottom: 40%;
+    border-radius: 0 0 5px 5px;
+    border-width: 0 1px 1px 1px;
+    -webkit-transform: rotate(-90deg);
+    -webkit-transform-origin: 0 0;
+    -moz-transform: rotate(-90deg);
+    -moz-transform-origin: 0 0;
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -o-transform-origin: 0 0;
+    -ms-transform: rotate(-90deg);
+    -ms-transform-origin: 0 0;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+#learning-plan-button.expanded{
+    left: 55%;
+}
+
+@media only screen and  (max-width: 760px){
+    #apptools-button{
+        display: block;
+    }
+    #apptools{
+        top: auto;
+        bottom: 0;
+        max-width: 200px;
+        margin: 0;
+        margin-right: 1em;
+        padding: 0;
+        padding-top: 0.5em;
+        width: 200px;
+        right: 0;
+        height: 125px;
+        display: none;
+    }
+    #apptools.show{
+        display: block;
+    }
+}

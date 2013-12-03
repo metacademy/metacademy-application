@@ -42,35 +42,6 @@ body{
     display: none;
 }
 
-#toolbox{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin-bottom: 0.5em;
-    margin-left: 1em;
-    border: 2px solid #EEEEEE;
-    border-radius: 5px;
-    padding: 1em;
-    z-index: 5;
-}
-
-#toolbox input{
-    width: 30px;
-    opacity: 0.4;
-}
-#toolbox input:hover{
-    opacity: 1;
-    cursor: pointer;
-}
-
-#hidden-file-upload{
-    display: none;
-}
-
-#download-input{
-    margin: 0 0.5em;
-}
-
 /* Graph editor specific styles */
 g.concept-g circle.to-edit-circle{
     fill: #C2DBFC;

@@ -74,14 +74,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
   var GraphEditor = GraphView.extend({
     // el: document.getElementById(pvt.consts.gcWrapId),
 
-    events: {
-      "click #optimize": "optimizeGraphPlacement",
-      "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
-      "change #hidden-file-upload": "uploadGraph",
-      "click #download-input": "downloadGraph",
-      "click #delete-graph": "clearGraph"
-    },
-
     // @override
     postinitialize: function() {
       var thisView = this;
@@ -313,7 +305,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
 
       if (mouseDownNode !== d){
         // we're in a different node: create new edge for mousedown edge and add to graph
-        var newEdge = {source: mouseDownNode, target: d, id: thisView.idct++};
+        var newEdge = {source: mouseDownNode, target: d, id: "c" + thisView.idct++};
         var filtRes = thisView.gPaths.filter(function(d){
           if (d.get("source") === newEdge.target && d.get("target") === newEdge.source){
             thisView.model.removeEdge(d);
@@ -411,7 +403,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
       } else if (state.graphMouseDown && d3.event.shiftKey){
         // clicked not dragged from svg
         var xycoords = d3.mouse(thisView.d3SvgG.node()),
-            d = {id: thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]},
+            d = {id: "c" + thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]},
             model = thisView.model;
 
         // add new node and make title immediently editable
@@ -470,44 +462,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
     // key up on main svg
     windowKeyUp: function() {
       this.state.lastKeyDown = -1;
-    },
-
-    uploadGraph: function(evt){
-      if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
-        alert("Your browser won't let you load a graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
-        return;
-      }
-      var thisGraph = this,
-          uploadFile = evt.currentTarget.files[0],
-          filereader = new window.FileReader();
-
-      filereader.onload = function(){
-        var txtRes = filereader.result;
-        try{
-          var jsonObj = JSON.parse(txtRes);
-          // thisGraph.deleteGraph(true);
-          thisGraph.model.addJsonNodesToGraph(jsonObj);
-          thisGraph.render();
-        }catch(err){
-          // FIXME better/more-informative error handling
-          alert("Error parsing uploaded file\nerror message: " + err.message);
-          return;
-        }
-      };
-      filereader.readAsText(uploadFile);
-    },
-
-    downloadGraph: function(){
-      var outStr = JSON.stringify(this.model.toJSON()),
-          blob = new window.Blob([outStr], {type: "text/plain;charset=utf-8"});
-      window.saveAs(blob, "mygraph.json"); // TODO replace with title once available
-    },
-
-    clearGraph: function(confirmDelete){
-      if (!confirmDelete || confirm("Press OK to clear this graph")){
-        this.model.clear().set(this.model.defaults());
-        this.render();
-      }
     },
 
     /**

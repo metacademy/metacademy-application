@@ -1,3 +1,4 @@
+/*global define*/
 define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorHandler){
   "use strict";
 
@@ -7,9 +8,10 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
   var AppToolsView = (function(){
     var pvt = {};
     pvt.prevButtonEl = null;
-    pvt.viewConsts = {
+    pvt.consts = {
       activeClass: "active",
       showClass: "show",
+      backToEditingButtonId: "back-to-editing",
       apptoolsButtonId: "apptools-button",
       expandButtonClass: "expanded",
       elNameAppend: "-button",
@@ -28,28 +30,28 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
     pvt.changeShowHideButtons = function(elId, enable){
       var $el = $("#" + elId);
       if (enable){
-        $el.removeClass(pvt.viewConsts.disabledClass);
+        $el.removeClass(pvt.consts.disabledClass);
         $el.prop("disabled", false);
       } else{
-        $el.addClass(pvt.viewConsts.disabledClass);
+        $el.addClass(pvt.consts.disabledClass);
         $el.prop("disabled", true);
       }
     };
 
     pvt.enableHide = function(){
-      pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, true);
+      pvt.changeShowHideButtons(pvt.consts.clearLearnedId, true);
     };
 
     pvt.disableHide = function(){
-      pvt.changeShowHideButtons(pvt.viewConsts.clearLearnedId, false);
+      pvt.changeShowHideButtons(pvt.consts.clearLearnedId, false);
     };
 
     pvt.disableShow = function(){
-      pvt.changeShowHideButtons(pvt.viewConsts.showLearnedId, false);
+      pvt.changeShowHideButtons(pvt.consts.showLearnedId, false);
     };
 
     pvt.enableShow = function(){
-      pvt.changeShowHideButtons(pvt.viewConsts.showLearnedId, true);
+      pvt.changeShowHideButtons(pvt.consts.showLearnedId, true);
     };
 
     pvt.isRendered = true; // view is prerendered
@@ -57,24 +59,36 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
     return Backbone.View.extend({
       appRouter: null,
 
+      el: document.getElementById(pvt.consts.viewId),
+
+      events: {
+        "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
+        "change #hidden-file-upload": "uploadGraph",
+        "click #download-input": "downloadGraph",
+        "click #delete-graph": "clearGraph",
+        "click #preview-graph": "previewGraph",
+        "click #back-to-editing": "returnToEditor"
+      },
+
+
       initialize: function(inp){
         var thisView = this,
-            viewConsts = pvt.viewConsts;
+            consts = pvt.consts;
         thisView.appRouter = inp.appRouter;
-        $('.' + viewConsts.elNavButtonClass).on("click", function(evt){
+        $('.' + consts.elNavButtonClass).on("click", function(evt){
           thisView.handleELButtonClick.call(thisView, evt);
         });
-        $('#' + viewConsts.clearLearnedId).on("click", function(evt){
+        $('#' + consts.clearLearnedId).on("click", function(evt){
           thisView.handleClearLearnedClick.call(thisView, evt);
         });
-        $('#' + viewConsts.showLearnedId).on("click", function(evt){
+        $('#' + consts.showLearnedId).on("click", function(evt){
           thisView.handleShowLearnedClick.call(thisView, evt);
         });
 
         // hide/show apptools for small view ports
-        $("#" + viewConsts.apptoolsButtonId).on("click", function(){
-          $(this).toggleClass(viewConsts.expandButtonClass);
-          $("#" + viewConsts.viewId).toggleClass(viewConsts.showClass);
+        $("#" + consts.apptoolsButtonId).on("click", function(){
+          $(this).toggleClass(consts.expandButtonClass);
+          $("#" + consts.viewId).toggleClass(consts.showClass);
         });
 
         var aux = window.agfkGlobals.auxModel;
@@ -141,7 +155,7 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
        * Handle click event for showing the [implicitly] learned nodes
        */
       handleClearLearnedClick: function(evt){
-        if (!$(evt.currentTarget).hasClass(pvt.viewConsts.disabledClass)){
+        if (!$(evt.currentTarget).hasClass(pvt.consts.disabledClass)){
           this.model.get("options").setLearnedConceptsState(false);
         }
       },
@@ -150,7 +164,7 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
        * Handle click event for showing the [implicitly] learned nodes
        */
       handleShowLearnedClick: function(evt){
-        if (!$(evt.currentTarget).hasClass(pvt.viewConsts.disabledClass)){
+        if (!$(evt.currentTarget).hasClass(pvt.consts.disabledClass)){
           this.model.get("options").setLearnedConceptsState(true);
         }
       },
@@ -173,10 +187,10 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
        * Change the active button to the input name: "explore" or "learn"
        */
       changeActiveELButtonFromName: function(name){
-        var $domEl = $("#" + name + pvt.viewConsts.elNameAppend);
-        ErrorHandler.assert($domEl.hasClass(pvt.viewConsts.elNavButtonClass),
-                            "changeActiveELButtonFromName did not obtain the correct dom element from name:" + name);
-        this.changeActiveELButtonFromDomEl($domEl.get(0));
+        var $domEl = $("#" + name + pvt.consts.elNameAppend);
+        if ($domEl.get(0)){
+          this.changeActiveELButtonFromDomEl($domEl.get(0));
+        }
       },
 
       /**
@@ -184,7 +198,7 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
        */
       changeActiveELButtonFromDomEl: function(buttonEl){
         if (pvt.prevButtonEl === null || buttonEl.id !== pvt.prevButtonEl.id){
-          var activeClass = pvt.viewConsts.activeClass,
+          var activeClass = pvt.consts.activeClass,
               $prevButton = $(pvt.prevButtonEl);
 
           $prevButton.toggleClass(activeClass);
@@ -196,6 +210,13 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
           pvt.prevButtonEl = buttonEl;
         }
       },
+
+      setMode: function (mode) {
+        this.mode = mode;
+        this.changeActiveELButtonFromName(mode);
+        this.el.setAttribute("class", mode);
+      },
+
 
       /**
        * Render the apptools view
@@ -211,6 +232,57 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
       close: function() {
         this.remove();
         this.unbind();
+      },
+
+      uploadGraph: function(evt){
+        if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+          alert("Your browser won't let you load a graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
+          return;
+        }
+        var thisView = this,
+            uploadFile = evt.currentTarget.files[0],
+            filereader = new window.FileReader();
+
+        filereader.onload = function(){
+          var txtRes = filereader.result;
+          try{
+            var jsonObj = JSON.parse(txtRes);
+            // thisView.deleteGraph(true);
+            thisView.model.addJsonNodesToGraph(jsonObj);
+            thisView.model.trigger("render");
+          }catch(err){
+            // FIXME better/more-informative error handling
+            alert("Error parsing uploaded file\nerror message: " + err.message);
+            return;
+          }
+        };
+        filereader.readAsText(uploadFile);
+      },
+
+      previewGraph: function () {
+        var thisView = this;
+        $("#" + pvt.consts.backToEditingButtonId).show();
+        thisView.appRouter.changeUrlParams({mode: "explore"});
+      },
+
+      returnToEditor: function () {
+        var thisView = this;
+        // FIXME this is an ugly hack
+        thisView.appRouter.navigate("", {trigger: true});
+      },
+
+
+      downloadGraph: function(){
+        var outStr = JSON.stringify(this.model.toJSON()),
+            blob = new window.Blob([outStr], {type: "text/plain;charset=utf-8"});
+        window.saveAs(blob, "mygraph.json"); // TODO replace with title once available
+      },
+
+      clearGraph: function(confirmDelete){
+        if (!confirmDelete || confirm("Press OK to clear this graph")){
+          this.model.clear().set(this.model.defaults());
+          this.model.trigger("render"); // FIXME this is a hack
+        }
       }
 
     });

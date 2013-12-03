@@ -6,8 +6,8 @@
 */
 @font-face {
   font-family: "Ionicons";
-  src: url("/static/fonts/ionicons.eot?v=1.3.3");
-  src: url("/static/fonts/ionicons.eot?v=1.3.3#iefix") format("embedded-opentype"), url("/static/fonts/ionicons.ttf?v=1.3.3") format("truetype"), url("/static/fonts/ionicons.woff?v=1.3.3") format("woff"), url("/static/fonts/ionicons.svg?v=1.3.3#Ionicons") format("svg");
+  src: url("../fonts/ionicons.eot?v=1.3.3");
+  src: url("../fonts/ionicons.eot?v=1.3.3#iefix") format("embedded-opentype"), url("../fonts/ionicons.ttf?v=1.3.3") format("truetype"), url("../fonts/ionicons.woff?v=1.3.3") format("woff"), url("../fonts/ionicons.svg?v=1.3.3#Ionicons") format("svg");
   font-weight: normal;
   font-style: normal; }
 
@@ -22,10 +22,6 @@
 .ion-arrow-down-b,
 .ion-arrow-down-c,
 .ion-arrow-expand,
-.ion-arrow-graph-down-left,
-.ion-arrow-graph-down-right,
-.ion-arrow-graph-up-left,
-.ion-arrow-graph-up-right,
 .ion-arrow-left-a,
 .ion-arrow-left-b,
 .ion-arrow-left-c,
@@ -46,10 +42,12 @@
 .ion-checkmark-round,
 .ion-close,
 .ion-close-circled,
+.ion-eye,
 .ion-help,
 .ion-help-circled,
-.ion-ios7-alarm-outline,
 .ion-ios7-close-outline,
+.ion-ios7-cloud-download,
+.ion-ios7-cloud-upload-outline,
 .ion-ios7-help,
 .ion-ios7-help-outline,
 .ion-ios7-information,
@@ -57,6 +55,9 @@
 .ion-ios7-information-outline,
 .ion-ios7-star,
 .ion-ios7-star-outline,
+.ion-ios7-trash-outline,
+.ion-load-d,
+.ion-loop,
 .ion-navicon,
 .ion-navicon-round,
 .ion-star,
@@ -131,18 +132,6 @@
 .ion-arrow-expand:before {
   content: "\f25e"; }
 
-.ion-arrow-graph-down-left:before {
-  content: "\f25f"; }
-
-.ion-arrow-graph-down-right:before {
-  content: "\f260"; }
-
-.ion-arrow-graph-up-left:before {
-  content: "\f261"; }
-
-.ion-arrow-graph-up-right:before {
-  content: "\f262"; }
-
 .ion-arrow-left-a:before {
   content: "\f106"; }
 
@@ -203,17 +192,23 @@
 .ion-close-circled:before {
   content: "\f128"; }
 
+.ion-eye:before {
+  content: "\f133"; }
+
 .ion-help:before {
   content: "\f143"; }
 
 .ion-help-circled:before {
   content: "\f142"; }
 
-.ion-ios7-alarm-outline:before {
-  content: "\f14c"; }
-
 .ion-ios7-close-outline:before {
   content: "\f2bb"; }
+
+.ion-ios7-cloud-download:before {
+  content: "\f174"; }
+
+.ion-ios7-cloud-upload-outline:before {
+  content: "\f176"; }
 
 .ion-ios7-help:before {
   content: "\f19c"; }
@@ -235,6 +230,15 @@
 
 .ion-ios7-star-outline:before {
   content: "\f1df"; }
+
+.ion-ios7-trash-outline:before {
+  content: "\f1eb"; }
+
+.ion-load-d:before, .ion-loading-d:before {
+  content: "\f29d"; }
+
+.ion-loop:before, .ion-looping:before {
+  content: "\f201"; }
 
 .ion-navicon:before {
   content: "\f20e"; }

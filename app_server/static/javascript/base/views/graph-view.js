@@ -238,17 +238,24 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
      * TODO throw error if in subclass version (how?)
      */
     initialize: function(inp){
-      this.preinitialize();
-      this.isFirstRender = true;
-      this.isRendered = false;
-      this.state = {
+      var thisView = this;
+      thisView.preinitialize();
+      thisView.isFirstRender = true;
+      thisView.isRendered = false;
+      thisView.state = {
         doCircleTrans: false,
         doPathsTrans: false
       };
+
+      thisView.listenTo(thisView.model, "render", thisView.render);
+
+      d3.select("#optimize").on("click", function(){thisView.optimizeGraphPlacement.call(thisView, true);});
+
+
       if (inp !== undefined){
-        this.appRouter = inp.appRouter;
+        thisView.appRouter = inp.appRouter;
       }
-      this.postinitialize();
+      thisView.postinitialize();
     },
 
     /**

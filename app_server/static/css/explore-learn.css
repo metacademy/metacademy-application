@@ -11,104 +11,6 @@ body {
     overflow-x: hidden;
 }
 
-/* App tools */
-
-#apptools{
-    width: 15%;
-    max-width: 180px;
-    margin: 0.5em;
-    padding: 0.5em 0.5em;
-    position: absolute;
-    z-index: 10;
-    top: 2em;
-    right: 0;
-    background: rgba(253, 253, 253, 0.98);
-    border: 2px solid #CE94BC;
-    border-radius: 10px;
-    text-align: center;
-}
-
-#apptools button, #hovertext-buttons button{
-    -webkit-box-shadow: 1px 1px 2px #463838;
-    -moz-box-shadow: 1px 1px 2px #463838;
-    box-shadow: 1px 1px 2px #463838;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    border: 2px #5C4A56 solid;
-    background-color: transparent;
-    padding: 1.5px;
-    cursor: pointer;
-}
-
-#apptools button:hover{
-    border: 2px #D145CC solid;
-}
-
-.apptools-title{
-    text-align: center;
-    font-size: 0.95em;
-    font-weight: bold;
-}
-
-/* Explore-Learn Navigation Button */
-.e-to-l-summary-link{
-    color: blueviolet;
-    margin-right: 0.5em;
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.el-nav-button img{
-    width: 30px;
-    height: 30px;
-}
-
-#apptools .el-nav-button.active{
-    opacity: 0.7;
-    border: 2px #5C4A56 solid;
-    cursor: default;
-   -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-}
-
-#apptools .el-nav-button.active:hover{
-    cursor: default;
-    border: 2px #5C4A56 solid;
-}
-
-#explore-learn-button-wrapper{
-    text-align: center;
-    margin: 0.3em 0px 0.6em;
-}
-
-/* apptools action buttons */
-
-#apptools .toggle-lc-button{
-    width: 5em;
-    margin: 0.5em 0.4em;
-    line-height: 1.3em;
-    font-size: 0.8em;
- }
-
-#apptools button.toggle-lc-button.disabled{
-    opacity: 0.4;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-}
-
-#apptools button.toggle-lc-button.disabled:hover{
-    border: 2px #5C4A56 solid;
-    cursor: default;
-}
-
-#apptools .apptools-lc-buttons-wrap{
-    display: inline-block;
-    margin: 0 auto;
-}
-
 .horz-center-wrapper{
     margin: 0 auto;
 }
@@ -602,44 +504,9 @@ h1 .learn-view-star{
     padding: 0.2em 1em;
 }
 
-#apptools-button{
-    right: 1.5em;
-    width: 100px;
-    bottom: 0;
-    padding-right: 1em;
-    border-radius: 5px 5px 0 0;
-    border-width: 1px 1px 0 1px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-#apptools-button.expanded{
-    bottom: 135px;
-    border-bottom: 2px #75526A solid;
-}
-
-#learning-plan-button{
-    left: 0;
-    bottom: 40%;
-    border-radius: 0 0 5px 5px;
-    border-width: 0 1px 1px 1px;
-    -webkit-transform: rotate(-90deg);
-    -webkit-transform-origin: 0 0;
-    -moz-transform: rotate(-90deg);
-    -moz-transform-origin: 0 0;
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    -o-transform-origin: 0 0;
-    -ms-transform: rotate(-90deg);
-    -ms-transform-origin: 0 0;
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
-}
-#learning-plan-button.expanded{
-    left: 55%;
-}
 
 @media only screen and  (max-width: 760px){
-    #learning-plan-button, #apptools-button{
+    #learning-plan-button{
         display: block;
     }
 
@@ -663,23 +530,6 @@ h1 .learn-view-star{
 
     .node-detail-summary-text {
         padding-right: 0;
-    }
-
-    #apptools{
-        top: auto;
-        bottom: 0;
-        max-width: 200px;
-        margin: 0;
-        margin-right: 1em;
-        padding: 0;
-        padding-top: 0.5em;
-        width: 200px;
-        right: 0;
-        height: 125px;
-        display: none;
-    }
-    #apptools.show{
-        display: block;
     }
 
     .detailed-title-tools{

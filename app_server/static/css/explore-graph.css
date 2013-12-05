@@ -98,3 +98,21 @@
     cursor: pointer;
 
 }
+
+.start-wisp, .end-wisp{
+    fill: none;
+    stroke: #333;
+    stroke-width: 2px;
+}
+
+.long-edge{
+    display: none;
+}
+
+path.link-wrapper-hover{
+    display: block;
+}
+
+path.link-wrapper-hover.link-wrapper{
+  opacity: 0.15;
+ }

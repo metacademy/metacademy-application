@@ -58,7 +58,7 @@ path.link {
     cursor: default;
 }
 
-path.link-wrapper{
+path.link-wrapper, path.short-link-wrapper{
     fill: none;
     stroke: rgb(22, 76, 216);
     stroke-width: 24px;

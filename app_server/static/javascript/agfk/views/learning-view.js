@@ -777,7 +777,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         // build the sidebar TODO refactor into a view
         var $div = $(document.createElement("div"));
         $div.attr("id", (pvt.viewConsts.titleListId));
-        thisView.nodeOrdering = thisView.getTopoSortedConcepts();
+        thisView.nodeOrdering = thisView.model.getTopoSort();
         var titlesTitle = document.createElement("h1");
         titlesTitle.textContent = "Learning Plan";
         thisView.$el.prepend(titlesTitle);
@@ -835,7 +835,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         var thisView = this,
             inum,
             noLen,
-            nodeOrdering = thisView.nodeOrdering || thisView.getTopoSortedConcepts(),
+            nodeOrdering = thisView.nodeOrdering || thisView.model.getTopoSort(), //getTopoSortedConcepts(),
             curNode,
             nliview,
             $list = $(document.createElement("ol")),
@@ -880,74 +880,15 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
       },
 
       /**
-       * Compute the learning view ordering (topological sort)
-       * TODO this function may be migrated
-       * if the view ordering is user-dependent
-       */
-      getTopoSortedConcepts: function(){
-        var thisView = this,
-            thisModel = thisView.model,
-            keyTag = window.agfkGlobals.auxModel.get("depRoot") || "",
-            nodes = thisModel.getNodes(),
-            traversedNodes = {}, // keep track of traversed nodes
-            startRootNodes,
-            includeLearned = thisModel.get("options").get("showLearnedConcepts"); // nodes already added to the list
-
-        if (keyTag === ""){
-          // init: obtain node tags with 0 outlinks (root nodes)
-          startRootNodes = _.map(nodes.filter(function(mdl){
-            return mdl.get("outlinks").length == 0 && (includeLearned || !mdl.isLearnedOrImplicitLearned());
-          }), function(itm){
-            return itm.get("id");
-          });
-        }
-        else if (includeLearned || !nodes.get(keyTag).isLearnedOrImplicitLearned()){
-          // root node is the keyTag
-          startRootNodes = [keyTag];
-        }
-        else{
-          return [];
-        }
-
-        // recursive dfs topological sort
-        // TODO this should be defined in pvt
-        function dfsTopSort (rootNodeTags){
-          var curRootNodeTagDepth,
-              returnArr = [],
-              rootNodeRoundArr = [],
-              curRootNodeTag,
-              unqDepTags,
-              curNode;
-
-          // recurse on the input root node tags
-          for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
-            curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
-            curNode = nodes.get(curRootNodeTag);
-            if (!traversedNodes.hasOwnProperty(curRootNodeTag) && (includeLearned || (curNode && !curNode.isLearnedOrImplicitLearned()))){
-              unqDepTags = includeLearned ? curNode.getUniqueDeps() : curNode.getUnlearnedUniqueDeps();
-              if (unqDepTags.length > 0){
-                returnArr = returnArr.concat(dfsTopSort(unqDepTags));
-              }
-              returnArr.push(curRootNodeTag);
-              traversedNodes[curRootNodeTag] = 1;
-            }
-          }
-          return returnArr;
-        };
-
-        return dfsTopSort(startRootNodes);
-      },
-
-      /**
        * Return true if the view has been rendered
        */
       isViewRendered: function(){
         return this.isRendered;
-      },
-
-      getLastElInTopoSort: function(){
-        return this.nodeOrdering && this.nodeOrdering[this.nodeOrdering.length - 1];
       }
+
+      // getLastElInTopoSort: function(){
+      //   return this.nodeOrdering && this.nodeOrdering[this.nodeOrdering.length - 1];
+      // }
     });
   })();
 

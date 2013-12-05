@@ -1,5 +1,5 @@
 /*global define */
-define(["jquery", "backbone", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, Backbone, BaseEdgeCollection, BaseNodeCollection){
+define(["jquery", "underscore", "backbone", "base/collections/edge-collection", "base/collections/node-collection", "base/models/node-model", "base/models/edge-model"], function($, _, Backbone, BaseEdgeCollection, BaseNodeCollection){
   var pvt = {};
 
   pvt.alwaysTrue = function(){return true;};
@@ -111,14 +111,14 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
      * @return <boolean> true if there is a directed path from stNode to endNode (follows outlinks from stNode)
      */
     isPathBetweenNodes: function (stNode, endNode, checkFun) {
-      var thisView = this,
+      var thisGraph = this,
           outlinks = stNode.get("outlinks");
       checkFun = checkFun || pvt.alwaysTrue;
       // DFS recursive search
       return outlinks.length > 0
         && outlinks.any(function(ol){
           var olTar = ol.get("target");
-          return checkFun(ol) && (olTar.id === endNode.id || thisView.isPathBetweenNodes(olTar, endNode, checkFun));
+          return checkFun(ol) && (olTar.id === endNode.id || thisGraph.isPathBetweenNodes(olTar, endNode, checkFun));
         });
     },
 
@@ -272,6 +272,77 @@ define(["jquery", "backbone", "base/collections/edge-collection", "base/collecti
       node.get("dependencies").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
       node.get("outlinks").pluck("id").forEach(function(edgeId){ thisGraph.removeEdge(edgeId);});
       nodes.remove(node);
+    },
+
+    /**
+     * Compute the learning view ordering (topological sort)
+     * TODO write tests for getTopoSort FIXME
+     */
+      getTopoSort: function(){
+        var thisGraph = this;
+        if (!thisGraph.topoSort){
+            thisGraph.doTopoSort();
+        }
+        return thisGraph.topoSort;
+      },
+
+    doTopoSort: function () {
+              // TODO cache the sort
+        var thisGraph = this,
+            nodes = thisGraph.getNodes(),
+            traversedNodes = {}, // keep track of traversed nodes
+            startRootNodes;
+
+        // init: obtain node tags with 0 outlinks (root nodes)
+          startRootNodes = _.map(nodes.filter(function(mdl){
+            return mdl.get("outlinks").length == 0;
+          }), function(itm){
+            return itm.get("id");
+          });
+
+        thisGraph.topoSort = dfsTopSort(startRootNodes);
+
+        // recursive dfs topological sort
+        // TODO this should be defined in pvt?
+        function dfsTopSort (rootNodeTags, prevRootTag){
+          var curRootNodeTagDepth,
+              returnArr = [],
+              rootNodeRoundArr = [],
+              curRootNodeTag,
+              unqDepTags,
+              curNode;
+
+          // recurse on the input root node tags
+          // -- use edge weight to do the ordering if available
+          for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
+            curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
+            curNode = nodes.get(curRootNodeTag);
+            if (!traversedNodes.hasOwnProperty(curRootNodeTag)){
+              if (prevRootTag) {
+                thisGraph.getEdge(curRootNodeTag + prevRootTag).isTopoEdge = true; // mark topological edges
+              }
+              unqDepTags = curNode.getUniqueDeps();
+              if (unqDepTags.length > 0){
+                returnArr = returnArr.concat(dfsTopSort(unqDepTags, curRootNodeTag));
+              }
+              returnArr.push(curRootNodeTag);
+              traversedNodes[curRootNodeTag] = 1;
+            }
+          }
+          return returnArr;
+        };
+    },
+
+    /**
+     * Check if the input edge is present in the topological sort
+     */
+    isEdgeInTopoSort: function(edge){
+      var thisGraph = this;
+      // make sure we've done a topological sort
+      if (!thisGraph.topoSort){
+        thisGraph.doTopoSort();
+      }
+      return edge.isTopoEdge;
     }
   });
 });

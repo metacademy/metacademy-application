@@ -3,7 +3,6 @@
  * FIXME this router has become tortuous -CJR
  */
 
-
 // TODO normalize create/edit vocabulary
 
 /*global define */
@@ -122,7 +121,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                   height: pvt.consts.colorboxHeight,
                   onClosed: function(){
                     thisRoute.navigate(""); // TODO this may not always be true
-                  }}); // TODO move hardcoding to consts
+                  }});
               } else {
                 $(selector).html(inView.$el).show();
               }
@@ -330,7 +329,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             }
             thisRoute.showView(thisRoute.learnView, doRender, "#" + consts.lViewId);
             if (isCreating && paramsObj[qFocusConcept] === undefined){
-              paramsObj[qFocusConcept] = thisRoute.learnView.getLastElInTopoSort();;
+              paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort.pop();
             }
             break;
 

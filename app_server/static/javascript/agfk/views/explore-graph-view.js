@@ -13,6 +13,14 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       // ----- class and id names ----- //
       viewId: "explore-graph-view", // id of view element (div by default) must change in CSS as well
       // WARNING some changes must be propagated to the css file
+      startWispPrefix: "startp-",
+      endWispPrefix: "endp-",
+      startWispClass: "start-wisp",
+      endWispClass: "end-wisp",
+      wispWrapperClass: "short-link-wrapper",
+      linkWrapHoverClass: "link-wrapper-hover",
+      longEdgeClass: "long-edge",
+      wispDashArray: "3,3",
       exploreSvgId: "explore-svg",
       learnedClass: "learned",
       implicitLearnedClass: "implicit-learned",
@@ -39,11 +47,13 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       renderEvt: "viewRendered",
       // ----- rendering options ----- //
       defaultScale: 0.54,
-      defaultGraphDepth: 200, // default depth of graph
+      numWispPts: 10,
+      wispLen: 80,
       defaultExpandDepth: 1, // default number of dependencies to show on expand
       defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
       defaultNodeSepDist: 1.7, // separation of graph nodes
       defaultNodeWidth: 2.7, // diameter of graph nodes
+      edgeLenThresh: 220, // threshold length of edges to be shown by default
       numCharLineDisplayNode: 14, // max number of characters to display per title line of graph nodes
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
@@ -89,15 +99,35 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
     };
 
     /**
+     * Returns the path of the starting wisp
+     */
+    pvt.getPathWispD = function (svgPath, isStart) {
+      var consts = pvt.consts,
+          distances = [],
+          dt = consts.wispLen/consts.numWispPts,
+          endDist = isStart ? consts.wispLen : svgPath.getTotalLength(),
+          i = isStart ? 0 :  endDist - consts.wispLen + consts.nodeRadius; // TODO subtract node radius
+
+      distances.push(i);
+      while ((i += dt) < endDist) distances.push(i);
+      var points = distances.map(function(dist){
+        return svgPath.getPointAtLength(dist);
+      });
+      if (!isStart) points.push(svgPath.getPointAtLength(10000000)); // FIXME hack for firefox support (how to get the last point?)
+      return "M" + points.map(function(p){ return p.x + "," + p.y;}).join("L");
+
+    };
+
+    /**
      * Get summary box placement (top left) given node placement
      */
     pvt.getSummaryBoxPlacement = function(nodeRect, placeLeft){
-      var viewConsts = pvt.consts,
+      var consts = pvt.consts,
           leftMultSign = placeLeft ? -1: 1,
-          shiftDiff = (1 + leftMultSign*viewConsts.SQRT2DIV2)*nodeRect.width/2 + leftMultSign*viewConsts.summaryArrowWidth;
-      if (placeLeft){shiftDiff -= viewConsts.summaryWidth;}
+          shiftDiff = (1 + leftMultSign*consts.SQRT2DIV2)*nodeRect.width/2 + leftMultSign*consts.summaryArrowWidth;
+      if (placeLeft){shiftDiff -= consts.summaryWidth;}
       return {
-        top:  (nodeRect.top + (1-viewConsts.SQRT2DIV2)*nodeRect.height/2 - viewConsts.summaryArrowTop) + "px",
+        top:  (nodeRect.top + (1-consts.SQRT2DIV2)*nodeRect.height/2 - consts.summaryArrowTop) + "px",
         left:  (nodeRect.left + shiftDiff) + "px"
       };
     };
@@ -107,28 +137,28 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
      */
     pvt.addEToLIcon = function(d, d3node){
       var thisView = this,
-          viewConsts = pvt.consts;
+          consts = pvt.consts;
 
       var iconG = d3node.append("svg:image")
             .attr("xlink:href", window.STATIC_PATH + "images/list-icon.png") // TODO move hardcoding
-            .attr("class", viewConsts.elIconClass)
-            .attr("height", viewConsts.elIconHeight + "px")
-            .attr("width", viewConsts.elIconWidth + "px")
-            .attr(viewConsts.dataConceptTagProp, d.id);
+            .attr("class", consts.elIconClass)
+            .attr("height", consts.elIconHeight + "px")
+            .attr("width", consts.elIconWidth + "px")
+            .attr(consts.dataConceptTagProp, d.id);
 
       var numEls = d3node.selectAll("tspan")[0].length,
-          elIconX = viewConsts.elIconXOffset,
-          elIconY = viewConsts.nodeIconsConstYOffset
-            + (numEls-1)*viewConsts.nodeIconsPerYOffset + viewConsts.elIconYOffset;
+          elIconX = consts.elIconXOffset,
+          elIconY = consts.nodeIconsConstYOffset
+            + (numEls-1)*consts.nodeIconsPerYOffset + consts.elIconYOffset;
       iconG.attr("transform",
                  "translate(" + elIconX + "," + elIconY + ") "
-                 + "scale(" + viewConsts.elIconScale + ")");
+                 + "scale(" + consts.elIconScale + ")");
 
     };
 
     pvt.attachIconToNode = function(d3node, d, clkFun, appendObjs, xOff, yOff, scale, iconClass){
       var thisView = this,
-          viewConsts = pvt.consts,
+          consts = pvt.consts,
           nodeId = d.id,
           aux = window.agfkGlobals.auxModel;
 
@@ -141,10 +171,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
               clkFun.call(aux, nodeId);
             })
             .on("mouseover", function() {
-              d3.select(this).classed(viewConsts.hoveredClass, true);
+              d3.select(this).classed(consts.hoveredClass, true);
             })
             .on("mouseout", function() {
-              d3.select(this).classed(viewConsts.hoveredClass, false);
+              d3.select(this).classed(consts.hoveredClass, false);
             });
 
       appendObjs.forEach(function(obj){
@@ -153,8 +183,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       });
 
       var numEls = d3node.selectAll("tspan")[0].length;
-      yOff += viewConsts.nodeIconsConstYOffset
-        + (numEls-1)*viewConsts.nodeIconsPerYOffset;
+      yOff += consts.nodeIconsConstYOffset
+        + (numEls-1)*consts.nodeIconsPerYOffset;
       gEl.attr("transform",
                "translate(" + xOff + "," + yOff + ") "
                + "scale(" + scale + ")");
@@ -276,8 +306,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       circleMouseOver: function(d, nodeEl) {
         var thisView = this,
-            viewConsts = pvt.consts,
-            hoveredClass = viewConsts.hoveredClass,
+            consts = pvt.consts,
+            hoveredClass = consts.hoveredClass,
             d3node = d3.select(nodeEl);
 
         if (d3node.classed(hoveredClass)){
@@ -290,29 +320,43 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         // add the appropriate class
         d3node.classed(hoveredClass, true);
 
-        // add node summary if not already present
-        if (pvt.summaryTOKillList.hasOwnProperty(nodeId)){
-          window.clearInterval(pvt.summaryTOKillList[nodeId]);
-          delete pvt.summaryTOKillList[nodeId];
-        }
-        thisView.attachNodeSummary(d, d3node);
+        // show/emphasize connecting edges
+        d.get("outlinks").each(function (ol) {
+          d3.select("#" + consts.edgeGIdPrefix + ol.id)
+            .selectAll("path")
+            .classed(consts.linkWrapHoverClass, true);
+        });
+        d.get("dependencies").each(function (dep) {
+          d3.select("#" + consts.edgeGIdPrefix + dep.id)
+            .selectAll("path")
+            .classed(consts.linkWrapHoverClass, true);
+        });
+
+
+        // TODO find a different way to present summaries on mouse over (e.g. with a button click)
+        // // add node summary if not already present
+        // if (pvt.summaryTOKillList.hasOwnProperty(nodeId)){
+        //   window.clearInterval(pvt.summaryTOKillList[nodeId]);
+        //   delete pvt.summaryTOKillList[nodeId];
+        // }
+        // thisView.attachNodeSummary(d, d3node);
 
         // add node-hoverables if not already present
-        if (!d3node.attr(viewConsts.dataHoveredProp)) {
+        if (!d3node.attr(consts.dataHoveredProp)) {
           // add checkmark if not present
-          if (d3node.select("." + viewConsts.checkClass).node() === null){
+          if (d3node.select("." + consts.checkClass).node() === null){
             thisView.addCheckmarkIcon(d, d3node);
           }
           // add node star if not already present
-          if (d3node.select("." + viewConsts.starClass).node() === null){
+          if (d3node.select("." + consts.starClass).node() === null){
             thisView.addStarIcon(d, d3node);
           }
 
           // add e-to-l button if not already present
-          if (d3node.select("." + viewConsts.elIconClass).node() === null){
+          if (d3node.select("." + consts.elIconClass).node() === null){
             pvt.addEToLIcon.call(thisView, d, d3node);
           }
-          d3node.attr(viewConsts.dataHoveredProp, true);
+          d3node.attr(consts.dataHoveredProp, true);
         }
         return 0;
       },
@@ -331,9 +375,22 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         var thisView = this,
             d3node = d3.select(nodeEl),
             summId = pvt.getSummaryIdForDivWrap.call(thisView, d3node),
-            viewConsts = pvt.consts,
-            hoveredClass = viewConsts.hoveredClass,
+            consts = pvt.consts,
+            hoveredClass = consts.hoveredClass,
             nodeId = nodeEl.id;
+
+        d3node.classed(hoveredClass, false); // FIXME align class options once summary display is figured out
+        // show/emphasize connecting edges
+        d.get("outlinks").each(function (ol) {
+          d3.select("#" + consts.edgeGIdPrefix + ol.id)
+            .selectAll("path")
+            .classed(consts.linkWrapHoverClass, false);
+        });
+        d.get("dependencies").each(function (dep) {
+          d3.select("#" + consts.edgeGIdPrefix + dep.id)
+            .selectAll("path")
+            .classed(consts.linkWrapHoverClass, false);
+        });
 
         if(pvt.summaryTOStartList.hasOwnProperty(nodeId)){
           window.clearInterval(pvt.summaryTOStartList[nodeId]);
@@ -349,7 +406,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
               delete pvt.summaryDisplays[summId];
               d3node.classed(hoveredClass, false);
             }
-          }, viewConsts.summaryHideDelay);
+          }, consts.summaryHideDelay);
         }
       },
 
@@ -379,6 +436,57 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       prerender: function () {
         var thisView = this;
         thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
+      },
+
+      /**
+       * @Override
+       */
+      postrender: function () {
+        // clip appropriate edges so we end up with a whisp effect
+        var thisView = this,
+            consts = pvt.consts;
+        thisView.gPaths.filter(function (d){
+          return thisView.doClipEdge.call(thisView, d);
+        })
+        .each(function(d){ // TODO filter the paths
+          var d3this = d3.select(this),
+              stPathD = pvt.getPathWispD(d3this.select("path").node(), true),
+              endPathD = pvt.getPathWispD(d3this.select("path").node(), false);
+
+          // hide long paths
+          var longPaths = d3this.selectAll("path");
+          longPaths.classed(consts.longEdgeClass, true)
+            .on("mouseout", function(d){
+              longPaths.classed("link-wrapper-hover", false);
+            });
+
+          // TODO remove hardcoding to consts
+          var wispsG = d3this.insert("g", ":first-child");
+          wispsG.append("path")
+            .attr("id", consts.startWispPrefix + d3this.attr("id"))
+            .attr("d", stPathD)
+            .attr("stroke-dasharray", consts.wispDashArray)
+            .classed(consts.startWispClass, true);
+          wispsG.append("path")
+            .attr("d", stPathD)
+            .classed("short-link-wrapper", true);
+
+          wispsG.append("path")
+            .attr("id", consts.endWispPrefix + d3this.attr("id"))
+            .attr("d", endPathD)
+            .attr("stroke-dasharray", consts.wispDashArray)
+            .style('marker-end','url(#end-arrow)')
+            .classed(consts.endWispClass, true);
+
+          wispsG.append("path")
+            .attr("d", endPathD)
+            .classed(consts.wispWrapperClass, true);
+
+          wispsG.selectAll("path")
+            .on("mouseover", function(){
+              longPaths.classed(consts.linkWrapHoverClass, true);
+            });
+        });
       },
 
       /**
@@ -431,17 +539,17 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        * propType: specify the property type: "learned", "implicitLearned", "starred"
        */
       toggleNodeProps: function(d, d3node, toggleOn, propType){
-        var viewConsts = pvt.consts,
+        var consts = pvt.consts,
             thisView = this,
             changeLearnStatus = propType === "learned" || propType === "implicitLearned",
             d3Svg = thisView.d3Svg;
-        var propClass = {"learned": viewConsts.learnedClass,
-                         "implicitLearned": viewConsts.implicitLearnedClass,
-                         "starred": viewConsts.starredClass
+        var propClass = {"learned": consts.learnedClass,
+                         "implicitLearned": consts.implicitLearnedClass,
+                         "starred": consts.starredClass
                         }[propType];
 
         if (changeLearnStatus){
-          var hasCheck = d3node.select("." + viewConsts.checkClass).node() !== null;
+          var hasCheck = d3node.select("." + consts.checkClass).node() !== null;
           // insert checkmark if needed
           if (propType === "learned" && toggleOn && !hasCheck){
             thisView.addCheckmarkIcon(d, d3node);
@@ -451,7 +559,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
           thisView.changeEdgesClass(d.get("dependencies"), propClass, toggleOn, d3Svg);
         }
         else{
-          var hasStar =  d3node.select("." + viewConsts.starClass).node() !== null;
+          var hasStar =  d3node.select("." + consts.starClass).node() !== null;
           if (toggleOn && !hasStar){
             thisView.addStarIcon(d, d3node);
           }
@@ -508,7 +616,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       showNodeSummary: function(d, circle) {
         var thisView = this,
-            viewConsts = pvt.consts,
+            consts = pvt.consts,
             div = document.createElement("div"),
             circleId = circle.attr("id"),
             summaryP = document.createElement("p"),
@@ -516,38 +624,38 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
         // add summary
         summaryTxt = d.get("summary");
-        summaryP.textContent = summaryTxt.length > 0 ? summaryTxt : viewConsts.NO_SUMMARY_MSG;
+        summaryP.textContent = summaryTxt.length > 0 ? summaryTxt : consts.NO_SUMMARY_MSG;
 
         div.appendChild(summaryP);
         div.id = pvt.getSummaryIdForDivTxt.call(thisView, circle);
         var $div = $(div);
-        $div.addClass(viewConsts.summaryTextClass);
+        $div.addClass(consts.summaryTextClass);
 
         // add wrapper div so we can use "overflow" pseudo elements
         var wrapDiv = document.createElement("div"),
             d3wrapDiv = d3.select(wrapDiv);
         wrapDiv.id = pvt.getSummaryIdForDivWrap.call(thisView, circle);
-        d3wrapDiv.classed(viewConsts.summaryWrapClass, true);
+        d3wrapDiv.classed(consts.summaryWrapClass, true);
 
         // place the summary box on the side with the most screen real-estate
         var circleRect = circle.node().getBoundingClientRect(),
             placeLeft = circleRect.left + circleRect.width / 2 > window.innerWidth / 2;
-        d3wrapDiv.classed(placeLeft ? viewConsts.summaryRightClass : viewConsts.summaryLeftClass, true);
+        d3wrapDiv.classed(placeLeft ? consts.summaryRightClass : consts.summaryLeftClass, true);
         wrapDiv.appendChild(div);
 
         // get/set location of box
         var sumLoc = pvt.getSummaryBoxPlacement(circleRect, placeLeft);
         wrapDiv.style.left = sumLoc.left;
         wrapDiv.style.top = sumLoc.top;
-        wrapDiv.style.width = viewConsts.summaryWidth + "px";
+        wrapDiv.style.width = consts.summaryWidth + "px";
         wrapDiv.style.display = "none";
 
         // add box to document with slight fade-in
         var $wrapDiv = $(wrapDiv);
         pvt.summaryTOStartList[circleId] = window.setTimeout(function(){
           delete pvt.summaryTOStartList[circleId];
-          $wrapDiv.appendTo("#" + viewConsts.viewId).fadeIn(viewConsts.summaryFadeInTime);
-        }, viewConsts.summaryAppearDelay);
+          $wrapDiv.appendTo("#" + consts.viewId).fadeIn(consts.summaryFadeInTime);
+        }, consts.summaryAppearDelay);
 
         pvt.summaryDisplays[wrapDiv.id] = {"$wrapDiv": $wrapDiv, "d3circle": circle, "placeLeft": placeLeft};
         return $wrapDiv;
@@ -610,9 +718,19 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       isEdgeVisible: function(edge, useVisTrans){
         var thisView = this;
         useVisTrans = useVisTrans === undefined ? true : useVisTrans;
-        return !edge.get("isContracted")
-          && (!useVisTrans || !thisView.isEdgeVisiblyTransitive(edge))
+        return (!useVisTrans || !thisView.isEdgeVisiblyTransitive(edge))
+          && !edge.get("isContracted")
           && (thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target")));
+
+      },
+
+      /**
+       * Determines if the edge should be clipped
+       *
+       */
+      doClipEdge: function(edge) {
+        var thisView = this;
+          return !(thisView.isEdgeShortestOutlink(edge) || thisView.isEdgeLengthBelowThresh(edge));
       },
 
       /**
@@ -620,9 +738,46 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       isEdgeVisiblyTransitive: function (edge) {
         var thisView = this;
-        return edge.get("isTransitive")
+          return edge.get("isTransitive")
           && thisView.model.checkIfTransitive(edge, pvt.getEdgeVisibleNoTransFun.call(thisView));
+      },
+
+      /**
+       * Detect if the given edge is shorter than the threshold specified in pvt.consts
+       * TODO use getTotalLength on svg path
+       */
+      isEdgeLengthBelowThresh: function (edge) {
+        var src = edge.get("source"),
+            tar = edge.get("target");
+        return Math.sqrt(Math.pow(src.get("x") - tar.get("x"), 2)  + Math.pow(src.get("y") - tar.get("y"), 2)) <= pvt.consts.edgeLenThresh;
+      },
+
+      /**
+       * Detect if the given edge is the shortest outlink from the source node
+       */
+      isEdgeShortestOutlink: function (edge) {
+        var thisView = this,
+            source = edge.get("source"),
+            srcX = source.get("x"),
+            srcY = source.get("y"),
+            curMinSqDist = Number.MAX_VALUE,
+            distSq,
+            tar,
+            minId;
+        source.get("outlinks").each(function (ol) {
+          tar = ol.get("target"),
+          distSq = Math.pow(tar.get("x") - srcX, 2) + Math.pow(tar.get("y") - srcY, 2);
+          if (distSq <= curMinSqDist && !thisView.isEdgeVisiblyTransitive(ol)){
+            minId = tar.id;
+            curMinSqDist = distSq;
+          }
+        });
+        if (source.id === "covariance") {
+          var x = 5;
+        }
+        return minId === edge.get("target").id;
       }
+
     }); // end Backbone.View.extend({
   })();
 

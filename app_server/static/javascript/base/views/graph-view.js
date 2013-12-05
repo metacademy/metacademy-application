@@ -44,7 +44,9 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     circleGIdPrefix: "circlgG-",
     edgeGIdPrefix: "edgeG-",
     depIconGClass: "dep-icon-g",
-    olIconGClass: "ol-icon-g"
+    olIconGClass: "ol-icon-g",
+    doBTOpt: true,
+    graphDirection: "BT" // BT TB LR RL
   };
 
   pvt.consts.plusPts = "0,0 " +
@@ -288,7 +290,8 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
 
       // set the paths to only contain visible paths FIXME do edges always have ids?
       thisView.gPaths = thisView.gPaths
-        .data(thisView.model.get("edges").filter(function(mdl){
+        .data(thisView.model.get("edges")
+        .filter(function(mdl){
           return thisView.isEdgeVisible(mdl);
         }), function(d){
           return d.id;
@@ -429,18 +432,26 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       minSSDist = minSSDist === undefined ? true : minSSDist;
 
       // input graph into dagre
-      nodes.filter(function(n){return thisView.isNodeVisible(n);}).forEach(function(node){
+      // nodes.filter(function(n){return thisView.isNodeVisible(n);}).forEach(function(node){
+      //   dagreGraph.addNode(node.id, {width: nodeWidth, height: nodeHeight});
+      // });
+      nodes.each(function(node){
         dagreGraph.addNode(node.id, {width: nodeWidth, height: nodeHeight});
       });
 
-      edges.filter(function(e){return thisView.isEdgeVisible(e);}).forEach(function(edge){
+      // edges.filter(function(e){return thisView.isEdgeVisible(e);}).forEach(function(edge){
+      //   dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
+      // });
+
+      edges.filter(function(e){
+        return !e.get("isTransitive");
+      }).forEach(function(edge){
         dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
       });
-
       var layout = dagre.layout()
             .rankSep(80)
             .nodeSep(120) // TODO move defaults to consts
-            .rankDir("BT").run(dagreGraph);
+            .rankDir(pvt.consts.graphDirection).run(dagreGraph);
 
       // determine average x and y movement
       if (noMoveNodeId === undefined && minSSDist) {

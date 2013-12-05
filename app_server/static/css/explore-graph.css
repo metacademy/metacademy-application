@@ -7,6 +7,15 @@
     fill: #868686;
 }
 
+/* dep and ol circles */
+.concept-g .ol-circle{
+    fill: rgb(255, 223, 223);
+}
+
+.concept-g .dep-circle{
+    fill: rgb(221, 232, 255);
+}
+
 /* properties for learned paths */
 .learned path.link, .implicit-learned path.link{
     opacity: 0.5;
@@ -116,3 +125,7 @@ path.link-wrapper-hover{
 path.link-wrapper-hover.link-wrapper{
   opacity: 0.15;
  }
+
+path.link-wrapper-hover.ol-show.link-wrapper{
+    stroke: red;
+}

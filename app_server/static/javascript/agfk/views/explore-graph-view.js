@@ -19,6 +19,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       endWispClass: "end-wisp",
       wispWrapperClass: "short-link-wrapper",
       linkWrapHoverClass: "link-wrapper-hover",
+      depLinkWrapHoverClass: "ol-show",
       longEdgeClass: "long-edge",
       wispDashArray: "3,3",
       exploreSvgId: "explore-svg",
@@ -30,6 +31,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       starHoveredClass: "node-star-hovered",
       starredClass: "starred",
       checkClass: "checkmark",
+      depCircleClass: "dep-circle",
+      olCircleClass: "ol-circle",
       checkHoveredClass: "checkmark-hovered",
       summaryDivSuffix: "-summary-txt",
       summaryWrapDivSuffix: "-summary-wrap",
@@ -321,17 +324,28 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         d3node.classed(hoveredClass, true);
 
         // show/emphasize connecting edges
+        // TODO move object refs outside of loop FIXME
         d.get("outlinks").each(function (ol) {
           d3.select("#" + consts.edgeGIdPrefix + ol.id)
             .selectAll("path")
-            .classed(consts.linkWrapHoverClass, true);
+            .classed(consts.linkWrapHoverClass, true)
+            .classed(consts.depLinkWrapHoverClass, true);
+          if (thisView.isEdgeVisible(ol)){
+            d3.select("#" + consts.circleGIdPrefix + ol.get("target").id)
+              .select("circle")
+              .classed(consts.olCircleClass, true);
+          }
         });
         d.get("dependencies").each(function (dep) {
           d3.select("#" + consts.edgeGIdPrefix + dep.id)
             .selectAll("path")
             .classed(consts.linkWrapHoverClass, true);
+          if (thisView.isEdgeVisible(dep)){
+            d3.select("#" + consts.circleGIdPrefix + dep.get("source").id)
+              .select("circle")
+              .classed(consts.depCircleClass, true);
+          }
         });
-
 
         // TODO find a different way to present summaries on mouse over (e.g. with a button click)
         // // add node summary if not already present
@@ -384,12 +398,21 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         d.get("outlinks").each(function (ol) {
           d3.select("#" + consts.edgeGIdPrefix + ol.id)
             .selectAll("path")
-            .classed(consts.linkWrapHoverClass, false);
+            .classed(consts.linkWrapHoverClass, false)
+            .classed(consts.depLinkWrapHoverClass, false);
+          d3.select("#" + consts.circleGIdPrefix + ol.get("target").id)
+            .select("circle")
+            .classed(consts.olCircleClass, false);
+
         });
         d.get("dependencies").each(function (dep) {
           d3.select("#" + consts.edgeGIdPrefix + dep.id)
             .selectAll("path")
             .classed(consts.linkWrapHoverClass, false);
+          d3.select("#" + consts.circleGIdPrefix + dep.get("source").id)
+            .select("circle")
+            .classed(consts.depCircleClass, false);
+
         });
 
         if(pvt.summaryTOStartList.hasOwnProperty(nodeId)){

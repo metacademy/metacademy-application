@@ -48,7 +48,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       hoverTextButtonsId: "hovertext-buttons",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
-      focusSvgClass: "focused",
+      scopeSvgClass: "scoped",
+      scopeCircleGClass: "scoped-circle-g",
       // ----- rendering options ----- //
       defaultScale: 0.54,
       numWispPts: 10,
@@ -100,6 +101,22 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       return function(e){
         return thisView.isEdgeVisible.call(thisView,  e, false);
       };
+    };
+
+    /**
+     * Change the scope node classes for the corresponding g elements
+     */
+    pvt.changeScopeNodeClasses = function (prevD, nextD) {
+      var thisView = this,
+          gId;
+      if (prevD) {
+        gId = thisView.getCircleGId(prevD.id);
+        d3.select("#" + gId).classed(pvt.consts.scopeCircleGClass, false);
+      }
+      if (nextD) {
+        gId = thisView.getCircleGId(nextD.id);
+        d3.select("#" + gId).classed(pvt.consts.scopeCircleGClass, true);
+      }
     };
 
     /**
@@ -160,7 +177,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
     };
 
-    pvt.attachIconToNode = function(d3node, d, clkFun, appendObjs, xOff, yOff, scale, iconClass){
+    pvt.attachIconToNode = function(d3node, d, mouseUpFun, appendObjs, xOff, yOff, scale, iconClass){
       var thisView = this,
           consts = pvt.consts,
           nodeId = d.id,
@@ -168,11 +185,9 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
       var gEl = d3node.append("g")
             .attr("class", iconClass)
-            .on("click", function(){
-              // stop event from firing on the ellipse
-              d3.event.stopPropagation();
-              // change the starred status of the node model
-              clkFun.call(aux, nodeId);
+            .on("mouseup", function(){
+              thisView.state.iconClicked = true;
+              mouseUpFun.call(aux, nodeId);
             })
             .on("mouseover", function() {
               d3.select(this).classed(consts.hoveredClass, true);
@@ -308,7 +323,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             gConsts = aux.getConsts(),
             thisModel = thisView.model;
 
-        thisView.focusNode = null;
+        thisView.scopeNode = null;
 
         // dim nodes that are [implicitly] learned or starred
         thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, nodeSid, status){
@@ -371,7 +386,9 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       svgMouseUp: function () {
         var thisView = this;
+        // reset the states here
         thisView.state.justDragged = false;
+        thisView.state.iconClicked = false;
       },
 
       /**
@@ -380,18 +397,18 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       circleMouseUp: function (d, domEl) {
         var thisView = this;
 
-        if (thisView.state.justDragged) {
+        if (thisView.state.justDragged || thisView.state.iconClicked) {
           return false;
         }
 
         thisView.model.expandGraph();
 
-        if (thisView.focusNode && thisView.focusNode.id === d.id) {
+        if (thisView.scopeNode && thisView.scopeNode.id === d.id) {
           thisView.optimizeGraphPlacement(true, false, d.id);
-          thisView.nullFocusNode();
+          thisView.nullScopeNode();
           return false;
         } else {
-          thisView.setFocusNode(d);
+          thisView.setScopeNode(d);
         }
 
         // contract the graph from the deps and ols
@@ -599,7 +616,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         d3El.select("." + consts.wispGClass).remove();
         d3El.select("." + consts.longEdgeClass).classed(consts.longEdgeClass, false);
         var thisView = this;
-        if (thisView.doClipEdge(d) && !thisView.focusNode) {
+        if (thisView.doClipEdge(d) && !thisView.scopeNode) {
           pvt.handleLongPaths(d, d3El);
         }
       },
@@ -728,7 +745,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       },
 
       /**
-       * Handle explore-to-learn view event that focuses on the clicked concept
+       * Handle explore-to-learn view event that scopees on the clicked concept
        *
        * @param evt: the click event
        */
@@ -743,12 +760,12 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       },
 
       /**
-       * Trigger transfer from explore view to learn view and focus on conceptTag
+       * Trigger transfer from explore view to learn view and scope on conceptTag
        *
        * @param conceptTag: the tag of the concept to show in the learn view
        */
       transferToLearnViewForConcept: function(conceptTag){
-        this.appRouter.changeUrlParams({mode: "learn", focus: conceptTag});
+        this.appRouter.changeUrlParams({mode: "learn", scope: conceptTag});
       },
 
       /**
@@ -835,8 +852,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             xOff = consts.checkXOffset,
             yOff = consts.checkYOffset;
         pvt.attachIconToNode.call(this, d3node, d,
-        window.agfkGlobals.auxModel.toggleLearnedStatus, appendObj,
-        xOff, yOff, consts.checkGScale, consts.checkClass);
+                                  window.agfkGlobals.auxModel.toggleLearnedStatus, appendObj,
+                                  xOff, yOff, consts.checkGScale, consts.checkClass);
       },
 
       /**
@@ -917,21 +934,23 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       },
 
       /**
-       * Set the focus node
+       * Set the scope node
        */
-      setFocusNode: function (d) {
+      setScopeNode: function (d) {
         var thisView = this;
-        thisView.focusNode = d;
-        thisView.d3Svg.classed(pvt.consts.focusSvgClass, true);
+        pvt.changeScopeNodeClasses.call(thisView, thisView.scopeNode, d);
+        thisView.scopeNode = d;
+        thisView.d3Svg.classed(pvt.consts.scopeSvgClass, true);
       },
 
       /**
-       * Set the focus node
+       * Remove the current scope node
        */
-      nullFocusNode: function (d) {
+      nullScopeNode: function (d) {
         var thisView = this;
-        thisView.focusNode = null;
-        thisView.d3Svg.classed(pvt.consts.focusSvgClass, false);
+        pvt.changeScopeNodeClasses.call(thisView, thisView.scopeNode, null);
+        thisView.scopeNode = null;
+        thisView.d3Svg.classed(pvt.consts.scopeSvgClass, false);
       }
 
 

@@ -60,7 +60,7 @@ path.link {
 
 path.link-wrapper, path.short-link-wrapper{
     fill: none;
-    stroke: rgb(22, 76, 216);
+    stroke: #8282e5;
     stroke-width: 24px;
     opacity: 0;
 }

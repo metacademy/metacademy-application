@@ -32,7 +32,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
       var thisGraph = this,
           deps = [],
           nodes = resp.nodes,
-          tag = this.get("root"),
           nodeTag;
       for (nodeTag in nodes) {
         if (nodes.hasOwnProperty(nodeTag)) {
@@ -43,8 +42,8 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
           // contract the incoming graph
           // tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
           //          if (tag === tmpNode.tag) {
-          tmpNode.x = 400; // TODO come up with better solution
-          tmpNode.y = 100;
+          // tmpNode.x = 400; // TODO come up with better solution
+          // tmpNode.y = 100;
           // tmpNode.hasContractedDeps = true;
           // tmpNode.isContracted = false;
           //          }

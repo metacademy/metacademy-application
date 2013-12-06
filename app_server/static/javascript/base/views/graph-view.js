@@ -46,7 +46,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     depIconGClass: "dep-icon-g",
     olIconGClass: "ol-icon-g",
     doBTOpt: true,
-    graphDirection: "BT" // BT TB LR RL
+    graphDirection: "BT" // BT TB LR RL TODO consider making an option for the user
   };
 
   pvt.consts.plusPts = "0,0 " +
@@ -101,6 +101,12 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     // svg nodes and edges
     thisView.gPaths = d3SvgG.append("g").selectAll("g");
     thisView.gCircles = d3SvgG.append("g").selectAll("g");
+
+    // set initial position of root elements
+    var rootNode = thisView.model.getNode(thisView.model.get("root")), // TODO handle multiple roots
+        winWidth = window.innerWidth; // TODO
+    rootNode.set("x", winWidth/2);
+    rootNode.set("y", 150);
   };
 
   // from http://bl.ocks.org/mbostock/3916621
@@ -196,7 +202,6 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     }
   };
 
-
   pvt.getEdgePath = function(d){
     var pathPts = [].concat(d.get("middlePts"));
     // TODO only compute if node position changed
@@ -228,7 +233,6 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
 
 
   return Backbone.View.extend({
-
 
     // hack to call appRouter from view (must pass in approuter)
     appRouter: null,
@@ -309,10 +313,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
             .attrTween("d", pvt.pathTween(edgePath, 4))
             .each("end", function (d) {
               thisView.postRenderEdge.call(thisView, d, d3.select(this.parentElement));
-            }
-);
-          // d3el.selectAll("path." + consts.pathWrapClass)
-          //   .attr("d", edgePath);
+            });
         });
         thisView.state.doPathsTrans = false;
       }
@@ -338,7 +339,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
 
-          // apend display path
+          // append display path
           d3el.append("path")
             .style('marker-end','url(#end-arrow)')
             .classed(consts.pathClass, true)

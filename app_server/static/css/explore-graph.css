@@ -11,9 +11,16 @@
 .concept-g .ol-circle{
     fill: rgb(255, 223, 223);
 }
-
 .concept-g .dep-circle{
     fill: rgb(221, 232, 255);
+}
+
+.focused .concept-g .ol-circle{
+    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
+}
+.focused .concept-g .dep-circle{
+    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
+
 }
 
 /* properties for learned paths */
@@ -105,7 +112,6 @@
 .e-to-l-icon:hover{
     opacity: 1;
     cursor: pointer;
-
 }
 
 .start-wisp, .end-wisp{
@@ -114,18 +120,26 @@
     stroke-width: 2px;
 }
 
+.link-wrapper-hover .start-wisp, .link-wrapper-hover .end-wisp{
+    display: none;
+}
+
 .long-edge{
     display: none;
 }
 
-path.link-wrapper-hover{
+.link-wrapper-hover path{
     display: block;
 }
 
-path.link-wrapper-hover.link-wrapper{
+.link-wrapper-hover path.link-wrapper{
   opacity: 0.15;
  }
 
-path.link-wrapper-hover.ol-show.link-wrapper{
+.ol-show path.link-wrapper{
     stroke: red;
+}
+
+.focused .link-wrapper-hover path.link-wrapper{
+    opacity: 0;
 }

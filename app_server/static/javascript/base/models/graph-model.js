@@ -42,12 +42,12 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
 
           // contract the incoming graph
           // tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
-//          if (tag === tmpNode.tag) {
-            tmpNode.x = 400; // TODO come up with better solution
-            tmpNode.y = 100;
-            // tmpNode.hasContractedDeps = true;
-            // tmpNode.isContracted = false;
-//          }
+          //          if (tag === tmpNode.tag) {
+          tmpNode.x = 400; // TODO come up with better solution
+          tmpNode.y = 100;
+          // tmpNode.hasContractedDeps = true;
+          // tmpNode.isContracted = false;
+          //          }
 
           // parse deps separately (outlinks will be readded)
           tmpNode.dependencies.forEach(function(dep){
@@ -99,9 +99,9 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
     /**
      * @return <boolean> true if the graph is populated
      */
-     isPopulated: function(){
-       return this.getEdges().length > 0 || this.getNodes().length > 0;
-     },
+    isPopulated: function(){
+      return this.getEdges().length > 0 || this.getNodes().length > 0;
+    },
 
     /**
      * @param stNode: the start node
@@ -278,59 +278,59 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
      * Compute the learning view ordering (topological sort)
      * TODO write tests for getTopoSort FIXME
      */
-      getTopoSort: function(){
-        var thisGraph = this;
-        if (!thisGraph.topoSort){
-            thisGraph.doTopoSort();
-        }
-        return thisGraph.topoSort;
-      },
+    getTopoSort: function(){
+      var thisGraph = this;
+      if (!thisGraph.topoSort){
+        thisGraph.doTopoSort();
+      }
+      return thisGraph.topoSort;
+    },
 
     doTopoSort: function () {
-              // TODO cache the sort
-        var thisGraph = this,
-            nodes = thisGraph.getNodes(),
-            traversedNodes = {}, // keep track of traversed nodes
-            startRootNodes;
+      // TODO cache the sort
+      var thisGraph = this,
+          nodes = thisGraph.getNodes(),
+          traversedNodes = {}, // keep track of traversed nodes
+          startRootNodes;
 
-        // init: obtain node tags with 0 outlinks (root nodes)
-          startRootNodes = _.map(nodes.filter(function(mdl){
-            return mdl.get("outlinks").length == 0;
-          }), function(itm){
-            return itm.get("id");
-          });
+      // init: obtain node tags with 0 outlinks (root nodes)
+      startRootNodes = _.map(nodes.filter(function(mdl){
+        return mdl.get("outlinks").length == 0;
+      }), function(itm){
+        return itm.get("id");
+      });
 
-        thisGraph.topoSort = dfsTopSort(startRootNodes);
+      thisGraph.topoSort = dfsTopSort(startRootNodes);
 
-        // recursive dfs topological sort
-        // TODO this should be defined in pvt?
-        function dfsTopSort (rootNodeTags, prevRootTag){
-          var curRootNodeTagDepth,
-              returnArr = [],
-              rootNodeRoundArr = [],
-              curRootNodeTag,
-              unqDepTags,
-              curNode;
+      // recursive dfs topological sort
+      // TODO this should be defined in pvt?
+      function dfsTopSort (rootNodeTags, prevRootTag){
+        var curRootNodeTagDepth,
+            returnArr = [],
+            rootNodeRoundArr = [],
+            curRootNodeTag,
+            unqDepTags,
+            curNode;
 
-          // recurse on the input root node tags
-          // -- use edge weight to do the ordering if available
-          for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
-            curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
-            curNode = nodes.get(curRootNodeTag);
-            if (!traversedNodes.hasOwnProperty(curRootNodeTag)){
-              if (prevRootTag) {
-                thisGraph.getEdge(curRootNodeTag + prevRootTag).isTopoEdge = true; // mark topological edges
-              }
-              unqDepTags = curNode.getUniqueDeps();
-              if (unqDepTags.length > 0){
-                returnArr = returnArr.concat(dfsTopSort(unqDepTags, curRootNodeTag));
-              }
-              returnArr.push(curRootNodeTag);
-              traversedNodes[curRootNodeTag] = 1;
+        // recurse on the input root node tags
+        // -- use edge weight to do the ordering if available
+        for(curRootNodeTagDepth = 0; curRootNodeTagDepth < rootNodeTags.length; curRootNodeTagDepth++){
+          curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
+          curNode = nodes.get(curRootNodeTag);
+          if (!traversedNodes.hasOwnProperty(curRootNodeTag)){
+            if (prevRootTag) {
+              thisGraph.getEdge(curRootNodeTag + prevRootTag).isTopoEdge = true; // mark topological edges
             }
+            unqDepTags = curNode.getUniqueDeps();
+            if (unqDepTags.length > 0){
+              returnArr = returnArr.concat(dfsTopSort(unqDepTags, curRootNodeTag));
+            }
+            returnArr.push(curRootNodeTag);
+            traversedNodes[curRootNodeTag] = 1;
           }
-          return returnArr;
-        };
+        }
+        return returnArr;
+      };
     },
 
     /**
@@ -343,6 +343,18 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
         thisGraph.doTopoSort();
       }
       return edge.isTopoEdge;
+    },
+
+    expandGraph: function () {
+      var thisGraph = this;
+      thisGraph.getEdges().each(function (edge) {
+        edge.set("isContracted", false);
+      });
+
+      thisGraph.getNodes().each(function (node) {
+        node.set("isContracted", false);
+      });
     }
+
   });
 });

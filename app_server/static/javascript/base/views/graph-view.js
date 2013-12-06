@@ -303,12 +303,16 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
         gPaths.each(function(d){
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
-          d3el.selectAll("path." + consts.pathClass)
+          d3el.selectAll("path") // ." + consts.pathClass)
             .transition()
             .duration(500)
-            .attrTween("d", pvt.pathTween(edgePath, 4));
-          d3el.selectAll("path." + consts.pathWrapClass)
-            .attr("d", edgePath);
+            .attrTween("d", pvt.pathTween(edgePath, 4))
+            .each("end", function (d) {
+              thisView.postRenderEdge.call(thisView, d, d3.select(this.parentElement));
+            }
+);
+          // d3el.selectAll("path." + consts.pathWrapClass)
+          //   .attr("d", edgePath);
         });
         thisView.state.doPathsTrans = false;
       }
@@ -318,17 +322,22 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
           d3el.selectAll("path")
-            .attr("d", edgePath);
+            .attr("d", edgePath)
+            .each(function (d) {
+              thisView.postRenderEdge.call(thisView, d, d3.select(this.parentNode));
+            });
         });
       }
 
       // add new paths
       var newPathsG = gPaths.enter().append("g");
       newPathsG
+        .attr("opacity", 0)
         .attr("id", function (d) { return  thisView.getPathGId(d); })
         .each(function(d){
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
+
           // apend display path
           d3el.append("path")
             .style('marker-end','url(#end-arrow)')
@@ -340,11 +349,25 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
             .classed(pvt.consts.pathWrapClass, true);
         });
 
+      newPathsG.transition()
+      .delay(300)
+      .duration(1000)
+      .attr("opacity", 1)
+      .each("end", function (d) {
+        // call post render function for edge
+        thisView.postRenderEdge.call(thisView, d, d3.select(this));
+      });
+
+
       // call subview function
       thisView.handleNewPaths(newPathsG);
 
       // remove old links
-      gPaths.exit().remove(); // TODO add appropriate animation
+      gPaths.exit()
+      .transition()
+      .duration(500)
+      .attr("opacity", 0)
+      .remove(); // TODO add appropriate animation
 
       //***************
       // Render Circles
@@ -356,7 +379,11 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
                 return d.id;
               });
 
-      thisView.gCircles.exit().remove(); // TODO add appropriate animation
+      thisView.gCircles.exit()
+        .transition()
+        .duration(500)
+        .attr("opacity", 0)
+        .remove(); // TODO add appropriate animation
 
       if (thisView.state.doCircleTrans){
         thisView.gCircles
@@ -364,6 +391,9 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
           .duration(500)
           .attr("transform", function(d){
             return "translate(" + d.get("x") + "," + d.get("y") + ")";
+          })
+          .each("end", function (d) {
+            thisView.postRenderNode.call(thisView, d, d3.select(this));
           });
         thisView.state.doCircleTrans = false;
       }
@@ -377,7 +407,8 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       // add new nodes
       var newGs = thisView.gCircles
             .enter()
-            .append("g");
+            .append("g")
+            .attr("opacity", 0);
 
       newGs.classed(consts.circleGClass, true)
         .attr("id", function (d) { return thisView.getCircleGId(d); })
@@ -390,12 +421,22 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
         Utils.insertTitleLinebreaks(d3this, d.get("title"));
       });
 
+      newGs.transition()
+        .delay(200)
+        .duration(800)
+        .attr("opacity", 1)
+        .each("end", function (d) {
+          thisView.postRenderNode.call(thisView, d, d3.select(this));
+        });
+
+
       thisView.handleNewCircles(newGs);
 
-      // handle expand contract icons last
-      thisView.gCircles.each(function(d){
-        thisView.addExpContIcons(d, d3.select(this), thisView);
-      });
+      // TODO FIXME -- don't always add expand/contract
+      // // handle expand contract icons last
+      // thisView.gCircles.each(function(d){
+      //   thisView.addExpContIcons(d, d3.select(this), thisView);
+      // });
 
       //***********
       // POSTRENDER
@@ -406,6 +447,17 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     },
 
     /**
+     * called for each edge after it has been rendered (all animations have been applied)
+     */
+    postRenderEdge: function () {},
+
+
+    /**
+     * called for each node after it has been rendered (all animations have been applied)
+     */
+    postRenderNode: function () {},
+
+    /**
      * Optimize graph placement using dagre
      *
      * @param nodeWidth <number>: the width in px of each node
@@ -414,8 +466,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
      * @param <id> noMoveNodeId: node id of node that should not move during optimization
      * note: noMoveNodeId has precedent over minSSDist
      */
-    optimizeGraphPlacement: function(doRender, minSSDist, noMoveNodeId) {
-
+    optimizeGraphPlacement: function(doRender, minSSDist, noMoveNodeId, orderNodesByX) {
       var thisView = this,
           thisGraph = thisView.model,
           dagreGraph = new dagre.Digraph(),
@@ -432,21 +483,19 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       minSSDist = minSSDist === undefined ? true : minSSDist;
 
       // input graph into dagre
-      // nodes.filter(function(n){return thisView.isNodeVisible(n);}).forEach(function(node){
-      //   dagreGraph.addNode(node.id, {width: nodeWidth, height: nodeHeight});
-      // });
-      nodes.each(function(node){
-        dagreGraph.addNode(node.id, {width: nodeWidth, height: nodeHeight});
-      });
+      nodes.sortBy(function (n) {
+        return orderNodesByX ? n.get("x") : -1;
+      })
+        .forEach(function(node){
+          if (thisView.isNodeVisible(node)) {
+            dagreGraph.addNode(node.id, {width: nodeWidth, height: nodeHeight});
+          }
+        });
 
-      // edges.filter(function(e){return thisView.isEdgeVisible(e);}).forEach(function(edge){
-      //   dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
-      // });
-
-      edges.filter(function(e){
-        return !e.get("isTransitive");
-      }).forEach(function(edge){
-        dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
+      edges.each(function(edge){
+        if (!edge.get("isContracted") && !edge.get("isTransitive")) {
+          dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
+        }
       });
       var layout = dagre.layout()
             .rankSep(80)

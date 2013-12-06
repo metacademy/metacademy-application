@@ -72,7 +72,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
   };
 
   var GraphEditor = GraphView.extend({
-    // el: document.getElementById(pvt.consts.gcWrapId),
 
     // @override
     postinitialize: function() {

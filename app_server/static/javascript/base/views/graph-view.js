@@ -20,7 +20,8 @@
  * + d3 should handle all svg-related events, while backbone should handle all other events
  * + use handleNewPaths and handleNewCircles to attach listeners during calls to render
  */
-window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], function(Utils, Backbone, d3, _, dagre) {
+ /*global define*/
+define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], function(Utils, Backbone, d3, _, dagre, $) {
 
   /**********************
    * private class vars *
@@ -46,7 +47,7 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     depIconGClass: "dep-icon-g",
     olIconGClass: "ol-icon-g",
     doBTOpt: true,
-    graphDirection: "BT" // BT TB LR RL TODO consider making an option for the user
+    graphDirection: "TB" // BT TB LR RL TODO consider making an option for the user
   };
 
   pvt.consts.plusPts = "0,0 " +
@@ -103,10 +104,11 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
     thisView.gCircles = d3SvgG.append("g").selectAll("g");
 
     // set initial position of root elements
-    var rootNode = thisView.model.getNode(thisView.model.get("root")), // TODO handle multiple roots
-        winWidth = window.innerWidth; // TODO
-    rootNode.set("x", winWidth/2);
-    rootNode.set("y", 150);
+    // var rootNode = thisView.model.getNode(thisView.model.get("root")), // TODO handle multiple roots
+    //   // hack since svg width is not yet available
+    //     useWidth = window.innerWidth - $("#concept-list-wrapper").outerWidth(true);
+    // rootNode.set("x", useWidth/2);
+    // rootNode.set("y", 150);
   };
 
   // from http://bl.ocks.org/mbostock/3916621
@@ -540,6 +542,28 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
       }
     },
 
+    centerForNode:function (d) {
+      var thisView = this;
+      if (!thisView.isNodeVisible(d)){
+        if (thisView.scopeNode) thisView.nullScopeNode();
+        thisView.model.expandGraph();
+        thisView.optimizeGraphPlacement(true, false, d.id);
+      }
+      return thisView.d3SvgG.transition()
+        .attr("transform", function () {
+          // TODO move this function to pvt
+          var dzoom = thisView.dzoom,
+              svgBCR = thisView.d3Svg.node().getBoundingClientRect(),
+              curScale = dzoom.scale(),
+              wx = svgBCR.width,
+              wy = svgBCR.height,
+              nextY = wy/2 - d.get("y")*curScale - pvt.consts.nodeRadius*curScale/2,
+              nextX = wx/2 - d.get("x")*curScale;
+          dzoom.translate([nextX, nextY]);
+          return "translate(" + nextX + "," + nextY + ") scale(" + curScale + ")";
+        });
+    },
+
     /**
      * Add expand/contract icon to graph
      * @param d: the data element
@@ -547,7 +571,6 @@ window.define(["base/utils/utils", "backbone", "d3", "underscore", "dagre"], fun
      * @param thisView: current view reference
      * @param isDeps: set to true if working with dependencies (otherwise working with outlinks)
      */
-
     addExpContIcons: function(d, d3this, thisView){
       if (!thisView.isNodeVisible(d)) return;
 

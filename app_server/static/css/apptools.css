@@ -185,26 +185,6 @@
     border-bottom: 2px #75526A solid;
 }
 
-#learning-plan-button{
-    left: 0;
-    bottom: 40%;
-    border-radius: 0 0 5px 5px;
-    border-width: 0 1px 1px 1px;
-    -webkit-transform: rotate(-90deg);
-    -webkit-transform-origin: 0 0;
-    -moz-transform: rotate(-90deg);
-    -moz-transform-origin: 0 0;
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    -o-transform-origin: 0 0;
-    -ms-transform: rotate(-90deg);
-    -ms-transform-origin: 0 0;
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
-}
-#learning-plan-button.expanded{
-    left: 55%;
-}
-
 @media only screen and  (max-width: 760px){
     #apptools-button{
         display: block;

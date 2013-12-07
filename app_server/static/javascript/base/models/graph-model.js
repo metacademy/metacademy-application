@@ -10,7 +10,8 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
       return {
         root: null, // TODO make this more general (multiple roots)
         edges: new BaseEdgeCollection(),
-        nodes: new BaseNodeCollection()
+        nodes: new BaseNodeCollection(),
+        focus: null
       };
     },
 
@@ -42,8 +43,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
           // contract the incoming graph
           // tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
           //          if (tag === tmpNode.tag) {
-          // tmpNode.x = 400; // TODO come up with better solution
-          // tmpNode.y = 100;
           // tmpNode.hasContractedDeps = true;
           // tmpNode.isContracted = false;
           //          }

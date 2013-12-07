@@ -1,0 +1,68 @@
+#concept-title-list h1{
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9em;
+    padding-bottom: 0.3em;
+}
+
+#concept-title-list .time-estimate{
+    font-size: 0.8em;
+    font-style: italic;
+    color: #8D5E5E;
+    text-align: center;
+    border-bottom: 1px solid #CCCCCC;
+    padding-bottom: 1em;
+}
+
+#concept-list-toggle-button{
+    display: none;
+    left: 0;
+    bottom: 40%;
+    border-radius: 0 0 5px 5px;
+    border-width: 0 1px 1px 1px;
+    -webkit-transform: rotate(-90deg);
+    -webkit-transform-origin: 0 0;
+    -moz-transform: rotate(-90deg);
+    -moz-transform-origin: 0 0;
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -o-transform-origin: 0 0;
+    -ms-transform: rotate(-90deg);
+    -ms-transform-origin: 0 0;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+#concept-list-toggle-button.expanded{
+    left: 55%;
+}
+
+@media only screen and  (max-width: 760px){
+    #concept-title-list{
+        display: none;
+        width: 55%;
+    }
+
+    #concept-list-toggle-button{
+        display: block;
+    }
+
+    #concept-title-list.show{
+        display: block;
+    }
+
+    #learning-plan-button{
+        display: block;
+    }
+
+    .learn-title-buttons{
+        position: relative;
+        display: block;
+        margin-top: 0.2em;
+    }
+
+    .learn-title-buttons span{
+        padding: 0 0.2em;
+    }
+
+}

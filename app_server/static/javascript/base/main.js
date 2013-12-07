@@ -8,8 +8,8 @@
 requirejs.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
-    jquery:"lib/jquery-2.0.3.min",
-    underscore: "lib/underscore-min",
+    jquery:"lib/jquery-1.10.2",
+    underscore: "lib/underscore",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
     "dagre": "lib/dagre",

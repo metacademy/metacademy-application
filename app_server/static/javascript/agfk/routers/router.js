@@ -6,8 +6,8 @@
 // TODO normalize create/edit vocabulary
 
 /*global define */
-define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "agfk/views/learning-view", "agfk/views/apptools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
-  function(Backbone, _, $, ExploreView, LearnView, AppToolsView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
+define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "base/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/apptools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
+  function(Backbone, _, $, ExploreView, ConceptListView, ConceptDetailsView, AppToolsView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
   "use strict";
 
   /**
@@ -33,6 +33,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       rightPanelId: "rightpanel",
       lViewId: "learn-view-wrapper", // id for main learn view div
       createViewId: "gc-wrap",
+      listWrapId: "concept-list-wrapper",
       expViewId: "explore-graph-view-wrapper", // id for main explore view div
       editViewId: "concept-editor-wrap",
       noContentErrorKey: "nocontent", // must also change in error-view.js
@@ -40,20 +41,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
     };
 
-    /**
-     * Clean up active views TODO where/when do we use this?
-     */
-    pvt.cleanUpViews = function(){
-      var thisRoute = this;
-      if (thisRoute.expView instanceof ExploreView){
-        thisRoute.expView.close();
-        thisRoute.expView = undefined;
-      }
-      if (thisRoute.learnView instanceof LearnView){
-        thisRoute.learnView.close();
-        thisRoute.learnView = undefined;
-      }
-    };
 
     // return public object
     return Backbone.Router.extend({
@@ -256,20 +243,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
 
         // should we re-render the view?
-        doRender = isCreating
-          || thisRoute.viewMode === pEditMode
-          || keyNodeChanged
-          || (thisRoute.viewMode === pLearnMode && typeof thisRoute.learnView === "undefined")
-          || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
-
-        // if (typeof thisRoute.loadingView === "undefined"){
-        //   thisRoute.loadingView = new LoadingView();
-        //   loadViewRender = true;
-        // }
-        // show loading view if new view is rendered
-        // if (doRender){
-        //   thisRoute.showView(thisRoute.loadingView, loadViewRender, "#" + consts.loadViewId);
-        // }
+        doRender = isCreating;
 
         // check if/how we need to acquire more data from the server FIXME
         if(!thisRoute.graphModel.isPopulated()){
@@ -288,49 +262,73 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
         // helper function to route change parameters appropriately
         // necessary because of AJAX calls to obtain new data
         function postNodePop() {
-         try{
+          try{
             !isCreating && ErrorHandler.assert(thisRoute.graphModel.get("nodes").length > 0,
-            "Fetch did not populate graph nodes for fetch: " + nodeId);
-         }
+                                               "Fetch did not populate graph nodes for fetch: " + nodeId);
+          }
           catch(err){
             console.error(err.message);
             thisRoute.showErrorMessageView(pvt.consts.noContentErrorKey, nodeId);
             return;
-            }
+          }
 
-          // set the document title to be the key concept
+          // set the document title as the key concept
           if (!isCreating){
             document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("root")).get("title") + " - Metacademy"; // UPDATE different in create
           } else {
             document.title = "Graph Creation - Metacademy";
           }
 
+          // add the concept list view if it is not already present
+          if (!thisRoute.conceptListView) {
+            thisRoute.conceptListView = new ConceptListView({model: thisRoute.graphModel, appRouter: thisRoute});
+            $("#" + consts.listWrapId).html(thisRoute.conceptListView.render().el);
+          }
+
+          if (paramsObj[qFocusConcept] === undefined){
+            paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
+          }
+
+
           switch (paramsObj[qViewMode]){
           case pExploreMode:
+            doRender = doRender || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
             if (doRender){ // UPDATE
               thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute});
             }
             thisRoute.showView(thisRoute.expView, doRender, "#" + consts.expViewId);
+            // center the graph display: flicker animation
+            var fnode = thisRoute.graphModel.getNode( paramsObj[qFocusConcept]);
+            thisRoute.expView.centerForNode(fnode);
+            thisRoute.expView.setFocusNode(fnode);
+
             break;
           case pEditMode:
+            doRender = true;
             thisRoute.editView = new ConceptEditorView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept])});
             thisRoute.showView(thisRoute.editView, doRender, "#" + consts.editViewId, false, true);
             break;
 
           case pCreateMode:
+            doRender = true;
             thisRoute.createView = thisRoute.createView
                                      || new EditorGraphView({model: thisRoute.graphModel, appRouter: thisRoute});
             thisRoute.showView(thisRoute.createView, doRender, "#" + consts.createViewId);
             break;
 
           case pLearnMode:
-            if (doRender){
-              thisRoute.learnView = new LearnView({model: thisRoute.graphModel, appRouter: thisRoute});
+            if (paramsObj[qFocusConcept] === undefined){
+              paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
+            }
+            if (!thisRoute.learnView || paramsObj[qFocusConcept] !== thisRoute.learnView.model.id ){
+              // close the old learn view
+              thisRoute.learnView && thisRoute.learnView.close();
+              doRender = true;
+              thisRoute.learnView = new ConceptDetailsView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept]),
+                                                            appRouter: thisRoute});
             }
             thisRoute.showView(thisRoute.learnView, doRender, "#" + consts.lViewId);
-            if (isCreating && paramsObj[qFocusConcept] === undefined){
-              paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort.pop();
-            }
+
             break;
 
           default:
@@ -343,12 +341,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             paramQLearnConcept = nodeId;
           }
 
-          // TODO what is the elTransition monitoring exactly? FIXME is this needed still?
-          if (paramsObj[qViewMode] === pLearnMode && (!thisRoute.elTransition || thisRoute.firstLTrans)){
-              thisRoute.learnView.expandConcept(paramQLearnConcept);
-              thisRoute.firstLTrans = false;
-          }
-          thisRoute.setELTransition(false); // reset the router state
+          thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
+          thisRoute.setELTransition(false); // reset the router state TODO is this still doing anything?
           thisRoute.prevUrlParams = $.extend({}, paramsObj);
           thisRoute.prevNodeId = nodeId;
         }

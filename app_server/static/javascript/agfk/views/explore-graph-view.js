@@ -45,11 +45,11 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       eToLConceptTxtClass: "exp-to-learn-txt",
       learnIconName: "glasses-icon.svg",
       dataConceptTagProp: "data-concept",
-      hoverTextButtonsId: "hovertext-buttons",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
       scopeSvgClass: "scoped",
       scopeCircleGClass: "scoped-circle-g",
+      focusCircleGClass: "focused-circle-g",
       // ----- rendering options ----- //
       defaultScale: 0.54,
       numWispPts: 10,
@@ -106,16 +106,16 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
     /**
      * Change the scope node classes for the corresponding g elements
      */
-    pvt.changeScopeNodeClasses = function (prevD, nextD) {
+    pvt.changeNodeClasses = function (prevD, nextD, classVal) {
       var thisView = this,
           gId;
       if (prevD) {
         gId = thisView.getCircleGId(prevD.id);
-        d3.select("#" + gId).classed(pvt.consts.scopeCircleGClass, false);
+        d3.select("#" + gId).classed(classVal, false);
       }
       if (nextD) {
         gId = thisView.getCircleGId(nextD.id);
-        d3.select("#" + gId).classed(pvt.consts.scopeCircleGClass, true);
+        d3.select("#" + gId).classed(classVal, true);
       }
     };
 
@@ -165,7 +165,11 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             .attr("class", consts.elIconClass)
             .attr("height", consts.elIconHeight + "px")
             .attr("width", consts.elIconWidth + "px")
-            .attr(consts.dataConceptTagProp, d.id);
+            .attr(consts.dataConceptTagProp, d.id)
+            .on("mouseup", function () {
+              thisView.handleEToLConceptClick.call(thisView, this.getAttribute(consts.dataConceptTagProp), this);
+            }
+);
 
       var numEls = d3node.selectAll("tspan")[0].length,
           elIconX = consts.elIconXOffset,
@@ -305,12 +309,6 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       // id of view element (div unless tagName is specified)
       id: pvt.consts.viewId,
 
-      // most events are handled via d3; this is awkward for backbone, but jQuery isn't as reliable/east for SVG events
-      // TODO try to be consistent with event handling
-      events: {
-        "click .e-to-l-icon": "handleEToLConceptClick"
-      },
-
       /**
        * @Override
        * Function called after initialize actions
@@ -392,7 +390,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       },
 
       /**
-       *
+       * Mouse up on the concept circle
        */
       circleMouseUp: function (d, domEl) {
         var thisView = this;
@@ -410,6 +408,9 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         } else {
           thisView.setScopeNode(d);
         }
+
+        // change node
+        thisView.appRouter.changeUrlParams({focus: d.id});
 
         // contract the graph from the deps and ols
         var edgeShowList = [],
@@ -442,20 +443,8 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             node.set("isContracted", nodeShowList.indexOf(node.id) === -1);
           });
 
-        // first transition the g so the node is centered
-        thisView.d3SvgG.transition()
-          .attr("transform", function () {
-            // TODO move this function to pvt
-            var dzoom = thisView.dzoom,
-                curScale = dzoom.scale(),
-                wx = window.innerWidth,
-                wy = window.innerHeight,
-                nextY = wy/2 - d.get("y")*curScale - pvt.consts.nodeRadius*curScale/2,
-                nextX = wx/2 - d.get("x")*curScale;
-            dzoom.translate([nextX, nextY]);
-            return "translate(" + nextX + "," + nextY + ") scale(" + curScale + ")";
-          })
-          .each("end", function () {
+        // transition the g so the node is centered
+          thisView.centerForNode(d).each("end", function () {
             thisView.optimizeGraphPlacement(true, false, d.id, true);
           });
         return true;
@@ -749,10 +738,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        *
        * @param evt: the click event
        */
-      handleEToLConceptClick: function(evt){
-        var imgEl = evt.currentTarget,
-            conceptTag = imgEl.getAttribute(pvt.consts.dataConceptTagProp);
-        this.transferToLearnViewForConcept(conceptTag);
+      handleEToLConceptClick: function(conceptTag, imgEl){
+        var thisView = this;
+        thisView.transferToLearnViewForConcept(conceptTag);
+        thisView.state.iconClicked = true;
         // simulate mouseout for explore-graph-view consistency
         Utils.simulate(imgEl.parentNode, "mouseout", {
           relatedTarget: document
@@ -765,7 +754,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        * @param conceptTag: the tag of the concept to show in the learn view
        */
       transferToLearnViewForConcept: function(conceptTag){
-        this.appRouter.changeUrlParams({mode: "learn", scope: conceptTag});
+        this.appRouter.changeUrlParams({mode: "learn", focus: conceptTag});
       },
 
       /**
@@ -933,12 +922,19 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         return minId === edge.get("target").id;
       },
 
+      setFocusNode: function (d) {
+        var thisView = this;
+        pvt.changeNodeClasses.call(thisView, thisView.focusNode, d, pvt.consts.focusCircleGClass);
+        thisView.focusNode = d;
+      },
+
+
       /**
        * Set the scope node
        */
       setScopeNode: function (d) {
         var thisView = this;
-        pvt.changeScopeNodeClasses.call(thisView, thisView.scopeNode, d);
+        pvt.changeNodeClasses.call(thisView, thisView.scopeNode, d, pvt.consts.scopeCircleGClass);
         thisView.scopeNode = d;
         thisView.d3Svg.classed(pvt.consts.scopeSvgClass, true);
       },
@@ -948,12 +944,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       nullScopeNode: function (d) {
         var thisView = this;
-        pvt.changeScopeNodeClasses.call(thisView, thisView.scopeNode, null);
+        pvt.changeNodeClasses.call(thisView, thisView.scopeNode, null, pvt.consts.scopeCircleGClass);
         thisView.scopeNode = null;
         thisView.d3Svg.classed(pvt.consts.scopeSvgClass, false);
       }
-
-
     }); // end Backbone.View.extend({
   })();
 

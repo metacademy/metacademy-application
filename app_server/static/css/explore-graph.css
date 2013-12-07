@@ -22,8 +22,8 @@
     fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
 }
 
-.concept-g.scoped-circle-g circle, .concept-g.scoped-circle-g .dep-circle, .concept-g.scoped-circle-g .ol-circle{
-    fill: #c3fee0;
+.concept-g.scoped-circle-g circle, .concept-g.scoped-circle-g .dep-circle, .concept-g.scoped-circle-g .ol-circle, .concept-g.focused-circle-g circle{
+    fill: rgb(245, 232, 242);
 }
 
 /* properties for learned paths */

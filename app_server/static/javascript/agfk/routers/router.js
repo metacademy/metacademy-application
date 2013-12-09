@@ -236,10 +236,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           thisRoute.userModel = userModel;
         }
 
-          //thisRoute.appToolsView.changeActiveELButtonFromName(thisRoute.viewMode);
-
-
-        // should we re-render the view?
+        // default rendering determined by edit mode
         doRender = isCreating;
 
         // check if/how we need to acquire more data from the server FIXME
@@ -279,7 +276,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           // add the concept list view if it is not already present
           if (!thisRoute.conceptListView) {
             thisRoute.conceptListView = new ConceptListView({model: thisRoute.graphModel, appRouter: thisRoute});
-            $("#" + consts.listWrapId).html(thisRoute.conceptListView.render().el);
+            $("#main").prepend(thisRoute.conceptListView.render().el);
           }
 
           if (paramsObj[qFocusConcept] === undefined){

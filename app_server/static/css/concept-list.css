@@ -1,4 +1,4 @@
-#concept-list-wrapper{
+#concept-title-list{
     border-right: #333 solid 1px;
 }
 
@@ -53,6 +53,7 @@
     background-color: rgb(249, 249, 255);
     z-index: 10;
     width: 20%;
+    min-width: 200px;
     height: 7em;
     border-bottom: 1px #333333 solid;
     border-right: 1px #333333 solid;
@@ -67,7 +68,28 @@
     text-align: center;
 }
 
-#concept-list-toggle-button{
+#concept-list-hide-button{
+    position: absolute;
+    z-index: 100;
+    right: 0;
+    top: 0.1em;
+    cursor: pointer;
+}
+
+#concept-list-hide-button{
+    border: 1px solid #7E7E7E;
+    border-radius: 4px 0 0 4px;
+    font-size: 1em;
+    border-right: 0;
+    color: #7e7e7e;
+}
+
+#concept-list-hide-button:hover{
+    border-color: #690259;
+    color: #690259;
+}
+
+#concept-list-show-button{
     display: none;
     left: 0;
     bottom: 40%;
@@ -85,21 +107,35 @@
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 }
 
-#concept-list-toggle-button.expanded{
+#concept-list-show-button.expanded{
     left: 55%;
 }
 
-@media only screen and  (max-width: 760px){
-    #concept-title-list{
-        display: none;
-        width: 55%;
-    }
+.hide-clist #concept-title-list{
+    display: none;
+}
 
-    #concept-list-toggle-button{
+.hide-clist #concept-list-show-button{
+    display: block;
+}
+
+@media only screen and  (max-width: 760px){
+    #concept-list-wrapper#concept-title-list{
+        display: none;
+    }
+    .show-clist #concept-list-wrapper{
         display: block;
     }
 
-    #concept-title-list.show{
+    .show-clist #concept-list-show-button{
+        display: none;
+    }
+
+    .hide-clist #concept-list-wrapper{
+        display: none;
+    }
+
+    #concept-list-show-button{
         display: block;
     }
 

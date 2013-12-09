@@ -41,9 +41,10 @@ body {
 */
 #concept-list-wrapper{
     width: 20%;
+    min-width: 200px;
     display: block;
     float: left;
-    border-right: 1px solid #333;
+    position:relative;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -53,7 +54,6 @@ body {
 
 #main-display-view{
     height: inherit;
-    margin-left: 20%;
     overflow: auto;
 }
 
@@ -87,4 +87,16 @@ body {
     color: rgb(236, 236, 236);
     border: #302C2C solid;
     padding: 0.2em 1em;
+}
+
+@media only screen and  (max-width: 760px){
+    #main-display-view{
+        padding-left: 2em;
+        padding-right: 1em;
+        margin-left: 0;
+    }
+
+    #concept-list-wrapper{
+        display: none;
+    }
 }

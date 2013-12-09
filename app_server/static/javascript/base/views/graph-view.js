@@ -541,6 +541,10 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       }
     },
 
+    /**
+     * Centers the given node
+     * Note: places root/leaves at 1/3 dist from respective edge
+     */
     centerForNode:function (d) {
       var thisView = this;
       if (!thisView.isNodeVisible(d)){
@@ -556,7 +560,8 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
               curScale = dzoom.scale(),
               wx = svgBCR.width,
               wy = svgBCR.height,
-              nextY = wy/2 - d.get("y")*curScale - pvt.consts.nodeRadius*curScale/2,
+              dispFract = d.get("dependencies").length ? (d.get("outlinks").length ? 0.5 : 2/3) : (1/3),
+              nextY = wy*dispFract - d.get("y")*curScale - pvt.consts.nodeRadius*curScale/2,
               nextX = wx/2 - d.get("x")*curScale;
           dzoom.translate([nextX, nextY]);
           return "translate(" + nextX + "," + nextY + ") scale(" + curScale + ")";

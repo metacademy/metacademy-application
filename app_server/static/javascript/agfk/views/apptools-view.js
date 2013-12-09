@@ -85,10 +85,10 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         });
 
         // hide/show apptools for small view ports
-        $("#" + consts.apptoolsButtonId).on("click", function(){
-          $(this).toggleClass(consts.expandButtonClass);
-          $("#" + consts.viewId).toggleClass(consts.showClass);
-        });
+        // $("#" + consts.apptoolsButtonId).on("click", function(){
+        //   $(this).toggleClass(consts.expandButtonClass);
+        //   $("#" + consts.viewId).toggleClass(consts.showClass);
+        // });
 
         var aux = window.agfkGlobals.auxModel;
         // enable/disable the hide/show buttons

@@ -1,9 +1,11 @@
 {% load staticfiles %}
 <script type="text/template" id="concept-list-template">
-  <div id="concept-list-toggle-button">
+
+  <div id="concept-list-show-button" class="small-vp-button">
     Concept List
   </div>
 
+<div id="concept-list-wrapper">
   <div id="concept-title-list">
     <div id="concept-title-header">
       <h1>
@@ -18,11 +20,15 @@
         <input type="text" id="concept-list-search-input" placeholder="enter the name of a concept to find it">
         <input type="button" value="Clear" id="cancel-search-input">
       </div>
+
+      <div id="concept-list-hide-button">
+        <i class="icon ion-ios7-arrow-left"> </i>
+      </div>
     </div>
 
     <ol id="concept-list">
-
     </ol>
+  </div>
 
   </div>
 </script>

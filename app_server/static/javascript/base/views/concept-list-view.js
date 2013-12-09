@@ -123,7 +123,9 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
       templateId : "concept-list-template",
       viewId: "concept-list",
       clickedItmClass: "clicked-title",
-      titleIdPrefix: "node-title-view-"
+      titleIdPrefix: "node-title-view-",
+      visibleClass: "show-clist",
+      hiddenClass: "hide-clist"
     };
 
     return Backbone.View.extend({
@@ -132,6 +134,8 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
 
       events: {
         "keyup #concept-list-search-input": "keyUpCLSearchInput",
+        "click #concept-list-show-button": "clickListShowButton",
+        "click #concept-list-hide-button": "clickListHideButton",
         "click #cancel-search-input": "clickCancelSearchInput"
       },
 
@@ -151,16 +155,14 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
         var thisView = this,
             appRouter = thisView.appRouter,
             nodes = thisView.model.getNodes(),
-            $list = $(document.createElement("ol")),
             curNode,
             nliview;
         thisView.isRendered = false;
 
-        // I'm going to add the jquery events here
         thisView.$el.html(thisView.template());
-        // TODO consider an update-based rendering
 
-        var nodeOrdering = thisView.model.getTopoSort();
+        var $list = thisView.$el.find("ol"),
+            nodeOrdering = thisView.model.getTopoSort();
         // add the list elements with the correct properties
         var i = -1, len = nodeOrdering.length;
         for(; ++i < len;){
@@ -169,11 +171,21 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
           thisView.idToTitleView[curNode.id] = nliview;
           $list.append(nliview.render().el);
         }
-        thisView.$el.find("#concept-list").append($list);
+        thisView.$el.find("#concept-list").append($list); // TODO move hardcoding
 
         thisView.isRendered = true;
 
         return thisView;
+      },
+
+      clickListShowButton: function (evt) {
+        this.$el.parent().addClass(pvt.consts.visibleClass);
+        this.$el.parent().removeClass(pvt.consts.hiddenClass);
+      },
+
+      clickListHideButton: function (evt) {
+        this.$el.parent().removeClass(pvt.consts.visibleClass);
+        this.$el.parent().addClass(pvt.consts.hiddenClass);
       },
 
       updateTimeEstimate: function(){

@@ -8,7 +8,6 @@
 define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbone, _, $, Utils){
   "use strict";
 
-
   /**
    * Main content display view
    */
@@ -31,7 +30,6 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
       id: pvt.viewConsts.viewId,
 
       events: {
-        // "click .learn-title-display": "showNodeDetailsFromEvt",
         "click .learn-view-check": function(evt){this.toggleConceptState(evt, "learn");},
         "click .learn-view-star": function(evt){this.toggleConceptState(evt, "star");}
       },

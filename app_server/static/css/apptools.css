@@ -1,20 +1,5 @@
 /* App tools */
 
-#apptools{
-    width: 15%;
-    max-width: 180px;
-    margin: 0.5em;
-    padding: 0.5em 0.5em;
-    position: absolute;
-    z-index: 10;
-    top: 2em;
-    right: 0;
-    background: rgba(253, 253, 253, 0.98);
-    border: 2px solid #CE94BC;
-    border-radius: 10px;
-    text-align: center;
-}
-
 #apptools.edit{
     display: none;
 }
@@ -88,7 +73,7 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
     border: 2px #5C4A56 solid;
-    background-color: transparent;
+    background-color: white;
     padding: 1.5px;
     cursor: pointer;
 }
@@ -119,8 +104,8 @@
 }
 
 .el-nav-button img{
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
 }
 
 #apptools .el-nav-button.active{
@@ -139,7 +124,7 @@
 
 #explore-learn-button-wrapper{
     text-align: center;
-    margin: 0.3em 0px 0.6em;
+    margin: 0.3em 0px;
 }
 
 /* apptools action buttons */

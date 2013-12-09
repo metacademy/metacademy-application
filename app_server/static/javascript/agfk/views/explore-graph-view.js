@@ -174,7 +174,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       var numEls = d3node.selectAll("tspan")[0].length,
           elIconX = consts.elIconXOffset,
           elIconY = consts.nodeIconsConstYOffset
-            + (numEls-1)*consts.nodeIconsPerYOffset + consts.elIconYOffset;
+            + (numEls-1)*consts.nodeIconsPerYOffset*(numEls > consts.reduceNodeTitleLength ? 2/3 : 1) + consts.elIconYOffset; // TODO fix this hack for large titles
       iconG.attr("transform",
                  "translate(" + elIconX + "," + elIconY + ") "
                  + "scale(" + consts.elIconScale + ")");
@@ -207,7 +207,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
       var numEls = d3node.selectAll("tspan")[0].length;
       yOff += consts.nodeIconsConstYOffset
-        + (numEls-1)*consts.nodeIconsPerYOffset;
+        + (numEls-1)*consts.nodeIconsPerYOffset*(numEls > consts.reduceNodeTitleLength ? 2/3 : 1);
       gEl.attr("transform",
                "translate(" + xOff + "," + yOff + ") "
                + "scale(" + scale + ")");

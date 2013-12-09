@@ -387,6 +387,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
       },
 
       tagName: pvt.viewConsts.viewTag,
+
       className: function(){
         var viewConsts = pvt.viewConsts,
             thisView = this,
@@ -446,13 +447,18 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
                                                               "time": Utils.formatTimeEstimate(thisView.model.get("time")),
                                                               "displayTitle": thisView.model.getLearnViewTitle()});
         thisView.$el.html(thisView.template(templateVars));
-        thisView.resources = thisView.resources || new ResourcesSectionView({model: thisView.model.get("resources"),
+        thisView.resources = thisView.resources
+            || new ResourcesSectionView({model: thisView.model.get("resources"),
                                                                              conceptId: thisView.model.get("id")});
-        thisView.dependencies = thisView.dependencies || new DependencySectionView({model: thisView.model.get("dependencies")});
-        thisView.outlinks = thisView.outlinks || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
-        thisView.pointers = thisView.pointers || new NestedListView({model: {text: thisView.model.get("pointers")},
+        thisView.dependencies = thisView.dependencies
+            || new DependencySectionView({model: thisView.model.get("dependencies")});
+        thisView.outlinks = thisView.outlinks
+            || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
+        thisView.pointers = thisView.pointers
+            || new NestedListView({model: {text: thisView.model.get("pointers")},
                                                                      prefix: "pointers"});
-        thisView.goals = thisView.goals || new NestedListView({model: {text: thisView.model.get("goals")},
+        thisView.goals = thisView.goals
+            || new NestedListView({model: {text: thisView.model.get("goals")},
                                                                prefix: "goals"});
         if (thisView.resources.model.length > 0){
           assignObj[resourcesLocClass] = thisView.resources;
@@ -478,6 +484,7 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbo
         thisView.addHoverText();
         thisView.delegateEvents();
         thisView.$el.scrollTop(0);
+
         thisView.isRendered = true;
         return thisView;
       },

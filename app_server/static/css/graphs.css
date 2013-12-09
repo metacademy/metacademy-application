@@ -19,6 +19,10 @@
 
 }
 
+.concept-g.reduce-node-title text{
+    font-size: 0.6em;
+}
+
 .concept-g circle{
     stroke: #333333;
     stroke-width: 2px;

@@ -236,9 +236,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           thisRoute.userModel = userModel;
         }
 
-        // show app tools TODO UPDATE show different app tools depending on view mode
-          thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
-        thisRoute.appToolsView.setMode(thisRoute.viewMode);
           //thisRoute.appToolsView.changeActiveELButtonFromName(thisRoute.viewMode);
 
 
@@ -340,6 +337,9 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
             paramsObj[qFocusConcept] = nodeId;
             paramQLearnConcept = nodeId;
           }
+
+          thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
+          thisRoute.appToolsView.setMode(thisRoute.viewMode);
 
           thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
           thisRoute.setELTransition(false); // reset the router state TODO is this still doing anything?

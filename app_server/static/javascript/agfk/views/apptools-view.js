@@ -59,8 +59,6 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
     return Backbone.View.extend({
       appRouter: null,
 
-      el: document.getElementById(pvt.consts.viewId),
-
       events: {
         "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
         "change #hidden-file-upload": "uploadGraph",
@@ -70,10 +68,11 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         "click #back-to-editing": "returnToEditor"
       },
 
-
       initialize: function(inp){
         var thisView = this,
             consts = pvt.consts;
+        thisView.setElement("#" + pvt.consts.viewId);
+
         thisView.appRouter = inp.appRouter;
         $('.' + consts.elNavButtonClass).on("click", function(evt){
           thisView.handleELButtonClick.call(thisView, evt);

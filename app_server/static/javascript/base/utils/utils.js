@@ -1,4 +1,5 @@
-/*global define
+
+  /*global define
 This file contains general purpose utility functions
 */
 
@@ -32,8 +33,8 @@ define(["jquery"], function($){
    * http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
    * TODO this function has become far too large & needs to be refactored
    */
-  utils.insertTitleLinebreaks = function (gEl, title, splLen) {
-    var words = title.split(/\s+/g),
+  utils.insertTitleLinebreaks = function (gEl, title, splLen, reduceThresh) {
+    var words = title.split(/[-\s]+/g),
         total = 0,
         result = [],
         resArr = [],
@@ -52,15 +53,17 @@ define(["jquery"], function($){
     }
     resArr.push(result.join(" "));
 
+    var dy = resArr.length > reduceThresh ? '10' : '15';
+
     var el = gEl.append("text")
           .attr("text-anchor","middle")
-          .attr("dy", "-" + (resArr.length-1)*6.5);
+          .attr("dy", "-" + (resArr.length-1)*dy*6.5/15);
 
 
     for (i = 0; i < resArr.length; i++) {
       var tspan = el.append('tspan').text(resArr[i]);
       if (i > 0)
-        tspan.attr('x', 0).attr('dy', '15');
+        tspan.attr('x', 0).attr('dy', dy);
     }
   };
 

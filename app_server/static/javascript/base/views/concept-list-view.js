@@ -130,6 +130,11 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
 
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
+      events: {
+        "keyup #concept-list-search-input": "keyUpCLSearchInput",
+        "click #cancel-search-input": "clickCancelSearchInput"
+      },
+
       initialize: function (inp) {
         var thisView = this,
             gConsts = window.agfkGlobals.auxModel.getConsts();
@@ -201,6 +206,32 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
 
       getDomIdFromId: function (id) {
         return pvt.consts.titleIdPrefix + id;
+      },
+
+      keyUpCLSearchInput: function () {
+        var thisView = this,
+            $inpEl = $("#concept-list-search-input"),
+            inpVal = $.trim($inpEl.val()).toLowerCase();
+
+        if (inpVal.length) {
+          $("#cancel-search-input").show();
+        } else {
+          $("#cancel-search-input").hide();
+        }
+
+        thisView.model.getNodes().each(function (node) {
+          if (!inpVal.length || node.get("title").match("^" + inpVal)) {
+            $("#" + pvt.consts.titleIdPrefix + node.id).show();
+          } else {
+            $("#" + pvt.consts.titleIdPrefix + node.id ).hide();
+          }
+        });
+
+      },
+
+      clickCancelSearchInput: function () {
+          $("#concept-list-search-input").val("");
+          this.keyUpCLSearchInput();
       },
 
       /**

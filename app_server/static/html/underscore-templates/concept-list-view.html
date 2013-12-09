@@ -1,20 +1,28 @@
+{% load staticfiles %}
 <script type="text/template" id="concept-list-template">
-<div id="concept-list-toggle-button">
-  Concept List
-</div>
-
-<div id="concept-title-list">
-  <h1>
-    Learning Plan
-  </h1>
-
-  <div class="time-estimate">
-    Completion Time: Infinity
+  <div id="concept-list-toggle-button">
+    Concept List
   </div>
 
-<ol id="concept-list">
+  <div id="concept-title-list">
+    <div id="concept-title-header">
+      <h1>
+        Learning Plan
+      </h1>
+      <div class="time-estimate">
+        Completion Time: Infinity
+      </div>
 
-</ol>
+      {% include "apptools.html" %}
+      <div id="concept-list-search">
+        <input type="text" id="concept-list-search-input" placeholder="enter the name of a concept to find it">
+        <input type="button" value="Clear" id="cancel-search-input">
+      </div>
+    </div>
 
-</div>
+    <ol id="concept-list">
+
+    </ol>
+
+  </div>
 </script>

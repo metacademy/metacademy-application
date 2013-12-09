@@ -20,7 +20,8 @@
  * + d3 should handle all svg-related events, while backbone should handle all other events
  * + use handleNewPaths and handleNewCircles to attach listeners during calls to render
  */
- /*global define*/
+
+/*global define/*/
 define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], function(Utils, Backbone, d3, _, dagre, $) {
 
   /**********************
@@ -46,6 +47,8 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
     edgeGIdPrefix: "edgeG-",
     depIconGClass: "dep-icon-g",
     olIconGClass: "ol-icon-g",
+    reduceNodeTitleClass: "reduce-node-title",
+    reduceNodeTitleLength: 4,
     doBTOpt: true,
     graphDirection: "TB" // BT TB LR RL TODO consider making an option for the user
   };
@@ -102,13 +105,6 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
     // svg nodes and edges
     thisView.gPaths = d3SvgG.append("g").selectAll("g");
     thisView.gCircles = d3SvgG.append("g").selectAll("g");
-
-    // set initial position of root elements
-    // var rootNode = thisView.model.getNode(thisView.model.get("root")), // TODO handle multiple roots
-    //   // hack since svg width is not yet available
-    //     useWidth = window.innerWidth - $("#concept-list-wrapper").outerWidth(true);
-    // rootNode.set("x", useWidth/2);
-    // rootNode.set("y", 150);
   };
 
   // from http://bl.ocks.org/mbostock/3916621
@@ -361,7 +357,6 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         thisView.postRenderEdge.call(thisView, d, d3.select(this));
       });
 
-
       // call subview function
       thisView.handleNewPaths(newPathsG);
 
@@ -421,7 +416,10 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
       newGs.each(function(d){
         var d3this = d3.select(this);
-        Utils.insertTitleLinebreaks(d3this, d.get("title"));
+        Utils.insertTitleLinebreaks(d3this, d.get("title"), null, consts.reduceNodeTitleLength);
+        if (d3this.selectAll("tspan")[0].length > consts.reduceNodeTitleLength) {
+          d3this.classed(consts.reduceNodeTitleClass, true);
+        }
       });
 
       newGs.transition()
@@ -469,7 +467,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
      * @param <id> noMoveNodeId: node id of node that should not move during optimization
      * note: noMoveNodeId has precedent over minSSDist
      */
-    optimizeGraphPlacement: function(doRender, minSSDist, noMoveNodeId, orderNodesByX) {
+    optimizeGraphPlacement: function(doRender, minSSDist, noMoveNodeId, orderNodesByXY) {
       var thisView = this,
           thisGraph = thisView.model,
           dagreGraph = new dagre.Digraph(),
@@ -477,6 +475,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
           nodeHeight = pvt.consts.nodeRadius,
           nodes = thisGraph.get("nodes"),
           edges = thisGraph.get("edges"),
+          lrOrder = pvt.consts.graphDirection.toLowerCase() === "lr",
           transX = 0,
           transY = 0;
 
@@ -487,7 +486,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
       // input graph into dagre
       nodes.sortBy(function (n) {
-        return orderNodesByX ? n.get("x") : -1;
+        return orderNodesByXY ? (lrOrder ? n.get("y") : n.get("x")) : -1;
       })
         .forEach(function(node){
           if (thisView.isNodeVisible(node)) {

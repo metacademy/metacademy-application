@@ -1,9 +1,63 @@
+#concept-list-wrapper{
+    border-right: #333 solid 1px;
+}
+
 #concept-title-list h1{
     text-align: center;
     font-weight: bold;
     color: #333;
     font-size: 0.9em;
     padding-bottom: 0.3em;
+    margin-top: 0.5em;
+}
+
+#concept-list{
+    padding-top: 7em;
+}
+
+#concept-list-search{
+    text-align: center;
+}
+
+#concept-list-search input{
+    width: 85%;
+    box-sizing: border-box;
+    background: white;
+    background-color: #fafafa;
+    font-size: 10px;
+    height: 2.2em;
+    outline: 0;
+    padding: 0 0.2em;
+    display: inline-block;
+    border: 1px solid #4e0142;
+    border-radius: 4px;
+    cursor: text;
+}
+
+#concept-list-search input:hover{
+    cursor: text;
+}
+
+#concept-list-search #cancel-search-input{
+    background-color: #F3F3F3;
+    cursor: pointer;
+    width: 15%;
+    border-radius: 0 4px 4px 0;
+    position: absolute;
+    right: 7%;
+    display: none;
+}
+
+#concept-title-header{
+    position: fixed;
+    background-color: rgb(249, 249, 255);
+    z-index: 10;
+    width: 20%;
+    height: 7em;
+    border-bottom: 1px #333333 solid;
+    border-right: 1px #333333 solid;
+    border-radius: 0px;
+    box-sizing: border-box;
 }
 
 #concept-title-list .time-estimate{
@@ -11,8 +65,6 @@
     font-style: italic;
     color: #8D5E5E;
     text-align: center;
-    border-bottom: 1px solid #CCCCCC;
-    padding-bottom: 1em;
 }
 
 #concept-list-toggle-button{

@@ -253,6 +253,25 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
       thisView.listenTo(thisView.model, "render", thisView.render);
 
+      // set instance variables -- can overwrite in subclasses
+      thisView.pathTransTime = 500;
+      // transition time for moving paths when optimizing graph
+      thisView.newPathTransDelay = 350;
+      // transition delay for new paths (lets nodes appear first)
+      thisView.newPathTransTime =  1000;
+      // fade in time of new paths
+      thisView.rmPathTransTime =  500;
+      // fade out time of removed paths
+      thisView.rmCircleTransTime =  500;
+      // fade out time of removed circles
+      thisView.moveCircleTransTime =  500;
+      // move transition time for circles
+      thisView.newCircleTransDelay =  200;
+      // trans delay for new circles
+      thisView.newCircleTransTime =  800;
+      // trans fade-in time for new circles
+
+
       d3.select("#optimize").on("click", function(){thisView.optimizeGraphPlacement.call(thisView, true);});
 
 
@@ -305,9 +324,9 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         gPaths.each(function(d){
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
-          d3el.selectAll("path") // ." + consts.pathClass)
+          d3el.selectAll("path")
             .transition()
-            .duration(500)
+            .duration(thisView.pathTransTime)
             .attrTween("d", pvt.pathTween(edgePath, 4))
             .each("end", function (d) {
               thisView.postRenderEdge.call(thisView, d, d3.select(this.parentElement));
@@ -349,8 +368,8 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         });
 
       newPathsG.transition()
-      .delay(300)
-      .duration(1000)
+      .delay(thisView.newPathTransDelay)
+      .duration(thisView.newPathTransTime)
       .attr("opacity", 1)
       .each("end", function (d) {
         // call post render function for edge
@@ -363,7 +382,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       // remove old links
       gPaths.exit()
       .transition()
-      .duration(500)
+      .duration(thisView.rmPathTransTime)
       .attr("opacity", 0)
       .remove(); // TODO add appropriate animation
 
@@ -379,14 +398,14 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
       thisView.gCircles.exit()
         .transition()
-        .duration(500)
+        .duration(thisView.rmCircleTransTime)
         .attr("opacity", 0)
         .remove(); // TODO add appropriate animation
 
       if (thisView.state.doCircleTrans){
         thisView.gCircles
           .transition()
-          .duration(500)
+          .duration(thisView.moveCircleTransTime)
           .attr("transform", function(d){
             return "translate(" + d.get("x") + "," + d.get("y") + ")";
           })
@@ -423,8 +442,8 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       });
 
       newGs.transition()
-        .delay(200)
-        .duration(800)
+        .delay(thisView.newCircleTransDelay)
+        .duration(thisView.newCircleTransTime)
         .attr("opacity", 1)
         .each("end", function (d) {
           thisView.postRenderNode.call(thisView, d, d3.select(this));

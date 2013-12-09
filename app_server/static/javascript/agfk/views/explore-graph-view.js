@@ -321,6 +321,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             gConsts = aux.getConsts(),
             thisModel = thisView.model;
 
+        thisView.doAnims = true;
         thisView.scopeNode = null;
 
         // dim nodes that are [implicitly] learned or starred

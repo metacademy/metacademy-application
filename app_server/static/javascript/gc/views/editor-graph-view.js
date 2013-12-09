@@ -92,8 +92,16 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
 
       thisView.idct = 0; // TODO this shouldn't be handled in the view
 
+      // change transition timing
+      thisView.newPathTransDelay= 0;  // transition delay for new paths (lets nodes appear first)
+      thisView.newPathTransTime= 0;  // fade in time of new paths
+      thisView.rmPathTransTime= 0;  // fade out time of removed paths
+      thisView.rmCircleTransTime= 0;  // fade out time of removed circles
+      thisView.newCircleTransDelay= 0;  // trans delay for new circles
+      thisView.newCircleTransTime= 0; // trans fade-in time for new circles
+
       /******
-       * Setup d3-based event listeners
+       * Setup=d3; based event listeners
        ******/
       // rerender when the graph model changes from server data TOMOVE
       thisView.listenTo(thisView.model, "loadedServerData", thisView.render);
@@ -148,7 +156,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
         });
 
       // listen for dragging
-      var dragSvg = d3.behavior.zoom()
+      thisView.dzoom = d3.behavior.zoom()
             .on("zoom", function() {
               if (d3.event.sourceEvent.shiftKey){
                 // TODO  the internal d3 state is still changing
@@ -168,7 +176,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
             .on("zoomend", function() {
               d3.select('body').style("cursor", "auto");
             });
-      d3Svg.call(dragSvg).on("dblclick.zoom", null);
+      d3Svg.call(thisView.dzoom).on("dblclick.zoom", null);
 
       // zoomed function used for dragging behavior above
       function zoomed() {
@@ -180,7 +188,6 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
     // @override
     postrender: function() {
       var thisView = this;
-
       thisView.gPaths.classed(pvt.consts.selectedClass, function(d){
         return d === thisView.state.selectedEdge;
       });
@@ -311,6 +318,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
           }
           return d.get("source") === newEdge.source && d.get("target") === newEdge.target;
         });
+
         if (!filtRes[0].length){
           thisView.model.addEdge(newEdge); // todo switch to create
           thisView.render();
@@ -351,19 +359,20 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
     changeTextOfNode: function(d3node, d){
       var thisView= this,
           consts = pvt.consts,
-          htmlEl = d3node.node();
+          nodeRadius = consts.nodeRadius;
+
       d3node.selectAll("text").style("display", "none");
-      var nodeBCR = htmlEl.getBoundingClientRect(),
-          curScale = nodeBCR.width/consts.nodeRadius,
-          placePad  =  5*curScale,
-          useHW = curScale > 1 ? nodeBCR.width*0.71 : consts.nodeRadius*1.42;
+      var curTrans = thisView.dzoom.translate(),
+          curScale = thisView.dzoom.scale(),//nodeBCR.width/consts.nodeRadius,
+          placePad  =  10*curScale,
+          useHW = curScale > 1 ? curScale*nodeRadius*0.71 : nodeRadius*1.42;
       // replace with editableconent text
       var d3txt = thisView.d3Svg.selectAll("foreignObject")
             .data([d])
             .enter()
             .append("foreignObject")
-            .attr("x", nodeBCR.left + placePad )
-            .attr("y", nodeBCR.top + placePad)
+            .attr("x", curTrans[0] + (d.get("x") - nodeRadius) *curScale + placePad )
+            .attr("y", curTrans[1] + (d.get("y") - nodeRadius) *curScale + placePad )// nodeBCR.top + placePad)
             .attr("height", 2*useHW)
             .attr("width", useHW)
             .append("xhtml:p")

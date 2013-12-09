@@ -223,7 +223,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
         // set view-mode
         thisRoute.viewMode = paramsObj[qViewMode];
 
-        // // init main app model
+        // init main app model
         if (!thisRoute.graphModel) {
           thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {root: nodeId});
         }

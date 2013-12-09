@@ -83,7 +83,6 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         $('#' + consts.showLearnedId).on("click", function(evt){
           thisView.handleShowLearnedClick.call(thisView, evt);
         });
-
         // hide/show apptools for small view ports
         // $("#" + consts.apptoolsButtonId).on("click", function(){
         //   $(this).toggleClass(consts.expandButtonClass);

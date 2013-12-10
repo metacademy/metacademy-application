@@ -336,6 +336,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           }
           if (thisRoute.conceptListView) {
             thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
+            thisRoute.conceptListView.changeActiveELButtonFromName(viewMode);
           }
 
           if (viewMode === pCreateMode){

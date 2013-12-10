@@ -57,9 +57,7 @@
     width: 20%;
     min-width: 200px;
     height: 7em;
-    border-bottom: 1px #CCCCCC solid;
-    border-right: 1px #CCCCCC solid;
-    border-radius: 0px;
+    border: 1px #333333 solid;
     box-sizing: border-box;
 }
 

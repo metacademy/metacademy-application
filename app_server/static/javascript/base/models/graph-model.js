@@ -40,13 +40,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
           tmpNode.sid = tmpNode.id;
           tmpNode.id = nodeTag;
 
-          // contract the incoming graph
-          // tmpNode.isContracted = true; // FIXME this is specific to editable-graph-model (how to generalize?)
-          //          if (tag === tmpNode.tag) {
-          // tmpNode.hasContractedDeps = true;
-          // tmpNode.isContracted = false;
-          //          }
-
           // parse deps separately (outlinks will be readded)
           tmpNode.dependencies.forEach(function(dep){
             deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, from_tag: dep.from_tag, to_tag: dep.to_tag});
@@ -59,8 +52,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
       deps.forEach(function(dep){
         thisGraph.addEdge(dep);
       });
-      //thisGraph.optimizePlacement();
-      // thisGraph.trigger("loadedServerData"); // TODO use "sync" events instead (they're standard)
     },
 
     // override in subclass

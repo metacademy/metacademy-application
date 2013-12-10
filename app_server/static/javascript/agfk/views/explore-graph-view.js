@@ -1,4 +1,5 @@
 /*global define*/
+  // TODO do we still want to dim "implicitly learned nodes?"
 define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base/utils/utils", "base/utils/errors"], function(Backbone, d3, $, _, GraphView, Utils, ErrorHandler){
   "use strict";
 
@@ -47,7 +48,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       dataConceptTagProp: "data-concept",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
-      scopeSvgClass: "scoped",
+      scopeClass: "scoped",
       scopeCircleGClass: "scoped-circle-g",
       focusCircleGClass: "focused-circle-g",
       // ----- rendering options ----- //
@@ -309,6 +310,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       // id of view element (div unless tagName is specified)
       id: pvt.consts.viewId,
 
+      events: {
+        "click #explore-info-box button": "handleShowAllClick"
+      },
+
       /**
        * @Override
        * Function called after initialize actions
@@ -434,15 +439,21 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         edgeShowList = edgeShowList.concat(showDeps.map(function(dep){return dep.id;}));
 
         // contract edges
+        var edges = thisView.model.getEdges();
         thisView.model.getEdges()
           .each(function (edge) {
             edge.set("isContracted", edgeShowList.indexOf(edge.id) === -1);
           });
         // contract nodes
-        thisView.model.getNodes()
+        var nodes = thisView.model.getNodes();
+        nodes
           .forEach(function (node) {
             node.set("isContracted", nodeShowList.indexOf(node.id) === -1);
           });
+
+        // update data for the info box (# of hidden nodes/edges)
+        thisView.numHiddenNodes = nodes.length - nodeShowList.length;
+        thisView.numHiddenEdges = edges.length - edgeShowList.length;
 
         // transition the g so the node is centered
           thisView.centerForNode(d).each("end", function () {
@@ -450,7 +461,6 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
           });
         return true;
       },
-
 
       /**
        * Add visual mouse over properties to the explore nodes
@@ -618,14 +628,21 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         // clip appropriate edges so we end up with a whisp effect
         var thisView = this,
             consts = pvt.consts;
-
-        // remove previous wisps
-        // d3.selectAll("." + consts.wispGClass).remove();
-        // d3.selectAll("." + consts.longEdgeClass).classed(consts.longEdgeClass, false);
-        //thisView.gPaths.filter(function (d){
-        //   return thisView.doClipEdge.call(thisView, d);
-        // })
-        // .each(pvt.handleLongPaths);
+        // create/change toast text
+        if (!thisView.$infoTextBox) {
+          var $infoTextBoxEl = $(document.createElement("div"));
+          $infoTextBoxEl.attr("id", "explore-info-box");
+          var $infoTextBox = $(document.createElement("div")).addClass("textbox");
+          $infoTextBoxEl.append($infoTextBox);
+          var $button = $(document.createElement("button"));
+          $button.text("show all");
+          $infoTextBoxEl.append($button);
+          thisView.$el.append($infoTextBoxEl);
+          thisView.$infoTextBox = $infoTextBox;
+        }
+        if (thisView.focusNode) {
+         thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
+        }
       },
 
       /**
@@ -923,12 +940,16 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         return minId === edge.get("target").id;
       },
 
+      handleShowAllClick: function (evt) {
+        var thisView = this;
+        Utils.simulate(document.getElementById(thisView.getCircleGId(thisView.focusNode)), "mouseup");
+      },
+
       setFocusNode: function (d) {
         var thisView = this;
         pvt.changeNodeClasses.call(thisView, thisView.focusNode, d, pvt.consts.focusCircleGClass);
         thisView.focusNode = d;
       },
-
 
       /**
        * Set the scope node
@@ -937,7 +958,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         var thisView = this;
         pvt.changeNodeClasses.call(thisView, thisView.scopeNode, d, pvt.consts.scopeCircleGClass);
         thisView.scopeNode = d;
-        thisView.d3Svg.classed(pvt.consts.scopeSvgClass, true);
+        // delay info box so that animations finish
+        window.setTimeout(function () {
+          thisView.$el.addClass(pvt.consts.scopeClass);
+        }, 800);
       },
 
       /**
@@ -947,7 +971,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         var thisView = this;
         pvt.changeNodeClasses.call(thisView, thisView.scopeNode, null, pvt.consts.scopeCircleGClass);
         thisView.scopeNode = null;
-        thisView.d3Svg.classed(pvt.consts.scopeSvgClass, false);
+        thisView.$el.removeClass(pvt.consts.scopeClass);
       }
     }); // end Backbone.View.extend({
   })();

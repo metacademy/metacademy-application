@@ -129,7 +129,9 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
       visibleClass: "show-clist",
       hiddenClass: "hide-clist",
       viewId: "concept-list-panel",
-      activeClass: "active"
+      activeClass: "active",
+      elNameAppend: "-button",
+      elNavButtonClass: "el-nav-button"
     };
 
     return Backbone.View.extend({

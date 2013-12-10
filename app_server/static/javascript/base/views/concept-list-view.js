@@ -119,6 +119,8 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
 
   // private class variables and methods
     var pvt = {};
+    pvt.prevButtonEl = null;
+
     pvt.consts = {
       templateId : "concept-list-template",
       viewId: "concept-list",
@@ -126,7 +128,8 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
       titleIdPrefix: "node-title-view-",
       visibleClass: "show-clist",
       hiddenClass: "hide-clist",
-      viewId: "concept-list-panel"
+      viewId: "concept-list-panel",
+      activeClass: "active"
     };
 
     return Backbone.View.extend({
@@ -139,7 +142,8 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
         "keyup #concept-list-search-input": "keyUpCLSearchInput",
         "click #concept-list-show-button": "clickListShowButton",
         "click #concept-list-hide-button": "clickListHideButton",
-        "click #cancel-search-input": "clickCancelSearchInput"
+        "click #cancel-search-input": "clickCancelSearchInput",
+        "click .el-nav-button": "handleELButtonClick"
       },
 
       initialize: function (inp) {
@@ -247,6 +251,45 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
       clickCancelSearchInput: function () {
           $("#concept-list-search-input").val("");
           this.keyUpCLSearchInput();
+      },
+
+      /**
+       * Handle click event by passing relevant event info to changeActiveELButton
+       */
+      handleELButtonClick: function(evt){
+        var thisView = this;
+        var buttonEl = evt.currentTarget;
+        thisView.changeActiveELButtonFromDomEl(buttonEl);
+        //thisView.appRouter.setELTransition(true);
+        thisView.appRouter.changeUrlParams({mode: buttonEl.id.split("-")[0]});
+      },
+
+      /**
+       * Change the active button to the input name: "explore" or "learn"
+       */
+      changeActiveELButtonFromName: function(name){
+        var $domEl = $("#" + name + pvt.consts.elNameAppend);
+        if ($domEl.get(0)){
+          this.changeActiveELButtonFromDomEl($domEl.get(0));
+        }
+      },
+
+      /**
+       * Change the active button to the input dom element (must be one of the EL buttons)
+       */
+      changeActiveELButtonFromDomEl: function(buttonEl){
+        if (pvt.prevButtonEl === null || buttonEl.id !== pvt.prevButtonEl.id){
+          var activeClass = pvt.consts.activeClass,
+              $prevButton = $(pvt.prevButtonEl);
+
+          $prevButton.toggleClass(activeClass);
+          $prevButton.prop("disabled", false);
+
+          var $buttonEl = $(buttonEl);
+          $buttonEl.toggleClass(activeClass);
+          $buttonEl.prop("disabled", true);
+          pvt.prevButtonEl = buttonEl;
+        }
       },
 
       /**

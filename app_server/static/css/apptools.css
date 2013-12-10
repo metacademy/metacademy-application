@@ -1,27 +1,26 @@
 /* App tools */
 
-#apptools.edit{
+.apptools{
     display: none;
-}
-
-#explore-learn-tools{
-    display: none;
-}
-
-#content-editing-tools{
-    display: none;
+    position: absolute;
+    top: 2em;
+    right: 5%;
+    border: 2px solid #CE94BC;
+    border-radius: 10px;
+    text-align: center;
+    padding: 1em;
 }
 
 .create #content-editing-tools{
     display: block;
 }
 
-#apptools input{
+.apptools input{
     width: 30px;
     opacity: 0.4;
 }
 
-#apptools input:hover{
+.apptools input:hover{
     opacity: 1;
     cursor: pointer;
 }
@@ -61,11 +60,7 @@
     color: #333;
 }
 
-.explore #explore-learn-tools, .learn #explore-learn-tools{
-    display: block;
-}
-
-#apptools.explore button, #apptools.learn button, #hovertext-buttons button{
+#explore-learn-button-wrapper button, #hovertext-buttons button{
     -webkit-box-shadow: 1px 1px 2px #463838;
     -moz-box-shadow: 1px 1px 2px #463838;
     box-shadow: 1px 1px 2px #463838;
@@ -78,11 +73,11 @@
     cursor: pointer;
 }
 
-#apptools.learn button:hover, #apptools.explore button:hover{
+#explore-learn-button-wrapper button:hover{
     border: 2px #D145CC solid;
 }
 
-#apptools #back-to-editing{
+#back-to-editing{
     display: none;
     padding: 1em;
     margin-top: 1em;
@@ -108,7 +103,7 @@
     height: 20px;
 }
 
-#apptools .el-nav-button.active{
+.el-nav-button.active{
     opacity: 0.7;
     border: 2px #5C4A56 solid;
     cursor: default;
@@ -117,7 +112,7 @@
     box-shadow: none;
 }
 
-#apptools .el-nav-button.active:hover{
+.el-nav-button.active:hover{
     cursor: default;
     border: 2px #5C4A56 solid;
 }
@@ -129,33 +124,33 @@
 
 /* apptools action buttons */
 
-#apptools .toggle-lc-button{
+.toggle-lc-button{
     width: 5em;
     margin: 0.5em 0.4em;
     line-height: 1.3em;
     font-size: 0.8em;
  }
 
-#apptools button.toggle-lc-button.disabled{
+button.toggle-lc-button.disabled{
     opacity: 0.4;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow: none;
 }
 
-#apptools button.toggle-lc-button.disabled:hover{
+button.toggle-lc-button.disabled:hover{
     border: 2px #5C4A56 solid;
     cursor: default;
 }
 
-#apptools .apptools-lc-buttons-wrap{
+.apptools-lc-buttons-wrap{
     display: inline-block;
     margin: 0 auto;
 }
 
 
 /* @media only screen and  (max-width: 760px){ */
-/*     #apptools{ */
+/*     .apptools{ */
 /*         top: auto; */
 /*         bottom: 0; */
 /*         max-width: 200px; */
@@ -168,7 +163,7 @@
 /*         height: 125px; */
 /*         display: none; */
 /*     } */
-/*     #apptools.show{ */
+/*     .apptools.show{ */
 /*         display: block; */
 /*     } */
 /* } */

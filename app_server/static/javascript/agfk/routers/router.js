@@ -6,7 +6,7 @@
 // TODO normalize create/edit vocabulary
 
 /*global define */
-define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "base/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/apptools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
+define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "base/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/edit-tools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
   function(Backbone, _, $, ExploreView, ConceptListView, ConceptDetailsView, AppToolsView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
   "use strict";
 
@@ -66,7 +66,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
         thisRoute.prevPurl = -1;
 
         // keeps track of Explore to Learn and Learn to Explore clicks
-        thisRoute.elTransition = false;
 
         // first learning view transition
         thisRoute.firstLTrans = true;
@@ -184,12 +183,12 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
         }
       },
 
-      /**
-       * Change transfer-click state (boolean to indicate when explore (learn) view was directly accessed from a specific concept in the learn (explore) view
-       */
-      setELTransition: function(state){
-        this.elTransition = state;
-      },
+      // /**
+      //  * Change transfer-click state (boolean to indicate when explore (learn) view was directly accessed from a specific concept in the learn (explore) view
+      //  */
+      // setELTransition: function(state){
+      //   this.elTransition = state;
+      // },
 
       /**
        * Show the error message view
@@ -222,6 +221,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
         // set view-mode
         thisRoute.viewMode = paramsObj[qViewMode];
+        var viewMode = thisRoute.viewMode;
 
         // init main app model
         if (!thisRoute.graphModel) {
@@ -274,7 +274,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           }
 
           // add the concept list view if it is not already present
-          if (!thisRoute.conceptListView) {
+          if (thisRoute.viewMode !== pCreateMode && !thisRoute.conceptListView && thisRoute.viewMode !== pEditMode) {
             thisRoute.conceptListView = new ConceptListView({model: thisRoute.graphModel, appRouter: thisRoute});
             $("#main").prepend(thisRoute.conceptListView.render().$el);
           }
@@ -284,7 +284,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           }
 
 
-          switch (paramsObj[qViewMode]){
+          switch (viewMode){
           case pExploreMode:
             doRender = doRender || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
             if (doRender){ // UPDATE
@@ -334,12 +334,17 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
             paramsObj[qFocusConcept] = nodeId;
             paramQLearnConcept = nodeId;
           }
+          if (thisRoute.conceptListView) {
+            thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
+          }
 
-          thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
-          thisRoute.appToolsView.setMode(thisRoute.viewMode);
+          if (viewMode === pCreateMode){
+            thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
+            thisRoute.appToolsView.$el.show();
+            //thisRoute.appToolsView.setMode(thisRoute.viewMode);
+          }
 
-          thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
-          thisRoute.setELTransition(false); // reset the router state TODO is this still doing anything?
+          // thisRoute.setELTransition(false); // reset the router state TODO is this still doing anything?
           thisRoute.prevUrlParams = $.extend({}, paramsObj);
           thisRoute.prevNodeId = nodeId;
         }

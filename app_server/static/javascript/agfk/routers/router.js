@@ -276,7 +276,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
           // add the concept list view if it is not already present
           if (!thisRoute.conceptListView) {
             thisRoute.conceptListView = new ConceptListView({model: thisRoute.graphModel, appRouter: thisRoute});
-            $("#main").prepend(thisRoute.conceptListView.render().el);
+            $("#main").prepend(thisRoute.conceptListView.render().$el);
           }
 
           if (paramsObj[qFocusConcept] === undefined){

@@ -50,6 +50,7 @@ body {
     box-sizing: border-box;
     overflow: auto;
     height: inherit;
+    border-right: 1px solid #CCCCCC;
 }
 
 #main-display-view{

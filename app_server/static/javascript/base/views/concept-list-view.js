@@ -125,12 +125,15 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
       clickedItmClass: "clicked-title",
       titleIdPrefix: "node-title-view-",
       visibleClass: "show-clist",
-      hiddenClass: "hide-clist"
+      hiddenClass: "hide-clist",
+      viewId: "concept-list-panel"
     };
 
     return Backbone.View.extend({
 
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
+
+      id: pvt.consts.viewId,
 
       events: {
         "keyup #concept-list-search-input": "keyUpCLSearchInput",

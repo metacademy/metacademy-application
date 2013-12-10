@@ -1,5 +1,6 @@
-#concept-title-list{
-    border-right: #333 solid 1px;
+#concept-list-panel{
+    height: inherit;
+    display: inline;
 }
 
 #concept-title-list h1{
@@ -55,8 +56,8 @@
     width: 20%;
     min-width: 200px;
     height: 7em;
-    border-bottom: 1px #333333 solid;
-    border-right: 1px #333333 solid;
+    border-bottom: 1px #CCCCCC solid;
+    border-right: 1px #CCCCCC solid;
     border-radius: 0px;
     box-sizing: border-box;
 }

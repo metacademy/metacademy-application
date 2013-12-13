@@ -891,6 +891,14 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       },
 
       /**
+       * @Override
+       * include the given edge in the optimization placement?
+       */
+      includeEdgeInOpt: function (edge) {
+        return !edge.get("isContracted") && !edge.get("isTransitive");
+      },
+
+      /**
        * Determines if the edge should be clipped
        *
        */

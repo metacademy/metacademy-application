@@ -514,7 +514,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         });
 
       edges.each(function(edge){
-        if (!edge.get("isContracted") && !edge.get("isTransitive")) {
+        if (thisView.includeEdgeInOpt(edge)){
           dagreGraph.addEdge(edge.id, edge.get("source").id, edge.get("target").id);
         }
       });
@@ -558,6 +558,13 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       if (doRender) {
         thisView.render();
       }
+    },
+
+    /**
+     * include the given edge in the optimization placement?
+     */
+    includeEdgeInOpt: function (edge) {
+      return true;
     },
 
     /**

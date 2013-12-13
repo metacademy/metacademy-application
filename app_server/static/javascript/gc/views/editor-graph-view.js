@@ -157,25 +157,25 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
 
       // listen for dragging
       thisView.dzoom = d3.behavior.zoom()
-            .on("zoom", function() {
-              if (d3.event.sourceEvent.shiftKey){
-                // TODO  the internal d3 state is still changing
-                return false;
-              } else{
-                zoomed.call(thisView);
-              }
-              return true;
-            })
-            .on("zoomstart", function() {
-              var ael = d3.select("#" + pvt.consts.activeEditId).node();
-              if (ael){
-                ael.blur();
-              }
-              if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
-            })
-            .on("zoomend", function() {
-              d3.select('body').style("cursor", "auto");
-            });
+        .on("zoom", function() {
+          if (d3.event.sourceEvent.shiftKey){
+            // TODO  the internal d3 state is still changing
+            return false;
+          } else{
+            zoomed.call(thisView);
+          }
+          return true;
+        })
+        .on("zoomstart", function() {
+          var ael = d3.select("#" + pvt.consts.activeEditId).node();
+          if (ael){
+            ael.blur();
+          }
+          if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
+        })
+        .on("zoomend", function() {
+          d3.select('body').style("cursor", "auto");
+        });
       d3Svg.call(thisView.dzoom).on("dblclick.zoom", null);
 
       // zoomed function used for dragging behavior above
@@ -486,6 +486,14 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
      */
     isEdgeVisible: function(edge){
       return !edge.get("isContracted"); // TODO add learned/hidden properties as well
+    },
+
+    /**
+     * @Override
+     * include the given edge in the optimization placement?
+     */
+    includeEdgeInOpt: function (edge) {
+      return !edge.get("isContracted");
     }
 
   }); // end GraphEditor definition

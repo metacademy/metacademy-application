@@ -154,7 +154,8 @@ define(["backbone", "underscore", "jquery", "base/utils/utils"], function (Backb
         thisView.idToTitleView = {};
         thisView.listenTo(window.agfkGlobals.auxModel,
                           gConsts.learnedTrigger, thisView.updateTimeEstimate);
-        thisView.listenTo(thisView.model.getNodes(), "sync", thisView.updateTimeEstimate);
+        // NOWFIX is this firing?
+        thisView.listenTo(thisView.model, "sync", thisView.updateTimeEstimate);
         if (inp !== undefined) {
           thisView.appRouter = inp.appRouter;
         }

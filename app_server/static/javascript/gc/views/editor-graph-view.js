@@ -91,6 +91,8 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
       });
 
       thisView.idct = 0; // TODO this shouldn't be handled in the view
+      // use expand/contract icons in editor graph
+      thisView.addECIcon = true;
 
       // change transition timing
       thisView.newPathTransDelay= 0;  // transition delay for new paths (lets nodes appear first)

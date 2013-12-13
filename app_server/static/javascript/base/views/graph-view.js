@@ -148,14 +148,14 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       hasExpOrContrName = "hasContractedDeps";
       expandFun = d.expandDeps;
       contractFun = d.contractDeps;
-      placeAtBottom = true;
+      placeAtBottom = false;
       d3Icon = d3el.selectAll("." + consts.depIconGClass);
     } else {
       iconGClass = consts.olIconGClass;
       hasExpOrContrName = "hasContractedOLs";
       expandFun = d.expandOLs;
       contractFun = d.contractOLs;
-      placeAtBottom = false,
+      placeAtBottom = true,
       d3Icon = d3el.selectAll("." + consts.olIconGClass);
     }
 
@@ -166,7 +166,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       d3Icon = d3el.append("g")
         .classed(iconGClass, true)
         .classed(consts.expandCrossClass, true);
-      var yplace = placeAtBottom ? (consts.nodeRadius - consts.minusRectH*3 - 8) : (-consts.nodeRadius + consts.minusRectH*3 - 8);
+      var yplace = placeAtBottom ? (consts.nodeRadius - consts.minusRectH*3 - 1) : (-consts.nodeRadius + consts.minusRectH*3 - 14);
       d3Icon.append("polygon")
         .attr("points", consts.plusPts)
         .attr("transform", "translate(" + (-consts.exPlusWidth/2) + ","
@@ -186,7 +186,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         .classed(consts.contractMinusClass, true);
       d3Icon.append("rect")
         .attr("x", -consts.minusRectW/2)
-        .attr("y", placeAtBottom ? consts.nodeRadius - consts.minusRectH*3 : -consts.nodeRadius + consts.minusRectH*3)
+        .attr("y", placeAtBottom ? consts.nodeRadius - consts.minusRectH*3  + 7: -consts.nodeRadius + consts.minusRectH*3 - 10)
         .attr("width", consts.minusRectW)
         .attr("height", consts.minusRectH)
         .on("mouseup", function(){
@@ -251,6 +251,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         doPathsTrans: false
       };
 
+      // TODO find a better way to communicate between views
       thisView.listenTo(thisView.model, "render", thisView.render);
 
       // set instance variables -- can overwrite in subclasses
@@ -458,9 +459,11 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
       // TODO FIXME -- don't always add expand/contract
       // // handle expand contract icons last
-      // thisView.gCircles.each(function(d){
-      //   thisView.addExpContIcons(d, d3.select(this), thisView);
-      // });
+       thisView.gCircles.each(function(d){
+         if (thisView.addECIcon || d.addECIcon) {
+           thisView.addExpContIcons(d, d3.select(this), thisView);
+         }
+      });
 
       //***********
       // POSTRENDER
@@ -598,7 +601,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
               curScale = hasScope ? (dScale > 1 ? dScale : 1) : (dScale < 0.9 ? dScale : .6), //dzoom.scale(),
               wx = svgBCR.width,
               wy = svgBCR.height,
-              dispFract = d.get("dependencies").length ? (d.get("outlinks").length ? 0.5 : 2/3) : (1/3),
+              dispFract = d.get("dependencies").length ? (d.get("outlinks").length ? 0.5 : 4/5) : (1/5),
               nextY = wy*dispFract - d.get("y")*curScale - pvt.consts.nodeRadius*curScale/2,
               nextX = wx/2 - d.get("x")*curScale;
           dzoom.translate([nextX, nextY]);

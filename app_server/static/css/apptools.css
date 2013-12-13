@@ -51,8 +51,7 @@
 }
 
 #content-editing-tools input:hover{
-    width: 90%;
-    cursor: default;
+    cursor: text;
 }
 
 

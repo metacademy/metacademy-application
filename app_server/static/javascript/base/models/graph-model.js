@@ -22,7 +22,7 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
     },
 
     url: function(){
-      var root = this.get("root");
+      var root = this.get("root") || this.fetchTag;
       if (!root){
         throw new Error("Must set graph root in graph-model to fetch graph data");
       }
@@ -57,22 +57,18 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
     // override in subclass
     postinitialize: function(){},
 
-    /**
-     * TODO only grab a single node (where would we use this?)
-     */
-    addServerNodeToGraph: function() {
-
-    },
-
-    /**
-     * Add dependency graph from server to the current graph
-     * TODO handle id problems
-     */
-    addServerDepGraphToGraph: function(tag) {
-      // FIXME this should be integrated into the fetch role -- this is hacky!
-      var thisGraph = this;
-      $.getJSON(window.CONTENT_SERVER + "/dependencies?concepts=" + tag, thisGraph.parse);
-    },
+    // /**
+    //  * Add dependency graph from server to the current graph
+    //  * TODO handle id problems
+    //  */
+    // addServerDepGraphToGraph: function(tag) {
+    //   // FIXME this should be integrated into the fetch role -- this is hacky!
+    //   var thisGraph = this;
+    //   $.getJSON(window.CONTENT_SERVER + "/dependencies?concepts=" + tag, function () {
+    //     thisGraph.
+    //     thisGraph.parse.apply(thisGraph, arguments);
+    //   });
+    // },
 
     /**
      * Export this graph to a simple json representation

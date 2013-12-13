@@ -14,7 +14,7 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     },
 
     // resource url
-    url: "/gc/save", // FIXME
+    //url: "/gc/save", // FIXME
 
     /**
      * Make/extend this graph from a json obj

@@ -12,44 +12,9 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
       backToEditingButtonId: "back-to-editing",
       apptoolsButtonId: "apptools-button",
       expandButtonClass: "expanded",
-//      clearLearnedId: "button-clear-learned",
-//      showLearnedId: "button-show-learned",
       disabledClass: "disabled",
       viewId: "content-editing-tools"
     };
-    //pvt.numVisLearned = 0; // FIXME don't define instance vars on private
-    //pvt.numLearned = 0;
-
-    // /**
-    //  * helper function to enable/disable the appropriate clear/show learned button
-    //  */
-    // pvt.changeShowHideButtons = function(elId, enable){
-    //   var $el = $("#" + elId);
-    //   if (enable){
-    //     $el.removeClass(pvt.consts.disabledClass);
-    //     $el.prop("disabled", false);
-    //   } else{
-    //     $el.addClass(pvt.consts.disabledClass);
-    //     $el.prop("disabled", true);
-    //   }
-    // };
-
-    // pvt.enableHide = function(){
-    //   pvt.changeShowHideButtons(pvt.consts.clearLearnedId, true);
-    // };
-
-    // pvt.disableHide = function(){
-    //   pvt.changeShowHideButtons(pvt.consts.clearLearnedId, false);
-    // };
-
-    // pvt.disableShow = function(){
-    //   pvt.changeShowHideButtons(pvt.consts.showLearnedId, false);
-    // };
-
-    // pvt.enableShow = function(){
-    //   pvt.changeShowHideButtons(pvt.consts.showLearnedId, true);
-    // };
-
     pvt.isRendered = true; // view is prerendered
 
     return Backbone.View.extend({
@@ -61,7 +26,8 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         "click #download-input": "downloadGraph",
         "click #delete-graph": "clearGraph",
         "click #preview-graph": "previewGraph",
-        "click #back-to-editing": "returnToEditor"
+        "click #back-to-editing": "returnToEditor",
+        "keyup #add-concept-input": "addConceptKeyUp"
       },
 
        initialize: function(inp){
@@ -71,99 +37,12 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
          thisView.appRouter = inp.appRouter;
        },
 
-        // thisView.appRouter = inp.appRouter;
-        // $('.' + consts.elNavButtonClass).on("click", function(evt){
-        //   thisView.handleELButtonClick.call(thisView, evt);
-        // });
-        // $('#' + consts.clearLearnedId).on("click", function(evt){
-        //   thisView.handleClearLearnedClick.call(thisView, evt);
-        // });
-        // $('#' + consts.showLearnedId).on("click", function(evt){
-        //   thisView.handleShowLearnedClick.call(thisView, evt);
-        // });
-        // hide/show apptools for small view ports
-        // $("#" + consts.apptoolsButtonId).on("click", function(){
-        //   $(this).toggleClass(consts.expandButtonClass);
-        //   $("#" + consts.viewId).toggleClass(consts.showClass);
-        // });
-
-        //var aux = window.agfkGlobals.auxModel;
-        // enablje/disable the hide/show buttons
-        // thisView.listenTo(thisView.model.get("options"), "change:showLearnedConcepts", thisView.changeShowHideState);
-        // thisView.listenTo(aux, "change:learnedConcepts", thisView.handleChLearnStatus ); // listen for check clicks
-
-        // FIXME probable initialization problem
-        // thisView.listenTo(thisView.model, "sync", function(){
-        //   thisView.model.getNodes().each(function(node){
-        //     if (aux.conceptIsLearned(node.id)){
-        //       thisView.handleChLearnStatus(node.id, node.get("sid"), true);
-        //     };
-        //   });
-        // });
-      //},
-
-      // /**
-      //  *  Change the show/hide learned concepts buttons state
-      //  */
-      // changeShowHideState: function(chmodel, chstate){
-      //   if (chstate){
-      //     // enables the "hide learned concepts" and disables "show learned concepts"
-      //     pvt.numVisLearned = pvt.numLearned;
-      //     pvt.enableHide();
-      //     pvt.disableShow();
-      //   } else{
-      //     // enables the "show learned concepts" and disables "hide learned concepts"
-      //     pvt.numVisLearned = 0;
-      //     pvt.disableHide();
-      //     pvt.enableShow();
-      //   }
-      // },
-
-      // /**
-      //  * Handle changing node status
-      //  */
-      // handleChLearnStatus: function(tag, nodesid, state){
-      //  // keep count of the number of visible learned nodes
-      //   if (state){
-      //     pvt.numVisLearned++;
-      //     pvt.numLearned++;
-      //     if (pvt.numVisLearned === 1){
-      //       pvt.enableHide();
-      //     }
-      //   }
-      //   else{
-      //     pvt.numVisLearned--;
-      //     pvt.numLearned--;
-      //     if(pvt.numVisLearned === 0){
-      //       pvt.disableHide();
-      //     }
-      //   }
-      // },
-
       /**
        * Return true if the view has been rendered
        */
       isViewRendered: function(){
         return pvt.isRendered;
       },
-
-      // /**
-      //  * Handle click event for showing the [implicitly] learned nodes
-      //  */
-      // handleClearLearnedClick: function(evt){
-      //   if (!$(evt.currentTarget).hasClass(pvt.consts.disabledClass)){
-      //     this.model.get("options").setLearnedConceptsState(false);
-      //   }
-      // },
-
-      // /**
-      //  * Handle click event for showing the [implicitly] learned nodes
-      //  */
-      // handleShowLearnedClick: function(evt){
-      //   if (!$(evt.currentTarget).hasClass(pvt.consts.disabledClass)){
-      //     this.model.get("options").setLearnedConceptsState(true);
-      //   }
-      // },
 
 
       /**
@@ -230,6 +109,40 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         if (!confirmDelete || confirm("Press OK to clear this graph")){
           this.model.clear().set(this.model.defaults());
           this.model.trigger("render"); // FIXME this is a hack
+        }
+      },
+
+      addConceptKeyUp: function (evt) {
+        var thisView = this,
+            keyCode = evt.keyCode;
+        if (keyCode === 13) {
+          var inpText = evt.target.value;
+          if (inpText) {
+            var aux = window.agfkGlobals.auxModel,
+            // try to find the tag and add to graph
+            res = aux.get("nodes").filter(function(d){
+              return d.get("title") === inpText || d.id === inpText;
+            });
+            if (res.length) {
+              var fetchNodeId = res[0].id;
+              thisView.model.set("root", fetchNodeId);
+              thisView.model.fetch({
+                success: function () {
+                  // need to contract
+                  var fetchNode = thisView.model.getNode(fetchNodeId);
+                  fetchNode.set("x", 200);
+                  fetchNode.set("y", 200); // FIXME figure out a better positioning system for the fetched node
+                  fetchNode.contractDeps();
+                  thisView.model.trigger("render");
+                  evt.target.value = "";
+                }
+              });
+              //thisView.model.addServerDepGraphToGraph(res[0].id); // TODO resolve ambiguities
+              // How to optimize and render? Oh no... - no optimize - just set initial coordinates and collapse all nodes - go!
+            } else {
+              // TODO let the user know that no matching concept was found
+            }
+          }
         }
       }
 

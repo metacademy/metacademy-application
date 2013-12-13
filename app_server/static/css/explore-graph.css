@@ -40,13 +40,13 @@
     fill: rgb(237, 255, 237);
 }
 
-.implicit-learned.concept-g > circle{
-    stroke: #868686;
-}
+/* .implicit-learned.concept-g > circle{ */
+/*     stroke: #868686; */
+/* } */
 
-.learned text, .implicit-learned text{
-    fill: #868686;
-}
+/* .learned text, .implicit-learned text{ */
+/*     fill: #868686; */
+/* } */
 
 /* dep and ol circles */
 .concept-g .ol-circle{
@@ -68,9 +68,9 @@
 }
 
 /* properties for learned paths */
-.learned path.link, .implicit-learned path.link{
-    opacity: 0.5;
-}
+/* .learned path.link, .implicit-learned path.link{ */
+/*     opacity: 0.5; */
+/* } */
 
 /*********
  node icons

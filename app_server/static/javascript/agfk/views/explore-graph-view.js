@@ -1,5 +1,5 @@
 /*global define*/
-  // TODO do we still want to dim "implicitly learned nodes?"
+// TODO do we still want to dim "implicitly learned nodes?"
 define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base/utils/utils", "base/utils/errors"], function(Backbone, d3, $, _, GraphView, Utils, ErrorHandler){
   "use strict";
 
@@ -171,7 +171,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             .on("mouseup", function () {
               thisView.handleEToLConceptClick.call(thisView, this.getAttribute(consts.dataConceptTagProp), this);
             }
-);
+               );
 
       var numEls = d3node.selectAll("tspan")[0].length,
           elIconX = consts.elIconXOffset,
@@ -252,16 +252,16 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
      * Hide long paths and show wisps
      */
     pvt.handleLongPaths = function (d, d3this) {
-          var consts = pvt.consts,
-              stPathD = pvt.getPathWispD(d3this.select("path").node(), true),
-              endPathD = pvt.getPathWispD(d3this.select("path").node(), false),
-              wispsG,
-              longPaths;
+      var consts = pvt.consts,
+          stPathD = pvt.getPathWispD(d3this.select("path").node(), true),
+          endPathD = pvt.getPathWispD(d3this.select("path").node(), false),
+          wispsG,
+          longPaths;
 
       // hide long paths
       longPaths = d3this.selectAll("path");
       longPaths.on("mouseout", function(d){
-          d3this.classed("link-wrapper-hover", false);
+        d3this.classed("link-wrapper-hover", false);
       });
       if (!d3this.classed(consts.linkWrapHoverClass)){
         longPaths.attr("opacity", 1)
@@ -277,7 +277,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
 
       // TODO remove hardcoding to consts
       wispsG = d3this.insert("g", ":first-child")
-            .classed(consts.wispGClass, true);
+        .classed(consts.wispGClass, true);
       wispsG.append("path")
         .attr("id", consts.startWispPrefix + d3this.attr("id"))
         .attr("d", stPathD)
@@ -371,7 +371,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
             thisView.circleMouseOut.call(thisView, d, this);
           })
           .on("mouseup", function (d) {
-              thisView.circleMouseUp.call(thisView, d, this);
+            thisView.circleMouseUp.call(thisView, d, this);
           });
 
         // FIXME this will likely need to be refactored
@@ -409,8 +409,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         thisView.model.expandGraph();
 
         if (thisView.scopeNode && thisView.scopeNode.id === d.id) {
-          thisView.optimizeGraphPlacement(true, false, d.id);
           thisView.nullScopeNode();
+          thisView.centerForNode(d).each("end", function () {
+            thisView.optimizeGraphPlacement(true, false, d.id);
+          });
           return false;
         } else {
           thisView.setScopeNode(d);
@@ -457,9 +459,9 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         thisView.numHiddenEdges = edges.length - edgeShowList.length;
 
         // transition the g so the node is centered
-          thisView.centerForNode(d).each("end", function () {
-            thisView.optimizeGraphPlacement(true, false, d.id, true);
-          });
+        thisView.centerForNode(d).each("end", function () {
+          thisView.optimizeGraphPlacement(true, false, d.id, true);
+        });
         return true;
       },
 
@@ -642,7 +644,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
           thisView.$infoTextBox = $infoTextBox;
         }
         if (thisView.focusNode) {
-         thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
+          thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
         }
       },
 
@@ -904,7 +906,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       doClipEdge: function(edge) {
         var thisView = this;
-          return !(thisView.isEdgeShortestOutlink(edge) || thisView.isEdgeLengthBelowThresh(edge));
+        return !(thisView.isEdgeShortestOutlink(edge) || thisView.isEdgeLengthBelowThresh(edge));
       },
 
       /**
@@ -912,7 +914,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
        */
       isEdgeVisiblyTransitive: function (edge) {
         var thisView = this;
-          return edge.get("isTransitive")
+        return edge.get("isTransitive")
           && thisView.model.checkIfTransitive(edge, pvt.getEdgeVisibleNoTransFun.call(thisView));
       },
 

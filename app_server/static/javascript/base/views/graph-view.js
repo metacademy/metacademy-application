@@ -318,9 +318,13 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
           return d.id;
         });
 
+        // .sort(function (a, b) {
+        //   return (Math.abs(a.get("source").get("x") - a.get("target").get("x")) + Math.abs(a.get("source").get("y") - a.get("target").get("y"))) - (Math.abs(b.get("source").get("x") - b.get("target").get("x")) + Math.abs(b.get("source").get("y") - b.get("target").get("y")));
+        // });
+
       var gPaths = thisView.gPaths;
 
-      if (thisView.state.doPathsTrans){ // TOMOVE do we want to use state?
+      if (thisView.state.doPathsTrans){
         gPaths.each(function(d){
           var d3el = d3.select(this),
               edgePath = pvt.getEdgePath(d);
@@ -573,25 +577,35 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
      */
     centerForNode:function (d) {
       var thisView = this;
+
+      if (thisView.state.isTransitioning) return false;
+      else thisView.state.isTransitioning = true;
+
       if (!thisView.isNodeVisible(d)){
         if (thisView.scopeNode) thisView.nullScopeNode();
         thisView.model.expandGraph();
         thisView.optimizeGraphPlacement(true, false, d.id);
       }
-      return thisView.d3SvgG.transition()
+      // TODO remove hard coded scale and duration
+      var hasScope = thisView.scopeNode !== undefined && thisView.scopeNode !== null;
+      var translateTrans = thisView.d3SvgG.transition()
+        .duration(500)
         .attr("transform", function () {
           // TODO move this function to pvt
           var dzoom = thisView.dzoom,
               svgBCR = thisView.d3Svg.node().getBoundingClientRect(),
-              curScale = dzoom.scale(),
+              curScale = hasScope ? 1 : 0.6, //dzoom.scale(),
               wx = svgBCR.width,
               wy = svgBCR.height,
               dispFract = d.get("dependencies").length ? (d.get("outlinks").length ? 0.5 : 2/3) : (1/3),
               nextY = wy*dispFract - d.get("y")*curScale - pvt.consts.nodeRadius*curScale/2,
               nextX = wx/2 - d.get("x")*curScale;
           dzoom.translate([nextX, nextY]);
+          dzoom.scale(curScale);
+          thisView.state.isTransitioning = false;
           return "translate(" + nextX + "," + nextY + ") scale(" + curScale + ")";
         });
+      return translateTrans;
     },
 
     /**

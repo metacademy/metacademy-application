@@ -35,7 +35,12 @@
 }
 
 /* properties for learned circles */
-.learned.concept-g > circle, .implicit-learned.concept-g > circle{
+.learned.concept-g > circle{
+    stroke: #868686;
+    fill: rgb(237, 255, 237);
+}
+
+.implicit-learned.concept-g > circle{
     stroke: #868686;
 }
 
@@ -59,7 +64,7 @@
 }
 
 .concept-g.scoped-circle-g circle, .concept-g.scoped-circle-g .dep-circle, .concept-g.scoped-circle-g .ol-circle, .concept-g.focused-circle-g circle{
-    fill: rgb(245, 232, 242);
+    fill: rgb(255, 244, 253);
 }
 
 /* properties for learned paths */

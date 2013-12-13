@@ -593,8 +593,9 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
         .attr("transform", function () {
           // TODO move this function to pvt
           var dzoom = thisView.dzoom,
+              dScale = dzoom.scale(),
               svgBCR = thisView.d3Svg.node().getBoundingClientRect(),
-              curScale = hasScope ? 1 : 0.6, //dzoom.scale(),
+              curScale = hasScope ? (dScale > 1 ? dScale : 1) : (dScale < 0.9 ? dScale : .6), //dzoom.scale(),
               wx = svgBCR.width,
               wy = svgBCR.height,
               dispFract = d.get("dependencies").length ? (d.get("outlinks").length ? 0.5 : 2/3) : (1/3),

@@ -46,6 +46,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       eToLConceptTxtClass: "exp-to-learn-txt",
       learnIconName: "glasses-icon.svg",
       dataConceptTagProp: "data-concept",
+      infoBoxId: "explore-info-box",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
       renderEvt: "viewRendered",
       scopeClass: "scoped",
@@ -631,7 +632,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         // create/change toast text
         if (!thisView.$infoTextBox) {
           var $infoTextBoxEl = $(document.createElement("div"));
-          $infoTextBoxEl.attr("id", "explore-info-box");
+          $infoTextBoxEl.attr("id", consts.infoBoxId);
           var $infoTextBox = $(document.createElement("div")).addClass("textbox");
           $infoTextBoxEl.append($infoTextBox);
           var $button = $(document.createElement("button"));

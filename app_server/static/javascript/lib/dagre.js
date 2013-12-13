@@ -298,7 +298,8 @@ module.exports = function() {
       maxX = Math.max(maxX, maxXPoints + value.width / 2);
       maxY = Math.max(maxY, maxYPoints + value.height / 2);
     });
-    out.graph().bbox = { width: maxX, height: maxY };
+    out.graph().width = maxX;
+    out.graph().height = maxY;
 
     return out;
   }
@@ -1529,7 +1530,7 @@ exports.relax = function(g) {
 var Set = require('cp-data').Set,
 /* jshint +W079 */
     Digraph = require('graphlib').Digraph,
-    rankUtil = require('./rankUtil');
+    util = require('../util');
 
 module.exports = feasibleTree;
 
@@ -1554,92 +1555,92 @@ module.exports = feasibleTree;
  * Nodes have the same id and value as that in the input graph.
  *
  * Edges in the tree have arbitrarily assigned ids. The attributes for edges
- * include `reversed` and `weight`. `reversed` indicates that the edge is a
- * back edge in the input graph. `weight` is used to indicate how many multi-
- * edges are represented by the tree edge.
+ * include `reversed`. `reversed` indicates that the edge is a
+ * back edge in the input graph.
  */
 function feasibleTree(g) {
   var remaining = new Set(g.nodes()),
-      minLen = [], // Array of {u, v, len}
       tree = new Digraph();
 
-  // Collapse multi-edges and precompute the minLen, which will be the
-  // max value of minLen for any edge in the multi-edge.
-  var minLenMap = {};
-  g.eachEdge(function(e, u, v, edge) {
-    var id = incidenceId(u, v);
-    if (!(id in minLenMap)) {
-      minLen.push(minLenMap[id] = { u: u, v: v, len: 0, weight: 0 });
-    }
-    var mle = minLenMap[id];
-    mle.len = Math.max(mle.len, edge.minLen);
-    mle.weight++;
-  });
+  if (remaining.size() === 1) {
+    var root = g.nodes()[0];
+    tree.addNode(root, {});
+    tree.graph({ root: root });
+    return tree;
+  }
 
-  // Remove arbitrary node - it is effectively the root of the spanning tree.
-  var root = g.nodes()[0];
-  remaining.remove(root);
-  var nodeVal = g.node(root);
-  tree.addNode(root, nodeVal);
-  tree.graph({root: root});
-
-  // Finds the next edge with the minimum slack.
-  function findMinSlack() {
-    var result,
-        eSlack = Number.POSITIVE_INFINITY;
-    minLen.forEach(function(mle /* minLen entry */) {
-      if (remaining.has(mle.u) !== remaining.has(mle.v)) {
-        var mleSlack = rankUtil.slack(g, mle.u, mle.v, mle.len);
-        if (mleSlack < eSlack) {
-          if (!remaining.has(mle.u)) {
-            result = {
-              treeNode: mle.u,
-              graphNode: mle.v,
-              len: mle.len,
-              reversed: false,
-              weight: mle.weight
-            };
-          } else {
-            result = {
-              treeNode: mle.v,
-              graphNode: mle.u,
-              len: -mle.len,
-              reversed: true,
-              weight: mle.weight
-            };
-          }
-          eSlack = mleSlack;
+  function addTightEdges(v) {
+    g.predecessors(v).forEach(function(u) {
+      if (remaining.has(u) && slack(g, u, v) === 0) {
+        if (remaining.has(v)) {
+          tree.addNode(v, {});
+          remaining.remove(v);
+          tree.graph({ root: v });
         }
+
+        tree.addNode(u, {});
+        tree.addEdge(null, u, v, { reversed: true });
+        remaining.remove(u);
+        addTightEdges(u);
       }
     });
 
-    return result;
+    g.successors(v).forEach(function(w)  {
+      if (remaining.has(w) && slack(g, v, w) === 0) {
+        if (remaining.has(v)) {
+          tree.addNode(v, {});
+          remaining.remove(v);
+          tree.graph({ root: v });
+        }
+
+        tree.addNode(w, {});
+        tree.addEdge(null, v, w, {});
+        remaining.remove(w);
+        addTightEdges(w);
+      }
+    });
   }
 
-  while (remaining.size() > 0) {
-    var result = findMinSlack();
-    nodeVal = g.node(result.graphNode);
-    remaining.remove(result.graphNode);
-    tree.addNode(result.graphNode, nodeVal);
-    tree.addEdge(null, result.treeNode, result.graphNode, {
-      reversed: result.reversed,
-      weight: result.weight
+  function createTightEdge() {
+    var minSlack = Number.MAX_VALUE;
+    remaining.keys().forEach(function(v) {
+      g.predecessors(v).forEach(function(u) {
+        var edgeSlack = slack(g, u, v);
+        if (Math.abs(edgeSlack) < Math.abs(minSlack)) {
+          minSlack = -edgeSlack;
+        }
+      });
+
+      g.successors(v).forEach(function(w) {
+        var edgeSlack = slack(g, v, w);
+        if (Math.abs(edgeSlack) < Math.abs(minSlack)) {
+          minSlack = edgeSlack;
+        }
+      });
     });
-    nodeVal.rank = g.node(result.treeNode).rank + result.len;
+
+    tree.eachNode(function(u) { g.node(u).rank -= minSlack; });
+  }
+
+  while (remaining.size()) {
+    var nodesToSearch = !tree.order() ? remaining.keys() : tree.nodes();
+    nodesToSearch.forEach(addTightEdges);
+    if (remaining.size()) {
+      createTightEdge();
+    }
   }
 
   return tree;
 }
 
-/*
- * This id can be used to group (in an undirected manner) multi-edges
- * incident on the same two nodes.
- */
-function incidenceId(u, v) {
-  return u < v ?  u.length + ':' + u + '-' + v : v.length + ':' + v + '-' + u;
+function slack(g, u, v) {
+  var rankDiff = g.node(v).rank - g.node(u).rank;
+  var maxMinLen = util.max(g.outEdges(u, v)
+                            .map(function(e) { return g.edge(e).minLen; }));
+  return rankDiff - maxMinLen;
 }
 
-},{"./rankUtil":15,"cp-data":19,"graphlib":23}],14:[function(require,module,exports){
+},{"../util":17,"cp-data":19,"graphlib":23}],14:[function(require,module,exports){
 var util = require('../util'),
     topsort = require('graphlib').alg.topsort;
 
@@ -2110,7 +2111,7 @@ log.level = 0;
 exports.log = log;
 
 },{}],18:[function(require,module,exports){
-module.exports = '0.3.10';
+module.exports = '0.4.1';
 
 },{}],19:[function(require,module,exports){
 exports.Set = require('./lib/Set');

@@ -8,13 +8,10 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
   return (function(){
     var pvt = {};
     pvt.consts = {
-      activeClass: "active",
       showClass: "show",
       backToEditingButtonId: "back-to-editing",
       apptoolsButtonId: "apptools-button",
       expandButtonClass: "expanded",
-      elNameAppend: "-button",
-      elNavButtonClass: "el-nav-button",
 //      clearLearnedId: "button-clear-learned",
 //      showLearnedId: "button-show-learned",
       disabledClass: "disabled",

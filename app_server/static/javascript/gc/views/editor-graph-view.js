@@ -313,7 +313,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
 
       if (mouseDownNode !== d){
         // we're in a different node: create new edge for mousedown edge and add to graph
-        var newEdge = {source: mouseDownNode, target: d, id: "c" + thisView.idct++};
+        var newEdge = {source: mouseDownNode, target: d};
         var filtRes = thisView.gPaths.filter(function(d){
           if (d.get("source") === newEdge.target && d.get("target") === newEdge.source){
             thisView.model.removeEdge(d);
@@ -436,7 +436,7 @@ window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/u
 
     // keydown on main svg
     windowKeyDown: function() {
-      if (!this.$el.is(":visible")) { return; }
+      if (!this.$el.is(":visible") || document.activeElement !== document.body) { return; }
 
       var thisView = this,
           state = thisView.state,

@@ -286,6 +286,9 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
           switch (viewMode){
           case pExploreMode:
+            if (paramsObj[qFocusConcept] === undefined){
+              paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
+            }
             doRender = doRender || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
             if (doRender){ // UPDATE
               thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute});
@@ -341,6 +344,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
           if (viewMode === pCreateMode){
             thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
+            thisRoute.appToolsView.render();
             thisRoute.appToolsView.$el.show();
             //thisRoute.appToolsView.setMode(thisRoute.viewMode);
           }

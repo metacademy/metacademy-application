@@ -1,5 +1,5 @@
 /*global define*/
-define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorHandler){
+define(["jquery", "backbone", "base/utils/errors", "completely"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**
@@ -27,7 +27,7 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
         "click #delete-graph": "clearGraph",
         "click #preview-graph": "previewGraph",
         "click #back-to-editing": "returnToEditor",
-        "keyup #add-concept-input": "addConceptKeyUp"
+        "keyup #add-concept-container input": "addConceptKeyUp"
       },
 
        initialize: function(inp){
@@ -50,6 +50,23 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
        */
       render: function(){
         pvt.viewRendered = true;
+        // setup autocomplete
+        // TODO handle styles in css -- perhaps use a different library
+        var auto = window.completely(document.getElementById('add-concept-container'), {
+    	     fontSize : '0.9em'
+         });
+         auto.options = window.agfkGlobals.auxModel.get("nodes").map(function (node) {
+           return node.get("title").toLowerCase();
+         });
+         auto.options.sort();
+         auto.input.placeholder = "Search for a concept to add";
+         var $auto = $(auto.input);
+         $auto.css("border", "1px solid rgb(56, 49, 49)");
+         $auto.css("padding", "0.2em");
+        var $hint = $(auto.hint);
+        $hint.css("padding", "0.3em");
+         //auto.repaint();
+        this.auto = auto;
         return this;
       },
 
@@ -115,13 +132,18 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
       addConceptKeyUp: function (evt) {
         var thisView = this,
             keyCode = evt.keyCode;
+        var inpText = evt.target.value;
+        if (!inpText.length) {
+          thisView.auto.hideDropDown();
+          thisView.auto.hint.value = "";
+          return;
+        }
         if (keyCode === 13) {
-          var inpText = evt.target.value;
           if (inpText) {
             var aux = window.agfkGlobals.auxModel,
             // try to find the tag and add to graph
             res = aux.get("nodes").filter(function(d){
-              return d.get("title") === inpText || d.id === inpText;
+              return d.get("title").toLowerCase() === inpText.toLowerCase() || d.id.toLowerCase() === inpText.toLowerCase();
             });
             if (res.length) {
               var fetchNodeId = res[0].id;
@@ -135,10 +157,12 @@ define(["jquery", "backbone", "base/utils/errors"], function($, Backbone, ErrorH
                   fetchNode.contractDeps();
                   thisView.model.trigger("render");
                   evt.target.value = "";
+
+                  // TODO write your own autocomplete
+                  thisView.auto.hideDropDown();
+                  thisView.auto.hint.value = "";
                 }
               });
-              //thisView.model.addServerDepGraphToGraph(res[0].id); // TODO resolve ambiguities
-              // How to optimize and render? Oh no... - no optimize - just set initial coordinates and collapse all nodes - go!
             } else {
               // TODO let the user know that no matching concept was found
             }

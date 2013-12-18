@@ -1,5 +1,5 @@
-// FIXME remove window
-window.define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
+/*global define*/
+define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
 
   var pvt = {};
 

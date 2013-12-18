@@ -1,6 +1,7 @@
 // Create simple event liseners and utility functions for headers -- this may eventually be tied in with an MVC framework but it's pretty simple and universal at the moment
 // requires: jQuery
 
+/*global define*/
 if (typeof window.define === "undefined"){
   var genutil = genFun($);
   genutil.prep();
@@ -16,7 +17,7 @@ function genFun($){
   "use strict";
   return {
     prep: function(){
-      
+
       /**
        * Parse the text in the search box after enter is pressed
        */
@@ -52,7 +53,7 @@ function genFun($){
           }
         });
       });
-      
+
       $("#main").on("mousedown", function(evt){
           $.sidr('close', 'sidr-main');
       });

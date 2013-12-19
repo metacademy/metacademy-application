@@ -598,7 +598,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
           var dzoom = thisView.dzoom,
               dScale = dzoom.scale(),
               svgBCR = thisView.d3Svg.node().parentElement.getBoundingClientRect(), // assumes the parent element wraps the intended width/height (firefox hack)
-              curScale = hasScope ? (dScale > 1 ? dScale : 1) : (dScale < 0.9 ? dScale : .6), //dzoom.scale(),
+              curScale = (hasScope || thisView.model.getNodes().length < 10) ? (dScale > 1 ? dScale : 1) : (dScale < 0.9 ? dScale : .6), //dzoom.scale(),
               wx = svgBCR.width,
               wy = svgBCR.height,
               dispFract = d.get("dependencies").length ? (d.get("outlinks").length ? 0.5 : 4/5) : (1/5),

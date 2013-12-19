@@ -1,4 +1,5 @@
 // want to test parsing
+/*global define*/
 define(["gc/models/editable-graph-model"], function(EditableGraphModel){
 
   // initialize aux testing objects
@@ -6,18 +7,18 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       nodes,
       idCt = 0,
       nodeIds = {
-        parent: idCt++,
-        grandparent: idCt++,
-        uncle: idCt++,
-        child: idCt++,
-        cousin: idCt++
+        parent: "n" + idCt++,
+        grandparent: "n" + idCt++,
+        uncle: "n" + idCt++,
+        child: "n" + idCt++,
+        cousin: "n" + idCt++
       },
       edgeIds = {
-        parentToChild: idCt++,
-        grandparentToParent: idCt++,
-        grandparentToUncle: idCt++,
-        uncleToCousin: idCt++,
-        grandparentToChild: idCt++
+        parentToChild: "e" + idCt++,
+        grandparentToParent: "e" + idCt++,
+        grandparentToUncle: "e" + idCt++,
+        uncleToCousin: "e" + idCt++,
+        grandparentToChild: "e" + idCt++
       },
       exampleResource = {
         title: "some title",
@@ -498,9 +499,9 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
       });
 
       it('should be able to add ggp node and edge to cousin', function(){
-        nodeIds.ggp = idCt++;
-        edgeIds.ggpToCousin = idCt++;
-        edgeIds.ggpToGp = idCt++;
+        nodeIds.ggp = "n" + idCt++;
+        edgeIds.ggpToCousin = "e" + idCt++;
+        edgeIds.ggpToGp = "e" + idCt++;
         graphObj.addNode({title: "ggp", id: nodeIds.ggp});
         graphObj.addEdge({source: graphObj.getNode(nodeIds.ggp),
                           target: graphObj.getNode(nodeIds.cousin),

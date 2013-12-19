@@ -55,7 +55,7 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
       postinitialize: function () {
         // setup listeners
         var thisGraph = this,
-            aux = window.agfkGlobals.auxModel;
+            aux = window.agfkGlobals && window.agfkGlobals.auxModel;
         // Implicit learned listeners
         if (aux) {
           thisGraph.listenTo(aux, aux.getConsts().learnedTrigger, thisGraph.changeILNodesFromTag);
@@ -73,10 +73,12 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
         // TODO cache learned/implicit learned nodes
         var thisGraph = this,
             nodes = thisGraph.getNodes(),
-            aux = window.agfkGlobals.auxModel,
+            aux = window.agfkGlobals && window.agfkGlobals.auxModel,
             depRoot = thisGraph.get("root"),
             isShortcut = nodes.get(depRoot).get("is_shortcut"),
             unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depRoot, isShortcut), function(tagO){return tagO.from_tag;});
+
+        if (!aux) return;
 
         nodes.each(function(node){
           if (unlearnedDepTags.indexOf(node.id) > -1){
@@ -86,20 +88,6 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
           }
         });
       }
-
-      // /**
-      //  * TODO does not have test coverage
-      //  */
-      // addDataFromEditorModel: function (edModel) {
-      //   // TODO
-      //   edModel.getNodes().each(function(node){
-      //     var tmpNode = _.clone(node);
-
-      //   });
-      //   // add nodes to model
-
-      //   // add edges
-      // }
     });
   })();
 });

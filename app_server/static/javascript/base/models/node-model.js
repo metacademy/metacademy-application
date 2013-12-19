@@ -75,13 +75,6 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
         nodePvt.visible = false;
         nodePvt.implicitLearn = false;
 
-        thisModel.setVisibleStatus = function(status){
-          if (nodePvt.visible !== nodePvt.visible){
-            nodePvt.visible = status;
-            thisModel.trigger("change:visibleStatus", thisModel.get("id"), status);
-          }
-        };
-
         thisModel.setImplicitLearnStatus = function(status){
           if (nodePvt.implicitLearn !== status){
             nodePvt.implicitLearn = status;
@@ -101,10 +94,6 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
           return nodePvt.implicitLearn;
         };
 
-        thisModel.getVisibleStatus = function(){
-          return nodePvt.visible;
-        };
-
         thisModel.getCollFields = function(){
             return thisModel.collFields;
         };
@@ -112,7 +101,6 @@ define(["backbone", "underscore", "base/collections/node-property-collections", 
         thisModel.getTxtFields = function(){
           return thisModel.txtFields;
         };
-
       },
 
       /**

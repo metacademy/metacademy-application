@@ -14,5 +14,10 @@
 {% endblock %}
 
 {% block jscript-extend %}
+  {% if debug %}
     <script data-main="{% static "javascript/test/main-browser-tests.js" %}"src="{% static "javascript/lib/require-min.js" %}"></script>
+  {% else %}
+  <script  src="{% static "javascript/lib/require-min.js" %}"></script>
+  <script src="{% static "javascript/base/main-browser-tests.js" %}"></script>
+  {% endif %}
 {% endblock %}

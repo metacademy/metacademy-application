@@ -41,10 +41,6 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       summaryWrapClass: "summary-wrap",
       summaryLeftClass: "tleft",
       summaryRightClass: "tright",
-      locElemId: "invis-loc-elem", // invisible location element
-      locElemClass: "invis-loc",
-      eToLConceptTxtClass: "exp-to-learn-txt",
-      learnIconName: "glasses-icon.svg",
       dataConceptTagProp: "data-concept",
       infoBoxId: "explore-info-box",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
@@ -61,14 +57,12 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       defaultNodeSepDist: 1.7, // separation of graph nodes
       defaultNodeWidth: 2.7, // diameter of graph nodes
       edgeLenThresh: 250, // threshold length of edges to be shown by default
-      numCharLineDisplayNode: 14, // max number of characters to display per title line of graph nodes
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
       summaryArrowTop: 28, // top distance to triangle apex
       summaryAppearDelay: 250, // delay before summary appears (makes smoother navigation)
       summaryHideDelay: 100,
       summaryFadeInTime: 50, // summary fade in time (ms)
-      SQRT2DIV2: Math.sqrt(2)/2, // FIXME use Math.SQRT1_2
       maxZoomScale: 5, // maximum zoom-in level for graph
       minZoomScale: 0.05, //maximum zoom-out level for graph
       elIconScale: 1,
@@ -147,10 +141,10 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
     pvt.getSummaryBoxPlacement = function(nodeRect, placeLeft){
       var consts = pvt.consts,
           leftMultSign = placeLeft ? -1: 1,
-          shiftDiff = (1 + leftMultSign*consts.SQRT2DIV2)*nodeRect.width/2 + leftMultSign*consts.summaryArrowWidth;
+          shiftDiff = (1 + leftMultSign*Math.SQRT1_2)*nodeRect.width/2 + leftMultSign*consts.summaryArrowWidth;
       if (placeLeft){shiftDiff -= consts.summaryWidth;}
       return {
-        top:  (nodeRect.top + (1-consts.SQRT2DIV2)*nodeRect.height/2 - consts.summaryArrowTop) + "px",
+        top:  (nodeRect.top + (1-Math.SQRT1_2)*nodeRect.height/2 - consts.summaryArrowTop) + "px",
         left:  (nodeRect.left + shiftDiff) + "px"
       };
     };
@@ -485,7 +479,6 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
         d3node.classed(hoveredClass, true);
 
         // show/emphasize connecting edges
-        // TODO move object refs outside of loop FIXME
         d.get("outlinks").each(function (ol) {
           d3.select("#" + consts.edgeGIdPrefix + ol.id)
             .classed(consts.linkWrapHoverClass, true)
@@ -986,5 +979,4 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
       }
     }); // end Backbone.View.extend({
   })();
-
 });

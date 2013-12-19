@@ -115,6 +115,7 @@ path.link-wrapper:hover{
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 }
 
 .summary-text p{

@@ -47,10 +47,16 @@ body {
     position:relative;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box; /* IE */
     box-sizing: border-box;
     overflow: auto;
     height: inherit;
     border-right: 1px solid #CCCCCC;
+}
+
+#explore-graph-view-wrapper{
+    height: 100%;
+    width: 100%;
 }
 
 #main-display-view{

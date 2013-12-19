@@ -1,6 +1,13 @@
 /* main container */
 #explore-graph-view{
     position: relative;
+    height: inherit;
+    width: inherit;
+}
+
+#explore-graph-view svg{
+    height: 100%;
+    width: 100%;
 }
 
 /* explore graph info box */
@@ -73,8 +80,8 @@
 /* } */
 
 /*********
- node icons
-**********/
+          node icons
+          **********/
 /* checkmark */
 .concept-g .checkmark{
     cursor: pointer;
@@ -177,8 +184,8 @@
 }
 
 .link-wrapper-hover path.link-wrapper{
-  opacity: 0.15;
- }
+    opacity: 0.15;
+}
 
 .ol-show path.link-wrapper{
     stroke: #e48989;

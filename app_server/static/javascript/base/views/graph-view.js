@@ -597,7 +597,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
           // TODO move this function to pvt
           var dzoom = thisView.dzoom,
               dScale = dzoom.scale(),
-              svgBCR = thisView.d3Svg.node().getBoundingClientRect(),
+              svgBCR = thisView.d3Svg.node().parentElement.getBoundingClientRect(), // assumes the parent element wraps the intended width/height (firefox hack)
               curScale = hasScope ? (dScale > 1 ? dScale : 1) : (dScale < 0.9 ? dScale : .6), //dzoom.scale(),
               wx = svgBCR.width,
               wy = svgBCR.height,

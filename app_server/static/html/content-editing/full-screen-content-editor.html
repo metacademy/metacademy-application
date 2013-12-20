@@ -1,0 +1,60 @@
+<script type="text/template" id="full-screen-content-editor">
+
+  <div class="ec-title">
+    <input type="text" class="title-input" placeholder="title of concept" value="<%- title %>">
+  </div>
+
+  <div class="ec-tabs">
+    <ul>
+      <li><button id="btn-summary">Summary</button></li>
+      <li><button id="btn-dependencies">Prerequisites</button></li>
+      <li><button id="btn-resources">Resources</button></li>
+      <li><button id="btn-goals">Goals</button></li>
+      <li><button id="btn-exercises">Exercises</button></li>
+      <li><button id="btn-pointers">See Also</button></li>
+    </ul>
+  </div>
+
+  <!-- wrappers for various editing sections: implement tab view by hiding all elements
+       with a given class and showing the one disered element -->
+
+  <div class="ec-display-wrap" id="summary">
+     <h3>
+    Summary
+    </h3>
+    <textarea><%=summary%></textarea>
+  </div>
+
+  <div class="ec-display-wrap" id="resources">
+    res
+  </div>
+
+  <div class="ec-display-wrap" id="dependencies">
+    <% dependencies.each(function(dep){ %>
+    <div class="dep-entry">
+       <h3> <%- dep.get("source").get("title") %> </h3>
+      <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">
+    </div>
+     <% }) %>
+  </div>
+
+  <div class="ec-display-wrap" id="pointers">
+     <h3>
+       See also
+    </h3>
+     <textarea><%=pointers%></textarea>
+  </div>
+
+  <div class="ec-display-wrap" id="goals">
+     <h3>
+       Goals
+    </h3>
+     <textarea><%=goals%></textarea>
+  </div>
+
+  <div class="ec-display-wrap" id="exercises">
+    exercises
+  </div>
+
+
+</script>

@@ -20,7 +20,7 @@ cache = Cache(app, config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': os.path.join
 """The API for this server responds to the following requests:
 
   GET  /dependencies                get a JSON representation of the dependency graph of the supplied concept(s) (specify via the 'concepts' or 'ids' parameter)
-  GET  /concepts/<concept_name>     get a JSON representation of <concept_name>              
+  GET  /concepts/<concept_name>     get a JSON representation of <concept_name>
   GET  search                       process a search query, return a list of JSON objects for the results
 
 EXMAPLES
@@ -109,7 +109,7 @@ def make_response(text, fmt):
         ctype = CONTENT_TYPES[fmt]
     else:
         flask.abort(NOT_FOUND)
-    
+
     resp = flask.make_response(text)
     resp.headers['Content-Type'] = ctype + ';charset=utf-8'
     resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -155,7 +155,7 @@ def do_concept(node_name=None):
 
     text = get_node_json(node_name, shortcut=shortcut)
 
-    return make_response(text, 'json')    
+    return make_response(text, 'json')
 
 @app.route('/list')
 def do_list():
@@ -168,19 +168,19 @@ def do_list():
         # TODO load course list
     elif 'ids' in args:
         # TODO should this functionality go under /concepts? (ids to titles, essentially)
-        # TODO this is problematic, what if we want to request 500 ids at once? The URL will be too long 
+        # TODO this is problematic, what if we want to request 500 ids at once? The URL will be too long
         query_ids = args.getlist('ids')
         tags = [db.id2tag[i] for i in query_ids if i in db.id2tag]
     else:
         tags = [tag for tag in db.nodes]
-    
+
     results = [{'tag': tag, 'id': db.tag2id[tag], 'title': db.nodes[tag].title}
                for tag in tags
-               if tag in db.tag2id]    
+               if tag in db.tag2id]
     text = json.dumps(results)
     return make_response(text, 'json')
-    
-        
+
+
 @app.route('/search')
 def do_search():
     args = flask.request.args
@@ -222,4 +222,3 @@ if __name__ == '__main__':
             port = hp_args[0]
         port = int(port)
     app.run(debug=config.DEBUG, port=port, host=host)
-

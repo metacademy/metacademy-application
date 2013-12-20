@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/ionicons.css" %}"/>
+<link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
+<link rel="stylesheet" href="{% static "css/colorbox.css" %}" media="screen" />
+<link rel="stylesheet" href="{% static "css/graphs.css" %}" />
+<link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
+<link rel="stylesheet" href="{% static "css/apptools.css" %}" />
+<link rel="stylesheet" href="{% static "css/concept-list.css" %}" />
+<link rel="stylesheet" href="{% static "css/concept-details.css" %}"/>
+<link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
+{% endblock %}
+
+{% block jscript-extend %}
+<script>
+  window.agfkGlobals = {};
+  agfkGlobals.userInitData = {{ user_data|safe }};
+  agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+  agfkGlobals.auxModel = null; // init in main js app
+</script>
+{% if debug %}
+<script data-main="{% static "javascript/base/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
+{% else %}
+<script  src="{% static "javascript/lib/require-min.js" %}"></script>
+<script src="{% static "javascript/base/main-built.js" %}"></script>
+{% endif %}
+{% endblock %}
+{% block main %}
+
+{% include "agfk-structure-loader.html" %}
+
+{% endblock %}

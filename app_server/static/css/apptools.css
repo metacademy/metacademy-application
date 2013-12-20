@@ -1,0 +1,168 @@
+/* App tools */
+
+.apptools{
+    display: none;
+    position: absolute;
+    top: 2em;
+    right: 5%;
+    border: 2px solid #CE94BC;
+    border-radius: 10px;
+    text-align: center;
+    padding: 1em;
+}
+
+.create #content-editing-tools{
+    display: block;
+}
+
+.apptools input{
+    width: 30px;
+    opacity: 0.4;
+}
+
+.apptools input:hover{
+    opacity: 1;
+    cursor: pointer;
+}
+
+#hidden-file-upload{
+    display: none;
+}
+
+#download-input{
+    margin: 0 0.5em;
+}
+
+#content-editing-tools button{
+    border: none;
+    background: inherit;
+}
+
+#content-editing-tools .icon{
+    color: #5C5C5C;
+    font-size: 2.2em;
+    cursor: pointer;
+}
+
+#content-editing-tools input{
+    width: 15em;
+    padding: 0.3em;
+    margin-bottom: 0.2em;
+}
+
+#content-editing-tools input:hover{
+    cursor: text;
+}
+
+
+#content-editing-tools .icon:hover{
+    color: #333;
+}
+
+#explore-learn-button-wrapper button, #hovertext-buttons button{
+    -webkit-box-shadow: 1px 1px 2px #463838;
+    -moz-box-shadow: 1px 1px 2px #463838;
+    box-shadow: 1px 1px 2px #463838;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 2px #5C4A56 solid;
+    background-color: white;
+    padding: 1.5px;
+    cursor: pointer;
+}
+
+#explore-learn-button-wrapper button:hover{
+    border: 2px #D145CC solid;
+}
+
+#back-to-editing{
+    display: none;
+    padding: 1em;
+    margin-top: 1em;
+    background-color: rgba(255, 211, 241, 0.39);
+}
+
+.apptools-title{
+    text-align: center;
+    font-size: 0.95em;
+    font-weight: bold;
+}
+
+/* Explore-Learn Navigation Button */
+.e-to-l-summary-link{
+    color: blueviolet;
+    margin-right: 0.5em;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.el-nav-button img{
+    width: 20px;
+    height: 20px;
+}
+
+.el-nav-button.active{
+    opacity: 0.7;
+    border: 2px #5C4A56 solid;
+    cursor: default;
+   -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.el-nav-button.active:hover{
+    cursor: default;
+    border: 2px #5C4A56 solid;
+}
+
+#explore-learn-button-wrapper{
+    text-align: center;
+    margin: 0.3em 0px;
+}
+
+/* apptools action buttons */
+
+.toggle-lc-button{
+    width: 5em;
+    margin: 0.5em 0.4em;
+    line-height: 1.3em;
+    font-size: 0.8em;
+ }
+
+button.toggle-lc-button.disabled{
+    opacity: 0.4;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+button.toggle-lc-button.disabled:hover{
+    border: 2px #5C4A56 solid;
+    cursor: default;
+}
+
+.apptools-lc-buttons-wrap{
+    display: inline-block;
+    margin: 0 auto;
+}
+
+
+/* @media only screen and  (max-width: 760px){ */
+/*     .apptools{ */
+/*         top: auto; */
+/*         bottom: 0; */
+/*         max-width: 200px; */
+/*         margin: 0; */
+/*         margin-right: 1em; */
+/*         padding: 0; */
+/*         padding-top: 0.5em; */
+/*         width: 200px; */
+/*         right: 0; */
+/*         height: 125px; */
+/*         display: none; */
+/*     } */
+/*     .apptools.show{ */
+/*         display: block; */
+/*     } */
+/* } */

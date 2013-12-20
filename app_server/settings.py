@@ -113,7 +113,8 @@ WSGI_APPLICATION = 'wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(CLIENT_SERVER_PATH,'static/html/'),
-    os.path.join(CLIENT_SERVER_PATH,'static/html/underscore-templates/')
+    os.path.join(CLIENT_SERVER_PATH,'static/html/underscore-templates/'),
+    os.path.join(CLIENT_SERVER_PATH,'static/html/content-editing/'),
 )
 
 INSTALLED_APPS = (
@@ -129,13 +130,13 @@ INSTALLED_APPS = (
     'apps.user_management',
     'apps.cserver_comm',
     'apps.roadmaps',
-    'apps.link_checker',
+    'apps.browser_tests',
     'haystack',
     'captcha',
     'south',
     'compressor',
     'lazysignup',
-    'reversion'
+    'reversion',
 )
 
 # apps settings

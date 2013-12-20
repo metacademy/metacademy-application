@@ -32,7 +32,7 @@ nosetests.xml
 # Mr Developer
 .mr.developer.cfg
 .project
-.pydevproject        
+.pydevproject
 
 # tmp folders/files
 tmp
@@ -51,3 +51,6 @@ media
 
 # debugging
 sandbox.py
+
+# tern server
+.tern-port

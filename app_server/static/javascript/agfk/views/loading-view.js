@@ -1,4 +1,5 @@
-define(["backbone"], function(Backbone){ 
+/*global define*/
+define(["backbone"], function(Backbone){
   "use strict";
 
   /**
@@ -14,7 +15,7 @@ define(["backbone"], function(Backbone){
   return Backbone.View.extend({
     className: "load-content",
     el: document.getElementById(pvt.viewConsts.viewId),
-    
+
     /* render: view html does not use a template */
     render: function(){
       pvt.isRendered = true;
@@ -24,10 +25,10 @@ define(["backbone"], function(Backbone){
     /**
      * Return true if the view has been rendered
      */
-    isRendered: function(){
+    isViewRendered: function(){
       return pvt.isRendered;
     }
-    
+
   });
 
 });

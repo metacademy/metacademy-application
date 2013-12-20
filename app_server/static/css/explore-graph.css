@@ -1,0 +1,196 @@
+/* main container */
+#explore-graph-view{
+    position: relative;
+    height: inherit;
+    width: inherit;
+}
+
+#explore-graph-view svg{
+    height: 100%;
+    width: 100%;
+}
+
+/* explore graph info box */
+#explore-info-box {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 0.8em;
+    text-align: center;
+    background-color: #F0F0F0;
+    color: rgb(143, 126, 139);
+    border-radius: 5px;
+    padding: 0.5em;
+}
+.scoped #explore-info-box{
+    display: block;
+}
+#explore-info-box button {
+    display: none;
+    border: 1px solid #333333;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+    margin-top: 0.5em;
+}
+#explore-info-box button:hover {
+    border-color: #D145CC;
+}
+#explore-info-box:hover button {
+    display: inline-block;
+}
+
+/* properties for learned circles */
+.learned.concept-g > circle{
+    stroke: #868686;
+    fill: rgb(237, 255, 237);
+}
+
+/* .implicit-learned.concept-g > circle{ */
+/*     stroke: #868686; */
+/* } */
+
+/* .learned text, .implicit-learned text{ */
+/*     fill: #868686; */
+/* } */
+
+/* dep and ol circles */
+.concept-g .ol-circle{
+    fill: #fbeded;
+}
+.concept-g .dep-circle{
+    fill: #e6e6fa;
+}
+
+.scoped .concept-g .ol-circle{
+    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
+}
+.scoped .concept-g .dep-circle{
+    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
+}
+
+.concept-g.scoped-circle-g circle, .concept-g.scoped-circle-g .dep-circle, .concept-g.scoped-circle-g .ol-circle, .concept-g.focused-circle-g circle{
+    fill: rgb(255, 244, 253);
+}
+
+/* properties for learned paths */
+/* .learned path.link, .implicit-learned path.link{ */
+/*     opacity: 0.5; */
+/* } */
+
+/*********
+          node icons
+          **********/
+/* checkmark */
+.concept-g .checkmark{
+    cursor: pointer;
+}
+.concept-g .checkmark path{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 4;
+    visibility: hidden;
+}
+.concept-g .checkmark circle{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 3;
+    visibility: hidden;
+}
+.concept-g .learned .checkmark circle{
+    fill: transparent;
+    stroke: #759466;
+    stroke-width: 4;
+    visibility: visible;
+}
+
+.concept-g .checkmark.hovered circle{
+    fill: transparent;
+    stroke: #9987AF;
+    stroke-width: 4;
+    visibility: visible;
+}
+
+.concept-g .checkmark.hovered path{
+    stroke-width: 5;
+    stroke: #9987AF;
+    visibility: visible;
+}
+
+.concept-g.learned .checkmark circle{
+    visibility: visible;
+    stroke: #759466;
+    stroke-width: 4;
+}
+
+.concept-g.learned .checkmark path{
+    stroke-width: 5;
+    stroke: #759466;
+    visibility: visible;
+}
+.hovered  .checkmark path, .clicked .checkmark path, .hovered .checkmark circle, .clicked .checkmark circle, .hovered .node-star polygon, .clicked .node-star-polygon, .starred polygon, .hovered .e-to-l-icon{
+    visibility: visible;
+}
+
+/* star */
+.node-star{
+    cursor:pointer;
+}
+
+.node-star polygon{
+    fill: transparent;
+    stroke: #868686;
+    stroke-width: 20;
+    visibility: hidden;
+}
+.node-star.hovered polygon{
+    fill: #D4C4E7;
+    Stroke: #56574D;
+}
+.starred .node-star polygon{
+    fill: #F8F8C9;
+    stroke: #56574D;
+    visibility: visible;
+}
+
+/* node e-to-l icon */
+.e-to-l-icon{
+    opacity: 0.3;
+    visibility: hidden;
+}
+
+.e-to-l-icon:hover{
+    opacity: 1;
+    cursor: pointer;
+}
+
+.start-wisp, .end-wisp{
+    fill: none;
+    stroke: #333;
+    stroke-width: 2px;
+}
+
+.link-wrapper-hover .start-wisp, .link-wrapper-hover .end-wisp{
+    display: none;
+}
+
+.long-edge{
+    display: none;
+}
+
+.link-wrapper-hover path{
+    display: block;
+}
+
+.link-wrapper-hover path.link-wrapper{
+    opacity: 0.15;
+}
+
+.ol-show path.link-wrapper{
+    stroke: #e48989;
+}
+
+.scoped .link-wrapper-hover path.link-wrapper{
+    opacity: 0;
+}

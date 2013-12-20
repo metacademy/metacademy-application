@@ -1,22 +1,16 @@
 {% load staticfiles %}
-<div id="apptools">
-  <h2 class="apptools-title">Display</h2>
-  <div id="explore-learn-button-wrapper">
-      <button class="el-nav-button" id="explore-button">
-        <img src="{% static "images/graph-icon.png" %}" alt="Graph">
-      </button>	
-      <button class="el-nav-button" id="learn-button">
-        <img src="{% static "images/list-icon.png" %}" alt="Graph">
-      </button>	
+<div id="content-editing-tools" class="apptools">
+  <div>
+    <button id="optimize" title="optimize placement of nodes and edges"><i class="icon ion-loop"></i></button>
+    <button id="preview-graph" title="preview this graph"><i class="icon ion-eye"></i></button>
   </div>
-
-  <h2 class="apptools-title">Learned Concepts</h2>
-  <div class="apptools-lc-buttons-wrap">
-          <button class="disabled toggle-lc-button" id="button-clear-learned" disabled>
-            hide
-          </button>
-          <button class="disabled toggle-lc-button" id="button-show-learned" disabled>
-            show
-          </button>
+  <div>
+    <input type="file" id="hidden-file-upload">
+    <button id="upload-input" title="upload a graph"><i class="icon ion-ios7-cloud-upload-outline"></i></button>
+    <button id="download-input" title="download this graph"> <i class="icon ion-ios7-cloud-download"></i></button>
+    <button id="delete-graph" title="remove all nodes and edges from this graph"><i class="icon ion-ios7-trash-outline"></i></button>
+  </div>
+  <div id="add-concept-container">
+    <!-- <input id="add-concept-input" type="text" placeholder="Search for a concept to add"> -->
   </div>
 </div>

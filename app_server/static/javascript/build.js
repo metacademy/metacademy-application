@@ -1,19 +1,34 @@
 ({
   baseUrl: ".",
-  name: "agfk/main.js",
-  out: "agfk/main-built.js",
-  paths: {
-    jquery:"lib/jquery-2.0.3.min",
-    "jquery.cookie": "lib/jquery.cookie",
-    underscore: "lib/underscore-min",
+  name: "base/main.js",
+  out: "base/main-built.js",
+    paths: {
+    jquery:"lib/jquery-1.10.2",
+    underscore: "lib/underscore",
     backbone: "lib/backbone-min",
     d3: "lib/d3",
+    "dagre": "lib/dagre",
     "btouch": "lib/backbone.touch",
-    "sidr": "lib/jquery.sidr.min"
+    "colorbox": "lib/jquery.colorbox-min",
+    "sidr": "lib/jquery.sidr.min",
+    "filesaver": "lib/FileSaver",
+    "completely": "lib/complete.ly.1.0.1"
   },
   shim: {
+    completely: {
+      exports: "completely"
+    },
     d3: {
       exports: "d3"
+    },
+    colorbox: {
+      deps: ["jquery"]
+    },
+    filesaver: {
+      exports: "Blob"
+    },
+    dagre: {
+      exports: "dagre"
     },
     underscore: {
       exports: "_"
@@ -22,10 +37,7 @@
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
     },
-    "jquery.cookie"  : {
-      deps: ["jquery"]
-    },
-    "btouch" : {
+    "btouch": {
       deps: ["jquery", "underscore", "backbone"]
     },
     "sidr": ["jquery"]

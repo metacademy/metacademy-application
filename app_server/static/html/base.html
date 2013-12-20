@@ -9,10 +9,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     {% block meta-viewport %}
-      <meta name="viewport" content="initial-scale=1">
+    <meta name="viewport" content="initial-scale=1">
     {% endblock %}
 
-     {% block meta-description %}
+    {% block meta-description %}
     <meta name="description" content="Metacademy - a free open source platform for efficient, personalized learning.">
     {% endblock %}
 
@@ -21,7 +21,7 @@
     {% block favicon %}
     <link rel="shortcut icon" type="image/x-icon" href="{% static "images/favicon.ico"%}">
     {% endblock %}
-    
+
     {% block targetblank %}
 
     {% endblock %}
@@ -56,9 +56,9 @@
     {% endblock %}
 
     {% block iedetect %}
-    
+
     <script type="text/javascript">
-      if(!document.createElement('canvas').getContext){ 
+      if(!document.createElement('canvas').getContext){
       alert("Sorry, Metacademy does not work for your browser" +
       " (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
                                                                                               }
@@ -83,13 +83,13 @@
       </div>
     </noscript>
     {% endblock %}
-    
+
     {% block body %}
 
     <div class="header-pull-right header-menu" id="header">
-    {% block header-search %}
+      {% block header-search %}
       <div id="meta-heading-search" class="header-title"> <a class="home-nav" href="/" target="_self"><span class="meta-home-link">&nbsp;</span></a> <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1"> </div>
-    {% endblock %}
+      {% endblock %}
       <ul>
         <li>
           <a href="/list" target="_self">Concept list</a>
@@ -107,11 +107,11 @@
         <li>
           <a target="_self" href="{% url 'user:user_main' %}" class="heleft">{{ user.username }}</a>
         </li>
-        
+
         <li class="join-line">
           &#124;
         </li>
-        
+
         <li>
           <a target="_self" href="{% url 'user:logout' %}" class="heright">Sign out</a>
         </li>
@@ -120,11 +120,11 @@
         <li>
           <a target="_self" href="{% url 'user:login' %}" class="heleft">Sign in</a>
         </li>
-        
+
         <li class="join-line">
           &#124;
         </li>
-        
+
         <li>
           <a target="_self" href="{% url 'user:register' %}" class="heright">Sign up</a>
         </li>
@@ -134,62 +134,57 @@
       <div id="mobile-header">
         <button id="responsive-menu-button">Menu</button>
       </div>
-</div>
+    </div>
 
-<div id="main">
-  {% block main %}
+    <div id="main">
+      {% block main %}
 
-  {% endblock %}
-</div>
+      {% endblock %}
+    </div>
 
-{% compress js %}
-{% block jscript %}
-{% include "load-jquery-snippet.html" %}
-<script src="{% static "javascript/lib/jquery.sidr.min.js" %}"></script>
-<script src="{% static "javascript/gen-utils.js" %}"></script>
-<script>
-  if (window.PRODUCTION){
-    $("body").on("mousedown", ".external-link", function(evt){
+    {% compress js %}
+    {% block jscript %}
+    {% include "load-jquery-snippet.html" %}
+    <script src="{% static "javascript/lib/jquery.sidr.min.js" %}"></script>
+    <script src="{% static "javascript/gen-utils.js" %}"></script>
+    <script>
+      if (window.PRODUCTION){
+      $("body").on("mousedown", ".external-link", function(evt){
       if(window._paq){
-        window._paq.push(['trackLink', evt.currentTarget.href, "link"]);
+      window._paq.push(['trackLink', evt.currentTarget.href, "link"]);
       }
-    });
-    $(window).on("hashchange", function() {
+      });
+      $(window).on("hashchange", function() {
       if(window._paq){
-        window._paq.push(['trackPageView', window.location.hash]);
+      window._paq.push(['trackPageView', window.location.hash]);
       }
-    });
-  }
-</script>
-{% endblock %}
+      });
+      }
+    </script>
+    {% endblock %}
 
-{% block jscript-extend %}
+    {% block jscript-extend %}
 
-{% endblock %}
+    {% endblock %}
 
-{% endcompress %}
+    {% endcompress %}
 
-{% endblock %}
+    {% endblock %}
 
-<script>
-  // piwik server-side tracking
-  if (window.PRODUCTION){
-  var _paq = _paq || [];
-  _paq.push(['trackPageView', window.location.href.split('/').pop()]);
-  (function() {
-  var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
-  _paq.push(['setTrackerUrl', u+'piwik.php']);
-  _paq.push(['setSiteId', 1]);
-  var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-  g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-    // log internal and external views (piwik won't track if the client has donottrack set)
-  }
-</script>
-</body>
-</html>          
-
-
-
-
-
+    <script>
+      // piwik server-side tracking
+      if (window.PRODUCTION){
+      var _paq = _paq || [];
+      _paq.push(['trackPageView', window.location.href.split('/').pop()]);
+      (function() {
+      var u=(("https:" == document.location.protocol) ? "https" : "http") + "://metacademy.org/analytics/piwik//";
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', 1]);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+      g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
+      // log internal and external views (piwik won't track if the client has donottrack set)
+      }
+    </script>
+  </body>
+</html>

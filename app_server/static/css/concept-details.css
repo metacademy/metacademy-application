@@ -1,0 +1,315 @@
+
+/* ---------------------------------------------------*/
+/* ---------->>> Learn View Styles <<<----------------*/
+/* ---------------------------------------------------*/
+
+/* #learn-view-wrapper{ */
+/*     display: none; */
+/*     width: 100%; */
+/*     background: white; */
+/*     height: inherit; */
+/* } */
+
+#learn-view{
+    height: inherit;
+}
+
+#learn-concept-wrapper{
+    height: inherit;
+    margin-left: 20%;
+    overflow: auto;
+}
+
+.learn-title-display{
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    text-decoration: none;
+    color: #3E4018;
+    padding: 1.4em 0.5em;
+    line-height: 1.2em;
+    font-size: 0.9em;
+    border-bottom: 1px solid #CCCCCC;
+    position: relative;
+}
+.learn-title-display:hover{
+    background-color: rgb(250, 242, 248);
+}
+.learn-title-display.clicked-title{
+    /*background-color: rgb(255, 255, 249);*/
+    font-weight: bold;
+    color: #333333;
+    background-color: rgb(245, 232, 242);
+    cursor: default;
+}
+
+.node-detail-view{
+   background-color: white;
+   color: #23240D;
+   padding: 0.3em 0 1em 1.5em;
+   width: 90%;
+   margin: auto;
+   line-height: 1.2em;
+}
+
+.node-detail-view h1{
+    font-size: 1.2em;
+    text-align: center;
+    font-weight: bold;
+}
+
+h1 .learn-view-check, h1 .learn-view-star{
+    display: inline-block;
+    cursor: default;
+    width: 0.9em;
+}
+
+h1 .learn-view-check{
+    margin-left: 0.2em;
+}
+
+h1 .learn-view-star{
+    font-size: 14pt;
+}
+
+.node-detail-title{
+    color: #333333;
+    font-size: 1em;
+    font-style: normal;
+    font-weight: bold;
+    padding: 1em 0 .2em 0;
+}
+
+.node-detail-subtitle{
+    color: #333333;
+    font-size: 1em;
+    font-style: normal;
+    margin: 0.5em 0;
+    font-weight: bold;
+}
+
+.node-detail-summary-text{
+    line-height: 1.35em;
+    padding-right: 3em;
+}
+
+.detail-time-est{
+    text-align: center;
+    margin-right: 1.5em;
+    margin-top: 0.2em;
+    font-size: 0.9em;
+    color: #8D5E5E;
+}
+
+.detailed-title-tools{
+    display: inline;
+    color: #7C7C7C;
+    font-size: 12pt;
+}
+
+.info-text{
+    font-style: italic;
+    font-weight: normal;
+    font-size: 0.95em;
+}
+
+.learned-concept-title{
+    opacity: 0.5;
+}
+
+.learn-title-buttons{
+    color: #8e8888;
+    font-size: 12pt;
+    font-weight: bold;
+    bottom: 0.1em;
+    position: absolute;
+    left: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.learn-title-buttons .learn-view-star{
+    font-weight: normal;
+    font-size: 14pt;
+}
+
+.learn-title-buttons span{
+    visibility: hidden;
+}
+
+ .learn-view-check:hover, .learn-view-star:hover{
+     color: #B99797;
+     cursor: pointer;
+ }
+
+
+.learned-concept-title .learn-view-check, .learned-concept .learn-view-check, .learned-concept .learn-view-check:hover{
+    visibility: visible;
+    color: rgb(18, 107, 18);
+}
+
+
+.starred-concept-title .learn-view-star, .starred-concept .learn-view-star, .starred-concept .learn-view-star:hover{
+    visibility: visible;
+    color: rgb(192, 182, 109);
+}
+
+
+.learn-title-display:hover .learn-title-buttons span{
+    visibility: visible;
+}
+
+.node-detail-comp-wrap{
+    margin: 0 0 0.3em 1em;
+}
+
+.resource-content-wrap{
+    margin-left: 2.5em;
+}
+
+.resource-view{
+    color: #252313;
+    line-height: 1.1em;
+    width: 90%;
+    display: inline-block;
+    overflow: auto;
+    margin-top: 0;
+}
+
+.resource-view ~ .resource-view{
+    margin-top: 1em;
+}
+
+.resource-title a{
+    color: #223804;
+}
+
+.res-arrow{
+    font-size: 0.8em;
+}
+
+.more-resource-info{
+    display: inline-block;
+    cursor: pointer;
+}
+
+.resource-location-display, .resource-dependencies-display{
+    margin-top: 0.1em;
+}
+
+.resource-location, .resource-edition, .resource-level, .resource-author, .resource-dependencies, .resource-extra, .resource-link{
+    font-size: 0.9em
+}
+
+.resource-location-item, .resource-dependencies-item, .resource-extra-item{
+    font-size: 0.9em;
+}
+
+.dependency-view, .outlink-view{
+    line-height: 1.2em;
+    margin: 0.1em 0 0.4em;
+}
+
+.dependency-reason, .outlink-reason{
+    color: #333;
+    font-size: 0.9em;
+}
+
+.no-content-msg{
+    margin: 0.2em 0;
+    display: inline-block;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+.node-detail-comp-wrap ul{
+    list-style: none;
+    margin-left: 1em;
+    padding-left: 0;
+}
+
+.node-detail-comp-wrap li{
+    padding-left: 1em;
+    text-indent: -1em;
+    margin-bottom: 0.2em;
+}
+.node-detail-comp-wrap li:before{
+    content: "+";
+    padding-right: 5px;
+}
+
+.pointers-wrap li ~ li{
+    margin-top: 0.5em;
+    margin-bottom: 0;
+}
+
+.pointers-wrap ul{
+    margin-left: 0;
+}
+
+.pointers-wrap ul ul{
+    margin-left: 1em;
+    margin-top: 0.1em;
+}
+
+.pointers-wrap ul ul li{
+    margin-top: 0.1em;
+}
+
+.pointers-wrap ul ul li:before{
+    content: "-";
+    padding-right: 5px;
+}
+
+.goals-wrap ul{
+    margin-left: 0;
+}
+
+.goals-wrap ul ul{
+    margin-left: 1em;
+}
+
+.goals-wrap ul ul li:before{
+    content: "-";
+    padding-right: 5px;
+}
+
+.key-resource-star{
+    font-size: 0.8em;
+    display: inline-block;
+    margin-right: 0.25em;
+}
+
+
+@media only screen and  (max-width: 760px){
+    #learn-concept-wrapper{
+        margin-left: 0;
+        padding: 0 1em 0 2em;
+    }
+
+    .node-detail-view{
+        width: 100%;
+    }
+
+    .node-detail-summary-text {
+        padding-right: 0;
+    }
+
+    .detailed-title-tools{
+        display: block;
+        margin-top: 0.2em;
+    }
+
+    .detailed-title-tools span{
+        margin: 0 0.15em;
+    }
+
+    .detail-time-est{
+        margin-right: 0;
+    }
+
+    .node-detail-view{
+        padding: 0;
+        margin-bottom: 3em;
+    }
+}

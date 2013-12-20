@@ -11,7 +11,12 @@
 {% endblock %}
 
 {% block extra-css %}
+<link rel="stylesheet" href="{% static "css/apptools.css" %}" />
 <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
+<link rel="stylesheet" href="{% static "css/concept-list.css" %}"/>
+<link rel="stylesheet" href="{% static "css/concept-details.css" %}"/>
+<link rel="stylesheet" href="{% static "css/graphs.css" %}"/>
+<link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
 <link rel="stylesheet" href="{% static "css/ionicons.css" %}"/>
 {% endblock %}
 
@@ -21,36 +26,14 @@
   {% include "concept-presentation.html" %}
 </div>
 
-{% include "apptools.html" %}
+{% include "agfk-structure-loader.html" %}
 
-  <div id="learn-view-wrapper">
-  </div>
-  <div id="explore-view-wrapper">
-  </div>
-  <div id="load-view-wrapper">
-  </div>
-  
-  {% include "node-title-view.html" %}
-  {% include "node-detail-view.html" %}
-  {% include "resource-view.html" %}
-  {% include "dependency-view.html" %}
-  {% include "pointers-view.html" %}
-  {% include "outlink-view.html" %}
-  {% include "loading-view.html" %}
-  {% include "resources-section-view.html" %}
-
-<div id="tutorial-modes-content">
-</div>
-
-<div id="apptools-button" class="small-vp-button">
-  Toolbox
-</div>
     <script>
       var el = document.getElementById("nojs-content");
       el.parentElement.removeChild(el);
     </script>
 {% endblock %}
-  
+
   {% block jscript %}
     <script>
       window.agfkGlobals = {};
@@ -59,10 +42,9 @@
       agfkGlobals.auxModel = null; // init in main js app
     </script>
   {% if debug %}
-  <script data-main="{% static "javascript/agfk/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
+  <script data-main="{% static "javascript/base/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
   {% else %}
   <script  src="{% static "javascript/lib/require-min.js" %}"></script>
-  <script src="{% static "javascript/agfk/main-built.js" %}"></script>
+  <script src="{% static "javascript/base/main-built.js" %}"></script>
   {% endif %}
   {% endblock %}
-

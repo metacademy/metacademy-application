@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+{% block title %} Browser Tests {% endblock %}
+
+{% block extra-css %}
+    <link rel="stylesheet" href="{% static "css/mocha.css" %}"/>
+{% endblock %}
+
+{% block main %}
+    <h1> Browser Tests </h1>
+    <div id="mocha"></div>
+{% endblock %}
+
+{% block jscript-extend %}
+    <script data-main="{% static "javascript/test/main-browser-tests.js" %}"src="{% static "javascript/lib/require-min.js" %}"></script>
+{% endblock %}

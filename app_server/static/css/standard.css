@@ -22,7 +22,7 @@ p {
 
 input{
     font-size: 75%;
-    font-family: "Lucida Grande" arial sans-serif;   
+    font-family: "Lucida Grande" arial sans-serif;
 }
 
 /* ----------------------------------------------------*/
@@ -203,7 +203,7 @@ a.home-nav{
 
 
 #header-search-input, user-form-field input{
-    outline: none;    
+    outline: none;
     padding: 0.2ex 0.4ex;
     /* margin-top: 0.3ex; */
     border: 1px solid #999999;

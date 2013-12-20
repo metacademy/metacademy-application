@@ -1,0 +1,176 @@
+#main{
+    position: relative;
+    overflow-y: scroll;
+}
+
+p{
+     text-align: center;
+     overflow: overlay;
+     position: relative;
+}
+
+input{
+    border-radius: 5px;
+    padding: 0.2em;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    overflow:hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#gc-wrap{
+    display: none;
+    width: inherit;
+    height: inherit;
+}
+
+#gc-wrap svg{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
+#concept-editor-wrap{
+    display: none;
+}
+
+/* Graph editor specific styles */
+g.concept-g circle.to-edit-circle{
+    fill: #C2DBFC;
+    display: none;
+}
+
+g.concept-g.hovered circle.to-edit-circle{
+    display: block;
+}
+
+g.connect-node circle{
+    fill: #BEFFFF;
+}
+
+/***************************
+*** Editable Content CSS ***
+***************************/
+
+#back-to-graph-button{
+    position: absolute;
+    left: 0;
+    background: aliceblue;
+    padding: 0.8em;
+    border: 1px #333 solid;
+    margin-left: 1em;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.ec-tabs button{
+   display:block;
+   margin:0 0 0 1px;
+   padding:3px 10px;
+   background:#ddd;
+   color:#000;
+   text-decoration:none;
+   line-height:1.3em;
+   border: 0;
+}
+
+.ec-tabs  button:hover {
+   background:#369;
+   color:#fff;
+}
+.ec-tabs button.active,
+.ec-tabs button.active:hover {
+   color:#fff;
+   background:#000;
+   font-weight:bold;
+}
+
+.ec-title{
+    text-align: center;
+    margin: 1em 0;
+}
+
+.ec-title input{
+    width: 25em;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.ec-tabs {
+   width:100%;
+   background:#fff;
+   border-bottom: 4px solid #000;
+   overflow:hidden;
+   position:relative;
+}
+.ec-tabs ul {
+   clear:left;
+   float:left;
+   list-style:none;
+   margin:0;
+   padding:0;
+   position:relative;
+   left:50%;
+   text-align:center;
+}
+.ec-tabs ul li {
+   display:block;
+   float:left;
+   list-style:none;
+   margin:0;
+   padding:0;
+   position:relative;
+   right:50%;
+}
+
+.ec-display-wrap{
+    margin: 1em auto;
+    display:none;
+    margin: auto;
+    width: 70%;
+    text-align: center;
+}
+
+.ec-display-wrap.active{
+    display:block;
+}
+
+.ec-display-wrap > h3{
+    margin: 0.5em;
+}
+
+.ec-display-wrap textarea{
+    width: 100%;
+    height: 15em;
+}
+
+.dep-entry{
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    border: 2px solid #C9B8C7;
+    background-color: rgb(244, 240, 245);
+    border-radius: 5px;
+    padding: 1em;
+}
+
+.dep-entry h3{
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+
+.dep-entry input{
+    width: 70%;
+}

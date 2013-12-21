@@ -32,6 +32,49 @@ body{
     height: inherit;
 }
 
+#create-instructions{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 0.8em;
+    background-color: #F0F0F0;
+    color: rgb(143, 126, 139);
+    border-radius: 5px;
+    padding: 0.5em;
+}
+
+#instruction-display-text{
+    text-align: center;
+}
+
+#create-instructions:hover #instruction-display-text{
+    display: none;
+}
+
+#instruction-text{
+    display: none;
+    font-size: 1.2em;
+    padding: 1em;
+}
+
+#instruction-text ul{
+    list-style: circle;
+    padding-left: 2em;
+}
+
+#instruction-text li + li{
+    margin-top: 1em;
+}
+
+.instr-task{
+    font-weight: bold;
+    display: block;
+}
+
+#create-instructions:hover #instruction-text{
+    display: block;
+}
+
 #gc-wrap svg{
     height: 100%;
     width: 100%;

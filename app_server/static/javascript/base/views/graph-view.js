@@ -319,10 +319,6 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
           return d.id;
         });
 
-        // .sort(function (a, b) {
-        //   return (Math.abs(a.get("source").get("x") - a.get("target").get("x")) + Math.abs(a.get("source").get("y") - a.get("target").get("y"))) - (Math.abs(b.get("source").get("x") - b.get("target").get("x")) + Math.abs(b.get("source").get("y") - b.get("target").get("y")));
-        // });
-
       var gPaths = thisView.gPaths;
 
       if (thisView.state.doPathsTrans){

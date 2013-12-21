@@ -5,6 +5,7 @@ define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/ut
 
   pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
     svgId: "gc-svg",
+    instructionsDivId: "create-instructions",
     toolboxId: "toolbox",
     selectedClass: "selected",
     connectClass: "connect-node",
@@ -72,7 +73,6 @@ define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/ut
   };
 
   var GraphEditor = GraphView.extend({
-
     // @override
     postinitialize: function() {
       var thisView = this;
@@ -125,6 +125,9 @@ define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/ut
       // svg listeners
       d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
       d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
+
+      // add the instructions tab TODO refactor into an html template
+      thisView.$el.append(document.getElementById(pvt.consts.instructionsDivId)).show();
 
       // displayed when dragging between nodes
       thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")

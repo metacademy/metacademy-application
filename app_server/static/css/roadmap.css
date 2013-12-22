@@ -220,7 +220,7 @@ a.external-link{
 }
 
 #edit-summary{
-    margin: 0.5em 0;    
+    margin: 0.5em 0;
 }
 #edit-summary input{
     width: 100%;
@@ -268,7 +268,7 @@ ol.history-list{
     margin: 1em auto;
     border-radius: 5px;
     padding: 0.5em;
-    max-width: 40em;    
+    max-width: 40em;
 }
 
 .history-list li.current{
@@ -316,7 +316,7 @@ ol.history-list{
 
 @media only screen and (max-width: 769px){
     div.container{
-        width: 95%;        
+        width: 95%;
     }
     ol.history-list{
         width: 90%;

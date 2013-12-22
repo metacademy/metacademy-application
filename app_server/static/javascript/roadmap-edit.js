@@ -1,4 +1,8 @@
-window.onload = (function($){
+window.onload = (function($, Editor){
+    // start the markdown editor
+    var el = document.getElementById("id_body");
+    var editor = new Editor({element: el, status: ['cursor']});
+    editor.render();
   $("#preview-button").click(function(evt) {
     var $curTar = $(this);
 
@@ -8,8 +12,7 @@ window.onload = (function($){
     var params = {'title': $("#id_title").val(),
                   'author': $("#id_author").val(),
                   'audience': $("#id_audience").val(),
-                  'body': $("#id_body").val()};
-
+                  'body': editor.codemirror.getValue()}; //$("#id_body").val()};
 
     $.post('/roadmaps/preview', params, function(data) {
       $curTar.html('Preview');
@@ -18,4 +21,4 @@ window.onload = (function($){
       $.colorbox({inline: true, href: $res, transition: "elastic", width: "85%", height: "85%"});
     });
   });
-})(window.$);
+})(window.$, window.Editor);

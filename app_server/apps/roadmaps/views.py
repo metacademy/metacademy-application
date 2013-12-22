@@ -80,13 +80,13 @@ def show(request, username, tag, vnum=-1):
     if not roadmap.visible_to(request.user):
         return HttpResponse(status=404)
 
-    vnum = int(vnum) 
+    vnum = int(vnum)
     versions = get_versions_obj(roadmap)
     num_versions = len(versions)
 
     fdict = {}
 
-    if num_versions > vnum >= 0 : 
+    if num_versions > vnum >= 0 :
         roadmap = versions[vnum].object_version.object
     can_edit = roadmap.editable_by(request.user)
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
@@ -150,13 +150,13 @@ def update_to_revision(request, username, tag, vnum):
     roadmap = models.load_roadmap(username, tag)
     if roadmap is None:
         return HttpResponse(status=404)
-    
+
     can_edit = roadmap.editable_by(request.user)
 
     if not can_edit:
         return HttpResponse(status=403)
 
-    vnum = int(vnum) 
+    vnum = int(vnum)
     versions = get_versions_obj(roadmap)
     num_versions = len(versions)
 
@@ -164,7 +164,7 @@ def update_to_revision(request, username, tag, vnum):
         return HttpResponse(status=404)
 
     versions[vnum].revert()
-    
+
     return HttpResponse(status=200)
 
 def get_versions_obj(obj):
@@ -181,12 +181,12 @@ def edit(request, username, tag):
         return HttpResponse(status=404)
 
     can_edit = roadmap.editable_by(request.user)
-    
+
     if request.method == 'POST':
         if not (request.user.is_authenticated() and can_edit):
             # TODO inform the user that they cannot edit
             return HttpResponse(status=401)
-        
+
         form = RoadmapForm(request.POST, instance=roadmap)
 
         if form.is_valid():
@@ -203,8 +203,8 @@ def edit(request, username, tag):
 
     else:
         form = RoadmapForm(instance=roadmap)
-    
-    
+
+
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
     history_url = base_url + "/history"
@@ -237,18 +237,18 @@ def new(request):
                 roadmap.user = request.user
                 roadmap.save()
                 reversion.set_user(request.user)
-            
+
             return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, roadmap.url_tag))
     else:
         form = RoadmapCreateForm()
-        
+
     return render(request, 'roadmap-new.html', {
         'form': form,
         'can_edit': can_edit
         })
 
 
-@csrf_exempt  # this is a POST request because it contains data, but there are no side effects 
+@csrf_exempt  # this is a POST request because it contains data, but there are no side effects
 def preview(request):
     if request.method != 'POST':
         return HttpResponse(status=404)
@@ -263,7 +263,7 @@ def preview(request):
     body_html = markdown_to_html(body)
 
 
-    
+
     return render(request, 'roadmap-content.html', {
         'roadmap': roadmap,
         'body_html': safestring.mark_safe(body_html),
@@ -281,7 +281,7 @@ def list(request):
         'include_create': True,
         'empty_message': 'Nobody has made any roadmaps yet.'
         })
-    
+
 def list_by_user(request, username):
     try:
         user = User.objects.get(username__exact=username)
@@ -299,4 +299,3 @@ def list_by_user(request, username):
         'include_create': include_create,
         'empty_message': 'This user has not made any roadmaps.'
         })
-    

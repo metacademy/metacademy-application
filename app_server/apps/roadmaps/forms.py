@@ -8,12 +8,12 @@ class RoadmapForm(ModelForm):
         model = models.Roadmap
         fields = ('title', 'author', 'audience', 'visibility', 'blurb', 'body')
         widgets = {
-            'body': Textarea(attrs={'rows': 40}),
+            'body': Textarea(attrs={'rows': 40, 'maxlength': 200000}),
             }
     def clean(self):
         cleaned_data = super(RoadmapForm, self).clean()
         if cleaned_data['commit_msg'] == PLACEHOLDER_TXT:
-           cleaned_data['commit_msg'] = '' 
+           cleaned_data['commit_msg'] = ''
         return cleaned_data
 
 
@@ -24,4 +24,3 @@ class RoadmapCreateForm(RoadmapForm):
         widgets = {
             'body': Textarea(attrs={'cols': 80, 'rows': 30})
             }
-        

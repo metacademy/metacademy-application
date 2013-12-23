@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db.models import CharField, ForeignKey, Model, SlugField, TextField, IntegerField
+from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugField, TextField, IntegerField
 
 import reversion
 
@@ -15,16 +15,7 @@ class Roadmap(Model):
     blurb = TextField('Blurb', blank=True)
     body = TextField()
     version_num = IntegerField(default=0)
-
-    VIS_PRIVATE = 'PRIVATE'
-    VIS_PUBLIC = 'PUBLIC'
-    VIS_MAIN = 'PUB_MAIN'
-    VISIBILITY_CHOICES = [(VIS_PRIVATE, 'Private'),
-                          (VIS_PUBLIC, 'Public'),
-                          (VIS_MAIN, 'Public, listed in main page'),
-                          ]
-    visibility = CharField('Visibility', max_length=20, choices=VISIBILITY_CHOICES, blank=False, default=VIS_PRIVATE)
-
+    listed_in_main = BooleanField(default=False);
     class Meta:
         unique_together = ('user', 'url_tag')
 
@@ -32,26 +23,22 @@ class Roadmap(Model):
         return '/roadmaps/%s/%s' % (self.user.username, self.url_tag)
 
     def is_public(self):
-        return self.visibility in [self.VIS_PUBLIC, self.VIS_MAIN]
+        return self.listed_in_main # self.visibility in [self.VIS_PUBLIC, self.VIS_MAIN]
 
     def listed_in_main(self):
-        return self.visibility == self.VIS_MAIN
+        return self.listed_in_main #visibility == self.VIS_MAIN
 
     def visible_to(self, user):
         return self.is_public() or (user.is_authenticated() and self.user.username == user.username)
 
     def editable_by(self, user):
         return user.is_authenticated() and self.user.username == user.username
-# use version control with roadmaps        
+# use version control with roadmaps
 reversion.register(Roadmap)
-    
-    
+
+
 def load_roadmap(username, roadmap_name):
     try:
         return Roadmap.objects.get(user__username__exact=username, url_tag__exact=roadmap_name)
     except Roadmap.DoesNotExist:
         return None
-
-
-
-

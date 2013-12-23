@@ -1,0 +1,67 @@
+This is example text. After quickly learning the syntax, feel free to delete this text and start creating your roadmap. At any point, press the information buttons in the toolbar (above) to see this example roadmap.
+
+## A Two-Minute Overview
+
+### Fundamentals
+Here's some text, you can just write like normal text. You can also make text **bold** or *italics,* which should help you emphasize all the great things you want to say.
+
+Placing a blank line between two text segments creates a new paragraph.
+
+Or you could use a blockquote to say something
+> I could have made money this way, and perhaps amused myself writing code. But I knew that at the end of my career, I would look back on years of building walls to divide people, and feel I had spent my life making the world a worse place. - Richard Stallman
+
+### Links
+
+Here is an external link to the [free software foundation](http://www.fsf.org)
+
+Here is an internal link to a metacademy concept that uses the concept's *tag*: [convolutional neural networks](convolutional_nets)
+
+
+Here is an internal link to a metacademy concept that uses the concept *title* with a shorthand link syntax:  [[convolutional neural nets]]
+
+Here is an **incorrect/missing** internal link to a metacademy concept that uses the concept *title* with a shorthand link syntax:  [[convolutional neural networks]]
+
+**Note**: soon we will allow the use of titles instead of tags and will include an autocomplete type of feature
+
+### Lists
+
+And of course, you can use lists:
+
+* here is a list item
+* here is another list item
+    * here is an embedded list item
+* back to the outer layer
+
+Or numbered lists
+
+1. Here's a numbered element
+84.  You can use any number to start a numbered list
+    902. here's an embedded numbered list item
+
+Make sure to place a blank line before your lists, other you'll end up with a list that looks like:
+* oops
+* this is wrong
+    * so, so wrong
+
+### Code
+Place inline code between backticks such as `printf()` or specify block-code via
+
+```
+import sys
+print sys.copyright
+```
+
+We currently do not have code highlighting/coloring in place, but let us know if you want to use it and we can oblige: [send us feedback](/feedback)
+
+
+### Math
+Math support is possible via [MathJax](http://www.mathjax.org/) by using two dollar signs: $$x^n + y^n \neq z^n \forall n > 2$$
+
+### Tables
+First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+
+### Multimedia
+We currently do not support embedded images or videos, but let us know if you want this functionality: [send us feedback](/feedback)

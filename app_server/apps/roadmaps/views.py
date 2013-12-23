@@ -253,7 +253,12 @@ def new(request):
 
             return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, roadmap.url_tag))
     else:
-        form = RoadmapCreateForm()
+        try:
+            initial_txt = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "templates/roadmap-instructions.txt")).read()
+        except:
+            sys.stderr.write("unable to open roadmap instructions txt\n")
+            initial_txt = ""
+        form = RoadmapCreateForm(initial={'body': initial_txt})
 
     return render(request, 'roadmap-new.html', {
         'form': form,

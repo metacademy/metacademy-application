@@ -7065,7 +7065,7 @@ var toolbar = [
 
   {name: 'link', action: drawLink},
   '|',
-  {name: 'info', action: 'http://lab.lepture.com/editor/markdown'},
+  {name: 'info', action: 'http://metacademy.org/roadmaps/cjrd/demo/edit'},
   {name: 'fullscreen', action: toggleFullScreen}
 ];
 

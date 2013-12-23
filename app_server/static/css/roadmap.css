@@ -1,3 +1,79 @@
+/* standard styles */
+.content em {
+    font-style: italic;
+}
+
+.content strong {
+    font-weight: bold;
+}
+
+.content ol {
+    list-style-type: decimal;
+    margin-left: 2em;
+}
+
+.content ol ol {
+    margin-left: 1em;
+}
+
+.content blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+}
+.content blockquote p {
+  display inline;
+  margin: 0;
+}
+
+.content p code {
+  font: 12px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;
+  color: #52595d;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  padding: 0px 3px;
+  display: inline-block;
+}
+
+.content code {white-space: nowrap;}
+
+.content pre {
+  border: 1px solid #cacaca;
+  line-height: 1.2em;
+  font: 12px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;
+  padding: 10px;
+  overflow:auto;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  background-color: #FAFAFB;
+  color: #393939;
+  margin: 0.3em;
+}
+.content pre code {white-space: pre;}
+
+table {
+    margin: auto;
+    border-collapse: collapse;
+    border: 1px solid #23240D;
+}
+
+td {
+    border: 1px solid #23240D;
+    padding: 1em;
+}
+
+
 .container {
     width: 75%;
     padding-bottom: 3em;
@@ -80,8 +156,8 @@ a.external-link{
     line-height: 1.4em;
 }
 
-.content p{
-    margin: 0.4em 0 0 0;
+.content p {
+    margin-top: 0.3em;
     padding: 0;
 }
 
@@ -116,7 +192,7 @@ a.external-link{
 .content h3 {
     font-weight: bold;
     font-size: 1.1em;
-    margin-top: 0.6em;
+    margin-top: 1em;
     margin-bottom: 0.3em;
 }
 
@@ -144,7 +220,7 @@ a.external-link{
     margin-top: 0.1em;
 }
 
-.content li:before {
+.content ul li:before {
     content: "+";
     padding-right: 5px;
 }

@@ -1,13 +1,10 @@
 import os
 from operator import attrgetter
-import pdb
-
 import bleach
 import markdown
 import re
 import urlparse
 import reversion
-
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
@@ -16,8 +13,9 @@ from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
-import apps.cserver_comm.cserver_communicator as cscomm
+from apps.cserver_comm import cserver_communicator as cscomm
 from utils.roadmap_extension import RoadmapExtension
+from utils.mathjax_extension import MathJaxExtension
 from forms import RoadmapForm, RoadmapCreateForm
 import models
 import settings
@@ -27,7 +25,8 @@ import settings
 MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mit_6_438.txt')
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
-                        'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div']
+                        'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'pre',
+                        'table', 'tr', 'th', 'tbody', 'thead', 'td']
 BLEACH_ATTR_WHITELIST = {
     '*': ['id', 'class'],
     'a': ['href', 'rel']
@@ -64,9 +63,23 @@ def process_link(attrs, new=False):
     attrs['target'] = '_blank'
     return attrs
 
+def wiki_link_url_builder(label, base, end):
+    """
+    TODO allow tags and titles (how to distinguish?)
+    """
+    ttt_dict = cscomm.get_title_to_tag_dict()
+    if ttt_dict.has_key(label):
+        return base + ttt_dict[label]
+    else:
+        return base + label
+
 def markdown_to_html(markdown_text):
+    """
+    converts markdown text to html using the markdown python library
+    """
     roadmap_ext = RoadmapExtension()
-    body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, 'toc'])
+    mathjax_ext = MathJaxExtension()
+    body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, mathjax_ext, 'toc', 'sane_lists', 'extra', 'wikilinks(base_url=/concepts/)'], extension_configs={'wikilinks(base_url=/concepts/)' : [('build_url', wiki_link_url_builder)]})
     html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
     return bleach.linkify(html, callbacks=[process_link])
 

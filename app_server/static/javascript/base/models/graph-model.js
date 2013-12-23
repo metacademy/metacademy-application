@@ -8,10 +8,9 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
 
     defaults: function(){
       return {
-        root: null, // TODO make this more general (multiple roots)
+        roots: [], // TODO perhaps this should be stored in the nodes
         edges: new BaseEdgeCollection(),
-        nodes: new BaseNodeCollection(),
-        focus: null
+        nodes: new BaseNodeCollection()
       };
     },
 
@@ -21,54 +20,9 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
       this.postinitialize();
     },
 
-    url: function(){
-      var root = this.get("root") || this.fetchTag;
-      if (!root){
-        throw new Error("Must set graph root in graph-model to fetch graph data");
-      }
-      return window.CONTENT_SERVER + "/dependencies?concepts=" + this.get("root");
-    },
-
-    parse: function(resp, xhr){
-      var thisGraph = this,
-          deps = [],
-          nodes = resp.nodes,
-          nodeTag;
-      for (nodeTag in nodes) {
-        if (nodes.hasOwnProperty(nodeTag)) {
-          var tmpNode = nodes[nodeTag];
-          tmpNode.sid = tmpNode.id;
-          tmpNode.id = nodeTag;
-
-          // parse deps separately (outlinks will be readded)
-          tmpNode.dependencies.forEach(function(dep){
-            deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, from_tag: dep.from_tag, to_tag: dep.to_tag});
-          });
-          delete tmpNode.dependencies;
-          delete tmpNode.outlinks;
-          thisGraph.addNode(tmpNode);
-        }
-      }
-      deps.forEach(function(dep){
-        thisGraph.addEdge(dep);
-      });
-    },
 
     // override in subclass
     postinitialize: function(){},
-
-    // /**
-    //  * Add dependency graph from server to the current graph
-    //  * TODO handle id problems
-    //  */
-    // addServerDepGraphToGraph: function(tag) {
-    //   // FIXME this should be integrated into the fetch role -- this is hacky!
-    //   var thisGraph = this;
-    //   $.getJSON(window.CONTENT_SERVER + "/dependencies?concepts=" + tag, function () {
-    //     thisGraph.
-    //     thisGraph.parse.apply(thisGraph, arguments);
-    //   });
-    // },
 
     /**
      * Export this graph to a simple json representation
@@ -93,7 +47,7 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
      * @param endNode: the end node
      * @param checkFun: an optional function that dermines whether an edge
      * is valid (e.g. an "is visible" function --defaults to a tautological function)
-     * @return <boolean> true if there is a directed path from stNode to endNode (follows outlinks from stNode)
+     * @return <boolean> - true if there is a directed path from stNode to endNode (follows outlinks from stNode)
      */
     isPathBetweenNodes: function (stNode, endNode, checkFun) {
       var thisGraph = this,
@@ -196,7 +150,7 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
       edge.source.get("outlinks").add(mEdge);
       edge.target.get("dependencies").add(mEdge);
 
-      // check if the new edge changes transitivity of other edges FIXME this is a trivial check
+      // check if the new edge changes transitivity of other edges
       if (!edge.isTransitive) {
         thisGraph.getEdges().filter(function(e){return !e.get("isTransitive");}).forEach(function(notTransEdge){
           var isTrans = thisGraph.checkIfTransitive(notTransEdge);
@@ -205,7 +159,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
           }
         });
       }
-
     },
 
     /**
@@ -271,6 +224,11 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
       return thisGraph.topoSort;
     },
 
+    /**
+     * Perform a depth first topological sort of the graph
+     *
+     * @return {list} - sorted ids of the nodes in the graph
+     */
     doTopoSort: function () {
       // TODO cache the sort
       var thisGraph = this,
@@ -303,9 +261,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
           curRootNodeTag = rootNodeTags[curRootNodeTagDepth];
           curNode = nodes.get(curRootNodeTag);
           if (!traversedNodes.hasOwnProperty(curRootNodeTag)){
-            if (prevRootTag) {
-              thisGraph.getEdge(curRootNodeTag + prevRootTag).isTopoEdge = true; // mark topological edges
-            }
             unqDepTags = curNode.getUniqueDeps();
             if (unqDepTags.length > 0){
               returnArr = returnArr.concat(dfsTopSort(unqDepTags, curRootNodeTag));
@@ -316,18 +271,6 @@ define(["jquery", "underscore", "backbone", "base/collections/edge-collection", 
         }
         return returnArr;
       };
-    },
-
-    /**
-     * Check if the input edge is present in the topological sort
-     */
-    isEdgeInTopoSort: function(edge){
-      var thisGraph = this;
-      // make sure we've done a topological sort
-      if (!thisGraph.topoSort){
-        thisGraph.doTopoSort();
-      }
-      return edge.isTopoEdge;
     },
 
     expandGraph: function () {

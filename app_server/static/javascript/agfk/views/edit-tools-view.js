@@ -147,7 +147,7 @@ define(["jquery", "backbone", "base/utils/errors", "completely"], function($, Ba
             });
             if (res.length) {
               var fetchNodeId = res[0].id;
-              thisView.model.set("root", fetchNodeId);
+              thisView.model.set("roots", [fetchNodeId]);
               thisView.model.fetch({
                 success: function () {
                   // need to contract

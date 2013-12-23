@@ -225,7 +225,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
         // init main app model
         if (!thisRoute.graphModel) {
-          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {root: nodeId});
+          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {roots: [nodeId]});
         }
 
         if (!thisRoute.userModel) {
@@ -268,7 +268,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
           // set the document title as the key concept
           if (!isCreating){
-            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("root")).get("title") + " - Metacademy"; // UPDATE different in create
+            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("roots")[0]).get("title") + " - Metacademy";
           } else {
             document.title = "Graph Creation - Metacademy";
           }

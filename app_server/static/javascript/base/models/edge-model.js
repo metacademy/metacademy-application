@@ -1,3 +1,4 @@
+/*global define*/
 define(["backbone"], function(Backbone){
   /**
    * general directed edge model
@@ -11,8 +12,7 @@ define(["backbone"], function(Backbone){
       return {
         from_tag: "",
         to_tag: "",
-        reason: "",
-        shortcut: ""
+        reason: ""
       };
     },
 
@@ -20,7 +20,6 @@ define(["backbone"], function(Backbone){
      * Initialize the DE (currently sets the id properly)
      */
     initialize: function(inp){
-      // FIXME does this handle all cases?
       this.id = inp.id || inp.from_tag + inp.to_tag;
     }
   });

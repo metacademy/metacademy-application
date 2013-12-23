@@ -272,9 +272,7 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
       thisView.newCircleTransTime =  800;
       // trans fade-in time for new circles
 
-
       d3.select("#optimize").on("click", function(){thisView.optimizeGraphPlacement.call(thisView, true);});
-
 
       if (inp !== undefined){
         thisView.appRouter = inp.appRouter;
@@ -453,7 +451,6 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
       thisView.handleNewCircles(newGs);
 
-      // TODO FIXME -- don't always add expand/contract
       // // handle expand contract icons last
        thisView.gCircles.each(function(d){
          if (thisView.addECIcon || d.addECIcon) {
@@ -760,7 +757,6 @@ define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], 
 
     // override in subclass
     firstRender: function(){
-
     }
   });
 

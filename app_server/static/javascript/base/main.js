@@ -71,7 +71,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "base/utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","base/models/aux-model", "jquery", "btouch", "sidr", "colorbox"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "base/utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr", "colorbox"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // handle noscript content

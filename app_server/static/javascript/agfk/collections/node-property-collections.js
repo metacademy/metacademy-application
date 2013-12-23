@@ -2,7 +2,8 @@
  Collections that are properties of the Node model
  */
 
-define(["backbone", "base/models/node-property-models"], function(Backbone, NodePropertyModels){
+/*global define*/
+define(["backbone", "agfk/models/node-property-models"], function(Backbone, NodePropertyModels){
 
   /**
    * collection of resource models

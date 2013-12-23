@@ -690,7 +690,7 @@ define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "base
           });
         }
 
-        thisView.optimizeGraphPlacement(false, false, thisView.model.get("root"));
+        thisView.optimizeGraphPlacement(false, false, thisView.model.get("roots")[0]);
       },
 
       /**

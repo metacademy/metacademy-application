@@ -120,14 +120,16 @@ define(["backbone", "d3",  "underscore", "base/views/graph-view", "base/utils/ut
     firstRender: function(){
       var thisView = this,
           d3Svg = thisView.d3Svg,
-          d3SvgG = thisView.d3SvgG;
+          d3SvgG = thisView.d3SvgG,
+          consts = pvt.consts;
 
       // svg listeners
       d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
       d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
 
       // add the instructions tab TODO refactor into an html template
-      thisView.$el.append(document.getElementById(pvt.consts.instructionsDivId)).show();
+      thisView.$el.append(document.getElementById(consts.instructionsDivId));
+      thisView.$el.find("#" + consts.instructionsDivId).show();
 
       // displayed when dragging between nodes
       thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")

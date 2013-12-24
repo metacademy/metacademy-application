@@ -34,7 +34,6 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
 
       defaults: {
         depRoot: undefined,
-        titles: {},
         nodes: new NodeCollection(),
         shortcuts: new NodeCollection()
       },
@@ -264,7 +263,8 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
        * Get node display title from id
        */
       getTitleFromId: function(nid){
-        return this.get("titles")[nid];
+        var tnode = this.get("nodes").get(nid);
+        return tnode && tnode.get("title");
       }
     });
   })();

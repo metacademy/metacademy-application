@@ -4,7 +4,7 @@
  */
 
 /*global define */
-define(['backbone', 'underscore', 'jquery', 'base/models/node-model'], function(Backbone, _, $, NodeModel){
+define(['backbone', 'underscore', 'jquery', 'lib/kmap/models/node-model'], function(Backbone, _, $, NodeModel){
   "use strict";
 
   /**

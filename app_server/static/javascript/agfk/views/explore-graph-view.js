@@ -1,6 +1,6 @@
 /*global define*/
 // TODO do we still want to dim "implicitly learned nodes?"
-define(["backbone", "d3", "jquery", "underscore", "base/views/graph-view", "utils/utils", "utils/errors"], function(Backbone, d3, $, _, GraphView, Utils, ErrorHandler){
+define(["backbone", "d3", "jquery", "underscore", "lib/kmap/views/graph-view", "utils/utils", "utils/errors"], function(Backbone, d3, $, _, GraphView, Utils, ErrorHandler){
   "use strict";
 
   return (function(){

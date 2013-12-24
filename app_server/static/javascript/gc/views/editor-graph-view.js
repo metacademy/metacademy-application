@@ -1,5 +1,5 @@
 /*global define*/
-define(["backbone", "d3",  "underscore", "base/views/graph-view", "utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
+define(["backbone", "d3",  "underscore", "lib/kmap/views/graph-view", "utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
 
   var pvt = {};
 

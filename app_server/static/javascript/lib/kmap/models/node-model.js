@@ -2,7 +2,7 @@
  This file contains the node model, which contains the data for each concept TODO should this be renamed "concept-model"?
  */
 
-define(["backbone", "underscore", "base/collections/edge-collection"], function(Backbone, _, DirectedEdgeCollection){
+define(["backbone", "underscore", "lib/kmap/collections/edge-collection"], function(Backbone, _, DirectedEdgeCollection){
   /**
    * Node: node model that encompasses several collections and sub-models
    */

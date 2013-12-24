@@ -1,5 +1,5 @@
 /*global define */
-define(["backbone", "base/models/edge-model"], function(Backbone, DirectedEdge){
+define(["backbone", "lib/kmap/models/edge-model"], function(Backbone, DirectedEdge){
   return  Backbone.Collection.extend({
     model: DirectedEdge
   });

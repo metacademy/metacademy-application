@@ -1,7 +1,7 @@
 ({
   baseUrl: ".",
-  name: "lib/kmap/main.js",
-  out: "lib/kmap/main-built.js",
+  name: "main.js",
+  out: "main-built.js",
     paths: {
     jquery:"lib/jquery-1.10.2",
     underscore: "lib/underscore",

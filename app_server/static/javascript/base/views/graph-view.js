@@ -22,7 +22,7 @@
  */
 
 /*global define/*/
-define(["base/utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], function(Utils, Backbone, d3, _, dagre, $) {
+define(["utils/utils", "backbone", "d3", "underscore", "dagre", "jquery"], function(Utils, Backbone, d3, _, dagre, $) {
 
   /**********************
    * private class vars *

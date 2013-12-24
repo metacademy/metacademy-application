@@ -1,5 +1,5 @@
 /*global define*/
-define(["jquery", "backbone", "base/utils/errors", "completely"], function($, Backbone, ErrorHandler){
+define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**

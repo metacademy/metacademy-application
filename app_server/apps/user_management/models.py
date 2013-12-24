@@ -42,7 +42,7 @@ class Profile(models.Model):
     with users from the auth model
     """
     user = models.OneToOneField(User, primary_key=True)
-    
+
     def __unicode__(self):
         return self.user.username
 
@@ -51,7 +51,7 @@ class Concepts(models.Model):
     learned_uprofs = models.ManyToManyField(Profile, related_name="learned")
     starred_uprofs = models.ManyToManyField(Profile, related_name="starred")
     id = models.CharField(max_length=10, unique=True, primary_key=True)
-        
+
 class LearnedConcept(models.Model):
     """
     Simple class to maintain learned concepts
@@ -67,7 +67,7 @@ class LearnedConcept(models.Model):
             id_concept_dict = get_id_to_concept_dict()
             self.title = id_concept_dict[self.id]['title']
         return self.title
-    
+
 class StarredConcept(models.Model):
     """
     Simple class to maintain starred concepts
@@ -83,4 +83,3 @@ class StarredConcept(models.Model):
             id_concept_dict = get_id_to_concept_dict()
             self.title = id_concept_dict[self.id]['title']
         return self.title
-    

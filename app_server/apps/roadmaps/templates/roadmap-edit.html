@@ -16,72 +16,100 @@
 {% block roadmap-content %}
 
 
-  <div class="form-wrapper">
-{% if not can_edit %}
+<div class="form-wrapper">
+  {% if not can_edit %}
   <div class="no-edit-inform">
     Note: your changes to this roadmap will not be saved (you're not on the editor list),
   </div>
-{% endif %}
+  {% endif %}
 
-    <form method="post" action="">
-      {% csrf_token %}
+  <form method="post" action="">
+    {% csrf_token %}
 
-      {% if form.errors %}
-	<div class="form-errors">
-	  {% for key, value in form.errors.items %}
+    {% if form.errors %}
+	  <div class="form-errors">
+	    {% for key, value in form.errors.items %}
 	    <p>
 	      {{ value }}
 	    </p>
-	  {% endfor %}
-	</div>
+	    {% endfor %}
+	  </div>
+    {% endif %}
+
+    {% block form-content %}
+
+	  <div class="form-field">
+	    {{ form.title.label_tag }}
+	    {{ form.title }}
+	  </div>
+
+	  <div class="form-field">
+	    {{ form.author.label_tag }}
+	    {{ form.author }}
+	  </div>
+
+    <div class="form-field">
+      {{ form.audience.label_tag }}
+      {{ form.audience }}
+    </div>
+
+    <div class="form-field">
+      <label for="id_blurb">Quick Description:</label>
+      {{ form.blurb }}
+    </div>
+
+    {% block settings-form %}
+    {% if settings_form.errors %}
+	  <div class="form-errors">
+	    {% for key, value in settings_form.errors.items %}
+	    <p>
+	      {{ value }}
+	    </p>
+	    {% endfor %}
+	  </div>
+    {% endif %}
+    <div id="settings-form">
+        <div class="form-field">
+          {{ settings_form.url_tag.label_tag }}
+          {{ settings_form.url_tag }}
+        </div>
+        <div class="form-field">
+          {{ settings_form.owners.label_tag }}
+          {{ settings_form.owners }}
+        </div>
+        <div class="form-field">
+          {{ settings_form.editors.label_tag }}
+          {{ settings_form.editors }}
+        </div>
+        <div class="form-field">
+          {{ settings_form.listed_in_main.label_tag }}
+          {{ settings_form.listed_in_main }}
+        </div>
+    </div>
+    {% endblock %}
+
+    <div class="body-button-wrapper">
+      <div class="form-body">
+        {{ form.body }}
+      </div>
+      {% if can_edit %}
+      <div id="edit-summary" class="form-field">
+        <label for="commit-blurb">Edit Message</label>
+        {{ form.commit_msg }}
+      </div>
       {% endif %}
+      <div class="buttons">
+        <button id="preview-button"> Preview </button>
+        {% if can_edit %}
+        <input id="submit-button" type="submit" value="Save" onclick="this.disabled = true; this.form.submit();"/>
+        {% endif %}
+      </div>
+    </div>
 
-      {% block form-content %}
+    {% endblock %}
 
-	<div class="form-field">
-	  {{ form.title.label_tag }}
-	  {{ form.title }}
-	</div>
-
-        {% block url_tag_field %} {% endblock %}
-
-	<div class="form-field">
-	  {{ form.author.label_tag }}
-	  {{ form.author }}
-	</div>
-
-        <div class="form-field">
-          {{ form.audience.label_tag }}
-          {{ form.audience }}
-        </div>
-
-        <div class="form-field">
-          <label for="id_blurb">Quick Description:</label>
-          {{ form.blurb }}
-        </div>
-
-        <div class="body-button-wrapper">
-          <div class="form-body">
-            {{ form.body }}
-          </div>
-          {% if can_edit %}
-          <div id="edit-summary" class="form-field">
-            <label for="commit-blurb">Edit Message</label>
-            {{ form.commit_msg }}
-          </div>
-          {% endif %}
-          <div class="buttons">
-            <button id="preview-button"> Preview </button>
-            {% if can_edit %}
-              <input id="submit-button" type="submit" value="Save" onclick="this.disabled = true; this.form.submit();"/>
-            {% endif %}
-          </div>
-        </div>
-
-      {% endblock %}
-
-    </form>
-  </div>
+  </form>
+</div>
 
 
 

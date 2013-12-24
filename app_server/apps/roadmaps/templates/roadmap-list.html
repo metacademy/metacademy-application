@@ -18,11 +18,11 @@
 
 {% block main %}
   <div class="search-res-wrapper">
-    
+
     <h1>
       Public Roadmaps
     </h1>
-      
+
     <div class="search-res">
       {% if not roadmaps|length %}
         <div class="nosearch-message">
@@ -33,7 +33,7 @@
         {% for roadmap in roadmaps %}
           <li class="search-res-li">
             <h3 class="search-res-title">
-              <a class="search-res-link internal-link" href="{{ roadmap.get_absolute_url }}"> {{ roadmap.title }} </a>
+              <a class="search-res-link internal-link" href="{{ roadmap.roadmapsettings.get_absolute_url }}"> {{ roadmap.title }} </a>
             </h3>
             <div class="search-res-description">
               <p>Created by: {{ roadmap.author }}</p>

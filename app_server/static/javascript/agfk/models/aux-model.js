@@ -263,7 +263,8 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
        * Get node display title from id
        */
       getTitleFromId: function(nid){
-        return this.get("titles")[nid];
+        var tnode = this.get("nodes").get(nid);
+        return tnode && tnode.get("title");
       }
     });
   })();

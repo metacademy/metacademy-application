@@ -2,6 +2,8 @@
  Utils for handling errors
 */
 
+/*global define*/
+
 define([], function(){
   "use strict";
 

@@ -2,7 +2,7 @@
  This file contains the graph-data model
  */
 /*global define */
-define(["backbone", "underscore", "base/models/graph-model", "base/collections/node-property-collections", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "base/utils/errors"], function(Backbone, _, GraphModel, NodePropertyCollections, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
+define(["backbone", "underscore", "lib/kmap/models/graph-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors"], function(Backbone, _, GraphModel, NodePropertyCollections, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
@@ -42,11 +42,45 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
        * default user states
        */
       defaults: function(){
-        return {
+        var enDef = {
           nodes: new DetailedNodeCollection(),
           edges: new DetailedEdgeCollection(),
           options: new GraphOptionsModel()
         };
+        return _.extend({}, GraphModel.prototype.defaults(), enDef);
+      },
+
+      url: function(){
+        var root = this.get("roots")[0] || this.fetchTag;
+        if (!root){
+          throw new Error("Must set graph root in graph-model to fetch graph data");
+        }
+        return window.CONTENT_SERVER + "/dependencies?concepts=" + this.get("roots")[0];
+      },
+
+      parse: function(resp, xhr){
+        var thisGraph = this,
+            deps = [],
+            nodes = resp.nodes,
+            nodeTag;
+        for (nodeTag in nodes) {
+          if (nodes.hasOwnProperty(nodeTag)) {
+            var tmpNode = nodes[nodeTag];
+            tmpNode.sid = tmpNode.id;
+            tmpNode.id = nodeTag;
+
+            // parse deps separately (outlinks will be readded)
+            tmpNode.dependencies.forEach(function(dep){
+              deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, from_tag: dep.from_tag, to_tag: dep.to_tag});
+            });
+            delete tmpNode.dependencies;
+            delete tmpNode.outlinks;
+            thisGraph.addNode(tmpNode);
+          }
+        }
+        deps.forEach(function(dep){
+          thisGraph.addEdge(dep);
+        });
       },
 
       /**
@@ -74,20 +108,23 @@ define(["backbone", "underscore", "base/models/graph-model", "base/collections/n
         var thisGraph = this,
             nodes = thisGraph.getNodes(),
             aux = window.agfkGlobals && window.agfkGlobals.auxModel,
-            depRoot = thisGraph.get("root"),
-            isShortcut = nodes.get(depRoot).get("is_shortcut"),
-            unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depRoot, isShortcut), function(tagO){return tagO.from_tag;});
+            depRoots = thisGraph.get("roots");
 
         if (!aux) return;
 
-        nodes.each(function(node){
-          if (unlearnedDepTags.indexOf(node.id) > -1){
-            node.setImplicitLearnStatus(false);
-          } else if (node.id !== depRoot){
-            node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
-          }
+        depRoots.forEach(function(depRoot){
+          var isShortcut = nodes.get(depRoot).get("is_shortcut"),
+              unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depRoot, isShortcut), function(tagO){return tagO.from_tag;});
+          nodes.each(function(node){
+            if (unlearnedDepTags.indexOf(node.id) > -1){
+              node.setImplicitLearnStatus(false);
+            } else if (node.id !== depRoot){
+              node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
+            }
+          });
         });
       }
+
     });
   })();
 });

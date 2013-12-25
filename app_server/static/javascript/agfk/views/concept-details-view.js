@@ -5,7 +5,7 @@
 
 /*global define*/
 
-define(["backbone", "underscore", "jquery", "base/utils/utils"], function(Backbone, _, $, Utils){
+define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _, $, Utils){
   "use strict";
 
   /**

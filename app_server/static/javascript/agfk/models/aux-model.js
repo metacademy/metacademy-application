@@ -1,5 +1,5 @@
 /*global define*/
-define(["backbone", "underscore", "base/collections/node-collection"], function(Backbone, _, NodeCollection){
+define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], function(Backbone, _, NodeCollection){
   /**
    * AuxModel: model to store all auxiliary information used throughout metacademy
    * All data associated with the aux model should be read only
@@ -31,10 +31,8 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
     };
 
     return Backbone.Model.extend({
-
       defaults: {
         depRoot: undefined,
-        titles: {},
         nodes: new NodeCollection(),
         shortcuts: new NodeCollection()
       },
@@ -264,7 +262,8 @@ define(["backbone", "underscore", "base/collections/node-collection"], function(
        * Get node display title from id
        */
       getTitleFromId: function(nid){
-        return this.get("titles")[nid];
+        var tnode = this.get("nodes").get(nid);
+        return tnode && tnode.get("title");
       }
     });
   })();

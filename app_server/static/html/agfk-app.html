@@ -42,9 +42,9 @@
       agfkGlobals.auxModel = null; // init in main js app
     </script>
   {% if debug %}
-  <script data-main="{% static "javascript/base/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
+  <script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
   {% else %}
   <script  src="{% static "javascript/lib/require-min.js" %}"></script>
-  <script src="{% static "javascript/base/main-built.js" %}"></script>
+  <script src="{% static "javascript/main-built.js" %}"></script>
   {% endif %}
   {% endblock %}

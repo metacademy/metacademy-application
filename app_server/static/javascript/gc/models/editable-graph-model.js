@@ -13,9 +13,6 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       return _.extend({}, ExploreGraphModel.prototype.defaults(), exDef);
     },
 
-    // resource url
-    //url: "/gc/save", // FIXME
-
     /**
      * Make/extend this graph from a json obj
      *

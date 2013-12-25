@@ -2,6 +2,8 @@
  This file contains the submodels of node-model.js
  */
 
+/*global define*/
+
 define(["backbone"], function(Backbone){
   /**
    * Comprehension question model

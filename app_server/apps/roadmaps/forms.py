@@ -11,7 +11,7 @@ class RoadmapForm(ModelForm):
     commit_msg = CharField( max_length=200, widget=TextInput(attrs={'placeholder': PLACEHOLDER_TXT}))
     class Meta:
         model = models.Roadmap
-        fields = ('title', 'author', 'audience', 'visibility', 'blurb', 'body')
+        fields = ('title', 'author', 'audience', 'blurb', 'body')
         widgets = {
             'body': Textarea(attrs={'rows': 40, 'maxlength': 200000})
         }
@@ -24,7 +24,7 @@ class RoadmapForm(ModelForm):
 class RoadmapCreateForm(RoadmapForm):
     class Meta:
         model = models.Roadmap
-        fields = ('visibility', 'body', 'title', 'author', 'url_tag', 'audience', 'blurb')
+        fields = ('body', 'title', 'author', 'url_tag', 'audience', 'blurb')
         widgets = {
             'body': Textarea(attrs={'rows': 40, 'maxlength': 200000}),
             'title': TextInput(attrs={'placeholder': 'Title for your roadmap'}),

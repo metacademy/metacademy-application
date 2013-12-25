@@ -6,7 +6,7 @@
 // TODO normalize create/edit vocabulary
 
 /*global define */
-define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "base/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/edit-tools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
+define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "lib/kmap/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/edit-tools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
   function(Backbone, _, $, ExploreView, ConceptListView, ConceptDetailsView, AppToolsView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
   "use strict";
 
@@ -225,7 +225,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
         // init main app model
         if (!thisRoute.graphModel) {
-          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {root: nodeId});
+          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {roots: [nodeId]});
         }
 
         if (!thisRoute.userModel) {
@@ -268,7 +268,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ba
 
           // set the document title as the key concept
           if (!isCreating){
-            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("root")).get("title") + " - Metacademy"; // UPDATE different in create
+            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("roots")[0]).get("title") + " - Metacademy";
           } else {
             document.title = "Graph Creation - Metacademy";
           }

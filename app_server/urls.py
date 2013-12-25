@@ -12,7 +12,7 @@ from views import MultiSearchView, ContactView
 
 admin.autodiscover()
 
-sqs = SearchQuerySet().filter(visibility=Roadmap.VIS_MAIN)
+sqs = SearchQuerySet()#.filter(visibility=Roadmap.VIS_MAIN)
 search_inst = search_view_factory(view_class=MultiSearchView, searchqueryset=sqs, template='search-results.html')
 
 

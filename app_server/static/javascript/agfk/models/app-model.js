@@ -2,7 +2,7 @@
  This file contains the central application model, which is a wrapper model for the other models in the agfk application
  */
 
-define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "base/utils/errors"], function(Backbone, GraphData, UserData, ErrorHandler){
+define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "utils/errors"], function(Backbone, GraphData, UserData, ErrorHandler){
   "use strict";
 
   /**

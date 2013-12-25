@@ -1,0 +1,3 @@
+[submodule "app_server/static/javascript/lib/kmap"]
+	path = app_server/static/javascript/lib/kmap
+	url = https://github.com/cjrd/kmap.git

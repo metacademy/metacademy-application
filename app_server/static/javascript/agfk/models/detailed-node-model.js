@@ -1,5 +1,5 @@
 /*global define*/
-define(["underscore", "lib/kmap/models/node-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
+define(["underscore", "lib/kmap/js/models/node-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
 
   var pvt = {};
 

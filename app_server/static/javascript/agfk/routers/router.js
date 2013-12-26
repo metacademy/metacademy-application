@@ -6,7 +6,7 @@
 // TODO normalize create/edit vocabulary
 
 /*global define */
-define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "lib/kmap/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/edit-tools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
+define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "lib/kmap/js/views/concept-list-view", "agfk/views/concept-details-view","agfk/views/edit-tools-view", "agfk/models/explore-graph-model", "agfk/models/user-data-model", "utils/errors", "agfk/views/error-view", "gc/views/editor-graph-view", "gc/views/concept-editor-view", "colorbox"],
   function(Backbone, _, $, ExploreView, ConceptListView, ConceptDetailsView, AppToolsView, ExploreGraphModel, UserData, ErrorHandler, ErrorMessageView, EditorGraphView, ConceptEditorView){
   "use strict";
 

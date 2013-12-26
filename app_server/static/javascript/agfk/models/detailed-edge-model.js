@@ -1,5 +1,5 @@
 /*global define*/
-define(["backbone", "underscore", "lib/kmap/js/models/edge-model"], function(Backbone, _, EdgeModel){
+define(["backbone", "underscore", "lib/kmapjs/models/edge-model"], function(Backbone, _, EdgeModel){
   return EdgeModel.extend({
     defaults: function(){
       var enDef = {

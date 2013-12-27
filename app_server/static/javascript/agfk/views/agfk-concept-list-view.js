@@ -25,6 +25,13 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
       /**
        * @override
        */
+      useListTemplate: function () {
+        return true;
+      },
+
+      /**
+       * @override
+       */
       postinitialize: function (inp) {
         var thisView = this,
             gConsts = window.agfkGlobals.auxModel.getConsts();

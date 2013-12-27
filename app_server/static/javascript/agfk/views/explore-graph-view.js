@@ -1,3 +1,4 @@
+
 /*global define*/
 // TODO do we still want to dim "implicitly learned nodes?"
 define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view", "utils/utils", "utils/errors"], function(Backbone, d3, $, _, GraphView, Utils, ErrorHandler){
@@ -31,7 +32,8 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       summaryRightClass: "tright",
       dataConceptTagProp: "data-concept",
       infoBoxId: "explore-info-box",
-      NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
+      // message to display in explore view when no summary is present
+      NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --",
       // ----- rendering options ----- //
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
@@ -60,67 +62,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
     pvt.$hoverTxtButtonEl = $("#" + pvt.consts.hoverTextButtonsId);
 
     /**
-     * return <function> isEdgeVisible function with correct "this"
-     * and transitivity not taken into account
-     */
-    pvt.getEdgeVisibleNoTransFun = function(){
-      var thisView = this;
-      return function(e){
-        return thisView.isEdgeVisible.call(thisView,  e, false);
-      };
-    };
-
-    /**
-     * Change the scope node classes for the corresponding g elements
-     */
-    pvt.changeNodeClasses = function (prevD, nextD, classVal) {
-      var thisView = this,
-          gId;
-      if (prevD) {
-        gId = thisView.getCircleGId(prevD.id);
-        d3.select("#" + gId).classed(classVal, false);
-      }
-      if (nextD) {
-        gId = thisView.getCircleGId(nextD.id);
-        d3.select("#" + gId).classed(classVal, true);
-      }
-    };
-
-    /**
-     * Returns the path of the starting wisp
-     */
-    pvt.getPathWispD = function (svgPath, isStart) {
-      var consts = pvt.consts,
-          distances = [],
-          dt = consts.wispLen/consts.numWispPts,
-          endDist = isStart ? consts.wispLen : svgPath.getTotalLength(),
-          i = isStart ? 0 :  endDist - consts.wispLen + consts.nodeRadius; // TODO subtract node radius
-
-      distances.push(i);
-      while ((i += dt) < endDist) distances.push(i);
-      var points = distances.map(function(dist){
-        return svgPath.getPointAtLength(dist);
-      });
-      if (!isStart) points.push(svgPath.getPointAtLength(10000000)); // FIXME hack for firefox support (how to get the last point?)
-      return "M" + points.map(function(p){ return p.x + "," + p.y;}).join("L");
-
-    };
-
-    /**
-     * Get summary box placement (top left) given node placement
-     */
-    pvt.getSummaryBoxPlacement = function(nodeRect, placeLeft){
-      var consts = pvt.consts,
-          leftMultSign = placeLeft ? -1: 1,
-          shiftDiff = (1 + leftMultSign*Math.SQRT1_2)*nodeRect.width/2 + leftMultSign*consts.summaryArrowWidth;
-      if (placeLeft){shiftDiff -= consts.summaryWidth;}
-      return {
-        top:  (nodeRect.top + (1-Math.SQRT1_2)*nodeRect.height/2 - consts.summaryArrowTop) + "px",
-        left:  (nodeRect.left + shiftDiff) + "px"
-      };
-    };
-
-    /**
      * Adds the explore-to-learn node icons TODO shouldn't be a pvt fun
      */
     pvt.addEToLIcon = function(d, d3node){
@@ -141,7 +82,9 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       var numEls = d3node.selectAll("tspan")[0].length,
           elIconX = consts.elIconXOffset,
           elIconY = consts.nodeIconsConstYOffset
-            + (numEls-1)*consts.nodeIconsPerYOffset*(numEls > consts.reduceNodeTitleLength ? 2/3 : 1) + consts.elIconYOffset; // TODO fix this hack for large titles
+            + (numEls-1)*consts.nodeIconsPerYOffset
+            *(numEls > consts.reduceNodeTitleLength ? 2/3 : 1)
+            + consts.elIconYOffset; // TODO fix this hack for large titles
       iconG.attr("transform",
                  "translate(" + elIconX + "," + elIconY + ") "
                  + "scale(" + consts.elIconScale + ")");
@@ -189,62 +132,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       if (d3node.node() !== null){
         thisView.toggleNodeProps(mdl, d3node, true, prop);
       }
-    };
-
-    /**
-     * Hide long paths and show wisps
-     */
-    pvt.handleLongPaths = function (d, d3this) {
-      var consts = pvt.consts,
-          stPathD = pvt.getPathWispD(d3this.select("path").node(), true),
-          endPathD = pvt.getPathWispD(d3this.select("path").node(), false),
-          wispsG,
-          longPaths;
-
-      // hide long paths
-      longPaths = d3this.selectAll("path");
-      longPaths.on("mouseout", function(d){
-        d3this.classed("link-wrapper-hover", false);
-      });
-      if (!d3this.classed(consts.linkWrapHoverClass)){
-        longPaths.attr("opacity", 1)
-          .transition()
-          .attr("opacity", 0)
-          .each("end", function(){
-            longPaths.classed(consts.longEdgeClass, true)
-              .attr("opacity", 1);
-          });
-      } else {
-        longPaths.classed(consts.longEdgeClass, true);
-      }
-
-      // TODO remove hardcoding to consts
-      wispsG = d3this.insert("g", ":first-child")
-        .classed(consts.wispGClass, true);
-      wispsG.append("path")
-        .attr("id", consts.startWispPrefix + d3this.attr("id"))
-        .attr("d", stPathD)
-        .attr("stroke-dasharray", consts.wispDashArray)
-        .classed(consts.startWispClass, true);
-      wispsG.append("path")
-        .attr("d", stPathD)
-        .classed("short-link-wrapper", true);
-
-      wispsG.append("path")
-        .attr("id", consts.endWispPrefix + d3this.attr("id"))
-        .attr("d", endPathD)
-        .attr("stroke-dasharray", consts.wispDashArray)
-        .style('marker-end','url(#end-arrow)')
-        .classed(consts.endWispClass, true);
-
-      wispsG.append("path")
-        .attr("d", endPathD)
-        .classed(consts.wispWrapperClass, true);
-
-      wispsG.selectAll("path")
-        .on("mouseover", function(){
-          d3this.classed(consts.linkWrapHoverClass, true);
-        });
     };
 
     /**
@@ -321,25 +208,8 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       /**
        * @Override
        */
-      svgMouseUp: function () {
+      postSvgMouseUp: function () {
         var thisView = this;
-        // reset the states here
-        thisView.state.justDragged = false;
-        thisView.state.iconClicked = false;
-      },
-
-      /**
-       * @Override
-       * called after all animations
-       */
-      postRenderEdge: function (d, d3El) {
-        var consts = pvt.consts;
-        d3El.select("." + consts.wispGClass).remove();
-        d3El.select("." + consts.longEdgeClass).classed(consts.longEdgeClass, false);
-        var thisView = this;
-        if (thisView.doClipEdge(d) && !thisView.scopeNode) {
-          pvt.handleLongPaths(d, d3El);
-        }
       },
 
       /**
@@ -379,10 +249,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
             gConsts = aux.getConsts(),
             thisModel = thisView.model;
 
-        // listen for mouse events on svg
-        thisView.d3Svg.on("mouseup", function(){
-          thisView.svgMouseUp.apply(thisView, arguments);
-        });
         thisView.optimizeGraphPlacement(false, false, thisView.model.get("roots")[0]);
       },
 
@@ -556,7 +422,8 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
             }],
             xOff = consts.starXOffset,
             yOff = consts.starYOffset;
-        pvt.attachIconToNode.call(this, d3node, d, window.agfkGlobals.auxModel.toggleStarredStatus, appendObj, xOff, yOff, consts.starGScale, consts.starClass);
+        pvt.attachIconToNode.call(this, d3node, d, window.agfkGlobals.auxModel.toggleStarredStatus,
+                                  appendObj, xOff, yOff, consts.starGScale, consts.starClass);
       },
 
       /**
@@ -589,86 +456,8 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         var aux = window.agfkGlobals.auxModel,
             thisView = this;
         return !node.get("isContracted")
-          && ( !node.isLearnedOrImplicitLearned() ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
-      },
-
-      /**
-       * @Override
-       * @param edge
-       * @param <boolean> useTrans: take into account transitivity? {default: true}
-       * @return <boolean> true if the edge path is visible
-       */
-      isEdgeVisible: function(edge, useVisTrans){
-        var thisView = this;
-        useVisTrans = useVisTrans === undefined ? true : useVisTrans;
-        return (!useVisTrans || !thisView.isEdgeVisiblyTransitive(edge))
-          && !edge.get("isContracted")
-          && (thisView.isNodeVisible(edge.get("source")) && thisView.isNodeVisible(edge.get("target")));
-
-      },
-
-      /**
-       * @Override
-       * include the given edge in the optimization placement?
-       */
-      includeEdgeInOpt: function (edge) {
-        return !edge.get("isContracted") && !edge.get("isTransitive");
-      },
-
-      /**
-       * Determines if the edge should be clipped
-       *
-       */
-      doClipEdge: function(edge) {
-        var thisView = this;
-        return !(thisView.isEdgeShortestOutlink(edge) || thisView.isEdgeLengthBelowThresh(edge));
-      },
-
-      /**
-       * Determines if an edge is transitive given that other edges may be hidden
-       */
-      isEdgeVisiblyTransitive: function (edge) {
-        var thisView = this;
-        return edge.get("isTransitive")
-          && thisView.model.checkIfTransitive(edge, pvt.getEdgeVisibleNoTransFun.call(thisView));
-      },
-
-      /**
-       * Detect if the given edge is shorter than the threshold specified in pvt.consts
-       * TODO use getTotalLength on svg path
-       */
-      isEdgeLengthBelowThresh: function (edge) {
-        var src = edge.get("source"),
-            tar = edge.get("target");
-        return Math.sqrt(Math.pow(src.get("x") - tar.get("x"), 2)  + Math.pow(src.get("y") - tar.get("y"), 2)) <= pvt.consts.edgeLenThresh;
-      },
-
-      /**
-       * Detect if the given edge is the shortest outlink from the source node
-       */
-      isEdgeShortestOutlink: function (edge) {
-        var thisView = this,
-            source = edge.get("source"),
-            srcX = source.get("x"),
-            srcY = source.get("y"),
-            curMinSqDist = Number.MAX_VALUE,
-            distSq,
-            tar,
-            minId;
-        source.get("outlinks").each(function (ol) {
-          tar = ol.get("target"),
-          distSq = Math.pow(tar.get("x") - srcX, 2) + Math.pow(tar.get("y") - srcY, 2);
-          if (distSq <= curMinSqDist && !thisView.isEdgeVisiblyTransitive(ol)){
-            minId = tar.id;
-            curMinSqDist = distSq;
-          }
-        });
-        return minId === edge.get("target").id;
-      },
-
-      handleShowAllClick: function (evt) {
-        var thisView = this;
-        Utils.simulate(document.getElementById(thisView.getCircleGId(thisView.focusNode)), "mouseup");
+          && ( !node.isLearnedOrImplicitLearned()
+               ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
       }
     }); // end Backbone.View.extend({
   })();

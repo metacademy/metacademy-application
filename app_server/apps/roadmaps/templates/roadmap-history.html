@@ -3,7 +3,7 @@
 
 {% block extra-css %}
 <link rel="stylesheet" href="{% static "css/roadmap.css" %}"> </rel>
-<link rel="stylesheet" href="{% static "css/colorbox.css" %}" media="screen" />
+<link rel="stylesheet" href="{% static "css/lib/colorbox.css" %}" media="screen" />
 {% endblock %}
 
 {% block jscript-extend %}
@@ -24,12 +24,12 @@
    {% if can_edit %}
    <div class="revision-history-revert">
      <a href="update_to_revision/{{forloop.revcounter0}}">Revert</a>
-   </div>      
+   </div>
    {% endif %}
 
    <div class="revision-history-preview">
    <a class="cbox-preview" href="{% url "roadmaps:version" username tag forloop.revcounter0 %}">Preview</a>
-   </div>   
+   </div>
 
    <div class="revision-history-comment">
      {% if rev.revision.comment %}

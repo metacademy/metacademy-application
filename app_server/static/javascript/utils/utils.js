@@ -1,5 +1,5 @@
 
-  /*global define
+/*global define
 This file contains general purpose utility functions
 */
 
@@ -7,26 +7,6 @@ define(["jquery"], function($){
   "use strict";
 
   var utils = {};
-  /**
-   * Simple function that guesses a node title from a given tag
-   * (currently replaces underscores with spaces)
-   * TODO: this function may be unnecessary
-   */
-  utils.getTitleGuessFromTag = function(tag){
-    return tag.replace(/_/g," ");
-  };
-
-
-  /**
-   * Simple function to break long strings and insert a hyphen (idea from http://ejohn.org/blog/injecting-word-breaks-with-javascript/)
-   * str: string to be potentially hyphenated
-   * num: longest accecptable length -1 (single letters will not be broken)
-   */
-  utils.wbr = function(str, num) {
-    return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
-      return text + "- " + ch;
-    });
-  };
 
   /**
    * Simulate html/mouse events

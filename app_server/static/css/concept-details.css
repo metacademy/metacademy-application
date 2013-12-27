@@ -114,7 +114,11 @@ h1 .learn-view-star{
 }
 
 .learned-concept-title{
-    opacity: 0.5;
+    opacity: 0.4;
+}
+
+.implicit-learned-concept-title{
+    opacity: 0.4;
 }
 
 .learn-title-buttons{

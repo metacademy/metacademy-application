@@ -1,3 +1,4 @@
+
 /*global define*/
 define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
   var pvt = {};
@@ -35,7 +36,6 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
     sel.removeAllRanges();
     sel.addRange(range);
   };
-
 
   pvt.replaceSelectEdge = function(d3Path, edgeData){
     var thisView = this;
@@ -243,7 +243,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
         var d3el = d3.select(this);
         thisView.listenTo(d, "change:title", function() {
           d3el.selectAll("text").remove();
-          Utils.insertTitleLinebreaks(d3el, d.get("title"));
+          thisView.insertTitleLinebreaks(d3el, d.get("title"));
         });
       });
 

@@ -13,16 +13,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
     pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
       // ----- class and id names ----- //
       viewId: "explore-graph-view", // id of view element (div by default) must change in CSS as well
-      wispGClass: "wispG",
-      startWispPrefix: "startp-",
-      endWispPrefix: "endp-",
-      startWispClass: "start-wisp",
-      endWispClass: "end-wisp",
-      wispWrapperClass: "short-link-wrapper",
-      linkWrapHoverClass: "link-wrapper-hover",
-      depLinkWrapHoverClass: "ol-show",
-      longEdgeClass: "long-edge",
-      wispDashArray: "3,3",
       exploreSvgId: "explore-svg",
       learnedClass: "learned",
       implicitLearnedClass: "implicit-learned",
@@ -32,8 +22,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       starHoveredClass: "node-star-hovered",
       starredClass: "starred",
       checkClass: "checkmark",
-      depCircleClass: "dep-circle",
-      olCircleClass: "ol-circle",
       checkHoveredClass: "checkmark-hovered",
       summaryDivSuffix: "-summary-txt",
       summaryWrapDivSuffix: "-summary-wrap",
@@ -44,27 +32,13 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       dataConceptTagProp: "data-concept",
       infoBoxId: "explore-info-box",
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --", // message to display in explore view when no summary is present
-      renderEvt: "viewRendered",
-      scopeClass: "scoped",
-      scopeCircleGClass: "scoped-circle-g",
-      focusCircleGClass: "focused-circle-g",
       // ----- rendering options ----- //
-      defaultScale: 0.54,
-      numWispPts: 10,
-      wispLen: 80,
-      defaultExpandDepth: 1, // default number of dependencies to show on expand
-      defaultGraphOrient: "BT", // orientation of graph ("BT", "TB", "LR", or "RL")
-      defaultNodeSepDist: 1.7, // separation of graph nodes
-      defaultNodeWidth: 2.7, // diameter of graph nodes
-      edgeLenThresh: 250, // threshold length of edges to be shown by default
       summaryWidth: 350, // px width of summary node (TODO can we move this to css and obtain the width after setting the class?)
       summaryArrowWidth: 32, // summary triangle width
       summaryArrowTop: 28, // top distance to triangle apex
       summaryAppearDelay: 250, // delay before summary appears (makes smoother navigation)
       summaryHideDelay: 100,
       summaryFadeInTime: 50, // summary fade in time (ms)
-      maxZoomScale: 5, // maximum zoom-in level for graph
-      minZoomScale: 0.05, //maximum zoom-out level for graph
       elIconScale: 1,
       elIconHeight: 18,
       elIconWidth: 18,
@@ -82,9 +56,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       nodeIconsConstYOffset: 15, // constant y offset for the node icons
       nodeIconsPerYOffset: 7 // y offset for each text element for the node icons
     });
-    pvt.summaryDisplays = {}; // FIXME this won't work with multiple views
-    pvt.summaryTOKillList = {}; // FIXME this won't work with multiple views
-    pvt.summaryTOStartList = {}; // FIXME this won't work with multiple views
 
     pvt.$hoverTxtButtonEl = $("#" + pvt.consts.hoverTextButtonsId);
 
@@ -221,28 +192,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
     };
 
     /**
-     * Helper function to obtain id of summary txt div for a given node in the exporation view
-     */
-    pvt.getSummaryIdForDivTxt = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.summaryDivSuffix;
-    };
-
-    /**
-     * Helper function to obtain id of wrapper div of summary txt for a given node in the exporation view
-     */
-    pvt.getSummaryIdForDivWrap = function(node) {
-      return pvt.getIdOfNodeType.call(this, node) + pvt.consts.summaryWrapDivSuffix;
-    };
-
-    /**
-     * Get id of node element (d3, dom, or model)
-     */
-    pvt.getIdOfNodeType = function(node) {
-      var nodeFun = node.attr || node.getAttribute || node.get;
-      return nodeFun.call(node, "id");
-    };
-
-    /**
      * Hide long paths and show wisps
      */
     pvt.handleLongPaths = function (d, d3this) {
@@ -357,17 +306,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
             thisNodes = thisView.model.getNodes(),
             aux = window.agfkGlobals.auxModel;
 
-        // attach listeners here FIXME do we have to attach these individually here?
-        newGs.on("mouseover", function(d) {
-          thisView.circleMouseOver.call(thisView, d, this);
-        })
-          .on("mouseout", function(d) {
-            thisView.circleMouseOut.call(thisView, d, this);
-          })
-          .on("mouseup", function (d) {
-            thisView.circleMouseUp.call(thisView, d, this);
-          });
-
         // FIXME this will likely need to be refactored
         _.each(thisNodes.filter(function(nde){return aux.conceptIsLearned(nde.id);}), function(mnode){
           pvt.addPropFunction.call(thisView, mnode, "learned");
@@ -388,219 +326,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         // reset the states here
         thisView.state.justDragged = false;
         thisView.state.iconClicked = false;
-      },
-
-      /**
-       * Mouse up on the concept circle
-       */
-      circleMouseUp: function (d, domEl) {
-        var thisView = this;
-
-        if (thisView.state.justDragged || thisView.state.iconClicked) {
-          return false;
-        }
-
-        thisView.model.expandGraph();
-
-        if (thisView.scopeNode && thisView.scopeNode.id === d.id) {
-          thisView.nullScopeNode();
-          thisView.centerForNode(d).each("end", function () {
-            thisView.optimizeGraphPlacement(true, false, d.id);
-          });
-          return false;
-        } else {
-          thisView.setScopeNode(d);
-        }
-
-        // change node
-        thisView.appRouter.changeUrlParams({focus: d.id});
-
-        // contract the graph from the deps and ols
-        var edgeShowList = [],
-            nodeShowList = [d.id];
-
-        var showOLs = d.get("outlinks").filter(function(ol){
-          return thisView.isEdgeVisible(ol);
-        });
-        showOLs.forEach(function(ol){
-          nodeShowList.push(ol.get("target").id);
-        });
-        edgeShowList = edgeShowList.concat(showOLs.map(function(ol){return ol.id;}));
-        var showDeps = d.get("dependencies")
-              .filter(function(dep){
-                return thisView.isEdgeVisible(dep);
-              });
-        showDeps.forEach(function(dep){
-          nodeShowList.push(dep.get("source").id);
-        });
-        edgeShowList = edgeShowList.concat(showDeps.map(function(dep){return dep.id;}));
-
-        // contract edges
-        var edges = thisView.model.getEdges();
-        thisView.model.getEdges()
-          .each(function (edge) {
-            edge.set("isContracted", edgeShowList.indexOf(edge.id) === -1);
-          });
-        // contract nodes
-        var nodes = thisView.model.getNodes();
-        nodes
-          .forEach(function (node) {
-            node.set("isContracted", nodeShowList.indexOf(node.id) === -1);
-          });
-
-        // update data for the info box (# of hidden nodes/edges)
-        thisView.numHiddenNodes = nodes.length - nodeShowList.length;
-        thisView.numHiddenEdges = edges.length - edgeShowList.length;
-
-        // transition the g so the node is centered
-        thisView.centerForNode(d).each("end", function () {
-          thisView.optimizeGraphPlacement(true, false, d.id, true);
-        });
-        return true;
-      },
-
-      /**
-       * Add visual mouse over properties to the explore nodes
-       */
-      circleMouseOver: function(d, nodeEl) {
-        var thisView = this,
-            consts = pvt.consts,
-            hoveredClass = consts.hoveredClass,
-            d3node = d3.select(nodeEl);
-
-        if (d3node.classed(hoveredClass)){
-          d3node.classed(hoveredClass, true);
-          return false;
-        }
-
-        var nodeId = nodeEl.id;
-
-        // add the appropriate class
-        d3node.classed(hoveredClass, true);
-
-        // show/emphasize connecting edges
-        d.get("outlinks").each(function (ol) {
-          d3.select("#" + consts.edgeGIdPrefix + ol.id)
-            .classed(consts.linkWrapHoverClass, true)
-            .classed(consts.depLinkWrapHoverClass, true);
-          if (thisView.isEdgeVisible(ol)){
-            d3.select("#" + consts.circleGIdPrefix + ol.get("target").id)
-              .select("circle")
-              .classed(consts.olCircleClass, true);
-          }
-        });
-        d.get("dependencies").each(function (dep) {
-          d3.select("#" + consts.edgeGIdPrefix + dep.id)
-            .classed(consts.linkWrapHoverClass, true);
-          if (thisView.isEdgeVisible(dep)){
-            d3.select("#" + consts.circleGIdPrefix + dep.get("source").id)
-              .select("circle")
-              .classed(consts.depCircleClass, true);
-          }
-        });
-
-        // TODO find a different way to present summaries on mouse over (e.g. with a button click)
-        // // add node summary if not already present
-        // if (pvt.summaryTOKillList.hasOwnProperty(nodeId)){
-        //   window.clearInterval(pvt.summaryTOKillList[nodeId]);
-        //   delete pvt.summaryTOKillList[nodeId];
-        // }
-        // thisView.attachNodeSummary(d, d3node);
-
-        // add node-hoverables if not already present
-        if (!d3node.attr(consts.dataHoveredProp)) {
-          // add checkmark if not present
-          if (d3node.select("." + consts.checkClass).node() === null){
-            thisView.addCheckmarkIcon(d, d3node);
-          }
-          // add node star if not already present
-          if (d3node.select("." + consts.starClass).node() === null){
-            thisView.addStarIcon(d, d3node);
-          }
-
-          // add e-to-l button if not already present
-          if (d3node.select("." + consts.elIconClass).node() === null){
-            pvt.addEToLIcon.call(thisView, d, d3node);
-          }
-          d3node.attr(consts.dataHoveredProp, true);
-        }
-        return 0;
-      },
-
-      /**
-       * Remove mouse over properties from the explore nodes
-       */
-      circleMouseOut:  function(d, nodeEl) {
-        var relTarget = d3.event.relatedTarget;
-
-        // check if we're in a semantically related el
-        if (!relTarget || $.contains(nodeEl, relTarget) || (relTarget.id && relTarget.id.match(nodeEl.id))){
-          return;
-        }
-
-        var thisView = this,
-            d3node = d3.select(nodeEl),
-            summId = pvt.getSummaryIdForDivWrap.call(thisView, d3node),
-            consts = pvt.consts,
-            hoveredClass = consts.hoveredClass,
-            nodeId = nodeEl.id;
-
-        d3node.classed(hoveredClass, false); // FIXME align class options once summary display is figured out
-        // show/emphasize connecting edges
-        d.get("outlinks").each(function (ol) {
-          d3.select("#" + consts.edgeGIdPrefix + ol.id)
-            .classed(consts.linkWrapHoverClass, false)
-            .classed(consts.depLinkWrapHoverClass, false);
-          d3.select("#" + consts.circleGIdPrefix + ol.get("target").id)
-            .select("circle")
-            .classed(consts.olCircleClass, false);
-
-        });
-        d.get("dependencies").each(function (dep) {
-          d3.select("#" + consts.edgeGIdPrefix + dep.id)
-            .classed(consts.linkWrapHoverClass, false);
-          d3.select("#" + consts.circleGIdPrefix + dep.get("source").id)
-            .select("circle")
-            .classed(consts.depCircleClass, false);
-
-        });
-
-        if(pvt.summaryTOStartList.hasOwnProperty(nodeId)){
-          window.clearInterval(pvt.summaryTOStartList[nodeId]);
-          delete pvt.summaryTOStartList[nodeId];
-          d3node.classed(hoveredClass, false);
-        }
-        else{
-          // wait a bit before removing the summary
-          pvt.summaryTOKillList[nodeId] = window.setTimeout(function(){
-            delete pvt.summaryTOKillList[nodeId];
-            if (pvt.summaryDisplays[summId] && !pvt.summaryDisplays[summId].$wrapDiv.hasClass(hoveredClass)){
-              d3.select("#" + summId).remove(); // use d3 remove for x-browser support
-              delete pvt.summaryDisplays[summId];
-              d3node.classed(hoveredClass, false);
-            }
-          }, consts.summaryHideDelay);
-        }
-      },
-
-      /**
-       * Helper function to attach the summary div and add an event listener  leaving the summary
-       */
-      attachNodeSummary: function(d, d3node){
-        // display the node summary
-        var $wrapDiv = this.showNodeSummary(d, d3node);
-        var hoveredClass = pvt.consts.hoveredClass;
-
-        $wrapDiv.on("mouseenter", function(){
-          $(this).addClass(hoveredClass);
-        });
-        // add listener to node summary so mouseouts trigger mouseout on node
-        $wrapDiv.on("mouseleave", function(evt) {
-          $(this).removeClass(hoveredClass);
-          Utils.simulate(d3node.node(), "mouseout", {
-            relatedTarget: evt.relatedTarget
-          });
-        });
       },
 
       /**
@@ -643,7 +368,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
 
       /**
        * @Override
-       * setup the appropriate event listers -- this should probably be called on initial render?
+       * setup the appropriate event listers
        */
       firstRender: function(){
         // build initial graph based on input collection
@@ -658,38 +383,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         thisView.d3Svg.on("mouseup", function(){
           thisView.svgMouseUp.apply(thisView, arguments);
         });
-
-        thisView.dzoom = d3.behavior.zoom();
-        var dzoom = thisView.dzoom;
-        // make graph zoomable/translatable
-        var vis = thisView.d3Svg
-              .attr("pointer-events", "all")
-              .attr("viewBox", null)
-              .call(dzoom.on("zoom", redraw))
-              .select("g");
-
-        // set the zoom scale
-        dzoom.scaleExtent([consts.minZoomScale, consts.maxZoomScale]);
-        var summaryDisplays = pvt.summaryDisplays,
-            nodeLoc,
-            d3event,
-            currentScale;
-
-        // helper function to redraw svg graph with correct coordinates
-        function redraw() {
-          // transform the graph
-          thisView.state.justDragged = true;
-          d3event = d3.event;
-          currentScale = d3event.scale;
-          thisView.prevScale = currentScale;
-          vis.attr("transform", "translate(" + d3event.translate + ")" + " scale(" + currentScale + ")");
-          // move the summary divs if needed
-          $.each(summaryDisplays, function(key, val){
-            nodeLoc = pvt.getSummaryBoxPlacement(val.d3circle.node().getBoundingClientRect(), val.placeLeft);
-            val.$wrapDiv.css(nodeLoc);
-          });
-        }
-
         thisView.optimizeGraphPlacement(false, false, thisView.model.get("roots")[0]);
       },
 
@@ -772,6 +465,35 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       },
 
       /**
+       * @Override
+       */
+      postCircleMouseOver: function (d, nodeEl) {
+        // add node-hoverables if not already present
+        var thisView = this,
+            d3node = d3.select(nodeEl),
+            consts = pvt.consts;
+
+        if (!d3node.attr(consts.dataHoveredProp)) {
+          // add checkmark if not present
+          if (d3node.select("." + consts.checkClass).node() === null){
+            thisView.addCheckmarkIcon(d, d3node);
+          }
+          // add node star if not already present
+          if (d3node.select("." + consts.starClass).node() === null){
+            thisView.addStarIcon(d, d3node);
+          }
+
+          // add e-to-l button if not already present
+          if (d3node.select("." + consts.elIconClass).node() === null){
+            pvt.addEToLIcon.call(thisView, d, d3node);
+          }
+          d3node.attr(consts.dataHoveredProp, true);
+        }
+        return 0;
+      },
+
+
+      /**
        * Show the node summary in "hover box" next to the node
        * TODO consider making this a view that monitors the nodes (i.e. event driven)
        */
@@ -813,12 +535,12 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
 
         // add box to document with slight fade-in
         var $wrapDiv = $(wrapDiv);
-        pvt.summaryTOStartList[circleId] = window.setTimeout(function(){
-          delete pvt.summaryTOStartList[circleId];
+        thisView.summaryTOStartList[circleId] = window.setTimeout(function(){
+          delete thisView.summaryTOStartList[circleId];
           $wrapDiv.appendTo("#" + consts.viewId).fadeIn(consts.summaryFadeInTime);
         }, consts.summaryAppearDelay);
 
-        pvt.summaryDisplays[wrapDiv.id] = {"$wrapDiv": $wrapDiv, "d3circle": circle, "placeLeft": placeLeft};
+        thisView.summaryDisplays[wrapDiv.id] = {"$wrapDiv": $wrapDiv, "d3circle": circle, "placeLeft": placeLeft};
         return $wrapDiv;
       },
 
@@ -947,35 +669,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       handleShowAllClick: function (evt) {
         var thisView = this;
         Utils.simulate(document.getElementById(thisView.getCircleGId(thisView.focusNode)), "mouseup");
-      },
-
-      setFocusNode: function (d) {
-        var thisView = this;
-        pvt.changeNodeClasses.call(thisView, thisView.focusNode, d, pvt.consts.focusCircleGClass);
-        thisView.focusNode = d;
-      },
-
-      /**
-       * Set the scope node
-       */
-      setScopeNode: function (d) {
-        var thisView = this;
-        pvt.changeNodeClasses.call(thisView, thisView.scopeNode, d, pvt.consts.scopeCircleGClass);
-        thisView.scopeNode = d;
-        // delay info box so that animations finish
-        window.setTimeout(function () {
-          thisView.$el.addClass(pvt.consts.scopeClass);
-        }, 800);
-      },
-
-      /**
-       * Remove the current scope node
-       */
-      nullScopeNode: function (d) {
-        var thisView = this;
-        pvt.changeNodeClasses.call(thisView, thisView.scopeNode, null, pvt.consts.scopeCircleGClass);
-        thisView.scopeNode = null;
-        thisView.$el.removeClass(pvt.consts.scopeClass);
       }
     }); // end Backbone.View.extend({
   })();

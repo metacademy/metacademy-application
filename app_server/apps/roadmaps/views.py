@@ -1,10 +1,13 @@
 import os
 from operator import attrgetter
+
 import bleach
 import markdown
 import re
 import urlparse
 import reversion
+from lazysignup.templatetags.lazysignup_tags import is_lazy_user
+
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,6 +15,7 @@ from django.shortcuts import render
 from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from apps.cserver_comm import cserver_communicator as cscomm
 from utils.roadmap_extension import RoadmapExtension
@@ -239,13 +243,8 @@ def edit(request, username, tag):
         })
 
 def new(request):
-    # temporary: editing disabled on server
-    can_edit = request.user.is_authenticated() and request.user.username in EDIT_USERS
-    if not can_edit:
-        return HttpResponse(status=404)
-
-    if not request.user.is_authenticated():
-        return HttpResponse(status=404)
+    if not request.user.is_authenticated() or is_lazy_user(request.user):
+        return HttpResponseRedirect(reverse("user:login"))
 
     if request.method == 'POST':
         form = RoadmapForm(request.POST)
@@ -256,7 +255,7 @@ def new(request):
                 roadmap.save()
                 reversion.set_user(request.user)
             rms = settings_form.save(commit=False)
-            rms.creator = request.user
+            rms.creator = request.user.profile
             rms.roadmap = roadmap
             rms.save()
 
@@ -274,7 +273,7 @@ def new(request):
     return render(request, 'roadmap-new.html', {
         'form': form,
         'settings_form': settings_form,
-        'can_edit': can_edit
+        'can_edit': True
         })
 
 

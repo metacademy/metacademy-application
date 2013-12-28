@@ -21,8 +21,12 @@ def user_main(request):
     if not request.user.is_authenticated() or is_lazy_user(request.user):
         return redirect('/user/login?next=%s' % request.path)
 
-    # obtain an array of learned concept ids for the user
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
+    # obtain roadmaps where the user is listed as a creator
+    # TODO I think this only gets roadmaps created by that user -- allow multiple editors
+    roadmaps = [rs.roadmap for rs in uprof.roadmapsettings_set.all()]
+
+    # obtain an array of learned concept ids for the user
     lids = [l.id for l in uprof.learned.all()]
     sids = [s.id for s in uprof.starred.all()]
     # TODO refactor
@@ -38,7 +42,7 @@ def user_main(request):
     else:
         sconcepts = []
 
-    return render_to_response('user.html', {"lconcepts": lconcepts, "sconcepts": sconcepts}, context_instance=RequestContext(request))
+    return render_to_response('user.html', {"lconcepts": lconcepts, "sconcepts": sconcepts, "roadmaps": roadmaps}, context_instance=RequestContext(request))
 
 @allow_lazy_user
 def register(request, redirect_addr="/user"):

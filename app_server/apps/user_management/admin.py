@@ -18,7 +18,7 @@ class ConceptAdmin(admin.ModelAdmin):
     filter_horizontal = ('uprofiles',)
     readonly_fields = ('get_title', 'show_uprofile_count')
     fields = ('get_title', 'show_uprofile_count', 'uprofiles',)
-    
+
     def queryset(self, request):
         return 0
 
@@ -33,9 +33,8 @@ class LearnedConceptAdmin(ConceptAdmin):
 class StarredConceptAdmin(ConceptAdmin):
     def queryset(self, request):
         return StarredConcept.objects.annotate(uprofiles_count=Count('uprofiles'))
-        
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(LearnedConcept, LearnedConceptAdmin)
 admin.site.register(StarredConcept, StarredConceptAdmin)
-

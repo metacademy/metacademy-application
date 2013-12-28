@@ -40,6 +40,8 @@ class Profile(models.Model):
     """
     This is a skeleton user profile model with a one-to-one relationship
     with users from the auth model
+
+    The profile was originally conceived to allow easy future extension of the user model without dealing with messy schema changes
     """
     user = models.OneToOneField(User, primary_key=True)
 

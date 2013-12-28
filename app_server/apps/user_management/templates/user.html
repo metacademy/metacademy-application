@@ -35,10 +35,20 @@
 
   <section id="contribs-section">
     <h2>
-      Your Contributions
+      Your Roadmaps
     </h2>
     <div class="user-graphs list-wrapper user-subsec">
-      <span class="no-content-message"> you have not yet contributed any content to metacademy (metacademy does not currently have this functionality)</span>
+    {% if roadmaps %}
+    {% for entry in roadmaps %}
+    <li class="list-roadmaps-li">
+      <h3 class="list-roadmaps-title">
+        <a class="list-roadmaps-link internal-link" href="{% url 'roadmaps:show' user.username entry.roadmapsettings.url_tag %}"> {{ entry.title }} </a>
+      </h3>
+    </li>
+    {% endfor %}
+    {% else %}
+      <span class="no-content-message"> you have not yet created any roadmaps</span>
+    {% endif %}
     </div>
   </section>
 
@@ -86,4 +96,3 @@
 
 </div>
 {% endblock %}
-

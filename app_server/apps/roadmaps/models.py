@@ -1,5 +1,6 @@
-from django.contrib.auth.models import User
 from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugField, TextField, IntegerField, OneToOneField, ManyToManyField
+
+from apps.user_management.models import Profile
 
 import reversion
 
@@ -24,9 +25,9 @@ class RoadmapSettings(Model):
     Model that contains the roadmap settings
     """
     roadmap = OneToOneField(Roadmap, primary_key=True)
-    creator = ForeignKey(User) # TODO should this be a part of RoadmapSettings?
-    owners = ManyToManyField(User, related_name="roadmap_owners")
-    editors = ManyToManyField(User, related_name="roadmap_editors")
+    creator = ForeignKey(Profile) # TODO should this be a part of RoadmapSettings?
+    owners = ManyToManyField(Profile, related_name="roadmap_owners")
+    editors = ManyToManyField(Profile, related_name="roadmap_editors")
     listed_in_main = BooleanField('show this roadmap in the search results', default=False)
     url_tag = SlugField('URL tag', max_length=30, help_text='only letters, numbers, underscores, hyphens')
 
@@ -34,20 +35,20 @@ class RoadmapSettings(Model):
         unique_together = ('creator', 'url_tag')
 
     def get_absolute_url(self):
-        return '/roadmaps/%s/%s' % (self.creator.username, self.url_tag)
+        return '/roadmaps/%s/%s' % (self.creator.user.username, self.url_tag)
 
     def is_public(self):
         return self.listed_in_main # self.visibility in [self.VIS_PUBLIC, self.VIS_MAIN]
 
     def visible_to(self, user):
-        return self.is_public() or (user.is_authenticated() and self.user.username == user.username) # TODO FIXME chould check if creator, owner, or editor
+        return True#self.is_public() or (user.is_authenticated() and self.username == user.username) # TODO FIXME chould check if creator, owner, or editor
 
     def editable_by(self, user):
-        return user.is_authenticated() and self.creator.username == user.username
+        return user.is_authenticated() and self.creator.user.username == user.username
         # TODO FIXME chould check if creator, owner, or editor
 
 def load_roadmap_settings(username, tag):
     try:
-        return RoadmapSettings.objects.get(creator__username__exact=username, url_tag__exact=tag)
+        return RoadmapSettings.objects.get(creator__user__username__exact=username, url_tag__exact=tag)
     except Roadmap.DoesNotExist:
         return None

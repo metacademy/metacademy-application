@@ -1,5 +1,5 @@
 /*global define*/
-define(['lib/kmap/collections/node-collection', 'agfk/models/detailed-node-model', 'underscore'], function(NodeCollection, DetailedNodeModel, _){
+define(['lib/kmapjs/collections/node-collection', 'agfk/models/detailed-node-model', 'underscore'], function(NodeCollection, DetailedNodeModel, _){
   return NodeCollection.extend({
     model: DetailedNodeModel,
 

@@ -1,5 +1,5 @@
 
-  /*global define
+/*global define
 This file contains general purpose utility functions
 */
 
@@ -7,66 +7,6 @@ define(["jquery"], function($){
   "use strict";
 
   var utils = {};
-  /**
-   * Simple function that guesses a node title from a given tag
-   * (currently replaces underscores with spaces)
-   * TODO: this function may be unnecessary
-   */
-  utils.getTitleGuessFromTag = function(tag){
-    return tag.replace(/_/g," ");
-  };
-
-
-  /**
-   * Simple function to break long strings and insert a hyphen (idea from http://ejohn.org/blog/injecting-word-breaks-with-javascript/)
-   * str: string to be potentially hyphenated
-   * num: longest accecptable length -1 (single letters will not be broken)
-   */
-  utils.wbr = function(str, num) {
-    return str.replace(RegExp("(\\w{" + num + "})(\\w{3," + num + "})", "g"), function(all,text, ch){
-      return text + "- " + ch;
-    });
-  };
-
-  /**
-   * insert svg line breaks: taken from
-   * http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
-   * TODO this function has become far too large & needs to be refactored
-   */
-  utils.insertTitleLinebreaks = function (gEl, title, splLen, reduceThresh) {
-    var words = title.split(/[-\s]+/g),
-        total = 0,
-        result = [],
-        resArr = [],
-        i;
-    splLen = splLen || 14;
-
-    // determine break points for words TODO shrink font if necessary
-    for (i = 0; i < words.length; i++) {
-      if (total + words[i].length + 1 > splLen && total !== 0) {
-        resArr.push(result.join(" "));
-        result = [];
-        total = 0;
-      }
-      result.push(words[i]);
-      total += words[i].length + 1;
-    }
-    resArr.push(result.join(" "));
-
-    var dy = resArr.length > reduceThresh ? '10' : '15';
-
-    var el = gEl.append("text")
-          .attr("text-anchor","middle")
-          .attr("dy", "-" + (resArr.length-1)*dy*6.5/15);
-
-
-    for (i = 0; i < resArr.length; i++) {
-      var tspan = el.append('tspan').text(resArr[i]);
-      if (i > 0)
-        tspan.attr('x', 0).attr('dy', dy);
-    }
-  };
-
 
   /**
    * Simulate html/mouse events

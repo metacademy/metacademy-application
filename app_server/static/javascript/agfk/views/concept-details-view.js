@@ -509,7 +509,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
       /**
        * Toggle speficied state of given concept
-       * TODO DRY with concept-list-view
        */
       toggleConceptState: function(evt, state){
         evt.stopPropagation();

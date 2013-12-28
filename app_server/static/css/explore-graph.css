@@ -47,41 +47,22 @@
     fill: rgb(237, 255, 237);
 }
 
-/* .implicit-learned.concept-g > circle{ */
-/*     stroke: #868686; */
-/* } */
-
-/* .learned text, .implicit-learned text{ */
-/*     fill: #868686; */
-/* } */
-
-/* dep and ol circles */
-.concept-g .ol-circle{
-    fill: #fbeded;
-}
-.concept-g .dep-circle{
-    fill: #e6e6fa;
+.implicit-learned.concept-g > circle{
+    stroke: #868686;
 }
 
-.scoped .concept-g .ol-circle{
-    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
-}
-.scoped .concept-g .dep-circle{
-    fill: #F6FBFF; /* light shade of alice blue see http://encycolorpedia.com/f6fbff for color scheme */
-}
-
-.concept-g.scoped-circle-g circle, .concept-g.scoped-circle-g .dep-circle, .concept-g.scoped-circle-g .ol-circle, .concept-g.focused-circle-g circle{
-    fill: rgb(255, 244, 253);
+.learned text, .implicit-learned text{
+    fill: #868686;
 }
 
 /* properties for learned paths */
-/* .learned path.link, .implicit-learned path.link{ */
-/*     opacity: 0.5; */
-/* } */
+.learned path.link, .implicit-learned path.link, .implicit-learned .wispG{
+    opacity: 0.5;
+}
 
 /*********
-          node icons
-          **********/
+node icons
+**********/
 /* checkmark */
 .concept-g .checkmark{
     cursor: pointer;
@@ -165,32 +146,84 @@
     cursor: pointer;
 }
 
-.start-wisp, .end-wisp{
-    fill: none;
-    stroke: #333;
-    stroke-width: 2px;
+
+/* Summary hover element */
+
+.summary-text {
+    padding: 0.4em 0.7em;
+    color: #3E4018;
+    background-color: white;
+    border: solid;
+    border-width: 4px;
+    border-color: #493A5C;
+    overflow: auto;
+    font-size: 1em;
+    line-height: 1.4em;
+    max-height: 12em;
+    min-height: 4em;
+    border-radius: 0.7em 0.7em;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+    -ms-box-sizing: border-box; /* IE */
+    box-sizing: border-box;
 }
 
-.link-wrapper-hover .start-wisp, .link-wrapper-hover .end-wisp{
-    display: none;
+.summary-text p{
+    display: inline;
 }
 
-.long-edge{
-    display: none;
+.summary-wrap{
+    position: absolute;
 }
-
-.link-wrapper-hover path{
+/* creates the larger triangle that points to the right > */
+.summary-wrap.tright:before {
+    content: "";
+    border: solid;
+    border-width: 16px 0 16px 32px;
+    border-color: transparent #493A5C; /*#493A5C;*/
+    position: absolute;
+    top: 20px;
+    right: -28px ; /* value = - triangle width + border-right-width */
     display: block;
+    width:0;
+    -moz-transform: scale(.9999);
 }
-
-.link-wrapper-hover path.link-wrapper{
-    opacity: 0.15;
+/* creates the smaller  triangle that points to the right > */
+.summary-wrap.tright:after {
+    content: "";
+    border-style: solid;
+    border-width: 12px 0 12px 24px; /* larger triangle - border width */
+    border-color: transparent white;
+    position: absolute;
+    top: 24px; /* position of larger triangle + border width */
+    right: -20px; /* value = - small triangle width + border-right-width */
+    display: block;
+    width: 0;
+    -moz-transform: scale(.9999);
 }
-
-.ol-show path.link-wrapper{
-    stroke: #e48989;
+/* creates the larger triangle that points to the left < */
+.summary-wrap.tleft:before {
+    content: "";
+    border: solid;
+    border-width: 16px 32px 16px 0;
+    border-color: transparent #493A5C; /*#493A5C;*/
+    position: absolute;
+    top: 20px;
+    left: -28px ; /* value = - triangle width + border-left-width */
+    display: block;
+    width: 0;
+    -moz-transform: scale(.9999);
 }
-
-.scoped .link-wrapper-hover path.link-wrapper{
-    opacity: 0;
+/* creates the smaller  triangle that points to the left <*/
+.summary-wrap.tleft:after {
+    content: "";
+    border-style: solid;
+    border-width: 12px 24px 12px 0; /* larger triangle - border width */
+    border-color: transparent white;
+    position: absolute;
+    top: 24px; /* position of larger triangle + border width */
+    left: -20px; /* value = - small triangle width + border-left-width */
+    display: block;
+    width: 0;
+    -moz-transform: scale(.9999);
 }

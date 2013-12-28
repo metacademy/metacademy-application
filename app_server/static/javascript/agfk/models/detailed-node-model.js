@@ -1,5 +1,5 @@
 /*global define*/
-define(["underscore", "lib/kmap/models/node-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
+define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
 
   var pvt = {};
 
@@ -208,102 +208,9 @@ define(["underscore", "lib/kmap/models/node-model", "agfk/collections/node-prope
       return title;
     },
 
-    /**
-     * Check if ancestID is an ancestor of this node
-     */
-    isAncestor: function(ancestID){
-      if (!this.ancestors){
-        this.getAncestors(true);
-      }
-      return this.ancestors.hasOwnProperty(ancestID);
-    },
-
-    /**
-     * Obtain (and optionally return) a list of the ancestors of this node
-     * side effect: creates a list of unique dependencies (dependencies not present as an
-     * ancestor of another dependency) which is stored in this.uniqueDeps
-     */
-    getAncestors: function(noReturn){
-      if (!this.ancestors || this.ancestorsStateChanged()){
-
-      }
-
-      if (!noReturn){
-        return this.ancestors;
-      }
-
-      else{
-        return false;
-      }
-    },
-
-    /* ulOnly: set to true to only return unlearned ancestors */
-    getAncestors: function(ulOnly){
-      var thisModel = this;
-      if (!thisModel.ancestors || ulOnly){
-
-        var ancests = {},
-            coll = this.collection,
-            aux = window.agfkGlobals.auxModel;
-        thisModel.get("dependencies").each(function(dep){
-          var depId = dep.get("from_tag");
-          if (!ulOnly || !aux.conceptIsLearned(depId)){
-            var depNode = coll.get(depId),
-                dAncests = depNode.getAncestors(ulOnly);
-            for (var dAn in dAncests){
-              if(dAncests.hasOwnProperty(dAn)){
-                ancests[dAn] = 1;
-              }
-            }
-          }
-        });
-        thisModel.get("dependencies").each(function(dep){
-          ancests[dep.get("from_tag")] = 1;
-        });
-        if(!ulOnly){
-          thisModel.ancestors = ancests;
-        }
-      }
-      return ancests || thisModel.ancestors;
-    },
-
     // TODO these methods might fit better on the node collection or aux
     getUnlearnedUniqueDeps: function(){
       return this.getUniqueDeps(true);
-    },
-
-    getUniqueDeps: function(ulOnly){
-      var thisModel = this,
-          allDeps = thisModel.get("dependencies").pluck("source"),
-          thisColl = thisModel.collection,
-          ulDeps = {},
-          ulUniqueDeps = {},
-          ulAcest,
-          dep;
-
-      _.each(allDeps, function(dep){
-        if (!ulOnly || !dep.isLearnedOrImplicitLearned()){
-          ulDeps[dep.id] = 1;
-          ulUniqueDeps[dep.id] = 1;
-        }
-      });
-
-      // for each unlearned ancestor, check if any of its ancestors are in the unlearned ancestor list
-      // if they are, remove it from the ulUniqueDeps object
-      for (ulAcest in ulDeps){
-        if (ulDeps.hasOwnProperty(ulAcest)){
-          var ulAcestAncests = thisColl.get(ulAcest).getAncestors(ulOnly);
-          for (var ulAcestAcest in ulAcestAncests){
-            if (ulAcestAncests.hasOwnProperty(ulAcestAcest)
-                && ulDeps[ulAcestAcest]){
-              if (ulUniqueDeps[ulAcestAcest]){
-                delete ulUniqueDeps[ulAcestAcest];
-              }
-            }
-          }
-        }
-      }
-      return Object.keys(ulUniqueDeps);
     },
 
     /**

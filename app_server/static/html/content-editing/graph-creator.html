@@ -2,10 +2,11 @@
 {% load staticfiles %}
 
 {% block extra-css %}
-<link rel="stylesheet" href="{% static "css/ionicons.css" %}"/>
+<link rel="stylesheet" href="{% static "css/lib/ionicons.css" %}"/>
 <link rel="stylesheet" href="{% static "css/explore-learn.css" %}"/>
-<link rel="stylesheet" href="{% static "css/colorbox.css" %}" media="screen" />
-<link rel="stylesheet" href="{% static "css/graphs.css" %}" />
+<link rel="stylesheet" href="{% static "css/lib/colorbox.css" %}" media="screen" />
+<link rel="stylesheet" href="{% static "css/lib/kmapcss/graph.css" %}" />
+<link rel="stylesheet" href="{% static "css/lib/kmapcss/list.css" %}" />
 <link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
 <link rel="stylesheet" href="{% static "css/apptools.css" %}" />
 <link rel="stylesheet" href="{% static "css/concept-list.css" %}" />
@@ -21,10 +22,10 @@
   agfkGlobals.auxModel = null; // init in main js app
 </script>
 {% if debug %}
-<script data-main="{% static "javascript/base/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
+<script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>
 {% else %}
 <script  src="{% static "javascript/lib/require-min.js" %}"></script>
-<script src="{% static "javascript/base/main-built.js" %}"></script>
+<script src="{% static "javascript/main-built.js" %}"></script>
 {% endif %}
 {% endblock %}
 {% block main %}

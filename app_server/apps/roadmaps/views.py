@@ -319,7 +319,7 @@ def list(request):
 
 def list_by_user(request, in_username):
     try:
-        user = User.objects.get(username__exact=username)
+        user = User.objects.get(username__exact=in_username)
     except User.DoesNotExist:
         return HttpResponse(status=404)
 

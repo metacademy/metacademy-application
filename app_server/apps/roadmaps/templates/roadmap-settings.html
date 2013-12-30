@@ -1,0 +1,31 @@
+{% extends "roadmap-edit.html" %}
+{% load staticfiles %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/roadmap.css" %}" />
+<!-- TODO hack -->
+<style>
+.buttons {
+text-align: right;
+  margin-right: 12.5em;
+}
+</style>
+{% endblock %}
+
+{% block jscript-extend %}
+{% endblock %}
+
+{% block form-content %}
+{% include "settings-form-tidbit.html" %}
+<div class="buttons">
+  <input id="submit-button" type="submit" value="{% block form-submit-button-value %}Save{% endblock %}" onclick="this.disabled = true; this.form.submit();"/>
+</div>
+<div class="dev-note">
+  <p>
+    Additional settings options will be made available here soon (e.g. adding additional editors).
+  </p>
+  <p>
+    <a href="http://metacademy.org/feedback">Contact us</a> if you'd like to see any additional functionality here.
+  </p>
+</div>
+{% endblock %}

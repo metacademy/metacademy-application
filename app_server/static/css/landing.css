@@ -36,18 +36,6 @@
     display: inline-block;
 }
 
-.dev-note{
-    margin-top: 2em;
-    line-height: 1.2em;
-    font-size: 0.9em;
-    text-align: center;
-    font-style: italic;
-    color: #512161;
-}
-
-.dev-note p{
-    padding: 0.1em 0.7em;
-}
 
 @media only screen and (max-width: 767px){
     #main-search-input{
@@ -64,11 +52,4 @@
     #main-search-logo{
         width: 310px;
     }
-    div.dev-note{
-        margin-top: 3em;
-    }
-    .dev-note p{
-        margin-top: 1em;
-    }
-    
 }

@@ -126,7 +126,7 @@ td {
     background-color: #eeeeee;
 }
 
-.edit #source-nav, .view #read-nav, .history #history-nav{
+.edit #source-nav, .view #read-nav, .history #history-nav, .settings #settings-nav{
     background-color: #333;
     color: white;
     cursor: default;
@@ -235,10 +235,8 @@ a.external-link{
 }
 
 .form-wrapper {
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 2em;
+    width: 75%;
+    margin: 2em 12.5%;
     padding-bottom: 3em;
 }
 
@@ -268,7 +266,7 @@ a.external-link{
     font-size: 0.9em;
     font-weight: bold;
     color: #333;
-    width: 20%;
+    width: 15%;
     float: left;
     margin-top: 0.5em;
     text-align: right;

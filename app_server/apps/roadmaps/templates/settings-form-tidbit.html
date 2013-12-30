@@ -1,0 +1,27 @@
+{% if settings_form.errors %}
+<div class="form-errors">
+	{% for key, value in settings_form.errors.items %}
+	<p>
+	  {{ value }}
+	</p>
+	{% endfor %}
+</div>
+{% endif %}
+<div id="settings-form">
+  <div class="form-field">
+    {{ settings_form.url_tag.label_tag }}
+    {{ settings_form.url_tag }}
+  </div>
+  <div class="form-field">
+    {{ settings_form.owners.label_tag }}
+    {{ settings_form.owners }}
+  </div>
+  <div class="form-field">
+    {{ settings_form.editors.label_tag }}
+    {{ settings_form.editors }}
+  </div>
+  <div class="form-field">
+    {{ settings_form.listed_in_main.label_tag }}
+    {{ settings_form.listed_in_main }}
+  </div>
+</div>

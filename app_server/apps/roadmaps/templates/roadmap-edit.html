@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block extra-css %}
-<link rel="stylesheet" href="{% static "css/roadmap.css" %}"> </rel>
+<link rel="stylesheet" href="{% static "css/roadmap.css" %}" />
 <link rel="stylesheet" href="{% static "css/lib/colorbox.css" %}" media="screen" />
 <link rel="stylesheet" href="{% static "css/roadmap-markdown-editor.css" %}" />
 {% endblock %}
@@ -14,7 +14,6 @@
 {% endblock %}
 
 {% block roadmap-content %}
-
 
 <div class="form-wrapper">
   {% if not can_edit %}
@@ -59,33 +58,7 @@
     </div>
 
     {% block settings-form %}
-    {% if settings_form.errors %}
-	  <div class="form-errors">
-	    {% for key, value in settings_form.errors.items %}
-	    <p>
-	      {{ value }}
-	    </p>
-	    {% endfor %}
-	  </div>
-    {% endif %}
-    <div id="settings-form">
-        <div class="form-field">
-          {{ settings_form.url_tag.label_tag }}
-          {{ settings_form.url_tag }}
-        </div>
-        <div class="form-field">
-          {{ settings_form.owners.label_tag }}
-          {{ settings_form.owners }}
-        </div>
-        <div class="form-field">
-          {{ settings_form.editors.label_tag }}
-          {{ settings_form.editors }}
-        </div>
-        <div class="form-field">
-          {{ settings_form.listed_in_main.label_tag }}
-          {{ settings_form.listed_in_main }}
-        </div>
-    </div>
+    {% include "settings-form-tidbit.html" %}
     {% endblock %}
 
     <div class="body-button-wrapper">

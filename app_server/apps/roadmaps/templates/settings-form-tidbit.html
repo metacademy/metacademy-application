@@ -24,4 +24,11 @@
     {{ settings_form.listed_in_main.label_tag }}
     {{ settings_form.listed_in_main }}
   </div>
+  {% if user.is_superuser %}
+  <div class="form-field">
+    {{ settings_form.sudo_listed_in_main.label_tag }}
+    {{ settings_form.sudo_listed_in_main }}
+  </div>
+  {% endif %}
+
 </div>

@@ -1,5 +1,3 @@
-import pdb
-
 import collections
 import os
 from operator import attrgetter
@@ -17,7 +15,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from apps.cserver_comm import cserver_communicator as cscomm
@@ -86,9 +83,9 @@ def markdown_to_html(markdown_text):
     return bleach.linkify(html, callbacks=[process_link])
 
 # todo a class-based view will simplify this
-def show(request, username, tag, vnum=-1):
+def show(request, in_username, tag, vnum=-1):
     try:
-        rm_dict = get_roadmap_objs(username, tag)
+        rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
     roadmap = rm_dict["roadmap"]
@@ -101,7 +98,7 @@ def show(request, username, tag, vnum=-1):
     if num_versions > vnum >= 0 :
         roadmap = versions[vnum].object_version.object
 
-    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, tag)
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
 
     return render(request, 'roadmap.html', dict({
         'body_html': markdown_to_html(roadmap.body),
@@ -109,9 +106,9 @@ def show(request, username, tag, vnum=-1):
         'page_class': "view"
         }, **common_rm_dict))
 
-def show_history(request, username, tag):
+def show_history(request, in_username, tag):
     try:
-        rm_dict = get_roadmap_objs(username, tag)
+        rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
     roadmap = rm_dict["roadmap"]
@@ -120,7 +117,7 @@ def show_history(request, username, tag):
     cur_version_num = roadmap.version_num
 
     revs = get_versions_obj(roadmap)[::-1]
-    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, tag)
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
     return render(request, 'roadmap-history.html',
                   dict({"revs": revs,
                         'page_class': "history",
@@ -128,7 +125,7 @@ def show_history(request, username, tag):
                     }, **common_rm_dict))
 
 @csrf_exempt
-def update_to_revision(request, username, tag, vnum):
+def update_to_revision(request, in_username, tag, vnum):
     """
     update the given roadmap to the specified reversion number (simply copies over the previous entry)
     """
@@ -137,7 +134,7 @@ def update_to_revision(request, username, tag, vnum):
         return HttpResponse(status=403)
 
     try:
-        rm_dict = get_roadmap_objs(username, tag)
+        rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
     roadmap = rm_dict["roadmap"]
@@ -162,9 +159,9 @@ def get_versions_obj(obj):
     return reversion.get_for_object(obj).order_by("id")
 
 @transaction.atomic
-def edit(request, username, tag):
+def edit(request, in_username, tag):
     try:
-        rm_dict = get_roadmap_objs(username, tag)
+        rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
     roadmap = rm_dict["roadmap"]
@@ -189,28 +186,28 @@ def edit(request, username, tag):
                 reversion.set_user(request.user)
                 reversion.set_comment(form.cleaned_data['commit_msg'])
 
-            return HttpResponseRedirect('/roadmaps/%s/%s' % (username, tag))
+            return HttpResponseRedirect('/roadmaps/%s/%s' % (in_username, tag))
 
     elif request.method == 'GET':
         form = RoadmapForm(instance=roadmap)
     else:
         return HttpResponse(status=403)
 
-    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, tag)
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
 
     return render(request, 'roadmap-edit.html', dict({
         'form': form,
         'page_class': "edit",
         }, **common_rm_dict))
 
-def settings(request, username, tag):
+def settings(request, in_username, tag):
     # check that the user is logged in
     if not request.user.is_authenticated() or is_lazy_user(request.user):
         return HttpResponseRedirect(reverse("user:login"))
 
     # get the roadmap and settings
     try:
-        rm_dict = get_roadmap_objs(username, tag)
+        rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
     roadmap = rm_dict["roadmap"]
@@ -222,15 +219,20 @@ def settings(request, username, tag):
 
     if request.method == 'POST':
         form = RoadmapSettingsForm(request.POST, instance=roadmap_settings)
+        rms_sudo_listed_in_main = roadmap_settings.sudo_listed_in_main
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/roadmaps/%s/%s' % (username, form.data['url_tag']))
+            rs = form.save(commit=False)
+            if not request.user.is_superuser:
+                rs.sudo_listed_in_main = rms_sudo_listed_in_main
+            rs.save()
+
+            return HttpResponseRedirect('/roadmaps/%s/%s' % (in_username, form.data['url_tag']))
     elif request.method == 'GET':
         form = RoadmapSettingsForm(instance=roadmap_settings)
     else:
         return HttpResponse(status=403)
 
-    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, tag)
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
 
     return render(request, 'roadmap-settings.html', dict({
         'settings_form': form,
@@ -246,12 +248,17 @@ def new(request):
     if request.method == 'POST':
         form = RoadmapForm(request.POST)
         settings_form = RoadmapSettingsForm(request.POST)
+
         if form.is_valid() and settings_form.is_valid():
             with reversion.create_revision():
                 roadmap = form.save(commit=False)
                 roadmap.save()
                 reversion.set_user(request.user)
+
             rms = settings_form.save(commit=False)
+            if not request.user.is_superuser:
+                rms.sudo_listed_in_main = models.RoadmapSettings._meta.get_field_by_name('sudo_listed_in_main')[0].default # TODO hack
+
             rms.roadmap = roadmap
             prof = request.user.profile
             rms.creator = prof
@@ -310,7 +317,7 @@ def list(request):
         'empty_message': 'Nobody has made any roadmaps yet.'
         })
 
-def list_by_user(request, username):
+def list_by_user(request, in_username):
     try:
         user = User.objects.get(username__exact=username)
     except User.DoesNotExist:
@@ -320,7 +327,7 @@ def list_by_user(request, username):
     roadmaps = [rs.roadmap for rs in roadmaps_setting if rs.is_listed_in_main()]
     roadmaps.sort(key=attrgetter("title"))
 
-    include_create = request.user.is_authenticated() and request.user.username == username
+    include_create = request.user.is_authenticated() and request.user.username == in_username
 
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
@@ -328,13 +335,12 @@ def list_by_user(request, username):
         'empty_message': 'This user has not made any public roadmaps.'
         })
 
-def get_common_roadmap_dict(roadmap, roadmap_settings, user, tag):
-    username = user.username
-    base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
+def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
+    base_url = '/roadmaps/%s/%s' % (rm_username, tag) # TODO remove hardcoding
     return {
         'roadmap': roadmap,
         'roadmap_settings': roadmap_settings,
-        'username': username,
+        'username': rm_username,
         'tag': tag,
         'edit_url': base_url + "/edit",
         'base_url': base_url,

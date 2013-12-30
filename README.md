@@ -76,6 +76,12 @@ We recommend using a virtual environment if you will be developing for the metac
         python app_server/manage.py syncdb # you'll be prompted to create an admin account -- simply follow the instructions
         
         python app_server/manage.py migrate
+        
+1. clone the kmap library
+        
+        git clone https://github.com/cjrd/kmap.git app_server/static/lib/kmap
+
+1. start the servers
 
         ./run_test_servers.sh
         

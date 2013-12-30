@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -8,15 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'RoadmapSettings.listed_in_main'
-        db.add_column(u'roadmaps_roadmapsettings', 'listed_in_main',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
+        # Adding M2M table for field owners on 'RoadmapSettings'
+        m2m_table_name = db.shorten_name(u'roadmaps_roadmapsettings_owners')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('roadmapsettings', models.ForeignKey(orm[u'roadmaps.roadmapsettings'], null=False)),
+            ('profile', models.ForeignKey(orm[u'user_management.profile'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['roadmapsettings_id', 'profile_id'])
+
+        # Adding M2M table for field editors on 'RoadmapSettings'
+        m2m_table_name = db.shorten_name(u'roadmaps_roadmapsettings_editors')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('roadmapsettings', models.ForeignKey(orm[u'roadmaps.roadmapsettings'], null=False)),
+            ('profile', models.ForeignKey(orm[u'user_management.profile'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['roadmapsettings_id', 'profile_id'])
 
 
     def backwards(self, orm):
-        # Deleting field 'RoadmapSettings.listed_in_main'
-        db.delete_column(u'roadmaps_roadmapsettings', 'listed_in_main')
+        # Removing M2M table for field owners on 'RoadmapSettings'
+        db.delete_table(db.shorten_name(u'roadmaps_roadmapsettings_owners'))
+
+        # Removing M2M table for field editors on 'RoadmapSettings'
+        db.delete_table(db.shorten_name(u'roadmaps_roadmapsettings_editors'))
 
 
     models = {
@@ -68,12 +84,17 @@ class Migration(SchemaMigration):
         },
         u'roadmaps.roadmapsettings': {
             'Meta': {'unique_together': "(('creator', 'url_tag'),)", 'object_name': 'RoadmapSettings'},
-            'creator': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'roadmap_editors'", 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
+            'creator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'roadmap_creator'", 'to': u"orm['user_management.Profile']"}),
+            'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'roadmap_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'listed_in_main': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'owners': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'roadmap_owners'", 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
+            'owners': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'roadmap_owners'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
+            'published': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'roadmap': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['roadmaps.Roadmap']", 'unique': 'True', 'primary_key': 'True'}),
             'url_tag': ('django.db.models.fields.SlugField', [], {'max_length': '30'})
+        },
+        u'user_management.profile': {
+            'Meta': {'object_name': 'Profile'},
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         }
     }
 

@@ -54,6 +54,7 @@ class Concepts(models.Model):
     starred_uprofs = models.ManyToManyField(Profile, related_name="starred")
     id = models.CharField(max_length=10, unique=True, primary_key=True)
 
+# TODO delete this model
 class LearnedConcept(models.Model):
     """
     Simple class to maintain learned concepts
@@ -70,6 +71,7 @@ class LearnedConcept(models.Model):
             self.title = id_concept_dict[self.id]['title']
         return self.title
 
+# TODO delete this model
 class StarredConcept(models.Model):
     """
     Simple class to maintain starred concepts

@@ -71,7 +71,7 @@ class Migration(SchemaMigration):
 
         # User chose to not deal with backwards NULL issues for 'Roadmap.user'
         raise RuntimeError("Cannot reverse this migration. 'Roadmap.user' and its values cannot be restored.")
-        
+
         # The following code is provided here to aid in writing a correct migration        # Adding field 'Roadmap.user'
         db.add_column(u'roadmaps_roadmap', 'user',
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']),
@@ -80,7 +80,7 @@ class Migration(SchemaMigration):
 
         # User chose to not deal with backwards NULL issues for 'Roadmap.url_tag'
         raise RuntimeError("Cannot reverse this migration. 'Roadmap.url_tag' and its values cannot be restored.")
-        
+
         # The following code is provided here to aid in writing a correct migration        # Adding field 'Roadmap.url_tag'
         db.add_column(u'roadmaps_roadmap', 'url_tag',
                       self.gf('django.db.models.fields.SlugField')(max_length=30),

@@ -1,3 +1,4 @@
+import pdb
 from django.conf.urls import patterns, include, url
 # handle static files locally
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -12,9 +13,8 @@ from views import MultiSearchView, ContactView
 
 admin.autodiscover()
 
-sqs = SearchQuerySet()#.filter(visibility=Roadmap.VIS_MAIN)
+sqs = SearchQuerySet().filter(is_listed_in_main_str="True")
 search_inst = search_view_factory(view_class=MultiSearchView, searchqueryset=sqs, template='search-results.html')
-
 
 """
 Django urls handler

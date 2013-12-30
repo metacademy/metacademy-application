@@ -101,7 +101,7 @@
       <div class="buttons">
         <button id="preview-button"> Preview </button>
         {% if can_edit %}
-        <input id="submit-button" type="submit" value="Save" onclick="this.disabled = true; this.form.submit();"/>
+        <input id="submit-button" type="submit" value="{% block form-submit-button-value %}Save{% endblock %}" onclick="this.disabled = true; this.form.submit();"/>
         {% endif %}
       </div>
     </div>

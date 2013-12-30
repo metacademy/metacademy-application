@@ -23,6 +23,9 @@ Metacademy - {{ roadmap.title|escape }}
     <a href="{{ base_url }}" id="read-nav">Read</a>
     <a href="{{ edit_url }}" id="source-nav">View source</a>
     <a href="{{ history_url }}" id="history-nav">View history</a>
+    {% if can_change_settings %}
+      <a href="{{ settings_url }}" id="settings-nav">Settings</a>
+    {% endif %}
   </div>
   {% endblock %}
 </div>

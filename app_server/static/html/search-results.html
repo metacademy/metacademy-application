@@ -4,7 +4,7 @@
 {% block targetblank %}
 {% endblock %}
 
-{% block header-search %}    
+{% block header-search %}
 {% endblock %}
 
 {% block title %}
@@ -15,8 +15,7 @@
 <link rel="stylesheet" href="{% static "css/search.css" %}"> </rel>
 {% endblock %}
 
-{% block main %} 
-
+{% block main %}
 
 <div class="search-res-wrapper">
   <div class="sres-search-wrapper">
@@ -36,7 +35,7 @@
         {% for sobj in page.object_list %}
         <li class="search-res-li">
           <h3 class="search-res-title">
-            <a class="search-res-link internal-link" href="{{ sobj.object.get_absolute_url }}"> {{sobj.object.title}} </a>
+            <a class="search-res-link internal-link" href="{{ sobj.object.roadmapsettings.get_absolute_url }}"> {{sobj.object.title}} </a>
           </h3>
           <div class="search-res-description">
             <p>

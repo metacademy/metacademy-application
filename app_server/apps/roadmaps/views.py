@@ -1,3 +1,5 @@
+import pdb
+
 import os
 from operator import attrgetter
 
@@ -25,9 +27,6 @@ import models
 import settings
 
 
-
-MIT_6_438_FILE = os.path.join(settings.CLIENT_SERVER_PATH, 'static', 'text', 'mit_6_438.txt')
-
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'pre',
                         'table', 'tr', 'th', 'tbody', 'thead', 'td']
@@ -35,9 +34,6 @@ BLEACH_ATTR_WHITELIST = {
     '*': ['id', 'class'],
     'a': ['href', 'rel']
 }
-
-# temporary: list of users who can edit
-EDIT_USERS = ['rgrosse', 'cjrd']
 
 def metacademy_domains():
     return ['']
@@ -89,13 +85,13 @@ def markdown_to_html(markdown_text):
 
 # todo a class-based view will simplify this
 def show(request, username, tag, vnum=-1):
-    roadmap_settings = models.load_roadmap_settings(username, tag)
-    roadmap = roadmap_settings.roadmap # TODO correct?
-
-    if roadmap is None:
+    try:
+        roadmap_settings = models.load_roadmap_settings(username, tag)
+        roadmap = roadmap_settings.roadmap # TODO correct?
+    except:
         return HttpResponse(status=404)
 
-    if not roadmap_settings.visible_to(request.user):
+    if roadmap is None:
         return HttpResponse(status=404)
 
     vnum = int(vnum)
@@ -104,25 +100,24 @@ def show(request, username, tag, vnum=-1):
 
     if num_versions > vnum >= 0 :
         roadmap = versions[vnum].object_version.object
+
     can_edit = roadmap_settings.editable_by(request.user)
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
     history_url = base_url + "/history"
-
-    # temporary: editing disabled on server
-    if username not in EDIT_USERS:
-        can_edit = False
+    settings_url = base_url + "/settings"
 
     return render(request, 'roadmap.html', {
         'body_html': markdown_to_html(roadmap.body),
         'roadmap': roadmap,
         'roadmap_settings': roadmap_settings,
-        'show_edit_link': can_edit,
+        'can_change_settings': roadmap_settings.can_change_settings(request.user),
         'username': username,
         'tag': tag,
         'edit_url': edit_url,
         'base_url': base_url,
         'history_url': history_url,
+        'settings_url': settings_url,
         'num_versions': num_versions,
         'page_class': "view",
         })
@@ -136,13 +131,11 @@ def show_history(request, username, tag):
     cur_version_num = roadmap.version_num
     can_edit = roadmap_settings.editable_by(request.user)
 
-    if not roadmap_settings.visible_to(request.user):
-        return HttpResponse(status=404)
-
     revs = get_versions_obj(roadmap)[::-1]
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
     history_url = base_url + "/history"
+    settings_url = base_url + "/settings"
 
     return render(request, 'roadmap-history.html',
                   {"revs": revs,
@@ -151,6 +144,7 @@ def show_history(request, username, tag):
                    'edit_url': edit_url,
                    'base_url': base_url,
                    'history_url': history_url,
+                   'settings_url': settings_url,
                    'page_class': "history",
                    'roadmap': roadmap,
                    'cur_version_num':cur_version_num,
@@ -166,8 +160,11 @@ def update_to_revision(request, username, tag, vnum):
     if not request.method == "PUT":
         return HttpResponse(status=403)
 
-    roadmap_settings = models.load_roadmap_settings(username, tag)
-    roadmap = roadmap_settings.roadmap  # TODO correct?
+    try:
+        roadmap_settings = models.load_roadmap_settings(username, tag)
+        roadmap = roadmap_settings.roadmap  # TODO correct?
+    except:
+        return HttpResponse(status=404)
 
     if roadmap is None:
         return HttpResponse(status=404)
@@ -200,9 +197,6 @@ def edit(request, username, tag):
     if roadmap is None:
         return HttpResponse(status=404)
 
-    if not roadmap_settings.visible_to(request.user):
-        return HttpResponse(status=404)
-
     can_edit = roadmap_settings.editable_by(request.user)
 
     if request.method == 'POST':
@@ -230,6 +224,7 @@ def edit(request, username, tag):
     base_url = '/roadmaps/%s/%s' % (username, tag) # TODO remove hardcoding
     edit_url = base_url + "/edit"
     history_url = base_url + "/history"
+    settings_url = base_url + "/settings"
 
     return render(request, 'roadmap-edit.html', {
         'form': form,
@@ -237,6 +232,7 @@ def edit(request, username, tag):
         'edit_url': edit_url,
         'base_url': base_url,
         'history_url': history_url,
+        "settings_url": settings_url,
         'page_class': "edit",
         'roadmap': roadmap,
         'can_edit': can_edit,
@@ -255,12 +251,16 @@ def new(request):
                 roadmap.save()
                 reversion.set_user(request.user)
             rms = settings_form.save(commit=False)
-            rms.creator = request.user.profile
             rms.roadmap = roadmap
+            prof = request.user.profile
+            rms.creator = prof
+            rms.save()
+            rms.owners.add(prof)
             rms.save()
 
-
-            return HttpResponseRedirect('/roadmaps/%s/%s' % (request.user.username, settings_form.cleaned_data['url_tag']))
+            return HttpResponseRedirect('/roadmaps/%s/%s'
+                                        % (request.user.username,
+                                           settings_form.cleaned_data['url_tag']))
     else:
         try:
             initial_txt = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "templates/roadmap-instructions.txt")).read()
@@ -291,8 +291,6 @@ def preview(request):
 
     body_html = markdown_to_html(body)
 
-
-
     return render(request, 'roadmap-content.html', {
         'roadmap': roadmap,
         'body_html': safestring.mark_safe(body_html),
@@ -302,7 +300,7 @@ def preview(request):
 
 def list(request):
     roadmaps = models.Roadmap.objects.all()
-    # roadmaps = filter(lambda r: r.listed_in_main(), roadmaps)
+    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and r.roadmapsettings.is_published() , roadmaps)
     roadmaps = sorted(roadmaps, key=lambda x: x.title.lower())
 
     return render(request, 'roadmap-list.html', {
@@ -317,8 +315,8 @@ def list_by_user(request, username):
     except User.DoesNotExist:
         return HttpResponse(status=404)
 
-    # TODO FIXME
-    roadmaps = models.Roadmap.objects.filter(user__username__exact=user.username)
+    # TODO FIXME so it gets all roadmaps that the user is in the creators list for
+    roadmaps = models.RoadmapSettings.objects.filter(creator__exact=user.username)
     roadmaps = filter(lambda r: r.is_public(), roadmaps)
     roadmaps.sort(key=attrgetter("title"))
 

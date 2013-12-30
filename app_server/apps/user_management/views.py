@@ -22,9 +22,9 @@ def user_main(request):
         return redirect('/user/login?next=%s' % request.path)
 
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-    # obtain roadmaps where the user is listed as a creator
-    # TODO I think this only gets roadmaps created by that user -- allow multiple editors
-    roadmaps = [rs.roadmap for rs in uprof.roadmapsettings_set.all()]
+
+    # list roadmaps where the user is listed as an owner
+    roadmaps = [rs.roadmap for rs in uprof.roadmap_owners.all()]
 
     # obtain an array of learned concept ids for the user
     lids = [l.id for l in uprof.learned.all()]

@@ -31,7 +31,7 @@ $(info LOCAL_DBS_DIR has the value $(LOCAL_DBS_DIR))
 $(info DJANGO_DB_FILE has the value $(DJANGO_DB_FILE))
 $(info )
 
-$(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | app_server/static/lib/kmap/README* python_path
+$(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | app_server/static/lib/kmap/* python_path
 	. $(VENV_ACTIVATE); python app_server/manage.py syncdb --noinput
 	. $(VENV_ACTIVATE); python app_server/manage.py migrate
 
@@ -67,4 +67,4 @@ clean:
 	-rm -r $(LOCAL_DBS_DIR)
 
 test:
-#TODO
+	. $(VENV_ACTIVATE); . run_test_servers; python app_server/manage.py test

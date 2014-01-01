@@ -60,7 +60,11 @@ Note: the initial search may take some time to load (the backend must load the g
 
 If you have any problems with this installations, please submit an issue at [https://github.com/metacademy/metacademy-application/issues?state=open](https://github.com/metacademy/metacademy-application/issues?state=open)
 
-### Optional Dependency: Scipy
+#### Optional: create a superuser
+
+        python app_server/manage.py createsuperuser
+
+#### Optional: Scipy dependency
 Some of metacademy's ancillary functions currently depend on `scipy`. Scipy can be tricky to install (`pip install scipy` won't work unless you have all of the systems-level dependencies) so we have made it an optional dependency. Once you have scipy installed on your machine (google will help here...), link it's site-packages folder to to your virtual environment's `lib/python2.7/site-packages/` folder. On my machine, this command was:
 
         ln -s /usr/local/lib/python2.7/site-packages/scipy lib/python2.7/site-packages/

@@ -1,5 +1,4 @@
-#!/bin/bash
-.PHONY: clean
+.PHONY: clean test
 
 # obtain the absolute path to metacademy-application
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -20,6 +19,7 @@ VENV_ACTIVATE = $(VENV)/bin/activate
 
 # derived vars
 LOCAL_DBS = $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR) $(LOCAL_DBS_DIR)/$(CONTENT_INDEX_DIR) $(LOCAL_DBS_DIR)/$(APP_INDEX_DIR)
+DJANGO_DB_FILE := $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR)/django_db.sqlite
 
 # print the vars used in the makefile
 $(info BASE_DIR has the value $(BASE_DIR))
@@ -28,13 +28,15 @@ $(info VENV has the value $(VENV))
 $(info VENV_ACTIVATE has the value $(VENV_ACTIVATE))
 $(info LOCAL_DBS has the value $(LOCAL_DBS))
 $(info LOCAL_DBS_DIR has the value $(LOCAL_DBS_DIR))
+$(info DJANGO_DB_FILE has the value $(DJANGO_DB_FILE))
+$(info )
 
-app_server/static/lib/kmap/: |setup_django_dbs
-	git clone "https://github.com/cjrd/kmap.git app_server/static/lib/kmap"
+$(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | app_server/static/lib/kmap/README* python_path
+	. $(VENV_ACTIVATE); python app_server/manage.py syncdb --noinput
+	. $(VENV_ACTIVATE); python app_server/manage.py migrate
 
-setup_django_dbs: config.py app_server/settings_local.py python_path $VENV $(LOCAL_DBS)
-	python app_server/manage.py syncdb --no-input
-	python app_server/manage.py migrate
+app_server/static/lib/kmap/*:
+	git clone https://github.com/cjrd/kmap.git app_server/static/lib/kmap
 
 config.py:
 	cp config-template.py config.py
@@ -45,7 +47,6 @@ app_server/settings_local.py:
 # append the meta-app path to the virtual env PYTHONPATH
 python_path: |$VENV
 	echo 'export PYTHONPATH=$(MAKEFILE_DIR):$(PYTHONPATH)' >> $(VENV_ACTIVATE)
-	. $(VENV_ACTIVATE)
 
 $VENV: $(VENV_ACTIVATE)
 
@@ -64,5 +65,6 @@ clean:
 	-rm -r $(VENV)
 	-rm -r $(LOCAL_DBS)
 	-rm -r $(LOCAL_DBS_DIR)
-	-rm config.py
-	-rm app_server/settings_local.py
+
+test:
+#TODO

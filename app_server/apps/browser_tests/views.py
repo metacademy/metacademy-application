@@ -9,6 +9,5 @@ def show_broken_links(request):
     blinks = get_broken_links_concepts()
     return render_to_response("display-broken-links.html", {"blinks": blinks}, context_instance=RequestContext(request))
 
-@staff_member_required
 def show_btests(request):
     return render_to_response("btests.html", context_instance=RequestContext(request))

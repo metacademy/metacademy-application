@@ -1,4 +1,4 @@
-.PHONY: clean test
+.PHONY: clean test vars
 
 # obtain the absolute path to metacademy-application
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -20,16 +20,6 @@ VENV_ACTIVATE = $(VENV)/bin/activate
 # derived vars
 LOCAL_DBS = $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR) $(LOCAL_DBS_DIR)/$(CONTENT_INDEX_DIR) $(LOCAL_DBS_DIR)/$(APP_INDEX_DIR)
 DJANGO_DB_FILE := $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR)/django_db.sqlite
-
-# print the vars used in the makefile
-$(info BASE_DIR has the value $(BASE_DIR))
-$(info MAKEFILE_DIR has the value $(MAKEFILE_DIR))
-$(info VENV has the value $(VENV))
-$(info VENV_ACTIVATE has the value $(VENV_ACTIVATE))
-$(info LOCAL_DBS has the value $(LOCAL_DBS))
-$(info LOCAL_DBS_DIR has the value $(LOCAL_DBS_DIR))
-$(info DJANGO_DB_FILE has the value $(DJANGO_DB_FILE))
-$(info )
 
 $(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | app_server/static/lib/kmap/* python_path
 	. $(VENV_ACTIVATE); python app_server/manage.py syncdb --noinput
@@ -61,10 +51,32 @@ $(LOCAL_DBS): |$(LOCAL_DBS_DIR)
 $(LOCAL_DBS_DIR):
 	mkdir $(LOCAL_DBS_DIR)
 
-clean:
+node_modules/mocha-phantomjs: node_modules/phantomjs
+	npm install mocha-phantomjs
+
+node_modules/phantomjs:
+	npm install phantomjs
+
+# TODO get confirmation from user
+cleandist:
 	-rm -r $(VENV)
 	-rm -r $(LOCAL_DBS)
 	-rm -r $(LOCAL_DBS_DIR)
 
-test: $(VENV_ACTIVATE)
-	. $(VENV_ACTIVATE); python app_server/manage.py test
+clean:
+	find . -name "*.pyc" -print0 | xargs -0 rm -rf
+
+test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs
+	./Tests
+
+# print the vars used in the makefile
+
+vars:
+	$(info BASE_DIR has the value $(BASE_DIR))
+	$(info MAKEFILE_DIR has the value $(MAKEFILE_DIR))
+	$(info VENV has the value $(VENV))
+	$(info VENV_ACTIVATE has the value $(VENV_ACTIVATE))
+	$(info LOCAL_DBS has the value $(LOCAL_DBS))
+	$(info LOCAL_DBS_DIR has the value $(LOCAL_DBS_DIR))
+	$(info DJANGO_DB_FILE has the value $(DJANGO_DB_FILE))
+	$(info )

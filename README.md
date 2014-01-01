@@ -14,17 +14,21 @@ Metacademy is live at http://www.metacademy.org
 
 
 ### Preliminary requirements
-* Install python 2.7X. NB: install `python-devel` if you're using a package manager such as apt-get. The following command should print a path (if this command raises an exception, make sure that you have the `python-devel` version installed):
+* `python 2.7X`: NB: install `python-devel` if you're using a package manager such as apt-get. The following command should print a path (if this command raises an exception, make sure that you have the `python-devel` version installed):
 *
             python -c 'from distutils.sysconfig import get_makefile_filename as m; print m()'
 
-* Install [gcc](http://gcc.gnu.org) (OSX users: installing the [OSX developer tools](https://developer.apple.com/technologies/tools/) is probably the easiest way to do this). The following command should not throw an error:
+* `gcc`: Install [gcc](http://gcc.gnu.org) (OSX users: installing the [OSX developer tools](https://developer.apple.com/technologies/tools/) is probably the easiest way to do this). The following command should not throw an error:
 
         gcc -v
 
-* Install [pip](http://www.pip-installer.org/en/latest/); here are [pip's installation instructions](http://www.pip-installer.org/en/latest/installing.html). The following command should not throw an error:
+* `pip` Install [pip](http://www.pip-installer.org/en/latest/); here are [pip's installation instructions](http://www.pip-installer.org/en/latest/installing.html). The following command should not throw an error:
 
         pip -V
+
+* `node.js` (needed to run tests): Install [node](http://nodejs.org/) The following command should not throw an error:
+
+        node -v
 
 ### Mac OS X and *nix
 

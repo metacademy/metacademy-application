@@ -1,6 +1,8 @@
 // want to test parsing
 /*global define*/
-define(["gc/models/editable-graph-model"], function(EditableGraphModel){
+define(["chai", "gc/models/editable-graph-model"], function(chai, EditableGraphModel){
+
+  var should = chai.should();
 
   // initialize aux testing objects
   var graphObj,
@@ -35,8 +37,7 @@ define(["gc/models/editable-graph-model"], function(EditableGraphModel){
         note: ["You should enjoy making examples for tests"]
       };
 
-  var should = window.should,
-      it = window.it,
+      var it = window.it,
       describe = window.describe;
 
   describe('Graph Creation and Editing', function(){

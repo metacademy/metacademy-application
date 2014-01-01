@@ -1,3 +1,5 @@
+
+/*global define, describe, it*/
 define([], function(){
   describe('trivial: Array', function(){
     describe('#indexOf()', function(){

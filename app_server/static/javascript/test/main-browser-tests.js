@@ -1,3 +1,5 @@
+
+/*global require, mocha*/
 require.config({
   baseUrl: window.STATIC_PATH + "javascript",
   paths: {
@@ -8,8 +10,8 @@ require.config({
     "dagre": "lib/dagre",
     "btouch": "lib/backbone.touch",
     "sidr": "lib/jquery.sidr.min",
-    "mocha": "lib/mocha",
-    "chai": "lib/chai"
+    "chai": "lib/chai",
+    "mocha": "lib/mocha"
   },
 
   shim: {
@@ -36,21 +38,18 @@ require.config({
       }
     },
     "sidr": ["jquery"]
-  }
-
-//  urlArgs: 'bust=' + (new Date()).getTime()
+  },
+  urlArgs: 'bust=' + (new Date()).getTime()
 });
 
-require(['require', 'chai', 'mocha', 'jquery'], function(require, chai, mocha){
-
-  // Chai TODO is this needed
-  window.should = chai.should();
+require(['require', 'chai', 'mocha', 'jquery'], function(require, chai, mocha, $){
 
   require([
     'test/trivial-test',
     'test/gc/test-editable-graph'
   ], function(require) {
-    mocha.run();
+    if (window.mochaPhantomJS) { window.mochaPhantomJS.run(); }
+    else { mocha.run(); }
   });
 
 });

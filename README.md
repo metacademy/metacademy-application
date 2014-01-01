@@ -30,27 +30,39 @@ Metacademy is live at http://www.metacademy.org
 
         node -v
 
-### Mac OS X and *nix
+### Mac OSX and *nix
 
 1. create a top-level metacademy directory in a desired location, e.g. `mkdir -p ~/MyProjects/metacademy`
 1. go to the top-level metacademy directory `cd ~/MyProjects/metacademy`
-1. from your top-level metacademy directory, clone the content and the application servers:
+1. from your top-level metacademy directory, clone the application repo:
 
         git clone https://github.com/metacademy/metacademy-application.git
-
-        git clone https://github.com/metacademy/metacademy-content.git
 
 1. go to the metacademy-application directory
 
         cd metacademy-application
 
-1. install the metacademy application (note: this project uses a [virtual environment](http://www.virtualenv.org/en/latest/) for development
+1. install the metacademy application (note: this project uses a [virtual environment](http://www.virtualenv.org/en/latest/) for development):
 
         make
 
 1. verify the installation
 
         make test
+
+#### Optional: create a superuser
+
+        python app_server/manage.py createsuperuser
+
+#### Very Optional: Scipy dependency
+Some of metacademy's ancillary functions currently depend on `scipy`. Scipy can be tricky to install (`pip install scipy` won't work unless you have all of the systems-level dependencies) so we have made it an optional dependency. Once you have scipy installed on your machine (google will help here...), link it's site-packages folder to to your virtual environment's `lib/python2.7/site-packages/` folder. On my machine, this command was:
+
+        ln -s /usr/local/lib/python2.7/site-packages/scipy lib/python2.7/site-packages/
+
+
+## Execution
+
+### Mac OSX and *nix
 
 1. start the virtual environment (you must do this for each new session)
 
@@ -65,12 +77,3 @@ Metacademy is live at http://www.metacademy.org
 Note: the initial search may take some time to load (the backend must load the graph into memory), but all subsequent pages should load much quicker.
 
 If you have any problems with this installations, please submit an issue at [https://github.com/metacademy/metacademy-application/issues?state=open](https://github.com/metacademy/metacademy-application/issues?state=open)
-
-#### Optional: create a superuser
-
-        python app_server/manage.py createsuperuser
-
-#### Optional: Scipy dependency
-Some of metacademy's ancillary functions currently depend on `scipy`. Scipy can be tricky to install (`pip install scipy` won't work unless you have all of the systems-level dependencies) so we have made it an optional dependency. Once you have scipy installed on your machine (google will help here...), link it's site-packages folder to to your virtual environment's `lib/python2.7/site-packages/` folder. On my machine, this command was:
-
-        ln -s /usr/local/lib/python2.7/site-packages/scipy lib/python2.7/site-packages/

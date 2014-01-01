@@ -29,17 +29,15 @@ class TestUserManagementViews(TestCase):
             lc, created = Concepts.objects.get_or_create(id=learned_concept_id)
             lc.learned_uprofs.add(self.prof)
 
-        # TODO this depends on the content server =\ -- not goof for testing
+        # check the /user page before authentication
+        resp = self.client.get(reverse('user:user_main'))
+        self.assertEqual(resp.status_code, 302) # should return a redirect
 
-        # # check the /user page before authentication
-        # resp = self.client.get(reverse('user:user_main'))
-        # self.assertEqual(resp.status_code, 302) # should return a redirect
-
-        # # login
-        # self.client.login(username=testuser, password=testpw)
-        # resp = self.client.get(reverse('user:user_main'))
-        # # should not redirect
-        # self.assertEqual(resp.status_code, 200)
-        # # learned concepts should contain the added concepts
-        # self.assertEqual(set([lc['id'] for lc in
-        #                       resp.context['lconcepts']]), set(learned_concepts))
+        # login
+        self.client.login(username=testuser, password=testpw)
+        resp = self.client.get(reverse('user:user_main'))
+        # should not redirect
+        self.assertEqual(resp.status_code, 200)
+        # learned concepts should contain the added concepts
+        self.assertEqual(set([lc['id'] for lc in
+                              resp.context['lconcepts']]), set(learned_concepts))

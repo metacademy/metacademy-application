@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # set the env
 source ../meta_venv/bin/activate

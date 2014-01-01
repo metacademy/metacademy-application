@@ -67,7 +67,7 @@ clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf
 
 test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs
-	./Tests
+	./Tests.sh
 
 # print the vars used in the makefile
 

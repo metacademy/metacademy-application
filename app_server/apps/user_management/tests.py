@@ -9,9 +9,10 @@ from apps.user_management.models import Concepts, Profile
 from apps.user_management.views import user_main
 
 class TestUserManagementViews(TestCase):
+    # TODO divide this test into better units (user creation, saving concepts, loading concepts)
     def test_register_index(self):
         resp = self.client.get(reverse('user:register'))
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 2000)
 
     def test_user_creation_and_data_persistence(self):
         # create a user and corresponding profile

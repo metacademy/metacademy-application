@@ -67,4 +67,4 @@ clean:
 	-rm -r $(LOCAL_DBS_DIR)
 
 test: $(VENV_ACTIVATE)
-	./Tests
+	. $(VENV_ACTIVATE); python app_server/manage.py test

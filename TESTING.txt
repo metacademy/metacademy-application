@@ -1,1 +1,0 @@
-see https://github.com/agfk/knowledge-maps/wiki/Production-Build-and-Testing for testing/build instructions

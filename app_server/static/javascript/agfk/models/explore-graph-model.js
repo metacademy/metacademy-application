@@ -51,11 +51,11 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
       },
 
       url: function(){
-        var root = this.get("roots")[0] || this.fetchTag;
-        if (!root){
-          throw new Error("Must set graph root in graph-model to fetch graph data");
+        var leaf = this.get("leafs")[0] || this.fetchTag;
+        if (!leaf){
+          throw new Error("Must set graph leaf in graph-model to fetch graph data");
         }
-        return window.CONTENT_SERVER + "/dependencies?concepts=" + this.get("roots")[0];
+        return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
       },
 
       parse: function(resp, xhr){
@@ -100,7 +100,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
       },
 
       /**
-       * DFS to change the implicit learned status of the dependencies of rootTag
+       * DFS to change the implicit learned status of the dependencies of leafTag
        * TODO does not have test coverage
        */
       changeILNodesFromTag: function(){
@@ -108,17 +108,17 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         var thisGraph = this,
             nodes = thisGraph.getNodes(),
             aux = window.agfkGlobals && window.agfkGlobals.auxModel,
-            depRoots = thisGraph.get("roots");
+            depLeafs = thisGraph.get("leafs");
 
         if (!aux) return;
 
-        depRoots.forEach(function(depRoot){
-          var isShortcut = nodes.get(depRoot).get("is_shortcut"),
-              unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depRoot, isShortcut), function(tagO){return tagO.from_tag;});
+        depLeafs.forEach(function(depLeaf){
+          var isShortcut = nodes.get(depLeaf).get("is_shortcut"),
+              unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depLeaf, isShortcut), function(tagO){return tagO.from_tag;});
           nodes.each(function(node){
             if (unlearnedDepTags.indexOf(node.id) > -1){
               node.setImplicitLearnStatus(false);
-            } else if (node.id !== depRoot){
+            } else if (node.id !== depLeaf){
               node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
             }
           });

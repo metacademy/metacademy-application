@@ -49,7 +49,7 @@ define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-mo
      * Aux function to set graph data from wrapper model (TODO this function may not be necessary)
      */
     setGraphData: function(gdataObj){
-        this.get("graphData").get("aux").set("depRoot", gdataObj.depRoot);
+        this.get("graphData").get("aux").set("depLeaf", gdataObj.depRoot);
     },
 
     /**
@@ -110,7 +110,7 @@ define(["backbone", "agfk/models/explore-graph-model", "agfk/models/user-data-mo
      */
     url: function(){
       var thisModel = this,
-          depTag = thisModel.get("graphData").get("aux").get("depRoot");
+          depTag = thisModel.get("graphData").get("aux").get("depLeaf");
       // TODO post CR-Restruct handle different types of input (aggregated graphs) based on url
       ErrorHandler.assert(typeof depTag === "string", "dependency is not defined in backbone URL request");
       return window.CONTENT_SERVER + "/dependencies?concepts=" + depTag;

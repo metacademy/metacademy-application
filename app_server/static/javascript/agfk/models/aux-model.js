@@ -32,7 +32,7 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
 
     return Backbone.Model.extend({
       defaults: {
-        depRoot: undefined,
+        depLeaf: undefined,
         nodes: new NodeCollection(),
         shortcuts: new NodeCollection()
       },
@@ -68,8 +68,8 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
         return retObj;
       },
 
-      setDepRoot: function(depRoot){
-        this.set("depRoot", depRoot);
+      setDepLeaf: function(depLeaf){
+        this.set("depLeaf", depLeaf);
       },
 
       /* this should be called after the user data is initialized */

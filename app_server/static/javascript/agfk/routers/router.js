@@ -225,13 +225,13 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
         // init main app model
         if (!thisRoute.graphModel) {
-          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {roots: [nodeId]});
+          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {leafs: [nodeId]});
         }
 
         if (!thisRoute.userModel) {
           var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true});
           var aux = window.agfkGlobals.auxModel;
-          isCreating || aux.setDepRoot(nodeId);
+          isCreating || aux.setDepLeaf(nodeId);
           aux.setUserModel(userModel);
           thisRoute.userModel = userModel;
         }
@@ -268,7 +268,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
           // set the document title as the key concept
           if (!isCreating){
-            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("roots")[0]).get("title") + " - Metacademy";
+            document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("leafs")[0]).get("title") + " - Metacademy";
           } else {
             document.title = "Graph Creation - Metacademy";
           }

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.db.models import Count
 
-from apps.user_management.models import Profile
+from models import Profile, Concepts
 
 class UserProfileInline(admin.StackedInline):
     model = Profile
@@ -13,7 +13,14 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(AuthUserAdmin):
     inlines = [UserProfileInline]
 
-# class ConceptAdmin(admin.ModelAdmin):
+class ConceptsInline(admin.StackedInline):
+    model = Concepts
+    max_num = 1
+    can_delete = False
+
+class ConceptsAdmin(admin.ModelAdmin):
+    inlines = [ConceptsInline]
+
 #     list_display = ('get_title', 'show_uprofile_count',)
 #     filter_horizontal = ('uprofiles',)
 #     readonly_fields = ('get_title', 'show_uprofile_count')
@@ -24,8 +31,8 @@ class UserAdmin(AuthUserAdmin):
 
 #     def show_uprofile_count(self, inst):
 #          return inst.uprofiles_count
-    show_uprofile_count.admin_order_field = 'uprofiles_count'
+#     show_uprofile_count.admin_order_field = 'uprofiles_count'
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-#admin.site.register(Profile)
+admin.site.register(Concepts, ConceptsAdmin)

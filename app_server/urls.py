@@ -32,6 +32,7 @@ urlpatterns = patterns('',
                        url(r'^about/?$',  TemplateView.as_view(template_name='about.html')),
                        url(r'^feedback/?$',  ContactView.as_view()),
                        url(r'^thanks/?$',  TemplateView.as_view(template_name='feedback_thanks.html')),
+                       (r'^admin/doc/', include('django.contrib.admindocs.urls')),
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^browser-tests', include('apps.browser_tests.urls', namespace="btests")),
 )

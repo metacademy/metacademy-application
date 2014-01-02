@@ -208,11 +208,6 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
       return title;
     },
 
-    // TODO these methods might fit better on the node collection or aux
-    getUnlearnedUniqueDeps: function(){
-      return this.getUniqueDeps(true);
-    },
-
     /**
      * Compute the list of outlinks to be displayed in the context section
      */

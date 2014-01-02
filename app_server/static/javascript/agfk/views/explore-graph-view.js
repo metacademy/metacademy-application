@@ -249,7 +249,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
             gConsts = aux.getConsts(),
             thisModel = thisView.model;
 
-        thisView.optimizeGraphPlacement(false, false, thisView.model.get("roots")[0]);
+        thisView.optimizeGraphPlacement(false, false, thisView.model.get("leafs")[0]);
       },
 
       /**

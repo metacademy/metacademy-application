@@ -49,7 +49,6 @@ class Profile(models.Model):
         return self.user.username
 
 class Concepts(models.Model):
-
     learned_uprofs = models.ManyToManyField(Profile, related_name="learned")
     starred_uprofs = models.ManyToManyField(Profile, related_name="starred")
     id = models.CharField(max_length=10, unique=True, primary_key=True)

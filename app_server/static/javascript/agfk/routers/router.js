@@ -34,7 +34,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       lViewId: "learn-view-wrapper", // id for main learn view div
       createViewId: "gc-wrap",
       listWrapId: "concept-list-wrapper",
-      expViewId: "explore-graph-view-wrapper", // id for main explore view div
+      expViewId: "graph-view-wrapper", // id for main explore view div
       editViewId: "concept-editor-wrap",
       noContentErrorKey: "nocontent", // must also change in error-view.js
       ajaxErrorKey: "ajax", // must also change in error-view.js

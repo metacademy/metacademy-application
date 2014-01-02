@@ -6,13 +6,11 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
     var pvt = {};
     pvt.consts = _.extend(ConceptListView.prototype.getConstsClone(),
       {
-        templateId : "concept-list-template",
         elNameAppend: "-button",
         elNavButtonClass: "el-nav-button"
       });
 
     return ConceptListView.extend({
-      template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
       events: function(){
         var thisView = this,
@@ -44,22 +42,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
         if (inp !== undefined) {
           thisView.appRouter = inp.appRouter;
         }
-      },
-
-      /**
-       * @override
-       */
-      prerender: function () {
-        var thisView = this;
-        thisView.$el.html(thisView.template());
-      },
-
-      /**
-       * @override
-       */
-      postrender: function () {
-        var thisView = this;
-        thisView.$el.find("#concept-list").append(thisView.$list); // TODO move hardcoding
       },
 
       /**

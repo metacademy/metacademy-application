@@ -40,7 +40,7 @@ body {
 *** General structure of app ***
 */
 
-#explore-graph-view-wrapper{
+#graph-view-wrapper{
     height: 100%;
     width: 100%;
     display: none;

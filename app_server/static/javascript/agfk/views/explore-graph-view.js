@@ -13,7 +13,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
     // FIXME refactor these names given the names in graph-view.js, also look for unused css
     pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
       // ----- class and id names ----- //
-      viewId: "explore-graph-view", // id of view element (div by default) must change in CSS as well
+      viewId: "graph-view", // id of view element (div by default) must change in CSS as well
       exploreSvgId: "explore-svg",
       learnedClass: "learned",
       implicitLearnedClass: "implicit-learned",

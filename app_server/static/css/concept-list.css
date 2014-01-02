@@ -1,6 +1,14 @@
-#concept-list-panel .time-estimate{
+#concept-list-panel .time-estimate {
     font-size: 0.8em;
     font-style: italic;
     color: #8D5E5E;
     text-align: center;
+}
+
+#concept-title-header {
+    height: 7em;
+}
+
+#concept-list {
+    padding-top: 7em;
 }

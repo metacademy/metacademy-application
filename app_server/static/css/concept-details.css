@@ -20,29 +20,6 @@
     overflow: auto;
 }
 
-.learn-title-display{
-    text-align: center;
-    display: block;
-    cursor: pointer;
-    text-decoration: none;
-    color: #3E4018;
-    padding: 1.4em 0.5em;
-    line-height: 1.2em;
-    font-size: 0.9em;
-    border-bottom: 1px solid #CCCCCC;
-    position: relative;
-}
-.learn-title-display:hover{
-    background-color: rgb(250, 242, 248);
-}
-.learn-title-display.clicked-title{
-    /*background-color: rgb(255, 255, 249);*/
-    font-weight: bold;
-    color: #333333;
-    background-color: rgb(245, 232, 242);
-    cursor: default;
-}
-
 .node-detail-view{
    background-color: white;
    color: #23240D;

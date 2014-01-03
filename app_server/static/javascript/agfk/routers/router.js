@@ -291,7 +291,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             }
             doRender = doRender || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
             if (doRender){ // UPDATE
-              thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute});
+              thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute, includeShortestOutlink: true });
             }
             thisRoute.showView(thisRoute.expView, doRender, "#" + consts.expViewId);
             // center the graph display: flicker animation

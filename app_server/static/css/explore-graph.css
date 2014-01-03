@@ -2,13 +2,13 @@
 #explore-info-box {
     display: none;
     position: absolute;
-    bottom: 0;
+    top: 0;
     right: 0;
     font-size: 0.8em;
     text-align: center;
     background-color: #F0F0F0;
     color: rgb(143, 126, 139);
-    border-radius: 5px;
+    border-radius: 0 0 0 5px;
     padding: 0.5em;
 }
 .scoped #explore-info-box{

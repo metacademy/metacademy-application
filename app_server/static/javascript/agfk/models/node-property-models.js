@@ -38,6 +38,7 @@ define(["backbone"], function(Backbone){
         node: null,
         resource_type: "",
         free: 0,
+        requires_signup: 0,
         core: 0,
         edition: "",
         level: "",

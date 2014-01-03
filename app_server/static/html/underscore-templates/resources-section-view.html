@@ -13,6 +13,10 @@
         <h2 class="node-detail-subtitle">-Free-</h2>
         <div class="node-detail-comp-wrap free-core-resources-wrap" id="node-detail-fcresources-<%- id %>" />
       <% } %>
+      <% if (freeSignupCoreResources.length > 0) { %>
+        <h2 class="node-detail-subtitle">-Free but requires signup-</h2>
+        <div class="node-detail-comp-wrap free-signup-core-resources-wrap" id="node-detail-scresources-<%- id %>" />
+      <% } %>
       <% if (paidCoreResources.length > 0) { %>
         <h2 class="node-detail-subtitle">-Paid-</h2>
         <div class="node-detail-comp-wrap paid-core-resources-wrap" id="node-detail-pcresources-<%- id %>" />
@@ -27,6 +31,10 @@
       <% if (freeSuppResources.length > 0) { %>
         <h2 class="node-detail-subtitle">-Free-</h2>
         <div class="node-detail-comp-wrap free-supp-resources-wrap" id="node-detail-fsresources-<%- id %>" />
+      <% } %>
+      <% if (freeSignupSuppResources.length > 0) { %>
+        <h2 class="node-detail-subtitle">-Free but requires signup-</h2>
+        <div class="node-detail-comp-wrap free-signup-supp-resources-wrap" id="node-detail-ssresources-<%- id %>" />
       <% } %>
       <% if (paidSuppResources.length > 0) { %>
         <h2 class="node-detail-subtitle">-Paid-</h2>

@@ -15,7 +15,11 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
      * Returns a backbone collection of the free resources TODO does this maintain the cid correctly?
      */
     getFreeResources: function(){
-      return new ResourceCollection(this.where({free: 1}));
+      return new ResourceCollection(this.where({free: 1, requires_signup: 0}));
+    },
+
+    getFreeSignupResources: function(){
+      return new ResourceCollection(this.where({free: 1, requires_signup: 1}));
     },
 
     /**

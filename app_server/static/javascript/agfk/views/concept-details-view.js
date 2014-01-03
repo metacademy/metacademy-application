@@ -78,16 +78,20 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         var coreResources = thisView.model.getCore(),
             suppResources = thisView.model.getSupplemental(),
             fcResources = coreResources.getFreeResources(),
+            scResources = coreResources.getFreeSignupResources(),
             pcResources = coreResources.getPaidResources(),
             fsResources = suppResources.getFreeResources(),
+            ssResources = suppResources.getFreeSignupResources(),
             psResources = suppResources.getPaidResources();
 
         var tempVars = {
           'coreResources': coreResources,
           'suppResources': suppResources,
           'freeCoreResources': fcResources,
+          'freeSignupCoreResources': scResources,
           'paidCoreResources': pcResources,
           'freeSuppResources': fsResources,
+          'freeSignupSuppResources': ssResources,
           'paidSuppResources': psResources,
           'id': this.options.conceptId
         };
@@ -98,6 +102,11 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
           fcEl.append(new ResourceView({model: itm}).render().el);
         });
 
+        var scEl = thisView.$el.find(".free-signup-core-resources-wrap");
+        scResources.each(function(itm){
+          scEl.append(new ResourceView({model: itm}).render().el);
+        });
+
         var pcEl = thisView.$el.find(".paid-core-resources-wrap");
         pcResources.each(function(itm){
           pcEl.append(new ResourceView({model: itm}).render().el);
@@ -106,6 +115,11 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         var fsEl = thisView.$el.find(".free-supp-resources-wrap");
         fsResources.each(function(itm){
           fsEl.append(new ResourceView({model: itm}).render().el);
+        });
+
+        var ssEl = thisView.$el.find(".free-signup-supp-resources-wrap");
+        ssResources.each(function(itm){
+          ssEl.append(new ResourceView({model: itm}).render().el);
         });
 
         var psEl = thisView.$el.find(".paid-supp-resources-wrap");

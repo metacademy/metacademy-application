@@ -5,6 +5,12 @@
   </div>
 
   <div class="resource-content-wrap">
+    <% if (description){ %>
+      <div class="resource-description-display">
+        <span class="resource-description"> <%- description %> </span>
+      </div>
+    <% } %>
+
     <% if (location){ %>
     <div class="resource-location-display">
       <% if (edition){ %>
@@ -56,7 +62,7 @@
 </div>
 
 <div class="resource-level-display">
-  <% if (level){ %>
+  <% if (level && !description){ %>
   <span class="resource-level"> Level: <%= level %> </span>
   <% } %>
 </div>

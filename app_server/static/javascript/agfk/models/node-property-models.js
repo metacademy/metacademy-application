@@ -33,6 +33,7 @@ define(["backbone"], function(Backbone){
     defaults: function() {
       return {
         title: "",
+        description: "",
         location: "",
         url: "",
         node: null,

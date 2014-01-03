@@ -178,7 +178,7 @@ h1 .learn-view-star{
     margin-top: 0.1em;
 }
 
-.resource-location, .resource-edition, .resource-level, .resource-author, .resource-dependencies, .resource-extra, .resource-link{
+.resource-description, .resource-location, .resource-edition, .resource-level, .resource-author, .resource-dependencies, .resource-extra, .resource-link{
     font-size: 0.9em
 }
 

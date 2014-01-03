@@ -1,4 +1,4 @@
-.PHONY: clean cleandist test vars
+.PHONY: clean cleandist test vars build_production
 
 # obtain the absolute path to metacademy-application
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -73,8 +73,15 @@ clean:
 test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs
 	./Tests.sh
 
-# print the vars used in the makefile
+build_production:
+	cd app_server/static/javascript; node lib/r.js -o build.js
+	$(VENV); python app_server/manage.py collectstatic --noinput
 
+update:
+	git pull
+	cd app_server/static/lib/kmap; git pull
+
+# print the vars used in the makefile
 vars:
 	$(info BASE_DIR has the value $(BASE_DIR))
 	$(info MAKEFILE_DIR has the value $(MAKEFILE_DIR))

@@ -106,13 +106,6 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
        ******/
       // rerender when the graph model changes from server data TOMOVE
       thisView.listenTo(thisView.model, "loadedServerData", thisView.render);
-
-      d3.select(window).on("keydown",  function(){
-        thisView.windowKeyDown.call(thisView);
-      });
-      d3.select(window).on("keyup",  function(){
-        thisView.windowKeyUp.call(thisView);
-      });
     },
 
     // @override

@@ -3,12 +3,13 @@
     display: none;
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     font-size: 0.8em;
     text-align: center;
     background-color: #F0F0F0;
     color: rgb(143, 126, 139);
-    border-radius: 0 0 0 5px;
+    border-radius: 0 0 5px 0;
+    cursor: default;
     padding: 0.5em;
 }
 .scoped #explore-info-box{

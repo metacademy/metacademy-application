@@ -141,8 +141,11 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       // id of view element (div unless tagName is specified)
       id: pvt.consts.viewId,
 
-      events: {
-        "click #explore-info-box button": "handleShowAllClick"
+      events: function(){
+        var levents = {
+          "click #explore-info-box button": "handleShowAllClick"
+        };
+        return _.extend(GraphView.prototype.events, levents);
       },
 
       /**

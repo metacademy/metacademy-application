@@ -27,6 +27,11 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
         return true;
       },
 
+      postrender: function () {
+        var thisView = this;
+        thisView.$el.find("#" + pvt.consts.olId).append(thisView.$list);
+      },
+
       /**
        * @override
        */

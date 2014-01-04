@@ -46,7 +46,9 @@ require(['require', 'chai', 'mocha', 'jquery'], function(require, chai, mocha, $
 
   require([
     'test/trivial-test',
-    'test/gc/test-editable-graph'
+    'lib/kmapjs/tests/tests',
+    'agfk/tests/tests',
+    'gc/tests/tests'
   ], function(require) {
     if (window.mochaPhantomJS) { window.mochaPhantomJS.run(); }
     else { mocha.run(); }

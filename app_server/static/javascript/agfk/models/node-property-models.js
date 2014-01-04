@@ -46,8 +46,31 @@ define(["backbone"], function(Backbone){
         authors: [],
         dependencies: [],
         extra: [],
-        note: []
+        note: [],
+        year: "",
+        edition_years: [],
       };
+    },
+
+    getYearString: function() {
+      if (this.get("year")) {
+        return this.get("year");
+      }
+
+      var edYears = this.get("edition_years"), ed = parseInt(this.get("edition"));
+      if (edYears && ed && 1 <= ed && ed <= edYears.length) {
+        if (edYears.length >= 2) {
+          return "edition " + ed + ", " + edYears[ed-1];
+        } else {
+          return edYears[ed-1];
+        }
+      }
+
+      if (this.get("edition")) {
+        return "edition " + this.get("edition");
+      }
+
+      return "";
     }
   });
 

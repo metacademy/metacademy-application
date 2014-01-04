@@ -1,7 +1,8 @@
 <script type="text/template" id="resource-view-template">
   <div class="resource-title-display">
     <% var titleDisp = title ? title : "-no title-" %>
-    <span class="res-arrow">→ </span><%= titleDisp %>
+    <% var yearDisp = yearString ? "(" + yearString + ")" : "" %>
+    <span class="res-arrow">→ </span><%= titleDisp %> <%- yearDisp %>
   </div>
 
   <div class="resource-content-wrap">
@@ -13,11 +14,7 @@
 
     <% if (location){ %>
     <div class="resource-location-display">
-      <% if (edition){ %>
-      <span class="resource-location"> Location (edition <%- edition %>): </span>
-      <% } else { %>
       <span class="resource-location"> Location: </span>
-      <% } %>
 
       <% if (location.length === 1){ %>
       <% if (location[0].link) { %>

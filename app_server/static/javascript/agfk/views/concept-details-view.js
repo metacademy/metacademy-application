@@ -37,7 +37,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
        */
       render: function(){
         var thisView = this;
-        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH});
+        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH,
+                                                      yearString: this.model.getYearString()});
         thisView.$el.html(thisView.template(temp));
         return thisView;
       },

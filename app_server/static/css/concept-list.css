@@ -5,10 +5,10 @@
     text-align: center;
 }
 
-#concept-title-header {
-    height: 7em;
+#concept-list-wrapper {
+    top: 7em;
 }
 
-#concept-list {
-    padding-top: 7em;
+#concept-title-header {
+    height: 7em;
 }

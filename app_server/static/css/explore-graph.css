@@ -62,20 +62,20 @@ node icons
     stroke-width: 4;
     visibility: hidden;
 }
-.concept-g .checkmark circle{
+.concept-g .checkmark > circle{
     fill: transparent;
     stroke: #868686;
     stroke-width: 3;
     visibility: hidden;
 }
-.concept-g .learned .checkmark circle{
+.concept-g .learned .checkmark > circle{
     fill: transparent;
     stroke: #759466;
     stroke-width: 4;
     visibility: visible;
 }
 
-.concept-g .checkmark.hovered circle{
+.concept-g .checkmark.hovered > circle{
     fill: transparent;
     stroke: #9987AF;
     stroke-width: 4;
@@ -88,7 +88,7 @@ node icons
     visibility: visible;
 }
 
-.concept-g.learned .checkmark circle{
+.concept-g.learned .checkmark > circle{
     visibility: visible;
     stroke: #759466;
     stroke-width: 4;
@@ -133,86 +133,4 @@ node icons
 .e-to-l-icon:hover{
     opacity: 1;
     cursor: pointer;
-}
-
-
-/* Summary hover element */
-
-.summary-text {
-    padding: 0.4em 0.7em;
-    color: #3E4018;
-    background-color: white;
-    border: solid;
-    border-width: 4px;
-    border-color: #493A5C;
-    overflow: auto;
-    font-size: 1em;
-    line-height: 1.4em;
-    max-height: 12em;
-    min-height: 4em;
-    border-radius: 0.7em 0.7em;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
-    -ms-box-sizing: border-box; /* IE */
-    box-sizing: border-box;
-}
-
-.summary-text p{
-    display: inline;
-}
-
-.summary-wrap{
-    position: absolute;
-}
-/* creates the larger triangle that points to the right > */
-.summary-wrap.tright:before {
-    content: "";
-    border: solid;
-    border-width: 16px 0 16px 32px;
-    border-color: transparent #493A5C; /*#493A5C;*/
-    position: absolute;
-    top: 20px;
-    right: -28px ; /* value = - triangle width + border-right-width */
-    display: block;
-    width:0;
-    -moz-transform: scale(.9999);
-}
-/* creates the smaller  triangle that points to the right > */
-.summary-wrap.tright:after {
-    content: "";
-    border-style: solid;
-    border-width: 12px 0 12px 24px; /* larger triangle - border width */
-    border-color: transparent white;
-    position: absolute;
-    top: 24px; /* position of larger triangle + border width */
-    right: -20px; /* value = - small triangle width + border-right-width */
-    display: block;
-    width: 0;
-    -moz-transform: scale(.9999);
-}
-/* creates the larger triangle that points to the left < */
-.summary-wrap.tleft:before {
-    content: "";
-    border: solid;
-    border-width: 16px 32px 16px 0;
-    border-color: transparent #493A5C; /*#493A5C;*/
-    position: absolute;
-    top: 20px;
-    left: -28px ; /* value = - triangle width + border-left-width */
-    display: block;
-    width: 0;
-    -moz-transform: scale(.9999);
-}
-/* creates the smaller  triangle that points to the left <*/
-.summary-wrap.tleft:after {
-    content: "";
-    border-style: solid;
-    border-width: 12px 24px 12px 0; /* larger triangle - border width */
-    border-color: transparent white;
-    position: absolute;
-    top: 24px; /* position of larger triangle + border width */
-    left: -20px; /* value = - small triangle width + border-left-width */
-    display: block;
-    width: 0;
-    -moz-transform: scale(.9999);
 }

@@ -20,7 +20,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
     // constants
     pvt.consts = {
-      createName: "create", // /graphs/create <- url defines this value
+      createName: "new", // /graphs/create <- url defines this value
       qViewMode: "mode",
       qFocusConcept: "focus",
       pExploreMode: "explore",
@@ -40,7 +40,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       ajaxErrorKey: "ajax", // must also change in error-view.js
       unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
     };
-
 
     // return public object
     return Backbone.Router.extend({

@@ -162,9 +162,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       render: function(){
         var thisView = this,
             thisModel = thisView.model;
-        // TODO this seems awkward
         thisView.$el.html(thisView.template(thisModel.toJSON()));
-        // _.extend(thisModel.toJSON(),                                                     {fromTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("from_tag"))})));
         return thisView;
       }
 
@@ -269,7 +267,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.delegateEvents();
         return thisView;
       }
-
     });
   })();
 
@@ -302,8 +299,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       }
       return result;
     };
-
-
 
     // return public object
     return Backbone.View.extend({

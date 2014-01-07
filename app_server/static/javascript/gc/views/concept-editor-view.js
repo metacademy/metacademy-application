@@ -1,39 +1,55 @@
 /*global define*/
-define(["backbone", "underscore"], function(Backbone, _){
+define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/node-property-models"], function(Backbone, _, ResourceEditorView, NodePropModels){
 
-  var ConceptEditorView = (function(){
+  return (function(){
     var pvt = {};
     pvt.state = {
       visId: ""
     };
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "full-screen-content-editor",
-      contentItemClass: "ec-display-wrap"
+      contentItemClass: "ec-display-wrap",
+      resourcesTidbitWrapId: "resources-tidbit-wrap"
     };
 
     return Backbone.View.extend({
-      template: _.template(document.getElementById(pvt.viewConsts.templateId).innerHTML),
+      template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
       events: {
         "blur .title-input": "changeTitleInput",
         "blur .ec-display-wrap > textarea": "changeTextField",
         "blur input.dep-reason": "changeDepReason",
-        "click .ec-tabs button": "changeDisplayedSection"
+        "click .ec-tabs button": "changeDisplayedSection",
+        "click #add-resource-button": "addResource"
       },
 
       render: function(){
-        var thisView = this;
+        var thisView = this,
+            consts = pvt.consts;
         pvt.state.visId = pvt.state.visId || "summary";
         thisView.isRendered = false;
 
         // use attributes since toJSON changes the structure
         thisView.$el.html(thisView.template(thisView.model.attributes));
+
+        // add the resources (they're the tricky part)
+        thisView.model.get("resources").each(function (res) {
+          var rev = new ResourceEditorView({model: res});
+          thisView.$el.find("#" + consts.resourcesTidbitWrapId).append(rev.render().$el);
+        });
+
         pvt.state.rendered = true;
 
         thisView.$el.find("#" + pvt.state.visId).addClass("active");
         thisView.$el.find("#btn-" + pvt.state.visId).addClass("active");
         thisView.isRendered = true;
         return thisView;
+      },
+
+      addResource: function () {
+        var thisView = this;
+        thisView.model.get("resources").add(new NodePropModels.Resource(), {at: 0});
+        thisView.render();
       },
 
       changeDisplayedSection: function(evt){
@@ -66,6 +82,4 @@ define(["backbone", "underscore"], function(Backbone, _){
 
     });
   })();
-
-  return ConceptEditorView;
 });

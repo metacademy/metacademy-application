@@ -101,6 +101,13 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       thisView.newCircleTransDelay= 0;  // trans delay for new circles
       thisView.newCircleTransTime= 0; // trans fade-in time for new circles
 
+      // change vis settings
+      var settings = {};
+      settings.useWisps = false;
+      settings.showEdgeSummary = false;
+      settings.showNodeSummary = false;
+      thisView.settings = settings;
+
       /******
        * Setup=d3; based event listeners
        ******/

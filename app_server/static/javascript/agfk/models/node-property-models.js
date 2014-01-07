@@ -14,10 +14,14 @@ define(["backbone"], function(Backbone){
      */
     defaults: function () {
       return {
-        text: "",
-        node: null
+        text: ""
       };
+    },
+
+    toText: function () {
+      return this.get("text");
     }
+
   });
 
 
@@ -34,9 +38,8 @@ define(["backbone"], function(Backbone){
       return {
         title: "",
         description: "",
-        location: "",
+        location: [],
         url: "",
-        node: null,
         resource_type: "",
         free: 0,
         requires_signup: 0,
@@ -48,8 +51,24 @@ define(["backbone"], function(Backbone){
         extra: [],
         note: [],
         year: "",
-        edition_years: [],
+        edition_years: []
       };
+    },
+
+    getLocationString: function () {
+      var retArr = [];
+      this.get("location").forEach(function (itm) {
+        if (itm.link) {
+          retArr.push(itm.text + " [" + itm.link + "]");
+        } else {
+          retArr.push(itm.text);
+        }
+      });
+      return retArr.join("\n");
+    },
+
+    getAuthorsString: function () {
+      return this.get("authors").join(" and ");
     },
 
     getYearString: function() {

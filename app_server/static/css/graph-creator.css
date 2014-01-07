@@ -217,3 +217,39 @@ g.connect-node circle{
 .dep-entry input{
     width: 70%;
 }
+
+.resource-form{
+    border: 2px solid #B4ADAD;
+    border-radius: 4px;
+    padding: 1em;
+    text-align: left;
+}
+.resource-form label{
+    margin-left: 15%;
+    font-size: 0.9em;
+    font-weight: bold;
+    display: block;
+}
+.resource-form + .resource-form{
+    margin-top: 2em;
+}
+
+.resource-form input{
+    margin-left: 15%;
+    display: block;
+    margin-bottom: 1.5em;
+}
+.resource-form input[type="radio"]{
+    display: inline;
+}
+
+.resource-form textarea{
+    height: 5em;
+}
+
+.resource-form input[type="text"], .resource-form textarea{
+    width: 70%;
+    line-height: 1.4em;
+    display: block;
+    margin: 0 auto 1.5em auto;
+}

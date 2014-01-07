@@ -27,7 +27,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       pLearnMode: "learn",
       pEditMode: "edit",
       colorboxWidth: "80%",
-      colorboxHeight: "75%",
+      colorboxHeight: "95%",
       pCreateMode: "create",
       leftPanelId: "leftpanel,",
       rightPanelId: "rightpanel",

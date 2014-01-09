@@ -22,8 +22,7 @@ $path2 = "$projectDir\lib\site-packages\Pillow-2.3.0-cp27-none-win32.whl"
 cd "$projectDir\lib\site-packages"
 easy_install numpy-1.7.1.win32-py2.7.exe
 pip install --use-wheel Pillow-2.3.0-cp27-none-win32.whl
-cd "$baseDir\windows"
-#If you're behind a proxy, it re-write look like this instead: pip install -r requirements.txt --proxy http://proxyaddress:proxyport
+(Get-Content "$baseDir\requirements.txt") -notmatch "numpy|pillow" | Set-Content "$projectDir\lib\site-packages\requirements.txt"
 pip install -r requirements.txt
 cd "$baseDir"
 git clone https://github.com/cjrd/kmap.git app_server/static/lib/kmap

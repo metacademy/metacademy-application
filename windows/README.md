@@ -7,7 +7,7 @@ This file describes installation on a modern Windows OS (This process was tested
 1. Install Git for Windows if you haven't already, and make sure that you include command-line execution http://msysgit.github.io
 
 1. Install Python 2.7X for Windows to C:\Python27 (or another directory if desired- just change the fitems below to match) http://www.python.org/getit/
-    > Note: Using a 32-bit Python build is the most reliable way to get a working installation on Windows with NumPy / Django.
+    > Note: Using a 32-bit Python build is the most reliable way to get a working installation on Windows with NumPy / Django. 
 
 1. Install NodeJS for Windows http://nodejs.org/
 
@@ -65,13 +65,10 @@ if you're unfamiliar with setting paths in windows.
 
         cd metacademy-application
 
-1. Run the powershell script; for a 32-bit build (recommended) run:
+1. Run the powershell script:
 
         ./Windows/win32build.ps1
 
-    or if you want to work with a 64-bit build (expiremental) run:
-
-        ./Windows/win64build.ps1
 
 1. After the build process is complete, run:
 

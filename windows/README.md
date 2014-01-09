@@ -7,7 +7,7 @@ This file describes installation on a modern Windows OS (This process was tested
 1. Install Git for Windows if you haven't already, and make sure that you include command-line execution http://msysgit.github.io
 
 1. Install Python 2.7X for Windows to C:\Python27 (or another directory if desired- just change the fitems below to match) http://www.python.org/getit/
-    > Note: Using a 32-bit Python build is the most reliable way to get a working installation on Windows with NumPy / Django. 
+    > Note: Using a 32-bit Python build is the most reliable way to get a working installation on Windows with NumPy / Django.
 
 1. Install NodeJS for Windows http://nodejs.org/
 
@@ -37,6 +37,12 @@ if you're unfamiliar with setting paths in windows.
 
         pip install wheel
 
+    >Note: If you are behindy a proxy, you'll need to define that proxy for pip. To set the proxy globally (so you don't have to pass the proxy option each time pip is called) make a pip.ini file in the directory  \`~\pip` with the following contents:
+
+    >>[global]
+    >>
+    >>proxy = http://proxyaddress:proxyport
+
 1. Make sure that you can execute unsigned scripts; the following should return  `RemoteSigned`, `Unrestricted`, or `Bypass`:
 
         Get-ExecutionPolicy
@@ -55,24 +61,24 @@ if you're unfamiliar with setting paths in windows.
 
 1. Now, make a top level directory for Metacademy, and then cd to your new dirctory in powershell:
 
-        mkdir  `~/MyProjects/metacademy`
+        mkdir  `~\MyProjects\metacademy`
 
-        cd `~/MyProjects/metacademy`
+        cd `~\MyProjects\metacademy`
 
 1. Get the git repository and the cd to the directory:
 
         git clone https://github.com/metacademy/metacademy-application.git
 
-        cd metacademy-application
+        cd metacademy-application\windows
 
 1. Run the powershell script:
 
-        ./Windows/win32build.ps1
+        .\win32build.ps1
 
 
 1. After the build process is complete, run:
 
-        ./run_test_servers.sh
+        .\run_test_servers.sh
 
     Open a modern web browser and navigate to http://127.0.0.1:8080 to verify the installation.
 

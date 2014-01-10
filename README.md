@@ -30,6 +30,8 @@ Metacademy is live at http://www.metacademy.org
 
         node -v
 
+>   Note: For Windows installation/requirements, please see the readme located in [/windows](/windows)
+
 ### Mac OSX and *nix
 
 1. create a top-level metacademy directory in a desired location, e.g. `mkdir -p ~/MyProjects/metacademy`

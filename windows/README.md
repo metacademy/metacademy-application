@@ -74,7 +74,8 @@ if you're unfamiliar with setting paths in windows.
 1. Run the powershell script:
 
         .\win32build.ps1
-
+        
+    > Note: This installation process uses pre-compiled versions of NumPy and Pillow, and does **not** require the user to have c or fortran compilers in their toolchain. Markupsafe will be compiled during the automated installation if the user has a working compiler, but it will fall back on pure python if not.
 
 1. After the build process is complete, run:
 

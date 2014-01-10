@@ -83,7 +83,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
           elIconX = consts.elIconXOffset,
           elIconY = consts.nodeIconsConstYOffset
             + (numEls-1)*consts.nodeIconsPerYOffset
-            *(numEls > consts.reduceNodeTitleLength ? 2/3 : 1)
+        *(numEls > consts.reduceNodeTitleLength ? 2/3 : 1)
             + consts.elIconYOffset; // TODO fix this hack for large titles
       iconG.attr("transform",
                  "translate(" + elIconX + "," + elIconY + ") "
@@ -361,58 +361,6 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         return 0;
       },
 
-
-      // /**
-      //  * Show the node summary in "hover box" next to the node
-      //  * TODO consider making this a view that monitors the nodes (i.e. event driven)
-      //  */
-      // showNodeSummary: function(d, circle) {
-      //   var thisView = this,
-      //       consts = pvt.consts,
-      //       div = document.createElement("div"),
-      //       circleId = circle.attr("id"),
-      //       summaryP = document.createElement("p"),
-      //       summaryTxt;
-
-      //   // add summary
-      //   summaryTxt = d.get("summary");
-      //   summaryP.textContent = summaryTxt.length > 0 ? summaryTxt : consts.NO_SUMMARY_MSG;
-
-      //   div.appendChild(summaryP);
-      //   div.id = pvt.getSummaryIdForDivTxt.call(thisView, circle);
-      //   var $div = $(div);
-      //   $div.addClass(consts.summaryTextClass);
-
-      //   // add wrapper div so we can use "overflow" pseudo elements
-      //   var wrapDiv = document.createElement("div"),
-      //       d3wrapDiv = d3.select(wrapDiv);
-      //   wrapDiv.id = pvt.getSummaryIdForDivWrap.call(thisView, circle);
-      //   d3wrapDiv.classed(consts.summaryWrapClass, true);
-
-      //   // place the summary box on the side with the most screen real-estate
-      //   var circleRect = circle.node().getBoundingClientRect(),
-      //       placeLeft = circleRect.left + circleRect.width / 2 > window.innerWidth / 2;
-      //   d3wrapDiv.classed(placeLeft ? consts.summaryRightClass : consts.summaryLeftClass, true);
-      //   wrapDiv.appendChild(div);
-
-      //   // get/set location of box
-      //   var sumLoc = pvt.getSummaryBoxPlacement(circleRect, placeLeft);
-      //   wrapDiv.style.left = sumLoc.left;
-      //   wrapDiv.style.top = sumLoc.top;
-      //   wrapDiv.style.width = consts.summaryWidth + "px";
-      //   wrapDiv.style.display = "none";
-
-      //   // add box to document with slight fade-in
-      //   var $wrapDiv = $(wrapDiv);
-      //   thisView.summaryTOStartList[circleId] = window.setTimeout(function(){
-      //     delete thisView.summaryTOStartList[circleId];
-      //     $wrapDiv.appendTo("#" + consts.viewId).fadeIn(consts.summaryFadeInTime);
-      //   }, consts.summaryAppearDelay);
-
-      //   thisView.summaryDisplays[wrapDiv.id] = {"$wrapDiv": $wrapDiv, "d3circle": circle, "placeLeft": placeLeft};
-      //   return $wrapDiv;
-      // },
-
       /**
        * Add bookmark star and associated properties to the given node
        */
@@ -438,12 +386,11 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
               svgEl: "path",
               attr: "d",
               attrVal: consts.checkPath
-            },
-                         {
-                           svgEl: "circle",
-                           attr: "r",
-                           attrVal: consts.checkCircleR
-                         }],
+            },{
+              svgEl: "circle",
+              attr: "r",
+              attrVal: consts.checkCircleR
+            }],
             xOff = consts.checkXOffset,
             yOff = consts.checkYOffset;
         pvt.attachIconToNode.call(this, d3node, d,

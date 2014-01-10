@@ -282,7 +282,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
           }
 
-
           switch (viewMode){
           case pExploreMode:
             if (paramsObj[qFocusConcept] === undefined){
@@ -293,10 +292,13 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
               thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute, includeShortestOutlink: true });
             }
             thisRoute.showView(thisRoute.expView, doRender, "#" + consts.expViewId);
-            // center the graph display: flicker animation
-            var fnode = thisRoute.graphModel.getNode( paramsObj[qFocusConcept]);
-            thisRoute.expView.centerForNode(fnode);
-            thisRoute.expView.setFocusNode(fnode);
+
+            if (doRender || viewMode !== thisRoute.prevUrlParams[qViewMode]) {
+              // center the graph display: flicker animation
+              var fnode = thisRoute.graphModel.getNode( paramsObj[qFocusConcept]);
+              thisRoute.expView.centerForNode(fnode);
+              thisRoute.expView.setFocusNode(fnode);
+            }
 
             break;
           case pEditMode:
@@ -324,7 +326,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                                                             appRouter: thisRoute});
             }
             thisRoute.showView(thisRoute.learnView, doRender, "#" + consts.lViewId);
-
             break;
 
           default:
@@ -345,10 +346,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
             thisRoute.appToolsView = thisRoute.appToolsView || new AppToolsView({model: thisRoute.graphModel, appRouter: thisRoute});
             thisRoute.appToolsView.render();
             thisRoute.appToolsView.$el.show();
-            //thisRoute.appToolsView.setMode(thisRoute.viewMode);
           }
 
-          // thisRoute.setELTransition(false); // reset the router state TODO is this still doing anything?
           thisRoute.prevUrlParams = $.extend({}, paramsObj);
           thisRoute.prevNodeId = nodeId;
         }

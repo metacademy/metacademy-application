@@ -37,9 +37,6 @@ define(["backbone", "underscore", "lib/kmapjs/views/concept-list-item"], functio
         "click .learn-view-star": function(evt){
           evt.stopPropagation();
           this.toggleConceptState(evt, "star");
-        },
-        "click": function(){
-          this.appRouter.changeUrlParams({focus: this.model.id});
         }
       };
       return _.extend(ConceptListItem.prototype.events, levts);

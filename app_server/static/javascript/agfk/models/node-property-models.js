@@ -17,11 +17,9 @@ define(["backbone"], function(Backbone){
         text: ""
       };
     },
-
     toText: function () {
       return this.get("text");
     }
-
   });
 
 
@@ -48,8 +46,7 @@ define(["backbone"], function(Backbone){
         level: "",
         authors: [],
         dependencies: [],
-        extra: [],
-        note: [],
+        extra: "",
         year: "",
         edition_years: []
       };

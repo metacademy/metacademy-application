@@ -1,3 +1,4 @@
+
 /*global define*/
 define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/node-property-models"], function(Backbone, _, ResourceEditorView, NodePropModels){
 

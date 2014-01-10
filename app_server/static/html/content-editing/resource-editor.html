@@ -1,41 +1,41 @@
 <script type="text/template" id="resource-editor-template">
   <label>Title</label>
-  <input type="text"  name="title<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
+  <input type="text"  class="text-field" name="title-<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
 
   <label>Brief description</label>
-  <input type="text"  name="description<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods" value="<%= description %>">
+  <input type="text"  class="text-field" name="description-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods" value="<%= description %>">
 
   <label>Location</label>
-  <input type="text"  name="location<%=this.cid%>" placeholder="e.g. pg. 76-78 [http://example.com/place_urls_in_brackets]" value="<%= this.model.getLocationString() %>">
+  <textarea class="composite-field" name="location-<%=this.cid%>" placeholder="e.g. pg. 76-78 [http://example.com/place_urls_in_brackets]"><%= this.model.getLocationString() %></textarea>
 
   <label>Resource year</label>
-  <input type="text" name="ryear<%=this.cid%>" placeholder="e.g. 2012" value="<%= year %>">
+  <input type="text" class="text-field" name="year-<%=this.cid%>" placeholder="e.g. 2012" value="<%= year %>">
 
   <label>Resource type</label>
-  <input type="text" name="rtype<%=this.cid%>" placeholder="e.g. textbook" value="<%= resource_type %>">
+  <input type="text" class="text-field" name="resource_type-<%=this.cid%>" placeholder="e.g. textbook" value="<%= resource_type %>">
 
   <label>Edition</label>
-  <input type="text" name="edition<%=this.cid%>" placeholder="e.g. 2" value="<%= edition %>">
+  <input type="text" class="text-field" name="edition-<%=this.cid%>" placeholder="e.g. 2" value="<%= edition %>">
 
   <label>Resource level</label>
-  <input type="text" name="level<%=this.cid%>" placeholder="e.g. undergraduate" value="<%= level %>">
+  <input type="text" class="text-field" name="level-<%=this.cid%>" placeholder="e.g. undergraduate" value="<%= level %>">
 
   <label>Authors (separate with "and")</label>
-  <input type="text" name="authors<%=this.cid%>" placeholder="e.g. Jim Henry and Mark Lollipop" value="<%= this.model.getAuthorsString() %>">
+  <input type="text" class="author-field" name="authors-<%=this.cid%>" placeholder="e.g. Jim Henry and Mark Lollipop" value="<%= this.model.getAuthorsString() %>">
 
   <label>Additional dependencies (enter concept title, separate with comma)</label>
-  <input type="text" name="dependencies<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= dependencies.map(function(d){return d.title;}).join(',') %>">
+  <input type="text" class="deps-field" name="dependencies-<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= dependencies.map(function(d){return d.title;}).join(', ') %>">
 
   <label>Extra information</label>
-  <textarea name="extra<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning"><%= extra %></textarea>
+  <textarea class="text-field" name="extra-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning"><%= extra %></textarea>
 
   <label>Freely available?</label>
-  <input type="checkbox" name="free<%=this.cid%>" value="free" <%= free ? "checked" : "" %>>
+  <input type="checkbox" class="boolean-field" name="free-<%=this.cid%>" value="free" <%= free ? "checked" : "" %>>
 
   <label>Requires registration?</label>
-  <input type="checkbox" name="signup<%=this.cid%>" value="signup"  <%= requires_signup ? "checked" : "" %>>
+  <input type="checkbox" class="boolean-field" name="requires_signup-<%=this.cid%>" value="signup"  <%= requires_signup ? "checked" : "" %>>
 
   <label>Resource type</label>
-  <input type="radio" name="core_type<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Core
-  <input type="radio" name="core_type<%=this.cid%>" value="supplementary" <%= (core == 0) ? "checked" : "" %>>Supplementary
+  <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Core
+  <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="supplementary" <%= (core == 0) ? "checked" : "" %>>Supplementary
 </script>

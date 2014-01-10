@@ -12,6 +12,9 @@ Metacademy is live at http://www.metacademy.org
 
 ## Installation
 
+### Windows
+For Windows installation/requirements, please see the readme located in [/windows](/windows), these instructions presume a *nix or OSX OS
+
 
 ### Preliminary requirements
 * `python 2.7X`: NB: install `python-devel` if you're using a package manager such as apt-get. The following command should print a path (if this command raises an exception, make sure that you have the `python-devel` version installed):
@@ -30,7 +33,6 @@ Metacademy is live at http://www.metacademy.org
 
         node -v
 
->   Note: For Windows installation/requirements, please see the readme located in [/windows](/windows)
 
 ### Mac OSX and *nix
 

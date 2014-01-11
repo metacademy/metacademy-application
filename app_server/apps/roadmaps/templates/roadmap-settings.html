@@ -18,7 +18,7 @@ text-align: right;
 {% block form-content %}
 {% include "settings-form-tidbit.html" %}
 <div class="buttons">
-  <input id="submit-button" type="submit" value="{% block form-submit-button-value %}Save{% endblock %}" onclick="this.disabled = true; this.form.submit();"/>
+  <input id="submit-button" type="submit" value="{% block form-submit-button-value %}Save{% endblock %}" class="submit-button onclick="this.disabled = true; this.form.submit();"/>
 </div>
 <div class="dev-note">
   <p>

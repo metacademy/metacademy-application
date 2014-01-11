@@ -44,7 +44,7 @@ class RoadmapSettings(Model):
     editors = ManyToManyField(Profile, related_name="roadmap_editors")
     listed_in_main = BooleanField('show this roadmap in the search results', default=False)
     sudo_listed_in_main = BooleanField('superuser only: allow this roadmap in the search results', default=True)
-    published = BooleanField(default=True)
+    published = BooleanField(default=False)
     url_tag = SlugField('URL tag', max_length=30, help_text='only letters, numbers, underscores, hyphens')
 
     class Meta:
@@ -57,7 +57,7 @@ class RoadmapSettings(Model):
         return self.published
 
     def is_listed_in_main(self):
-        return self.listed_in_main and self.sudo_listed_in_main
+        return self.is_published() and self.listed_in_main and self.sudo_listed_in_main
 
     def can_change_settings(self, user):
         # superusers and owners can change settings

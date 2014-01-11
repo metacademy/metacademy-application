@@ -1,3 +1,5 @@
+import pdb
+
 import collections
 import os
 from operator import attrgetter
@@ -82,14 +84,17 @@ def markdown_to_html(markdown_text):
     html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
     return bleach.linkify(html, callbacks=[process_link])
 
-# todo a class-based view will simplify this
 def show(request, in_username, tag, vnum=-1):
     try:
         rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
+
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
+
+    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+        return HttpResponse(status=404)
 
     vnum = int(vnum)
     versions = get_versions_obj(roadmap)
@@ -114,6 +119,9 @@ def show_history(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
+    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+        return HttpResponse(status=404)
+
     cur_version_num = roadmap.version_num
 
     revs = get_versions_obj(roadmap)[::-1]
@@ -137,6 +145,7 @@ def update_to_revision(request, in_username, tag, vnum):
         rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
+
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
@@ -164,8 +173,14 @@ def edit(request, in_username, tag):
         rm_dict = get_roadmap_objs(in_username, tag)
     except:
         return HttpResponse(status=404)
+
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
+
+    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+        return HttpResponse(status=404)
+
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
 
     can_edit = roadmap_settings.editable_by(request.user)
 
@@ -186,14 +201,15 @@ def edit(request, in_username, tag):
                 reversion.set_user(request.user)
                 reversion.set_comment(form.cleaned_data['commit_msg'])
 
-            return HttpResponseRedirect('/roadmaps/%s/%s' % (in_username, tag))
+            if request.POST["submitbutton"] == "Publish" and common_rm_dict['can_change_settings']:
+                roadmap_settings.published = True
+                roadmap_settings.save()
+                return HttpResponseRedirect('/roadmaps/%s/%s' % (in_username, tag))
 
     elif request.method == 'GET':
         form = RoadmapForm(instance=roadmap)
     else:
         return HttpResponse(status=403)
-
-    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
 
     return render(request, 'roadmap-edit.html', dict({
         'form': form,
@@ -240,7 +256,7 @@ def settings(request, in_username, tag):
         }, **common_rm_dict))
 
 
-
+# TODO refactor with edit
 def new(request):
     if not request.user.is_authenticated() or is_lazy_user(request.user):
         return HttpResponseRedirect(reverse("user:login"))
@@ -248,6 +264,7 @@ def new(request):
     if request.method == 'POST':
         form = RoadmapForm(request.POST)
         settings_form = RoadmapSettingsForm(request.POST)
+        is_publish = request.POST["submitbutton"] == "Publish"
 
         if form.is_valid() and settings_form.is_valid():
             with reversion.create_revision():
@@ -258,6 +275,9 @@ def new(request):
             rms = settings_form.save(commit=False)
             if not request.user.is_superuser:
                 rms.sudo_listed_in_main = models.RoadmapSettings._meta.get_field_by_name('sudo_listed_in_main')[0].default # TODO hack
+
+            if is_publish:
+                rms.published = True
 
             rms.roadmap = roadmap
             prof = request.user.profile
@@ -344,6 +364,7 @@ def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
         'tag': tag,
         'edit_url': base_url + "/edit",
         'base_url': base_url,
+        'is_published': roadmap_settings.is_published(),
         'history_url': base_url + "/history",
         'settings_url': base_url + '/settings',
         'can_change_settings': roadmap_settings.can_change_settings(user),

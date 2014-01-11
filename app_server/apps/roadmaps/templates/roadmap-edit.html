@@ -72,9 +72,12 @@
       </div>
       {% endif %}
       <div class="buttons">
-        <button id="preview-button"> Preview </button>
+        <button id="preview-button" class="submit-button"> Preview </button>
         {% if can_edit %}
-        <input id="submit-button" type="submit" value="{% block form-submit-button-value %}Save{% endblock %}" onclick="this.disabled = true; this.form.submit();"/>
+        <input id="save-button" class="submit-button" name="submitbutton" type="submit" value="Save"/>
+          {% if not is_published %}
+          <input id="publish-button" class="submit-button" name="submitbutton" type="submit" value="Publish"/>
+          {% endif %}
         {% endif %}
       </div>
     </div>

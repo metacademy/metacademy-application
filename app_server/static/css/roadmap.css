@@ -303,29 +303,29 @@ a.external-link{
     float: none;
 }
 
-#preview-button, #submit-button{
+.buttons > .submit-button{
     font-size: 1.2em;
     padding-left: 0.5em;
     padding-right: 0.5em;
     padding-top: 0.25em;
     padding-bottom: 0.25em;
     width: 8em;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #preview-button{
     background-color: #70404F;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
-#submit-button{
+#save-button{
     background-color: #413C3E;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+}
+
+#publish-button{
+    background-color: rgb(16, 92, 16);
 }
 
 #preview-area{

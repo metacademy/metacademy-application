@@ -1,3 +1,4 @@
+import pdb
 import os
 
 from django.forms import ModelForm, Textarea, CharField, TextInput
@@ -7,7 +8,7 @@ import models
 PLACEHOLDER_TXT = 'Optional: write a brief message explaining your change'
 
 class RoadmapForm(ModelForm):
-    commit_msg = CharField( max_length=200, widget=TextInput(attrs={'placeholder': PLACEHOLDER_TXT}))
+    commit_msg = CharField( max_length=200, required=False, widget=TextInput(attrs={'placeholder': PLACEHOLDER_TXT}))
     class Meta:
         model = models.Roadmap
         fields = ('body', 'title', 'author', 'audience', 'blurb')
@@ -21,7 +22,7 @@ class RoadmapForm(ModelForm):
 
     def clean(self):
         cleaned_data = super(RoadmapForm, self).clean()
-        if cleaned_data['commit_msg'] == PLACEHOLDER_TXT:
+        if (not cleaned_data.has_key('commit_msg')) or cleaned_data['commit_msg'] == PLACEHOLDER_TXT:
            cleaned_data['commit_msg'] = ''
         return cleaned_data
 

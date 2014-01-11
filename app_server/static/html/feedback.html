@@ -3,6 +3,7 @@
 
 {% block extra-css %}
 <link rel="stylesheet" href="{% static "css/user-form.css" %}" />
+<link rel="stylesheet" href="{% static "css/form-errors.css" %}" />
 <link rel="stylesheet" href="{% static "css/feedback.css" %}"/>
 {% endblock %}
 
@@ -15,8 +16,8 @@
 {% block headtitle %}
   Send Feedback
 {% endblock %}
-  
-  
+
+
 {% block form-content %}
   <div class="user-form-field">
   {{ form.email.label_tag }}
@@ -39,5 +40,3 @@
 </div>
 
 {% endblock %}
-
-

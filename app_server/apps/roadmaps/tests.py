@@ -5,7 +5,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-# TODO test: sudo_listed_in_main
+# TODO test: sudo_listed_in_main, test failed roadmap creation (incorrect form)
 
 """
 Fixtures:

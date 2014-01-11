@@ -3,6 +3,7 @@
 
 {% block extra-css %}
 <link rel="stylesheet" href="{% static "css/user-form.css" %}" />
+<link rel="stylesheet" href="{% static "css/form-errors.css" %}" />
 {% endblock %}
 
 
@@ -25,7 +26,7 @@
             {{ error }}
         {% endfor %}
   </div>
-  {% endif %}
+{% endif %}
 
 {% block form-content %}
 
@@ -44,6 +45,3 @@
 {% endblock %}
 
 {% endblock %}
-
-
-

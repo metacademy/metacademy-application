@@ -5,6 +5,13 @@
 <link rel="stylesheet" href="{% static "css/roadmap.css" %}" />
 <link rel="stylesheet" href="{% static "css/lib/colorbox.css" %}" media="screen" />
 <link rel="stylesheet" href="{% static "css/roadmap-markdown-editor.css" %}" />
+<link rel="stylesheet" href="{% static "css/form-errors.css" %}"> </link>
+<style>
+  .form-errors, .non-field-form-errors{
+    width: 20%;
+    margin: 0.5em 0 0 25%;
+  }
+</style>
 {% endblock %}
 
 {% block jscript-extend %}
@@ -23,38 +30,57 @@
   {% endif %}
 
   <form method="post" action="">
-    {% csrf_token %}
 
-    {% if form.errors %}
-	  <div class="form-errors">
-	    {% for key, value in form.errors.items %}
-	    <p>
-	      {{ value }}
-	    </p>
-	    {% endfor %}
-	  </div>
+    {% if form.non_field_errors %}
+    <div class="non-field-form-errors">
+      {% for error in form.non_field_errors %}
+      {{ error }}
+      {% endfor %}
+    </div>
     {% endif %}
+
+    {% csrf_token %}
 
     {% block form-content %}
 
 	  <div class="form-field">
 	    {{ form.title.label_tag }}
 	    {{ form.title }}
+      {% if form.title.errors %}
+      <div class="form-errors">
+        {{form.title.errors}}
+      </div>
+      {% endif %}
 	  </div>
 
 	  <div class="form-field">
 	    {{ form.author.label_tag }}
 	    {{ form.author }}
+      {% if form.author.errors %}
+      <div class="form-errors">
+        {{form.author.errors}}
+      </div>
+      {% endif %}
 	  </div>
 
     <div class="form-field">
       {{ form.audience.label_tag }}
       {{ form.audience }}
+      {% if  form.audience.errors  %}
+      <div class="form-errors">
+        {{ form.audience.errors }}
+      </div>
+      {% endif %}
     </div>
 
     <div class="form-field">
       <label for="id_blurb">Quick Description:</label>
       {{ form.blurb }}
+      {% if  form.blurb.errors  %}
+      <div class="form-errors">
+        {{ form.blurb.errors }}
+      </div>
+      {% endif %}
     </div>
 
     {% block settings-form %}
@@ -64,11 +90,21 @@
     <div class="body-button-wrapper">
       <div class="form-body">
         {{ form.body }}
+        {% if  form.body.errors  %}
+        <div class="form-errors">
+          {{ form.body.errors }}
+        </div>
+        {% endif %}
       </div>
       {% if can_edit %}
       <div id="edit-summary" class="form-field">
         <label for="commit-blurb">Edit Message</label>
         {{ form.commit_msg }}
+        {% if  form.commit_msg.errors  %}
+        <div class="form-errors">
+          {{ form.commit_msg.errors }}
+        </div>
+        {% endif %}
       </div>
       {% endif %}
       <div class="buttons">

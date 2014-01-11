@@ -5,6 +5,8 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+# TODO test: sudo_listed_in_main
+
 """
 Fixtures:
 
@@ -28,38 +30,77 @@ class TestRoadmapCreation(TestCase):
         self.normal_username = "test"
         self.superuser_username = "test_super"
         self.roadmap_name = "test"
+        self.base_roadmap = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': 'publish_public_roadmap', 'listed_in_main': 'on', 'body':'some test [[text]]', 'submitbutton':'Save'}
 
-    # define reusable test functions
+    ######
+    # published public roadmap
+    ######
+
     def publish_public_roadmap(self):
         """
         create/publish a public (listed in main) roadmap
         """
-        pass
+        client = Client()
+        client.login(username=self.rcreator_username, password=self.rcreator_username)
+        rmap_url_tag = 'publish_public_roadmap'
+        rm_dict = self.base_roadmap.copy()
+        rm_dict['submitbutton'] = 'Publish'
+        resp = client.post(reverse('roadmaps:new'), rm_dict)
+        # should redirect to temp view
+        self.assertEqual(resp.status_code, 302)
+        view_url = reverse("roadmaps:show", args=(self.rcreator_username, rmap_url_tag,))
+        self.assertEqual(resp.url, 'http://testserver' + view_url)
+        return view_url
 
-    def save_unpublished_public_roadmap(self):
-        """
-        create but don't publish a public roadmap
-        """
-        pass
-
-    def publish_link_only_roadmap(self):
-        """
-        create/publish a "view with link only" roadmap
-        """
-        pass
-
-    def save_link_only_roadmap(self):
-        """
-        create but don't publish a "link only" roadmap
-        """
-        pass
-
-    # define unit test cases
     def test_publish_public_roadmap(self):
         """
         test: create and publish a public roadmap
         """
         self.publish_public_roadmap()
+
+    def test_settings_publish_public_roadmap(self):
+        """
+        test: verify the correct settings of the published public roadmap
+        """
+        rmap_url = self.publish_public_roadmap()
+        client = Client()
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        rm_settings = resp.context['roadmap_settings']
+        self.assertEqual(rm_settings.is_published(), True)
+        self.assertEqual(rm_settings.is_listed_in_main(), True)
+        self.assertEqual(rm_settings.sudo_listed_in_main, True)
+
+    def test_show_published_public_roadmap_unauth(self):
+        """
+        test: show the published public roadmap to the unauth user
+        """
+        rmap_url = self.publish_public_roadmap()
+        client = Client()
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['can_change_settings'], False)
+        self.assertEqual(resp.context['can_edit'], False)
+
+    ######
+    # unpublished public roadmap
+    ######
+
+    def save_unpublished_public_roadmap(self):
+        """
+        create but don't publish a public roadmap
+        """
+        client = Client()
+        client.login(username=self.rcreator_username, password=self.rcreator_username)
+        rm_dict = self.base_roadmap.copy()
+        rmap_url_tag = 'save_public_roadmap'
+        rm_dict['url_tag'] = rmap_url_tag
+        resp = client.post(reverse('roadmaps:new'), rm_dict)
+        # should redirect to temp view
+        self.assertEqual(resp.status_code, 302)
+        view_url = reverse("roadmaps:show", args=(self.rcreator_username, rmap_url_tag,))
+        self.assertEqual(resp.url, 'http://testserver' + view_url)
+        return view_url
 
     def test_save_unpublished_public_roadmap(self):
         """
@@ -67,17 +108,156 @@ class TestRoadmapCreation(TestCase):
         """
         self.save_unpublished_public_roadmap()
 
+    def test_settings_save_unpublished_roadmap(self):
+        """
+        test: verify the correct settings of the unpublished public roadmap
+        """
+        rmap_url = self.save_unpublished_public_roadmap()
+        client = Client()
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 404)
+
+        # now login as the creator
+        client.login(username=self.rcreator_username, password=self.rcreator_username)
+        resp = client.get(rmap_url)
+        rm_settings = resp.context['roadmap_settings']
+        self.assertEqual(rm_settings.is_published(), False)
+        self.assertEqual(rm_settings.is_listed_in_main(), False)
+        self.assertEqual(rm_settings.sudo_listed_in_main, True)
+
+    def test_show_unpublished_public_roadmap_unauth(self):
+        """
+        test: show the unpublished public roadmap to the unauth user
+        """
+        rmap_url = self.save_unpublished_public_roadmap()
+        client = Client()
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_show_unpublished_public_roadmap_normal(self):
+        """
+        test: show the unpublished public roadmap to the normal user
+        """
+        rmap_url = self.save_unpublished_public_roadmap()
+        client = Client()
+        client.login(username=self.normal_username, password=self.normal_username)
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 404)
+
+    def show_unpublished_public_roadmap_success(self, un):
+        """
+        test: show the unpublished public roadmap to a user that can view/edit it
+        """
+        rmap_url = self.save_unpublished_public_roadmap()
+        client = Client()
+        client.login(username=un, password=un)
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['can_change_settings'], True)
+        self.assertEqual(resp.context['can_edit'], True)
+
+    def test_show_unpublished_public_roadmap_rcreator(self):
+        """
+        test: show the unpublished public roadmap to the rcreator user
+        """
+        self.show_unpublished_public_roadmap_success(self.rcreator_username)
+
+    def test_show_unpublished_public_roadmap_superuser(self):
+        """
+        test: show the unpublished public roadmap to the superuser
+        """
+        self.show_unpublished_public_roadmap_success(self.superuser_username)
+
+    ######
+    # published link-only public roadmap
+    ######
+
+    def publish_link_only_roadmap(self):
+        """
+        create/publish a "view with link only" roadmap
+        """
+        client = Client()
+        client.login(username=self.rcreator_username, password=self.rcreator_username)
+
+        rm_dict = self.base_roadmap.copy()
+        rm_dict['submitbutton'] = 'Publish'
+        rmap_url_tag = 'publish_link_only_rmap'
+        rm_dict['url_tag'] = rmap_url_tag
+        del rm_dict['listed_in_main']
+        resp = client.post(reverse('roadmaps:new'), rm_dict)
+
+        self.assertEqual(resp.status_code, 302)
+        view_url = reverse("roadmaps:show", args=(self.rcreator_username, rmap_url_tag,))
+        self.assertEqual(resp.url, 'http://testserver' + view_url)
+        return view_url
+
     def test_publish_link_only_roadmap(self):
         """
         test: create/publish a "view with link only" roadmap
         """
         self.publish_link_only_roadmap()
 
-    def test_save_link_only_roadmap(self):
+    def test_settings_publish_link_only_roadmap(self):
         """
-        test: create but don't publish a "link only" roadmap
+        test: verify the correct settings of the published link-only roadmap
         """
-        self.save_link_only_roadmap()
+        rmap_url = self.publish_link_only_roadmap()
+        client = Client()
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        rm_settings = resp.context['roadmap_settings']
+        self.assertEqual(rm_settings.is_published(), True)
+        self.assertEqual(rm_settings.is_listed_in_main(), False)
+        self.assertEqual(rm_settings.sudo_listed_in_main, True)
+
+    def test_show_link_only_roadmap_unauth(self):
+        """
+        test: show the link-only roadmap to the unauth user
+        """
+        rmap_url = self.publish_link_only_roadmap()
+        client = Client()
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['can_change_settings'], False)
+        self.assertEqual(resp.context['can_edit'], False)
+
+    def test_show_link_only_roadmap_normal(self):
+        """
+        test: show the link-only roadmap to the normal user
+        """
+        rmap_url = self.publish_link_only_roadmap()
+        client = Client()
+        client.login(username=self.normal_username, password=self.normal_username)
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['can_change_settings'], False)
+        self.assertEqual(resp.context['can_edit'], False)
+
+    def show_link_only_roadmap_success_edit(self, un):
+        """
+        test: show the link-only public roadmap to a user that can view/edit it
+        """
+        rmap_url = self.publish_link_only_roadmap()
+        client = Client()
+        client.login(username=un, password=un)
+        resp = client.get(rmap_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['can_change_settings'], True)
+        self.assertEqual(resp.context['can_edit'], True)
+
+    def test_show_unpublished_public_roadmap_rcreator(self):
+        """
+        test: show the link-only public roadmap to the rcreator user
+        """
+        self.show_link_only_roadmap_success_edit(self.rcreator_username)
+
+    def test_show_unpublished_public_roadmap_superuser(self):
+        """
+        test: show the link-only public roadmap to the superuser
+        """
+        self.show_link_only_roadmap_success_edit(self.superuser_username)
+
+
 
 class RoadmapViewTestCase(TestCase):
     fixtures = ["roadmap_fixture.json"]

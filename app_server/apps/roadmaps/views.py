@@ -151,7 +151,7 @@ def update_to_revision(request, in_username, tag, vnum):
 
     can_edit = roadmap_settings.editable_by(request.user)
     if not can_edit:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     vnum = int(vnum)
     versions = get_versions_obj(roadmap)

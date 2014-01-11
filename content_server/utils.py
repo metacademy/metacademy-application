@@ -1,3 +1,6 @@
+import sys
+import pdb
+
 import config
 import database
 import graphs
@@ -6,7 +9,7 @@ db = None
 def load_db():
     global db
     db = database.Database.load(config.CONTENT_PATH)
-    
+
 def find_references(key):
     global db
     if db is None:
@@ -116,18 +119,21 @@ def errors_nonempty(errors):
         raise RuntimeError('Invalid type %s' % type(errors))
 
 def print_errors(errors, indent=0):
+    error_ct = 0
     if type(errors) == str:
         print ' ' * indent + errors
+        error_ct += 1
     elif type(errors) == list:
         for e in errors:
-            print_errors(e, indent=indent)
+            error_ct += print_errors(e, indent=indent)
     elif type(errors) == dict:
         for k, v in errors.items():
             if errors_nonempty(v):
-                print_errors(k, indent)
-                print_errors(v, indent + 4)
+                error_ct += print_errors(k, indent)
+                error_ct += print_errors(v, indent + 4)
     else:
         raise RuntimeError('Invalid type %s' % type(errors))
+    return error_ct
 
 
 def check_db():
@@ -135,7 +141,17 @@ def check_db():
     if db is None:
         load_db()
 
-    print_errors(database.check_all_node_formats(config.CONTENT_PATH))
-    print_errors(db.check())
+    # get the error dbs
+    format_error_dict = database.check_all_node_formats(config.CONTENT_PATH)
+    db_check_error_dict = db.check()
 
+    # show the errors
+    err_ct = print_errors(format_error_dict)
+    err_ct += print_errors(db_check_error_dict)
 
+    print 'found ' + str(err_ct) + ' problems'
+    assert( err_ct == 0 )
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        check_db()

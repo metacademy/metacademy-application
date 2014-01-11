@@ -1,3 +1,9 @@
+{% if not is_published %}
+  <div class="roadmap-alert">
+    This roadmap is not published and is only viewable by those on the editor list.
+  </div>
+{% endif %}
+
 <div class="aux-info">
   <div class="author"> Created by: {{ roadmap.author }} </div>
   <div class="audience"> Intended for: {{ roadmap.audience }} </div>

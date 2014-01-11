@@ -388,6 +388,16 @@ ol.history-list{
     display: none;
 }
 
+.roadmap-alert {
+    font-size: 1.3em;
+    text-align: center;
+    padding: 1em;
+    margin: 1em 0;
+    border: 2px solid #333;
+    background: aliceblue;
+    border-radius: 5px;
+}
+
 @media only screen and (max-width: 769px){
     div.container{
         width: 95%;

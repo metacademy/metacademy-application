@@ -1,9 +1,16 @@
 language: python
 python:
-  - "2.7"
-# command to install dependencies
+- '2.7'
+addons:
+  sauce_connect: true
+env:
+  global:
+  - secure: OaknDUL5p5bSp3bqYV17EaKQSQ4eOqnciTnZdDB0bMDpKBW6yHzfVzdIb7KBp5JsgPCDAwChpXMLowqCxX2tlZ+ya7/WsMXhfbTh1DYXKuskIDRd0sTQspFF741GW5OIt9TR0aDyZiW2ojpZYE/KGBwE88TNzAeK6HoQNgdxvGs=
+  - secure: JCBC89+cydG7O21TXb9H4B4UCSE/Zy3s8noK2HwvfkdsGqg0iCKgjUblCLKxDjEqWO7G8Z0rZ3N+QcyCVOCTQdzBv7x0kLLQKyvLJPlvVR3DffHK93YDVhaD33vAvTTvzn5U1Oo4Ofvn+YXpqgl2/YOAL9Qhp3eru2ySm3oAJYY=
+
+before_script:
+- curl https://gist.github.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 install:
-  - make
-# command to run tests
+- make
 script:
-  - make test
+- make test

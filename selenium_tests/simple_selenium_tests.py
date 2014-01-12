@@ -1,10 +1,20 @@
-from selenium.webdriver.firefox.webdriver import WebDriver
-from selenium.webdriver.common.action_chains import ActionChains
-
-import time, unittest
+import os
+import sys
+import new
+from random import randint
+import base64
+import json
+import httplib
+import unittest
+import unittest
 from random import randint
 import new
 import pdb
+import os
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 def is_alert_present(wd):
     try:
@@ -13,10 +23,9 @@ def is_alert_present(wd):
     except:
         return False
 
-class simple_selenium_tests(unittest.TestCase):
+class SimpleSelTest(unittest.TestCase):
+    __test__ = False
     def setUp(self):
-        self.wd = WebDriver()
-        self.wd.implicitly_wait(60)
         self.caps['name'] = 'Selenium Testing'
         if (os.environ.get('TRAVIS')):
             self.caps['tunnel-identifier'] = os.environ['TRAVIS_JOB_NUMBER']
@@ -30,9 +39,10 @@ class simple_selenium_tests(unittest.TestCase):
         self.driver = webdriver.Remote(desired_capabilities=self.caps,
                                        command_executor="http://%s/wd/hub" % hub_url)
         self.jobid = self.driver.session_id
+        self.driver.implicitly_wait(60)
         print "Sauce Labs job: https://saucelabs.com/jobs/%s" % self.jobid
 
-    def test_simple_selenium_tests(self):
+    def test_SimpleSelTest(self):
         success = True
         wd = self.wd
         wd.get("http://127.0.0.1:8080/")
@@ -78,8 +88,8 @@ if __name__ == '__main__':
         #  }
         ]
     for platform in PLATFORMS:
-        d = dict(simple_selenium_tests.__dict__)
-        name = "%s_%s_%s_%s" % (simple_selenium_tests.__name__,
+        d = dict(SimpleSelTest.__dict__)
+        name = "%s_%s_%s_%s" % (SimpleSelTest.__name__,
                                 platform['browserName'],
                                 platform.get('platform', 'ANY'),
                                 randint(0, 999))
@@ -87,7 +97,7 @@ if __name__ == '__main__':
         d.update({'__test__': True,
                   'caps': platform,
                   })
-        classes[name] = new.classobj(name, (simple_selenium_tests,), d)
+        classes[name] = new.classobj(name, (SimpleSelTest,), d)
 
     globals().update(classes)
-    #unittest.main()
+    unittest.main()

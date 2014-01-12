@@ -13,6 +13,7 @@ import pdb
 import os
 
 from selenium import webdriver
+from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 
 
@@ -26,25 +27,27 @@ def is_alert_present(wd):
 class SimpleSelTest(unittest.TestCase):
     __test__ = False
     def setUp(self):
+        self.caps = {}
         self.caps['name'] = 'Selenium Testing'
         if (os.environ.get('TRAVIS')):
             self.caps['tunnel-identifier'] = os.environ['TRAVIS_JOB_NUMBER']
             self.caps['build'] = os.environ['TRAVIS_BUILD_NUMBER']
             self.caps['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], 'CI']
-        self.url = 'http://localhost:8080/'
-
-        self.username = os.environ['SAUCE_USERNAME']
-        self.key = os.environ['SAUCE_ACCESS_KEY']
-        hub_url = "%s:%s@localhost:4445" % (self.username, self.key)
-        self.driver = webdriver.Remote(desired_capabilities=self.caps,
-                                       command_executor="http://%s/wd/hub" % hub_url)
+        #self.url = 'http://localhost:8080/'
+            self.username = os.environ['SAUCE_USERNAME']
+            self.key = os.environ['SAUCE_ACCESS_KEY']
+            hub_url = "%s:%s@localhost:4445" % (self.username, self.key)
+            self.driver = webdriver.Remote(desired_capabilities=self.caps,
+                                           command_executor="http://%s/wd/hub" % hub_url)
+        else:
+            self.driver = WebDriver()
         self.jobid = self.driver.session_id
         self.driver.implicitly_wait(60)
         print "Sauce Labs job: https://saucelabs.com/jobs/%s" % self.jobid
 
     def test_SimpleSelTest(self):
         success = True
-        wd = self.wd
+        wd = self.driver
         wd.get("http://127.0.0.1:8080/")
         wd.find_element_by_link_text("Concept list").click()
         wd.find_element_by_link_text("Roadmap list").click()
@@ -55,7 +58,7 @@ class SimpleSelTest(unittest.TestCase):
         self.assertTrue(success)
 
     def tearDown(self):
-        self.wd.quit()
+        self.driver.quit()
 
 if __name__ == '__main__':
     classes = {}

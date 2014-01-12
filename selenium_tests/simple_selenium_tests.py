@@ -12,6 +12,8 @@ import new
 import pdb
 import os
 
+import nose
+from nose.plugins.multiprocess import MultiProcess
 from selenium import webdriver
 from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -26,8 +28,8 @@ def is_alert_present(wd):
 
 class SimpleSelTest(unittest.TestCase):
     __test__ = False
+
     def setUp(self):
-        self.caps = {}
         self.caps['name'] = 'Selenium Testing'
         if (os.environ.get('TRAVIS')):
             self.caps['tunnel-identifier'] = os.environ['TRAVIS_JOB_NUMBER']
@@ -60,47 +62,54 @@ class SimpleSelTest(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-if __name__ == '__main__':
-    classes = {}
-    PLATFORMS = [
-        {'browserName': 'firefox',
-         'platform': 'LINUX',
-         },
-        # {'browserName': 'firefox',
-        #  'platform': 'XP',
-        #  },
-        # {'browserName': 'firefox',
-        #  'platform': 'VISTA',
-        #  },
-        # {'browserName': 'chrome',
-        #  'platform': 'LINUX',
-        #  },
-        # {'browserName': 'chrome',
-        #  'platform': 'XP',
-        #  },
-        # {'browserName': 'chrome',
-        #  'platform': 'VISTA',
-        #  },
-        # {'browserName': 'internet explorer',
-        #  'version': '10',
-        #  'platform': 'WIN8',
-        #  },
-        # {'browserName': 'internet explorer',
-        #  'version': '9',
-        #  'platform': 'VISTA',
-        #  }
-        ]
-    for platform in PLATFORMS:
-        d = dict(SimpleSelTest.__dict__)
-        name = "%s_%s_%s_%s" % (SimpleSelTest.__name__,
-                                platform['browserName'],
-                                platform.get('platform', 'ANY'),
-                                randint(0, 999))
-        name = name.replace(" ", "").replace(".", "")
-        d.update({'__test__': True,
-                  'caps': platform,
-                  })
-        classes[name] = new.classobj(name, (SimpleSelTest,), d)
+classes = {}
+PLATFORMS = [
+    {'browserName': 'firefox',
+     'platform': 'LINUX',
+     },
+    # {'browserName': 'firefox',
+    #  'platform': 'XP',
+    #  },
+    # {'browserName': 'firefox',
+    #  'platform': 'VISTA',
+    #  },
+    # {'browserName': 'chrome',
+    #  'platform': 'LINUX',
+    #  },
+    # {'browserName': 'chrome',
+    #  'platform': 'XP',
+    #  },
+    # {'browserName': 'chrome',
+    #  'platform': 'VISTA',
+    #  },
+    # {'browserName': 'internet explorer',
+    #  'version': '10',
+    #  'platform': 'WIN8',
+    #  },
+    # {'browserName': 'internet explorer',
+    #  'version': '9',
+    #  'platform': 'VISTA',
+    #  }
+    ]
+for platform in PLATFORMS:
+    d = dict(SimpleSelTest.__dict__)
+    name = "%s_%s_%s_%s" % (SimpleSelTest.__name__,
+                            platform['browserName'],
+                            platform.get('platform', 'ANY'),
+                            randint(0, 999))
+    name = name.replace(" ", "").replace(".", "")
+    d.update({'__test__': True,
+              'caps': platform,
+              })
+    classes[name] = new.classobj(name, (SimpleSelTest,), d)
 
-    globals().update(classes)
-    unittest.main()
+globals().update(classes)
+
+# this is just handy. If __main__, just run the tests in multiple processes
+if __name__ == "__main__":
+    nose.core.run(argv=["nosetests", "-vv",
+                        "--processes", len(PLATFORMS),
+                        "--process-timeout", 180,
+                        __file__],
+                  plugins=[MultiProcess()])
+    #unittest.main()

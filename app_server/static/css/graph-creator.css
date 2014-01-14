@@ -178,6 +178,7 @@ g.connect-node circle{
 }
 
 .ec-display-wrap{
+    position: relative;
     margin: 1em auto;
     display:none;
     margin: auto;
@@ -196,6 +197,7 @@ g.connect-node circle{
 .ec-display-wrap textarea{
     width: 100%;
     height: 15em;
+    margin-top: 1em;
 }
 
 .dep-entry{
@@ -218,12 +220,77 @@ g.connect-node circle{
     width: 70%;
 }
 
+#resources-tidbit-wrap{
+    margin-top: 1.5em;
+}
+
+#add-resource-button{
+    border: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    background-color: #50094A;
+    padding: 0.3em;
+    padding-right: 0.6em;
+    font-size: 0.5em;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    position: absolute;
+    left: 0;
+    top: -2em;
+    font-size: .7em;
+}
+
+#add-resource-button:hover{
+    background: #A01F70;
+}
+
+.ec-button{
+    position: absolute;
+    bottom: 0em;
+    left: 50%;
+    width: 10em;
+    margin-left: -5em;
+    border: none;
+    background: rgb(226, 226, 226);
+    border-radius: 5px;
+    font-weight: bold;
+    color: #696969;
+    cursor: pointer;
+}
+.ec-button:hover{
+    background-color: rgb(245, 223, 237);
+}
+
+.expanded .expand-resource{
+    display: none;
+}
+
+.contract-resource{
+    display: none;
+}
+
+.expanded .contract-resource{
+    display: block;
+}
+
+.expand-content{
+    display: none;
+}
+
+.expanded .expand-content{
+    display: block;
+}
+
 .resource-form{
+    position: relative;
     border: 2px solid #B4ADAD;
     border-radius: 4px;
     padding: 1em;
     text-align: left;
 }
+
 .resource-form label{
     margin-left: 15%;
     font-size: 0.9em;

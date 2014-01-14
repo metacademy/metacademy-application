@@ -41,14 +41,14 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
 
 
   /**
-   * Collection of question models
+   * Collection of exercise models
    */
-  var QuestionCollection = Backbone.Collection.extend({
+  var ExerciseCollection = Backbone.Collection.extend({
     model: NodePropertyModels.Question
   });
 
   return {
-    QuestionCollection: QuestionCollection,
+    ExerciseCollection: ExerciseCollection,
     ResourceCollection: ResourceCollection
   };
 });

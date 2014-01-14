@@ -6,9 +6,9 @@
 
 define(["backbone"], function(Backbone){
   /**
-   * Comprehension question model
+   * Comprehension exercises model
    */
-  var Question = Backbone.Model.extend({
+  var Exercise = Backbone.Model.extend({
     /**
      * default values -- underscore attribs used to match data from server
      */
@@ -21,7 +21,6 @@ define(["backbone"], function(Backbone){
       return this.get("text");
     }
   });
-
 
   /**
    * Learning resource model
@@ -91,7 +90,7 @@ define(["backbone"], function(Backbone){
   });
 
   return {
-    Question: Question,
+    Exercise: Exercise,
     Resource: Resource
   };
 

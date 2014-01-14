@@ -2,6 +2,7 @@
 
 .apptools{
     display: none;
+    background: white;
     position: absolute;
     top: 1.5em;
     right: 4em;

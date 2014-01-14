@@ -147,7 +147,7 @@ define(["chai", "gc/models/editable-graph-model"], function(chai, EditGraphModel
             });
             filtRes.length.should.equal(1);
           });
-          // TODO compare questions once the schema is figured out
+          // TODO compare exercises once the schema is figured out
         }); // end forEach node comparison
       }); // end it()
 

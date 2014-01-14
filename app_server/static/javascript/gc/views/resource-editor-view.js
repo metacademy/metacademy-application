@@ -1,11 +1,12 @@
 
 /*global define*/
-define(["backbone", "underscore"], function(Backbone, _){
+define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
   return  (function(){
 
     var pvt = {};
-    pvt.viewConsts = {
-      templateId: "resource-editor-template"
+    pvt.consts = {
+      templateId: "resource-editor-template",
+      ecClass: "expanded"
     };
 
     /**
@@ -31,7 +32,7 @@ define(["backbone", "underscore"], function(Backbone, _){
     };
 
     return Backbone.View.extend({
-      template: _.template(document.getElementById(pvt.viewConsts.templateId).innerHTML),
+      template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
       className: "resource-form",
 
@@ -41,7 +42,8 @@ define(["backbone", "underscore"], function(Backbone, _){
         "change .boolean-field": "changeBooleanField",
         "blur .deps-field": "changeDepsField",
         "blur .author-field": "changeAuthorField",
-        "blur .composite-field": "changeCompositeField"
+        "blur .composite-field": "changeCompositeField",
+        "click .ec-button": "toggleEC"
       },
 
       /**
@@ -55,6 +57,13 @@ define(["backbone", "underscore"], function(Backbone, _){
 
         thisView.isRendered = true;
         return thisView;
+      },
+
+      /**
+       * Expand/contract all the resource fields
+       */
+      toggleEC: function (evt) {
+        $(evt.currentTarget.parentElement).toggleClass(pvt.consts.ecClass);
       },
 
       /**

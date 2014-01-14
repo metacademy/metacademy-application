@@ -8,9 +8,9 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
     // private functions //
 
     return DetailedNodeModel.extend({
-      collFields: ["questions", "dependencies", "outlinks", "resources"],
+      collFields: ["exercises", "dependencies", "outlinks", "resources"],
 
-      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
+      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "software", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
 
       defaults: function() {
         var enDef = {
@@ -48,7 +48,7 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         });
         retObj.dependencies = dependencies;
         retObj.resources = thisModel.get("resources").toJSON();
-        retObj.questions = thisModel.get("questions").toJSON();
+        retObj.exercises = thisModel.get("exercises").toJSON();
 
         return retObj;
       }

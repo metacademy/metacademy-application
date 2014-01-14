@@ -51,7 +51,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     });
   })();
 
-
   /**
    * Wrapper view to display all dependencies
    */
@@ -327,9 +326,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
         // array depth corresponds to list depth
         for (i = 0; i < lines.length; i++){
-          var line = lines[i];
+          var line = lines[i],
+              depth = line.depth;
 
-          var depth = line.depth;
           while (depth < prevDepth){
             htmlStr += '</ul>\n';
             depth++;
@@ -341,9 +340,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
           }
           liStr = pvt.lineToStr(line.items);
           htmlStr += "<li>" + liStr + "</li>\n";
-
           prevDepth = line.depth;
-
         }
 
         while (prevDepth--){

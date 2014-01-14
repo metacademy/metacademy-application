@@ -11,24 +11,20 @@
       <li><button id="btn-resources">Resources</button></li>
       <li><button id="btn-goals">Goals</button></li>
       <li><button id="btn-exercises">Exercises</button></li>
+      <li><button id="btn-software">Software</button></li>
       <li><button id="btn-pointers">See Also</button></li>
     </ul>
   </div>
 
   <!-- wrappers for various editing sections: implement tab view by hiding all elements
-       with a given class and showing the one disered element -->
+       with a given class and showing the one desired element -->
 
   <div class="ec-display-wrap" id="summary">
-     <h3>
-    Summary
-    </h3>
     <textarea><%=summary%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="resources">
-    <h3>Resources</h3>
-
-    <button id="add-resource-button">add resource</button>
+    <button id="add-resource-button">+ Add Resource</button>
 
     <div id="resources-tidbit-wrap">
 
@@ -45,25 +41,19 @@
   </div>
 
   <div class="ec-display-wrap" id="pointers">
-     <h3>
-       See also
-    </h3>
      <textarea><%=pointers%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="goals">
-     <h3>
-       Goals
-    </h3>
      <textarea><%=goals%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="exercises">
-    <h3>
-      Exercises
-    </h3>
-    <textarea><%=questions%></textarea>
+    <textarea><%=exercises%></textarea>
   </div>
 
+  <div class="ec-display-wrap" id="software">
+    <textarea><%=software%></textarea>
+  </div>
 
 </script>

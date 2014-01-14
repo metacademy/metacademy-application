@@ -26,12 +26,61 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
 
       render: function(){
         var thisView = this,
+            thisModel = thisView.model,
             consts = pvt.consts;
         pvt.state.visId = pvt.state.visId || "summary";
         thisView.isRendered = false;
 
+        // check the structure of goals, resources, problems, and relevant software
+        // convert to free-form text for now
+        var freeFormFields = ["goals", "pointers", "exercises"]; //, "exercises"]; // TODO add exercises
+        var ffl = freeFormFields.length,
+            httpRe = /http:/;
+        while( ffl -- ){
+          var qfield = thisModel.get(freeFormFields[ffl]);
+
+          // if the field does not exist: set to ""
+          if (qfield === undefined){
+            thisModel.set(freeFormFields[ffl], "");
+            qfield = "";
+          }
+
+          if (typeof qfield !== "string") {
+            // make field into a string for editing purposes
+            var convArr = [],
+                i = qfield.length,
+                prevDepth = 0,
+                liStr;
+            // convert array to displayable string
+            while( i -- ){
+              var line = qfield[i],
+                  depth = line.depth,
+                  items = line.items,
+                  j = -1,
+                  itemsLen = line.items.length,
+                  retStr = Array(depth + 1).join("*") + " ";
+              while (++j < itemsLen ){
+                var item = line.items[j];
+                if (item.link) {
+                  if (httpRe.test(item.link)) {
+                    retStr += item.text + "[" + item.link + "]";
+                  } else {
+                    retStr += '"' + item.text + '":' + item.link;
+                  }
+                } else {
+                  retStr += item.text;
+                }
+              } // end while j --
+              convArr.push(retStr);
+            } // end while i --
+            thisModel.set(freeFormFields[ffl], convArr.join("\n"));
+          } // end if typeof qfield !-- string
+        } // end while ffl--
+
         // use attributes since toJSON changes the structure
-        thisView.$el.html(thisView.template(thisView.model.attributes));
+        thisView.$el.html(thisView.template(thisModel.attributes));
+
+
 
         // add the resources (they're the tricky part)
         thisView.model.get("resources").each(function (res) {

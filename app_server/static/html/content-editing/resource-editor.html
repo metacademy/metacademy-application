@@ -1,12 +1,20 @@
 <script type="text/template" id="resource-editor-template">
+
+  <button class="expand-resource ec-button"> + show all fields </button>
+  <button class="contract-resource ec-button"> - collapse fields</button>
+
   <label>Title</label>
   <input type="text"  class="text-field" name="title-<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
 
+  <div class="expand-content">
   <label>Brief description</label>
-  <input type="text"  class="text-field" name="description-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods" value="<%= description %>">
+  <textarea  class="text-field" name="description-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods"><%= description %></textarea>
 
   <label>Location</label>
   <textarea class="composite-field" name="location-<%=this.cid%>" placeholder="e.g. pg. 76-78 [http://example.com/place_urls_in_brackets]"><%= this.model.getLocationString() %></textarea>
+
+  <label>Base resource url</label>
+  <input type="text" class="text-field" name="url-<%=this.cid%>" placeholder="e.g. https://www.coursera.org/course/ml" value="<%= url %>">
 
   <label>Resource year</label>
   <input type="text" class="text-field" name="year-<%=this.cid%>" placeholder="e.g. 2012" value="<%= year %>">
@@ -38,4 +46,5 @@
   <label>Resource type</label>
   <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Core
   <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="supplementary" <%= (core == 0) ? "checked" : "" %>>Supplementary
+  </div>
 </script>

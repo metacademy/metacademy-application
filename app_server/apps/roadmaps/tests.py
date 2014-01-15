@@ -307,6 +307,7 @@ class RoadmapViewTestCase(TestCase):
         self.revert_rm_to_0(self.normal_username, 401)
 
     def test_revert_resp_superuser(self):
+        pdb.set_trace()
         self.revert_rm_to_0(self.superuser_username, 200)
 
     def test_revert_resp_rcreator(self):

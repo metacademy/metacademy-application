@@ -23,6 +23,7 @@ def get_graph_creator(request):
     full_graph_json = get_full_graph_json_str()
     return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts)}, context_instance=RequestContext(request))
 
+
 def get_user_data(request):
     if request.user.is_authenticated():
         uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
@@ -34,3 +35,19 @@ def get_user_data(request):
     else:
         concepts = {"concepts": []}
     return concepts
+
+def save_graph_data(request):
+    """
+    Save the input graph data (update the graph and appropriate concept models and revisions)
+    TODO handle status of concepts/graphs automatically
+    check for errors and conflicts
+    """
+    pass
+
+def save_concept_data(request):
+    """
+    Save the input concept data (update the appropriate concept models and revisions)
+    TODO handle status of concepts automatically
+    check for errors and conflicts
+    """
+    pass

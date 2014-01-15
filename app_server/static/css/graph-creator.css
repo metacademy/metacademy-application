@@ -103,6 +103,23 @@ g.connect-node circle{
 *** Editable Content CSS ***
 ***************************/
 
+#graph-title{
+    position: absolute;
+    top: 0;
+    left: 0.5em;
+    z-index: 100;
+    margin-top: 0.3em;
+    color: #50094A;
+    border-bottom: 1px solid #50094A;
+    min-width: 3em;
+    padding: 0.5em;
+    padding-bottom: 0;
+    text-align: center;
+}
+#graph-title:hover{
+    background-color: #FFF5FE;
+}
+
 #back-to-graph-button{
     position: absolute;
     left: 0;

@@ -9,12 +9,13 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       var exDef = {
         nodes: new EditableNodeCollection(),
         edges: new EditableEdgeCollection(),
-        graphDiscussion: ""
+        title: "Graph Title"
       };
       return _.extend({}, ExploreGraphModel.prototype.defaults(), exDef);
     },
 
-    // FIXME should this always return true since we don't populate the graph?
+    // TODO sync title/discussion with server
+
     isPopulated: function(){
       return true;
     }

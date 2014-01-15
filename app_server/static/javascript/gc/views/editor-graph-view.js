@@ -5,6 +5,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
 
   pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
     svgId: "gc-svg",
+    titleId: "graph-title",
     instructionsDivId: "create-instructions",
     toolboxId: "toolbox",
     selectedClass: "selected",
@@ -72,6 +73,15 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
   };
 
   var GraphEditor = GraphView.extend({
+    events: function () {
+      var thisView = this,
+          levts = {};
+      levts["blur #" + pvt.consts.titleId] = function (evt) {
+        thisView.model.set("title", evt.currentTarget.innerHTML);
+      };
+      return _.extend(GraphView.prototype.events, levts);
+    },
+
     // @override
     postinitialize: function() {
       var thisView = this;
@@ -126,9 +136,15 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       d3Svg.on("mousedown", function(){thisView.svgMouseDown.apply(thisView, arguments);});
       d3Svg.on("mouseup", function(){thisView.svgMouseUp.apply(thisView, arguments);});
 
+      var titleDiv = document.createElement("h1");
+      titleDiv.id = consts.titleId;
+      titleDiv.innerHTML = thisView.model.get("title");
+      titleDiv.setAttribute("contentEditable", "true");
+      thisView.$el.append(titleDiv);
+
       // add the instructions tab TODO refactor into an html template
-      thisView.$el.append(document.getElementById(consts.instructionsDivId));
-      thisView.$el.find("#" + consts.instructionsDivId).show();
+       thisView.$el.append(document.getElementById(consts.instructionsDivId));
+       thisView.$el.find("#" + consts.instructionsDivId).show();
 
       // displayed when dragging between nodes
       thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")

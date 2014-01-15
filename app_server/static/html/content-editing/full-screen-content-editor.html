@@ -20,39 +20,94 @@
        with a given class and showing the one desired element -->
 
   <div class="ec-display-wrap" id="summary">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Provide a brief summary of the concept (typically 3-5 sentences) that specifies the essential information for the concept -- see other concepts or the first paragraph of wikipedia articles for examples.
+      </div>
+    </div>
     <textarea><%=summary%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="resources">
-    <button id="add-resource-button">+ Add Resource</button>
-
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Provide learning resources that the reader can consult in order to learn about the topic. These will generally be textbooks, video lectures, lecture notes, and review papers, although other sources such as Ph.D. theses or individual papers are also possible. The resource list means "read one of the following," rather than "read all of the following."
+      </div>
+    </div>
     <div id="resources-tidbit-wrap">
+      <button id="add-resource-button">+ Add Resource</button>
 
     </div>
   </div>
 
   <div class="ec-display-wrap" id="dependencies">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        This list specifies the the prerequisites for the given concept. Add prerequisites using the graph (see the instructions in the bottom right of the graph view).
+      </div>
+    </div>
     <% dependencies.each(function(dep){ %>
     <div class="dep-entry">
-       <h3> <%- dep.get("source").get("title") %> </h3>
+      <h3> <%- dep.get("source").get("title") %> </h3>
       <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">
     </div>
-     <% }) %>
+    <% }) %>
   </div>
 
   <div class="ec-display-wrap" id="pointers">
-     <textarea><%=pointers%></textarea>
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify relationships to other concepts using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+      </div>
+    </div>
+    <textarea><%=pointers%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="goals">
-     <textarea><%=goals%></textarea>
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify the goals for the user using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+      </div>
+    </div>
+    <textarea><%=goals%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="exercises">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify and explain links to exercises the user can practice in order to understand this concept further using simplified markdown syntax (TODO this should be more structured and allow users to write their own exercises).
+      </div>
+    </div>
     <textarea><%=exercises%></textarea>
   </div>
 
   <div class="ec-display-wrap" id="software">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify and explain links to software implementations of the specified concept (TODO these should include more structure, e.g. language fields).
+      </div>
+    </div>
     <textarea><%=software%></textarea>
   </div>
 

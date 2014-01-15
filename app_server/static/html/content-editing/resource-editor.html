@@ -6,12 +6,12 @@
   <label>Title</label>
   <input type="text"  class="text-field" name="title-<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
 
+  <label>Location</label>
+  <textarea class="composite-field" name="location-<%=this.cid%>" placeholder="e.g. pg. 76-78 [http://example.com/place_urls_in_brackets]"><%= this.model.getLocationString() %></textarea>
+
   <div class="expand-content">
   <label>Brief description</label>
   <textarea  class="text-field" name="description-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods"><%= description %></textarea>
-
-  <label>Location</label>
-  <textarea class="composite-field" name="location-<%=this.cid%>" placeholder="e.g. pg. 76-78 [http://example.com/place_urls_in_brackets]"><%= this.model.getLocationString() %></textarea>
 
   <label>Base resource url</label>
   <input type="text" class="text-field" name="url-<%=this.cid%>" placeholder="e.g. https://www.coursera.org/course/ml" value="<%= url %>">

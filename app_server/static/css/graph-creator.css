@@ -32,37 +32,46 @@ body{
     height: inherit;
 }
 
+/************
+Instructions
+************/
 #create-instructions{
     position: absolute;
     bottom: 0;
     right: 0;
+}
+
+.instructions{
     font-size: 0.8em;
     background-color: #F0F0F0;
     color: rgb(143, 126, 139);
     border-radius: 5px;
     padding: 0.5em;
+    display: inline-block;
+    margin-top: 0.4em;
 }
 
-#instruction-display-text{
+.instructions-icon{
     text-align: center;
 }
 
-#create-instructions:hover #instruction-display-text{
+.instructions:hover .instructions-icon{
     display: none;
 }
 
-#instruction-text{
+.instructions-text{
     display: none;
-    font-size: 1.2em;
+    font-size: 1.1em;
     padding: 1em;
+    line-height: 1.5em;
 }
 
-#instruction-text ul{
+.instructions-text ul{
     list-style: circle;
     padding-left: 2em;
 }
 
-#instruction-text li + li{
+.instructions-text li + li{
     margin-top: 1em;
 }
 
@@ -71,9 +80,11 @@ body{
     display: block;
 }
 
-#create-instructions:hover #instruction-text{
+.instructions:hover .instructions-text{
     display: block;
 }
+
+/** **/
 
 #gc-wrap svg{
     height: 100%;
@@ -139,20 +150,20 @@ g.connect-node circle{
    margin:0 0 0 1px;
    padding:3px 10px;
    background:#ddd;
-   color:#000;
+   color:##ECECEC;
    text-decoration:none;
    line-height:1.3em;
    border: 0;
 }
 
 .ec-tabs  button:hover {
-   background:#369;
+   background:#878888;
    color:#fff;
 }
 .ec-tabs button.active,
 .ec-tabs button.active:hover {
    color:#fff;
-   background:#000;
+   background:#4D4747;
    font-weight:bold;
 }
 
@@ -170,7 +181,7 @@ g.connect-node circle{
 .ec-tabs {
    width:100%;
    background:#fff;
-   border-bottom: 4px solid #000;
+   border-bottom: 2px solid #4D4747;
    overflow:hidden;
    position:relative;
 }
@@ -183,6 +194,12 @@ g.connect-node circle{
    position:relative;
    left:50%;
    text-align:center;
+}
+.ec-tabs ul li:first-child button {
+    border-radius: 3px 0 0 0;
+}
+.ec-tabs ul li:last-child button{
+    border-radius: 0 3px 0 0;
 }
 .ec-tabs ul li {
    display:block;
@@ -238,6 +255,7 @@ g.connect-node circle{
 }
 
 #resources-tidbit-wrap{
+    position: relative;
     margin-top: 1.5em;
 }
 

@@ -5,31 +5,32 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from apps.user_management.models import Profile
+
 # TODO test: sudo_listed_in_main, test failed roadmap creation (incorrect form)
 
-"""
-Fixtures:
+def common_setup(self):
+    self.rcreator_username = "test_roadmap_creator"
+    self.normal_username = "test"
+    self.superuser_username = "test_super"
+    uns = [self.rcreator_username, self.normal_username, self.superuser_username]
 
-+ roadmap_fixture.json
+    # create accounts
+    for username in uns:
+        if username == self.superuser_username:
+            self.user = User.objects.create_superuser(username, username + "@test.com", username)
+        else:
+            self.user = User.objects.create_user(username, username + "@test.com", username)
+        self.user.save()
+        self.prof = Profile(user=self.user)
+        self.prof.save()
 
-    -- Users (pw is always username for test fixtures) --
-    basic user: test
-    super user: test_super
-    basic user that created a roadmap (at .../test): test_roadmap_creator
 
-   -- Roadmaps --
-   /roadmaps/test_roadmap_creator/test
-
-"""
 
 class TestRoadmapCreation(TestCase):
-    fixtures = ["roadmap_fixture.json"]
 
     def setUp(self):
-        self.rcreator_username = "test_roadmap_creator"
-        self.normal_username = "test"
-        self.superuser_username = "test_super"
-        self.roadmap_name = "test"
+        common_setup(self)
         self.base_roadmap = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': 'publish_public_roadmap', 'listed_in_main': 'on', 'body':'some test [[text]]', 'submitbutton':'Save'}
 
     ######
@@ -260,13 +261,16 @@ class TestRoadmapCreation(TestCase):
 
 
 class RoadmapViewTestCase(TestCase):
-    fixtures = ["roadmap_fixture.json"]
 
     def setUp(self):
-        self.rcreator_username = "test_roadmap_creator"
-        self.normal_username = "test"
-        self.superuser_username = "test_super"
+        common_setup(self)
         self.roadmap_name = "test"
+
+        # publish initial roadmap
+        client = Client()
+        client.login(username=self.rcreator_username, password=self.rcreator_username)
+        rm_dict = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': self.roadmap_name, 'listed_in_main': 'on', 'body':'some test [[text]]', 'submitbutton':'Publish'}
+        resp = client.post(reverse('roadmaps:new'), rm_dict)
 
     def client_get_rm_login(self, reverse_str, un, url_args, resp_code):
         client = Client()
@@ -289,28 +293,29 @@ class RoadmapViewTestCase(TestCase):
         resp = client.get(reverse('roadmaps:user-list', args=(self.rcreator_username,)))
         self.assertEqual(resp.status_code, 200)
 
-    def revert_rm_to_0(self, un, resp_code):
-        """
-        helper funtion: test reversion w/auth
-        """
-        client = Client()
-        client.login(username=un, password=un)
-        resp = client.put(reverse('roadmaps:revert', args=(self.rcreator_username, self.roadmap_name, 0,)))
-        self.assertEqual(resp.status_code, resp_code)
+    # TODO readd reversion tests
+    # def revert_rm_to_0(self, un, resp_code):
+    #     """
+    #     helper funtion: test reversion w/auth
+    #     """
+    #     client = Client()
+    #     client.login(username=un, password=un)
+    #     resp = client.put(reverse('roadmaps:revert', args=(self.rcreator_username, self.roadmap_name, 0,)))
+    #     self.assertEqual(resp.status_code, resp_code)
 
-    def test_revert_resp_no_auth(self):
-        client = Client()
-        resp = client.put(reverse('roadmaps:revert', args=(self.rcreator_username, self.roadmap_name, 0,)))
-        self.assertEqual(resp.status_code, 401)
+    # def test_revert_resp_no_auth(self):
+    #     client = Client()
+    #     resp = client.put(reverse('roadmaps:revert', args=(self.rcreator_username, self.roadmap_name, 0,)))
+    #     self.assertEqual(resp.status_code, 401)
 
-    def test_revert_resp_normal(self):
-        self.revert_rm_to_0(self.normal_username, 401)
+    # def test_revert_resp_normal(self):
+    #     self.revert_rm_to_0(self.normal_username, 401)
 
-    def test_revert_resp_superuser(self):
-        self.revert_rm_to_0(self.superuser_username, 200)
+    # def test_revert_resp_superuser(self):
+    #     self.revert_rm_to_0(self.superuser_username, 200)
 
-    def test_revert_resp_rcreator(self):
-        self.revert_rm_to_0(self.rcreator_username, 200)
+    # def test_revert_resp_rcreator(self):
+    #     self.revert_rm_to_0(self.rcreator_username, 200)
 
     def view_rev_0(self, un, resp_code):
         """

@@ -27,12 +27,13 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         "click #delete-graph": "clearGraph",
         "click #preview-graph": "previewGraph",
         "click #back-to-editing": "returnToEditor",
+        "click #save": "syncWithServer",
         "keyup #add-concept-container input": "addConceptKeyUp"
+        // Bad design note: #optimize listener is in graph-view
       },
 
        initialize: function(inp){
          var thisView = this;
-        //     consts = pvt.consts;
          thisView.setElement("#" + pvt.consts.viewId);
          thisView.appRouter = inp.appRouter;
        },
@@ -43,7 +44,6 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       isViewRendered: function(){
         return pvt.isRendered;
       },
-
 
       /**
        * Render the apptools view
@@ -115,6 +115,20 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         thisView.appRouter.navigate("", {trigger: true});
       },
 
+      syncWithServer: function () {
+        var jsonModelStr = JSON.stringify(this.model.toJSON());
+        $.ajax({ type: "PUT",
+                 data: jsonModelStr,
+                 headers: {'X-CSRFToken': window.CSRF_TOKEN},
+                 success: function (resp) {
+                   if (resp.url) {
+                     // TODO figure out back button issues
+                     window.history.pushState({}, "", resp.url);
+                   }
+                   console.log("success!");
+                 }
+               });
+      },
 
       downloadGraph: function(){
         var outStr = JSON.stringify(this.model.toJSON()),

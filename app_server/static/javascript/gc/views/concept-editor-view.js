@@ -71,7 +71,7 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
                   retStr += item.text;
                 }
               } // end while j --
-              convArr.push(retStr);
+              convArr.unshift(retStr);
             } // end while i --
             thisModel.set(freeFormFields[ffl], convArr.join("\n"));
           } // end if typeof qfield !-- string

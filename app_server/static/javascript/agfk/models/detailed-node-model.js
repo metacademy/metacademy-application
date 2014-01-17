@@ -3,15 +3,15 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
 
   var DetailedNode = Node.extend({
     // FIXME these shouldn't be hardcoded
-    collFields: ["exercises", "dependencies", "outlinks", "resources"],
+    collFields: ["dependencies", "outlinks", "resources"],
 
-    txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
+    txtFields: ["id", "exercises", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
 
     defaults: function(){
       var dnDefaults = {
         dependencies: new DetailedEdgeCollection(),
         outlinks: new DetailedEdgeCollection(),
-        exercises: new NodePropertyCollections.ExerciseCollection(),
+        exercises: "", // TODO new NodePropertyCollections.ExerciseCollection(),
         resources: new NodePropertyCollections.ResourceCollection(),
         flags: [],
         goals: "",

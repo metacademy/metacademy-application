@@ -8,9 +8,9 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
     // private functions //
 
     return DetailedNodeModel.extend({
-      collFields: ["exercises", "dependencies", "outlinks", "resources"],
+      collFields: ["dependencies", "outlinks", "resources"],
 
-      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "software", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
+      txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isNew", "editNote", "exercists", "software", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
 
       defaults: function() {
         var enDef = {
@@ -38,9 +38,11 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         // handle collection attributes (don't pass outlinks -- redundant)
         var dependencies = [];
         thisModel.get("dependencies").forEach(function(dep) {
-          var tmpDep = {};
-          tmpDep.source = dep.get("source").get("id");
+          var tmpDep = {},
+              src = dep.get("source");
+          tmpDep.source = src.get("id");
           tmpDep.id = dep.id;
+          tmpDep.sid = src.get("sid")|| src.get("id");
           tmpDep.reason = dep.get("reason");
           tmpDep.middlePts = dep.get("middlePts");
           tmpDep.isContracted = dep.get("isContracted");
@@ -48,7 +50,6 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         });
         retObj.dependencies = dependencies;
         retObj.resources = thisModel.get("resources").toJSON();
-        retObj.exercises = thisModel.get("exercises").toJSON();
 
         return retObj;
       }

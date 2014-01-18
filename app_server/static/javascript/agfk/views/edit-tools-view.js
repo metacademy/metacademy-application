@@ -123,7 +123,7 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
                  success: function (resp) {
                    if (resp.url) {
                      // TODO figure out back button issues
-                     window.history.pushState({}, "", resp.url);
+                     //window.history.pushState({}, "", resp.url);
                    }
                    console.log("success!");
                  }

@@ -11,6 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'Concept'
         db.create_table(u'graph_concept', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
+            ('tag', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('summary', self.gf('django.db.models.fields.CharField')(max_length=1000)),
             ('goals', self.gf('django.db.models.fields.CharField')(max_length=2000)),
@@ -18,17 +19,35 @@ class Migration(SchemaMigration):
             ('software', self.gf('django.db.models.fields.CharField')(max_length=2000)),
             ('pointers', self.gf('django.db.models.fields.CharField')(max_length=2000)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('is_shortcut', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('is_provisional', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal(u'graph', ['Concept'])
 
-        # Adding M2M table for field prerequisites on 'Concept'
-        m2m_table_name = db.shorten_name(u'graph_concept_prerequisites')
+        # Adding M2M table for field flags on 'Concept'
+        m2m_table_name = db.shorten_name(u'graph_concept_flags')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('from_concept', models.ForeignKey(orm[u'graph.concept'], null=False)),
-            ('to_concept', models.ForeignKey(orm[u'graph.concept'], null=False))
+            ('concept', models.ForeignKey(orm[u'graph.concept'], null=False)),
+            ('flag', models.ForeignKey(orm[u'graph.flag'], null=False))
         ))
-        db.create_unique(m2m_table_name, ['from_concept_id', 'to_concept_id'])
+        db.create_unique(m2m_table_name, ['concept_id', 'flag_id'])
+
+        # Adding model 'Flag'
+        db.create_table(u'graph_flag', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('text', self.gf('django.db.models.fields.CharField')(max_length=30)),
+        ))
+        db.send_create_signal(u'graph', ['Flag'])
+
+        # Adding model 'Edge'
+        db.create_table(u'graph_edge', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('source', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edge_source', to=orm['graph.Concept'])),
+            ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edge_target', to=orm['graph.Concept'])),
+            ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
+        ))
+        db.send_create_signal(u'graph', ['Edge'])
 
         # Adding model 'ConceptSettings'
         db.create_table(u'graph_conceptsettings', (
@@ -107,15 +126,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'graph', ['Graph'])
 
-        # Adding M2M table for field concepts on 'Graph'
-        m2m_table_name = db.shorten_name(u'graph_graph_concepts')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('graph', models.ForeignKey(orm[u'graph.graph'], null=False)),
-            ('concept', models.ForeignKey(orm[u'graph.concept'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['graph_id', 'concept_id'])
-
         # Adding model 'GraphSettings'
         db.create_table(u'graph_graphsettings', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -137,8 +147,14 @@ class Migration(SchemaMigration):
         # Deleting model 'Concept'
         db.delete_table(u'graph_concept')
 
-        # Removing M2M table for field prerequisites on 'Concept'
-        db.delete_table(db.shorten_name(u'graph_concept_prerequisites'))
+        # Removing M2M table for field flags on 'Concept'
+        db.delete_table(db.shorten_name(u'graph_concept_flags'))
+
+        # Deleting model 'Flag'
+        db.delete_table(u'graph_flag')
+
+        # Deleting model 'Edge'
+        db.delete_table(u'graph_edge')
 
         # Deleting model 'ConceptSettings'
         db.delete_table(u'graph_conceptsettings')
@@ -160,9 +176,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Graph'
         db.delete_table(u'graph_graph')
-
-        # Removing M2M table for field concepts on 'Graph'
-        db.delete_table(db.shorten_name(u'graph_graph_concepts'))
 
         # Deleting model 'GraphSettings'
         db.delete_table(u'graph_graphsettings')
@@ -211,12 +224,15 @@ class Migration(SchemaMigration):
         u'graph.concept': {
             'Meta': {'object_name': 'Concept'},
             'exercises': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
+            'flags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['graph.Flag']", 'symmetrical': 'False'}),
             'goals': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
+            'is_provisional': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
-            'prerequisites': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'prerequisites_rel_+'", 'to': u"orm['graph.Concept']"}),
             'software': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
             'summary': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'tag': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
@@ -244,6 +260,18 @@ class Migration(SchemaMigration):
             'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'concept_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        u'graph.edge': {
+            'Meta': {'object_name': 'Edge'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
+            'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edge_source'", 'to': u"orm['graph.Concept']"}),
+            'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edge_target'", 'to': u"orm['graph.Concept']"})
+        },
+        u'graph.flag': {
+            'Meta': {'object_name': 'Flag'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'text': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+        },
         u'graph.globalresource': {
             'Meta': {'object_name': 'GlobalResource'},
             'additional_prerequisites': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'global_additional_prerequisites'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
@@ -262,7 +290,6 @@ class Migration(SchemaMigration):
         },
         u'graph.graph': {
             'Meta': {'object_name': 'Graph'},
-            'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_concepts'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },

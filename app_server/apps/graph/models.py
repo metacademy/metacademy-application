@@ -20,6 +20,10 @@ class Concept(Model):
     version_num = IntegerField(default=0)
     is_shortcut = BooleanField(default=False)
     is_provisional = BooleanField(default=True) # provisional = not moderated
+    flags = ManyToManyField("Flag")
+
+class Flag(Model):
+    text = CharField(max_length=30)
 
 class Edge(Model):
     """
@@ -56,7 +60,7 @@ class GlobalResource(Model):
     description = CharField(max_length=500)
     note = CharField(max_length=500)
     resource_type = CharField(max_length=100)
-    additional_prerequisites = ManyToManyField(Concept, related_name="global_additional_prerequisites")
+    version_num = IntegerField(default=0)
 
 class ConceptResource(Model):
     """
@@ -70,8 +74,8 @@ class ConceptResource(Model):
     additional_prerequisites = ManyToManyField(Concept, "concept_additional_prerequisites")
     authors = CharField(max_length=200)
     year = IntegerField()
-    free = BooleanField(default=False)
-    signup = BooleanField(default=False)
+    free = BooleanField()
+    signup = BooleanField()
     resource_type = CharField(max_length=100)
     edition = CharField(max_length=100)
     resource_level = CharField(max_length=100) # TODO use a set of options?
@@ -79,36 +83,6 @@ class ConceptResource(Model):
     note = CharField(max_length=500)
     resource_type = CharField(max_length=100)
     version_num = IntegerField(default=0)
-    def get_version_num(self):
-        pass
-    def get_additional(self):
-        pass
-    def get_resource(self):
-        pass
-    def get_note(self):
-        pass
-    def get_description(self):
-        pass
-    def get_resource(self):
-        pass
-    def get_edition(self):
-        pass
-    def get_resource(self):
-        pass
-    def get_signup(self):
-        pass
-    def get_free(self):
-        pass
-    def get_year(self):
-        pass
-    def get_authors(self):
-        pass
-    def get_additional(self):
-        pass
-    def get_core(self):
-        pass
-    def get_location(self):
-        pass
 
 class Graph(Model):
     """

@@ -33,7 +33,8 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
 
         // check the structure of goals, resources, problems, and relevant software
         // convert to free-form text for now
-        var freeFormFields = ["goals", "pointers", "exercises"]; //, "exercises"]; // TODO add exercises
+        // TODO extract this to a utils function
+        var freeFormFields = ["goals", "pointers", "exercises"];
         var ffl = freeFormFields.length,
             httpRe = /http:/;
         while( ffl -- ){
@@ -79,8 +80,6 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
 
         // use attributes since toJSON changes the structure
         thisView.$el.html(thisView.template(thisModel.attributes));
-
-
 
         // add the resources (they're the tricky part)
         thisView.model.get("resources").each(function (res) {

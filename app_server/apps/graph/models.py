@@ -1,10 +1,12 @@
+import pdb
+
 from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugField, TextField, IntegerField, OneToOneField, ManyToManyField
 
 import reversion
 
 from apps.user_management.models import Profile
 
-
+# TODO simplify the required fields
 class Concept(Model):
     """
     Model that contains the concept data under version control
@@ -20,7 +22,7 @@ class Concept(Model):
     version_num = IntegerField(default=0)
     is_shortcut = BooleanField(default=False)
     is_provisional = BooleanField(default=True) # provisional = not moderated
-    flags = ManyToManyField("Flag")
+    flags = ManyToManyField("Flag", blank=True, null=True)
 
 class Flag(Model):
     text = CharField(max_length=30)
@@ -89,13 +91,15 @@ class Graph(Model):
     Model that contains graph data under version control
     """
     # TODO the concepts should save a freeze of the concept revisions
-    #concepts = ManyToManyField(Concept, related_name="graph_concepts")
+    id = CharField(max_length=30, primary_key=True)
+    title = CharField(max_length=100)
     version_num = IntegerField(default=0)
+    concepts = ManyToManyField(Concept, related_name="graph_concepts")
 
 
 class GraphSettings(Model):
     """
     Model that contains graph data under version control. Effectively, a graph is a set of nodes, and for now, it's mostly used in the context of users creating graphs
     """
-    title = CharField(max_length=100)
+    graph = OneToOneField(Graph)
     editors = ManyToManyField(Profile, related_name="graph_editors")

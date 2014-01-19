@@ -12,7 +12,7 @@ def sync_graph(in_graph):
     """
     Sync client graph changes with the server-side graph model
     """
-    for node in in_graph:
+    for node in in_graph["items"]:
         sync_concept(node)
 
 
@@ -38,19 +38,6 @@ def sync_concept(in_concept):
             changed = True
             setattr(concept, tf, in_concept[tf])
 
-    # handle nested list text fields
-    nested_lists = ["pointers", "goals"]
-    for nl_itm in nested_lists:
-        nl = in_concept[nl_itm]
-        parse_nl = type(nl) is unicode
-        nl = unicode(nl)
-        if is_new or getattr(concept, nl_itm) != nl:
-            if parse_nl:
-                nl = [Line.parse(line) for line in nl.split("\n")]
-                nl = unicode(nl)
-                # need to parse the text
-            setattr(concept, nl_itm, nl)
-
     # handle prereqs: create concept place holders if they don't exist yet
     for in_inlink in in_concept["dependencies"]:
         inlink_id = in_inlink['sid']
@@ -72,25 +59,11 @@ def sync_concept(in_concept):
 
     # handle resource (this should generalize for software and exercises as well)
     for in_resource in in_concept["resources"]:
-        # first, check if the given local resource exists for the concept (uh-oh: do we need unique resource ids to trace changes? - how to do this without unique ids? HAshing function...hmmm)
-#         in_resource
-# id props: title, url
-# plan: check url
-        # attempt to match by url
-        GlobalResource.objects.filter(url=in_resource["url"])
-        # if that doesn't work, attempt to match by title
-        GlobalResource.objects.filter(title=in_resource["title"])
-
-        # I need to rethink this relationship...
-
-        # let's see
-
-        # remove no longer present resources? or should this be done with delete requests? What if we're only updating a subset of the node
-
-        pdb.set_trace()
-
+        pass
+        #pdb.set_trace()
+        # resource should have an id given to it from the server
+        # the corresponding conceptid should already exist
     # don't update concept if it hasn't changed
     # TODO add revision history after dealing with current db schema
     if changed:
-        pdb.set_trace()
         concept.save()

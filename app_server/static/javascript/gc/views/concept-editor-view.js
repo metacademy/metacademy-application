@@ -97,6 +97,7 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
 
       addResource: function () {
         var thisView = this;
+        // should do create
         thisView.model.get("resources").add(new NodePropModels.Resource(), {at: 0});
         thisView.render();
       },

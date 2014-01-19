@@ -27,7 +27,7 @@ def new_graph(request):
         graph_url = update_graph(request,return_url=True)
         return HttpResponse(json.dumps({"url": graph_url}), content_type="application/json", status=200)
     else:
-        return HttpResponse(status=403)
+        return HttpResponse(status=405)
 
 def update_graph(request, return_url=False):
     if request.method == "PUT":
@@ -37,7 +37,7 @@ def update_graph(request, return_url=False):
         else:
             return HttpResponse(status=200)
     else:
-        return HttpResponse(status=403)
+        return HttpResponse(status=405)
 
 
 def get_user_data(request):

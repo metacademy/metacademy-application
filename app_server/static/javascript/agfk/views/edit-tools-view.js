@@ -116,16 +116,22 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       },
 
       syncWithServer: function () {
-        var jsonModelStr = JSON.stringify(this.model.toJSON());
-        $.ajax({ type: "PUT",
+        var jsonModelStr = JSON.stringify({id: "tempgraph", title: "temp test",  concepts: this.model.toJSON()});
+        $.ajax({ type: "POST",
+                 url: "/graphs/api/v1/graph/",
+                 contentType: "application/json; charset=utf-8",
                  data: jsonModelStr,
                  headers: {'X-CSRFToken': window.CSRF_TOKEN},
                  success: function (resp) {
+                   console.log("success!");
+                   console.log(resp.responseText);
                    if (resp.url) {
                      // TODO figure out back button issues
                      //window.history.pushState({}, "", resp.url);
                    }
-                   console.log("success!");
+                 },
+                 error: function (resp) {
+                   console.log(resp.responseText);
                  }
                });
       },

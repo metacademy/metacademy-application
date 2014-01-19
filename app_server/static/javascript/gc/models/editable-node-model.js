@@ -39,10 +39,12 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
         var dependencies = [];
         thisModel.get("dependencies").forEach(function(dep) {
           var tmpDep = {},
-              src = dep.get("source");
+              src = dep.get("source"),
+              tar = dep.get("target");
           tmpDep.source = src.get("id");
           tmpDep.id = dep.id;
-          tmpDep.sid = src.get("sid")|| src.get("id");
+          tmpDep.sid_source = src.get("sid")|| src.get("id");
+          tmpDep.sid_target = tar.get("sid")|| tar.get("id");
           tmpDep.reason = dep.get("reason");
           tmpDep.middlePts = dep.get("middlePts");
           tmpDep.isContracted = dep.get("isContracted");

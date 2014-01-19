@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'compressor',
     'lazysignup',
     'reversion',
+    'tastypie'
 )
 
 # apps settings
@@ -209,5 +210,6 @@ INTERNAL_IPS = ("127.0.0.1",)
 CONTENT_SERVER = 'http://'+ str(config.CONTENT_SERVER_IP) + ":" + str(config.CONTENT_SERVER_PORT)
 
 APP_SERVER = 'http://'+ str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONTEND_SERVER_PORT)
+
 
 from settings_local import *

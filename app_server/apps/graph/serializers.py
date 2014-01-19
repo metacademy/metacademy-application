@@ -6,7 +6,7 @@ from tastypie.serializers import Serializer
 
 from apps.graph.models import Concept
 
-SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "edge_target"]
+SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies"]
 
 def serialize_concept(in_concept):
     # TODO need to normalize client side to better agree with server representation
@@ -30,11 +30,14 @@ def serialize_concept(in_concept):
     # handle prereqs: create concept place holders if they don't exist yet
     for i, in_inlink in enumerate(in_concept["dependencies"]):
         inlink = {}
-        inlink['source'] = in_inlink['sid_source']
-        inlink['target'] = in_inlink['sid_target']
+        inlink['source'] = {"id": in_inlink['sid_source']}
+        inlink['target'] = {"id": in_inlink['sid_target']}
         inlink['reason'] = in_inlink['reason']
+        if not in_inlink.has_key("id"):
+            inlink["id"] = in_inlink["sid_source"] + in_inlink["sid_target"]
+        else:
+            inlink["id"] = in_inlink["id"]
         in_concept["dependencies"][i] = inlink
-    in_concept["edge_target"] = in_concept["dependencies"]
 
     # remove non-save fields
     for field in in_concept.keys():

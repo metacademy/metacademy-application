@@ -42,7 +42,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Edge'
         db.create_table(u'graph_edge', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
             ('source', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edge_source', to=orm['graph.Concept'])),
             ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edge_target', to=orm['graph.Concept'])),
             ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
@@ -264,7 +264,7 @@ class Migration(SchemaMigration):
         },
         u'graph.edge': {
             'Meta': {'object_name': 'Edge'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
             'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edge_source'", 'to': u"orm['graph.Concept']"}),
             'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edge_target'", 'to': u"orm['graph.Concept']"})

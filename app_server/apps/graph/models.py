@@ -31,10 +31,10 @@ class Edge(Model):
     """
     Concept edge
     """
+    id = CharField(max_length=30, primary_key=True)
     source = ForeignKey("Concept", related_name="edge_source")
     target = ForeignKey("Concept", related_name="edge_target")
     reason = CharField(max_length=500)
-
 
 class ConceptSettings(Model):
     """

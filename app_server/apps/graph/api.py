@@ -43,8 +43,8 @@ class EdgeResource(ModelResource):
         return bundle
 
 class ConceptResource(ModelResource):
-    dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True, null=True)
-    flags = fields.ManyToManyField(FlagResource, 'flags', full=True, null=True)
+    dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True)
+    flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
     class Meta:
         queryset = Concept.objects.all()
         resource_name = 'concept'

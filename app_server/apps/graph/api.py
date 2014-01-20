@@ -4,9 +4,8 @@ from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization # TODO change
 
-from apps.graph.models import Concept, Edge, Flag, Graph
+from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource
 from apps.graph.serializers import ConceptSerializer, GraphSerializer
-
 
 
 class FlagResource(ModelResource):
@@ -17,8 +16,7 @@ class FlagResource(ModelResource):
         resource_name = 'flag'
         authorization = Authorization()
 
-
-class EdgeConceptResource(ModelResource):
+class ShellConceptResource(ModelResource):
     class Meta:
         fields = ("id", "tag")
         queryset = Concept.objects.all()
@@ -26,10 +24,9 @@ class EdgeConceptResource(ModelResource):
         include_resource_uri = False
         authorization = Authorization()
 
-
 class EdgeResource(ModelResource):
-    source = fields.ForeignKey(EdgeConceptResource, "source", full=True)
-    target = fields.ForeignKey(EdgeConceptResource, "target", full=True)
+    source = fields.ForeignKey(ShellConceptResource, "source", full=True)
+    target = fields.ForeignKey(ShellConceptResource, "target", full=True)
     class Meta:
         queryset = Edge.objects.all()
         resource_name = 'edge'
@@ -42,8 +39,17 @@ class EdgeResource(ModelResource):
         del bundle.data["id"]
         return bundle
 
+class ConceptResourceResource(ModelResource):
+    # additional_prerequisites = fields.ManyToManyField(ShellConceptResource, "concept_additional_prerequisites", full=True, null=True)
+    concept = fields.ForeignKey(ShellConceptResource, "concept", full=True)
+    class Meta:
+        queryset = ConceptResource.objects.all()
+        resource_name = 'conceptresource'
+        authorization = Authorization()
+
 class ConceptResource(ModelResource):
     dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True)
+    resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
     class Meta:
         queryset = Concept.objects.all()

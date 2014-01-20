@@ -12,17 +12,17 @@ class Concept(Model):
     Model that contains the concept data under version control
     """
     id = CharField(max_length=30, primary_key=True) # charfield for backwards compatability
-    tag = CharField(max_length=30, unique=True, null=False) # charfield for backwards compatability
+    tag = CharField(max_length=30, null=False) # charfield for backwards compatability with text system
     title = CharField(max_length=100)
-    summary = CharField(max_length=1000)
-    goals = CharField(max_length=2000) # field type may change
-    exercises = CharField(max_length=2000) # field type may change
-    software = CharField(max_length=2000) # field type may change
-    pointers = CharField(max_length=2000) # field type may change
-    version_num = IntegerField(default=0)
+    summary = CharField(max_length=1000, null=True, blank=True)
+    goals = CharField(max_length=2000, null=True, blank=True) # field type may change
+    exercises = CharField(max_length=2000,  null=True, blank=True) # field type may change
+    software = CharField(max_length=2000, null=True, blank=True) # field type may change
+    pointers = CharField(max_length=2000, null=True, blank=True) # field type may change
+    version_num = IntegerField(default=0, null=True, blank=True)
+    flags = ManyToManyField("Flag", blank=True, null=True)
     is_shortcut = BooleanField(default=False)
     is_provisional = BooleanField(default=True) # provisional = not moderated
-    flags = ManyToManyField("Flag", blank=True, null=True)
 
 class Flag(Model):
     text = CharField(max_length=30)
@@ -51,18 +51,19 @@ class GlobalResource(Model):
     for new concept resources
     """
     title = CharField(max_length=100)
-    url = CharField(max_length=200)
-    authors = CharField(max_length=200)
-    year = IntegerField()
+    url = CharField(max_length=200, unique=True)
+    authors = CharField(max_length=200, null=True, blank=True)
+    year = IntegerField(null=True, blank=True)
     free = BooleanField(default=False)
-    signup = BooleanField(default=False)
-    resource_type = CharField(max_length=100)
-    edition = CharField(max_length=100)
-    resource_level = CharField(max_length=100) # TODO use a set of options?
-    description = CharField(max_length=500)
-    note = CharField(max_length=500)
-    resource_type = CharField(max_length=100)
-    version_num = IntegerField(default=0)
+    requires_signup = BooleanField(default=False)
+    resource_type = CharField(max_length=100, null=True, blank=True)
+    edition = CharField(max_length=100, null=True, blank=True)
+    # TODO use a set of options (reference, high school, overview, etc)
+    level = CharField(max_length=100, null=True, blank=True)
+    description = CharField(max_length=500, null=True, blank=True)
+    extra = CharField(max_length=500, null=True, blank=True)
+    resource_type = CharField(max_length=100, null=True, blank=True)
+    version_num = IntegerField(default=0, null=True, blank=True)
 
 class ConceptResource(Model):
     """
@@ -70,21 +71,23 @@ class ConceptResource(Model):
     NOTE: should use functions to obtain fields
      functions will query the GlobalResource if the ConceptResource does not have a value for the field
     """
-    resource = ForeignKey(GlobalResource)
+    id = CharField(max_length=30, primary_key=True)
+    resource = ForeignKey(GlobalResource, null=True) # CHANGEME
+    concept = ForeignKey(Concept, related_name="concept_resource")
     location = CharField(max_length=1000)
     core = BooleanField(default=False)
-    additional_prerequisites = ManyToManyField(Concept, "concept_additional_prerequisites")
-    authors = CharField(max_length=200)
-    year = IntegerField()
-    free = BooleanField()
-    signup = BooleanField()
-    resource_type = CharField(max_length=100)
-    edition = CharField(max_length=100)
-    resource_level = CharField(max_length=100) # TODO use a set of options?
-    description = CharField(max_length=500)
-    note = CharField(max_length=500)
-    resource_type = CharField(max_length=100)
-    version_num = IntegerField(default=0)
+    additional_dependencies = ManyToManyField(Concept, "concept_additional_dependencies", null=True, blank=True)
+    authors = CharField(max_length=200, null=True, blank=True)
+    year = IntegerField(null=True, blank=True)
+    free = BooleanField(default=False)
+    requires_signup = BooleanField(default=False)
+    resource_type = CharField(max_length=100, null=True, blank=True)
+    edition = CharField(max_length=100, null=True, blank=True)
+    level = CharField(max_length=100, null=True, blank=True) # TODO use a set of options
+    description = CharField(max_length=500, null=True, blank=True)
+    extra = CharField(max_length=500, null=True, blank=True)
+    resource_type = CharField(max_length=100, null=True, blank=True)
+    version_num = IntegerField(default=0, null=True, blank=True)
 
 class Graph(Model):
     """

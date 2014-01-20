@@ -1,12 +1,14 @@
 import json
 import pdb
+import string
+import random
 
 from django.core.serializers.json import DjangoJSONEncoder
 from tastypie.serializers import Serializer
 
 from apps.graph.models import Concept
 
-SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies"]
+CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
 
 def serialize_concept(in_concept):
     # TODO need to normalize client side to better agree with server representation
@@ -20,12 +22,36 @@ def serialize_concept(in_concept):
     in_concept["id"] = useid
     in_concept["tag"] = usetag
 
+    for resource in in_concept["resources"]:
+        try:
+            resource["year"] = int(resource["year"])
+        except:
+            resource["year"] = None
+        if not resource.has_key("id"):
+            resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(12)])
+           # FIXME this shouldn't exist here, or at least, it should check
+           # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
+        resource["concept"] = {"id": in_concept["id"], "tag": in_concept["tag"]}
+        # resource["additional_dependencies"] = resource["dependencies"]  # TODO figure these out
+        del resource["dependencies"]
+        # pdb.set_trace()
+
+        # FIXME TEMPORARY HACK FOR EXPLORATION- CJR
+        del resource['url']
+        del resource['title']
+        if resource.has_key('specific_url_base'):
+            del resource['specific_url_base']
+        if resource.has_key('edition_years'):
+            del resource['edition_years']
+
     # handle flags TODO this shouldn't be necessary eventually
     if in_concept["flags"]:
         flag_arr = []
         for flag in in_concept["flags"]:
             flag_arr.append({"text": flag})
         in_concept["flags"] = flag_arr
+
+    # handle format of structured lists  TODO NEXT
 
     # handle prereqs: create concept place holders if they don't exist yet
     for i, in_inlink in enumerate(in_concept["dependencies"]):
@@ -41,7 +67,7 @@ def serialize_concept(in_concept):
 
     # remove non-save fields
     for field in in_concept.keys():
-        if field not in SAVE_FIELDS:
+        if field not in CONCEPT_SAVE_FIELDS:
             del in_concept[field]
 
 
@@ -89,7 +115,6 @@ class GraphSerializer(Serializer):
         data = json.loads(content)
         for i, concept in enumerate(data["concepts"]):
             data["concepts"][i] = serialize_concept(concept)
-
         return data
 
         # have to change input to align with desired output...

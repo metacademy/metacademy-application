@@ -11,14 +11,14 @@ class Migration(SchemaMigration):
         # Adding model 'Concept'
         db.create_table(u'graph_concept', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
-            ('tag', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
+            ('tag', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('summary', self.gf('django.db.models.fields.CharField')(max_length=1000)),
-            ('goals', self.gf('django.db.models.fields.CharField')(max_length=2000)),
-            ('exercises', self.gf('django.db.models.fields.CharField')(max_length=2000)),
-            ('software', self.gf('django.db.models.fields.CharField')(max_length=2000)),
-            ('pointers', self.gf('django.db.models.fields.CharField')(max_length=2000)),
-            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('summary', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True, blank=True)),
+            ('goals', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
+            ('exercises', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
+            ('software', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
+            ('pointers', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
+            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('is_shortcut', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('is_provisional', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
@@ -69,41 +69,42 @@ class Migration(SchemaMigration):
         db.create_table(u'graph_globalresource', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('authors', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('year', self.gf('django.db.models.fields.IntegerField')()),
+            ('url', self.gf('django.db.models.fields.CharField')(unique=True, max_length=200)),
+            ('authors', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
+            ('year', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('free', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('signup', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('edition', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('resource_level', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('note', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('requires_signup', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('edition', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('level', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
+            ('extra', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
+            ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['GlobalResource'])
 
         # Adding model 'ConceptResource'
         db.create_table(u'graph_conceptresource', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('resource', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['graph.GlobalResource'])),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
+            ('resource', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['graph.GlobalResource'], null=True)),
+            ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='concept_resource', to=orm['graph.Concept'])),
             ('location', self.gf('django.db.models.fields.CharField')(max_length=1000)),
             ('core', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('authors', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('year', self.gf('django.db.models.fields.IntegerField')()),
-            ('free', self.gf('django.db.models.fields.BooleanField')()),
-            ('signup', self.gf('django.db.models.fields.BooleanField')()),
-            ('edition', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('resource_level', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('note', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('authors', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
+            ('year', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('free', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('requires_signup', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('edition', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('level', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
+            ('extra', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
+            ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['ConceptResource'])
 
-        # Adding M2M table for field additional_prerequisites on 'ConceptResource'
-        m2m_table_name = db.shorten_name(u'graph_conceptresource_additional_prerequisites')
+        # Adding M2M table for field additional_dependencies on 'ConceptResource'
+        m2m_table_name = db.shorten_name(u'graph_conceptresource_additional_dependencies')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('conceptresource', models.ForeignKey(orm[u'graph.conceptresource'], null=False)),
@@ -170,8 +171,8 @@ class Migration(SchemaMigration):
         # Deleting model 'ConceptResource'
         db.delete_table(u'graph_conceptresource')
 
-        # Removing M2M table for field additional_prerequisites on 'ConceptResource'
-        db.delete_table(db.shorten_name(u'graph_conceptresource_additional_prerequisites'))
+        # Removing M2M table for field additional_dependencies on 'ConceptResource'
+        db.delete_table(db.shorten_name(u'graph_conceptresource_additional_dependencies'))
 
         # Deleting model 'Graph'
         db.delete_table(u'graph_graph')
@@ -225,36 +226,37 @@ class Migration(SchemaMigration):
         },
         u'graph.concept': {
             'Meta': {'object_name': 'Concept'},
-            'exercises': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
+            'exercises': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'flags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Flag']", 'null': 'True', 'blank': 'True'}),
-            'goals': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
+            'goals': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
             'is_provisional': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
-            'software': ('django.db.models.fields.CharField', [], {'max_length': '2000'}),
-            'summary': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
-            'tag': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
+            'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
+            'software': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
+            'summary': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
+            'tag': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         },
         u'graph.conceptresource': {
             'Meta': {'object_name': 'ConceptResource'},
-            'additional_prerequisites': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['graph.Concept']", 'symmetrical': 'False'}),
-            'authors': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'additional_dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Concept']", 'null': 'True', 'blank': 'True'}),
+            'authors': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'concept_resource'", 'to': u"orm['graph.Concept']"}),
             'core': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'edition': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'free': ('django.db.models.fields.BooleanField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
+            'edition': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'extra': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
+            'free': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
+            'level': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
-            'note': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'resource': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['graph.GlobalResource']"}),
-            'resource_level': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'signup': ('django.db.models.fields.BooleanField', [], {}),
-            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'year': ('django.db.models.fields.IntegerField', [], {})
+            'requires_signup': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'resource': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['graph.GlobalResource']", 'null': 'True'}),
+            'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'year': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'graph.conceptsettings': {
             'Meta': {'object_name': 'ConceptSettings'},
@@ -276,19 +278,19 @@ class Migration(SchemaMigration):
         },
         u'graph.globalresource': {
             'Meta': {'object_name': 'GlobalResource'},
-            'authors': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'edition': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'authors': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
+            'edition': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'extra': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'free': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'note': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'resource_level': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'signup': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'level': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'requires_signup': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'url': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'year': ('django.db.models.fields.IntegerField', [], {})
+            'url': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'}),
+            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'year': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'graph.graph': {
             'Meta': {'object_name': 'Graph'},

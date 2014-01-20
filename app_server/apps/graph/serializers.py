@@ -56,8 +56,8 @@ def serialize_concept(in_concept):
     # handle prereqs: create concept place holders if they don't exist yet
     for i, in_inlink in enumerate(in_concept["dependencies"]):
         inlink = {}
-        inlink['source'] = {"id": in_inlink['sid_source']}
-        inlink['target'] = {"id": in_inlink['sid_target']}
+        inlink['source'] = {"id": in_inlink['sid_source'], "tag": in_inlink['source']}
+        inlink['target'] = {"id": in_inlink['sid_target'], "tag": in_concept["tag"]}
         inlink['reason'] = in_inlink['reason']
         if not in_inlink.has_key("id"):
             inlink["id"] = in_inlink["sid_source"] + in_inlink["sid_target"]
@@ -115,6 +115,7 @@ class GraphSerializer(Serializer):
         data = json.loads(content)
         for i, concept in enumerate(data["concepts"]):
             data["concepts"][i] = serialize_concept(concept)
+
         return data
 
         # have to change input to align with desired output...

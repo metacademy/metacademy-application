@@ -12,7 +12,7 @@ class Concept(Model):
     Model that contains the concept data under version control
     """
     id = CharField(max_length=30, primary_key=True) # charfield for backwards compatability
-    tag = CharField(max_length=30, null=False) # charfield for backwards compatability with text system
+    tag = CharField(max_length=30, unique=True, null=False) # charfield for backwards compatability with text system
     title = CharField(max_length=100)
     summary = CharField(max_length=1000, null=True, blank=True)
     goals = CharField(max_length=2000, null=True, blank=True) # field type may change
@@ -62,6 +62,7 @@ class GlobalResource(Model):
     level = CharField(max_length=100, null=True, blank=True)
     description = CharField(max_length=500, null=True, blank=True)
     extra = CharField(max_length=500, null=True, blank=True)
+    note = CharField(max_length=500, null=True, blank=True)
     resource_type = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
 
@@ -86,6 +87,7 @@ class ConceptResource(Model):
     level = CharField(max_length=100, null=True, blank=True) # TODO use a set of options
     description = CharField(max_length=500, null=True, blank=True)
     extra = CharField(max_length=500, null=True, blank=True)
+    note = CharField(max_length=500, null=True, blank=True)
     resource_type = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
 

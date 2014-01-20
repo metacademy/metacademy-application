@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'Concept'
         db.create_table(u'graph_concept', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
-            ('tag', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('tag', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('summary', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True, blank=True)),
             ('goals', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
@@ -78,6 +78,7 @@ class Migration(SchemaMigration):
             ('level', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
             ('extra', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
+            ('note', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
             ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
@@ -98,6 +99,7 @@ class Migration(SchemaMigration):
             ('level', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
             ('extra', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
+            ('note', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
             ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
@@ -235,7 +237,7 @@ class Migration(SchemaMigration):
             'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'software': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'summary': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
-            'tag': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'tag': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         },
@@ -252,6 +254,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
             'level': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'note': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'requires_signup': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'resource': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['graph.GlobalResource']", 'null': 'True'}),
             'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
@@ -285,6 +288,7 @@ class Migration(SchemaMigration):
             'free': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'level': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'note': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'requires_signup': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),

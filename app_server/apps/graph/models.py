@@ -44,36 +44,14 @@ class ConceptSettings(Model):
     status = CharField(max_length=100) # TODO {public, provisional, private}, maybe?
     editors = ManyToManyField(Profile, related_name="concept_editors")
 
-
-class GlobalResource(Model):
-    """
-    Model to maintain a global set of resources -- users always enter local resources    and we extract the global set: can then use with e.g. autocomplete features
-    for new concept resources
-    """
-    title = CharField(max_length=100)
-    url = CharField(max_length=200, unique=True)
-    authors = CharField(max_length=200, null=True, blank=True)
-    year = IntegerField(null=True, blank=True)
-    free = BooleanField(default=False)
-    requires_signup = BooleanField(default=False)
-    resource_type = CharField(max_length=100, null=True, blank=True)
-    edition = CharField(max_length=100, null=True, blank=True)
-    # TODO use a set of options (reference, high school, overview, etc)
-    level = CharField(max_length=100, null=True, blank=True)
-    description = CharField(max_length=500, null=True, blank=True)
-    extra = CharField(max_length=500, null=True, blank=True)
-    note = CharField(max_length=500, null=True, blank=True)
-    resource_type = CharField(max_length=100, null=True, blank=True)
-    version_num = IntegerField(default=0, null=True, blank=True)
-
 class ConceptResource(Model):
     """
     Model to maintain concept specific resources
     NOTE: should use functions to obtain fields
-     functions will query the GlobalResource if the ConceptResource does not have a value for the field
     """
     id = CharField(max_length=30, primary_key=True)
-    resource = ForeignKey(GlobalResource, null=True) # CHANGEME
+    title = CharField(max_length=100)
+    url = CharField(max_length=200, unique=True)
     concept = ForeignKey(Concept, related_name="concept_resource")
     location = CharField(max_length=1000)
     core = BooleanField(default=False)

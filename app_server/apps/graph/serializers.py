@@ -37,8 +37,6 @@ def serialize_concept(in_concept):
         # pdb.set_trace()
 
         # FIXME TEMPORARY HACK FOR EXPLORATION- CJR
-        del resource['url']
-        del resource['title']
         if resource.has_key('specific_url_base'):
             del resource['specific_url_base']
         if resource.has_key('edition_years'):

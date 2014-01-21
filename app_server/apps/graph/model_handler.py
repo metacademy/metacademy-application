@@ -1,6 +1,6 @@
 import pdb
 
-from apps.graph.models import Concept, ConceptSettings, Graph, GraphSettings, Edge, Flag, ConceptResource, GlobalResource
+from apps.graph.models import Concept, ConceptSettings, Graph, GraphSettings, Edge, Flag, ConceptResource
 
 from content_server.formats import Line
 

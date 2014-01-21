@@ -40,7 +40,6 @@ class EdgeResource(ModelResource):
         return bundle
 
 class ConceptResourceResource(ModelResource):
-    # additional_prerequisites = fields.ManyToManyField(ShellConceptResource, "concept_additional_prerequisites", full=True, null=True)
     concept = fields.ForeignKey(ShellConceptResource, "concept", full=True)
     class Meta:
         queryset = ConceptResource.objects.all()

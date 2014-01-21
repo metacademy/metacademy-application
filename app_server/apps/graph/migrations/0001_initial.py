@@ -69,12 +69,15 @@ class Migration(SchemaMigration):
         db.create_table(u'graph_conceptresource', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('url', self.gf('django.db.models.fields.CharField')(unique=True, max_length=200)),
+            ('url', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='concept_resource', to=orm['graph.Concept'])),
             ('location', self.gf('django.db.models.fields.CharField')(max_length=1000)),
             ('core', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('additional_dependencies', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
             ('authors', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
             ('year', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('edition_years', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('specific_url_base', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('free', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('requires_signup', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('edition', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
@@ -86,15 +89,6 @@ class Migration(SchemaMigration):
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['ConceptResource'])
-
-        # Adding M2M table for field additional_dependencies on 'ConceptResource'
-        m2m_table_name = db.shorten_name(u'graph_conceptresource_additional_dependencies')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('conceptresource', models.ForeignKey(orm[u'graph.conceptresource'], null=False)),
-            ('concept', models.ForeignKey(orm[u'graph.concept'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['conceptresource_id', 'concept_id'])
 
         # Adding model 'Graph'
         db.create_table(u'graph_graph', (
@@ -151,9 +145,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'ConceptResource'
         db.delete_table(u'graph_conceptresource')
-
-        # Removing M2M table for field additional_dependencies on 'ConceptResource'
-        db.delete_table(db.shorten_name(u'graph_conceptresource_additional_dependencies'))
 
         # Deleting model 'Graph'
         db.delete_table(u'graph_graph')
@@ -222,12 +213,13 @@ class Migration(SchemaMigration):
         },
         u'graph.conceptresource': {
             'Meta': {'object_name': 'ConceptResource'},
-            'additional_dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Concept']", 'null': 'True', 'blank': 'True'}),
+            'additional_dependencies': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'authors': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'concept_resource'", 'to': u"orm['graph.Concept']"}),
             'core': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'edition': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'edition_years': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'extra': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'free': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
@@ -236,8 +228,9 @@ class Migration(SchemaMigration):
             'note': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'requires_signup': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'specific_url_base': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'url': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'}),
+            'url': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'year': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },

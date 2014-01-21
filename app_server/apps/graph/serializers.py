@@ -33,14 +33,10 @@ def serialize_concept(in_concept):
            # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
         resource["concept"] = {"id": in_concept["id"], "tag": in_concept["tag"]}
         # resource["additional_dependencies"] = resource["dependencies"]  # TODO figure these out
+        # del resource[""]
+        resource["additional_dependencies"] = resource["dependencies"]
         del resource["dependencies"]
         # pdb.set_trace()
-
-        # FIXME TEMPORARY HACK FOR EXPLORATION- CJR
-        if resource.has_key('specific_url_base'):
-            del resource['specific_url_base']
-        if resource.has_key('edition_years'):
-            del resource['edition_years']
 
     # handle flags TODO this shouldn't be necessary eventually
     if in_concept["flags"]:

@@ -8,11 +8,30 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization # TODO change
 
 from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource
-from apps.graph.serializers import ConceptSerializer, GraphSerializer
+
+
+CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
+def normalize_concept(in_concept):
+    """
+    Temporary hack to normalize tag/id for new and old data and remove client-side fields
+    """
+    if in_concept.has_key("sid") and len(in_concept["sid"]):
+        useid = in_concept["sid"]
+        usetag = in_concept["id"]
+    else:
+        useid = in_concept["id"]
+        usetag = in_concept["id"]
+    in_concept["id"] = useid
+    in_concept["tag"] = usetag
+
+    for field in in_concept.keys():
+        if field not in CONCEPT_SAVE_FIELDS:
+            del in_concept[field]
 
 
 class FlagResource(ModelResource):
     class Meta:
+        max_limit = 0
         fields = ("text",)
         include_resource_uri = False
         queryset = Flag.objects.all()
@@ -21,6 +40,7 @@ class FlagResource(ModelResource):
 
 class ShellConceptResource(ModelResource):
     class Meta:
+        max_limit = 0
         fields = ("id", "tag")
         queryset = Concept.objects.all()
         resource_name = 'concept'
@@ -31,6 +51,7 @@ class EdgeResource(ModelResource):
     source = fields.ForeignKey(ShellConceptResource, "source", full=True)
     target = fields.ForeignKey(ShellConceptResource, "target", full=True)
     class Meta:
+        max_limit = 0
         queryset = Edge.objects.all()
         resource_name = 'edge'
         include_resource_uri = False
@@ -45,35 +66,27 @@ class EdgeResource(ModelResource):
 class ConceptResourceResource(ModelResource):
     concept = fields.ForeignKey(ShellConceptResource, "concept", full=True)
     class Meta:
+        max_limit = 0
         queryset = ConceptResource.objects.all()
         resource_name = 'conceptresource'
         authorization = Authorization()
 
 class ConceptResource(ModelResource):
+    """
+
+    """
     dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True)
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
     class Meta:
+        max_limit = 0
         queryset = Concept.objects.all()
         resource_name = 'concept'
         authorization = Authorization()
-        serializer = GraphSerializer()
 
-    def hydrate_id(self, bundle, **kwargs):
-        # TODO need to normalize client side to better agree with server representation
-        # FIXME after migrating to concept-storing database
-        in_concept = bundle.data
-        if in_concept.has_key("sid") and len(in_concept["sid"]):
-            useid = in_concept["sid"]
-            usetag = in_concept["id"]
-        else:
-            useid = in_concept["id"]
-            usetag = in_concept["id"]
-        in_concept["id"] = useid
-        in_concept["tag"] = usetag
-
-        return bundle
+    def alter_deserialized_detail_data(self, request, data):
+        return normalize_concept(data)
 
     def hydrate_flags(self, bundle):
         in_concept = bundle.data
@@ -92,7 +105,6 @@ class ConceptResource(ModelResource):
                 continue
 
             inlink = {}
-
             inlink['source'] = {"id": in_inlink['sid_source'], "tag": in_inlink['source']}
             inlink['target'] = {"id": in_inlink['sid_target'], "tag": in_concept["tag"]}
             inlink['reason'] = in_inlink['reason']
@@ -130,12 +142,18 @@ class ConceptResource(ModelResource):
 
         return bundle
 
+
 class GraphResource(ModelResource):
+    """
+    """
     concepts = fields.ManyToManyField(ConceptResource, 'concepts', full=True)
-    def alter_deserialized_list_data(self, request, data):
-        pdb.set_trace()
+    def alter_deserialized_detail_data(self, request, data):
+        for concept in data["concepts"]:
+            normalize_concept(concept)
+        return data
+
     class Meta:
+        max_limit = 0
         queryset = Graph.objects.all()
         resource_name = 'graph'
         authorization = Authorization()
-        serializer = GraphSerializer()

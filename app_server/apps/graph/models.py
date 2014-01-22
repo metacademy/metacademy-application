@@ -22,7 +22,11 @@ class Concept(Model):
     version_num = IntegerField(default=0, null=True, blank=True)
     flags = ManyToManyField("Flag", blank=True, null=True)
     is_shortcut = BooleanField(default=False)
-    is_provisional = BooleanField(default=True) # provisional = not moderated
+
+    def is_provisional(self):
+        # "approved" concepts get their very own tag
+        return self.tag == self.id
+
 
 class Flag(Model):
     text = CharField(max_length=30)

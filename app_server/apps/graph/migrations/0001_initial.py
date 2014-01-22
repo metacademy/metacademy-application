@@ -20,7 +20,6 @@ class Migration(SchemaMigration):
             ('pointers', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('is_shortcut', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('is_provisional', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal(u'graph', ['Concept'])
 
@@ -202,7 +201,6 @@ class Migration(SchemaMigration):
             'flags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Flag']", 'null': 'True', 'blank': 'True'}),
             'goals': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
-            'is_provisional': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'software': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),

@@ -11,7 +11,7 @@ class Concept(Model):
     """
     Model that contains the concept data under version control
     """
-    id = CharField(max_length=30, primary_key=True) # charfield for backwards compatability
+    id = CharField(max_length=12, primary_key=True) # charfield for backwards compatability
     tag = CharField(max_length=30, unique=True, null=False) # charfield for backwards compatability with text system
     title = CharField(max_length=100)
     summary = CharField(max_length=1000, null=True, blank=True)
@@ -29,7 +29,7 @@ class Concept(Model):
 
 
 class Flag(Model):
-    text = CharField(max_length=30)
+    text = CharField(max_length=100)
 
 class Edge(Model):
     """
@@ -53,7 +53,7 @@ class ConceptResource(Model):
     Model to maintain concept specific resources
     NOTE: should use functions to obtain fields
     """
-    id = CharField(max_length=30, primary_key=True)
+    id = CharField(max_length=12, primary_key=True)
     title = CharField(max_length=100)
     url = CharField(max_length=200)
     concept = ForeignKey(Concept, related_name="concept_resource")
@@ -80,9 +80,8 @@ class Graph(Model):
     Model that contains graph data under version control
     """
     # TODO the concepts should save a freeze of the concept revisions
-    id = CharField(max_length=30, primary_key=True)
+    id = CharField(max_length=12, primary_key=True)
     title = CharField(max_length=100)
-    version_num = IntegerField(default=0)
     concepts = ManyToManyField(Concept, related_name="graph_concepts")
 
 

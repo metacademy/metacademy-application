@@ -76,8 +76,34 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
     events: function () {
       var thisView = this,
           levts = {};
+      levts["keydown #" + pvt.consts.titleId] = function (evt) {
+        var keyCode = evt.keyCode;
+        if (keyCode === pvt.consts.ENTER_KEY) {
+         evt.currentTarget.blur();
+        }
+      };
+
       levts["blur #" + pvt.consts.titleId] = function (evt) {
-        thisView.model.set("title", evt.currentTarget.innerHTML);
+        var title = evt.currentTarget.innerHTML;
+        thisView.model.set("title", title);
+        thisView.model.save({title: title}, {
+          parse: false,
+          success: function (mdl, resp) {
+            console.log(resp && resp.responseText);
+            // TODO this needs to be more general
+            if (window.location.pathname.substr(-3) == "new") {
+              var newPath = window.location.pathname.split("/");
+              newPath.pop();
+              newPath = newPath.join("/") + "/" + thisView.model.id;
+              window.history.pushState({}, "", newPath);
+            }
+          },
+          error:function (mdl, resp) {
+            // TODO why is this called when receiving 204 ?
+            console.log(resp && resp.responseText);
+          }
+        });
+        // update new title with server
       };
       return _.extend(GraphView.prototype.events, levts);
     },

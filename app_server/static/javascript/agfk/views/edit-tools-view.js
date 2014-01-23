@@ -116,7 +116,8 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       },
 
       syncWithServer: function () {
-        var jsonModelStr = JSON.stringify({id: "tempgraph", title: "temp test",  concepts: this.model.toJSON()});
+        var thisView = this,
+            jsonModelStr = JSON.stringify(this.model.toJSON());
         $.ajax({ type: "POST",
                  url: "/graphs/api/v1/graph/",
                  contentType: "application/json; charset=utf-8",
@@ -125,9 +126,11 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
                  success: function (resp) {
                    console.log("success!");
                    console.log(resp.responseText);
-                   if (resp.url) {
-                     // TODO figure out back button issues
-                     //window.history.pushState({}, "", resp.url);
+                   if (window.location.pathname.substr(-3) == "new") {
+                     var newPath = window.location.pathname.split("/");
+                     newPath.pop();
+                     newPath = newPath.join("/") + "/" + thisView.model.id;
+                     window.history.pushState({}, "", newPath);
                    }
                  },
                  error: function (resp) {
@@ -168,6 +171,7 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
             if (res.length) {
               var fetchNodeId = res[0].id;
               thisView.model.set("leafs", [fetchNodeId]);
+              thisView.model.useOldUrl = true;
               thisView.model.fetch({
                 success: function () {
                   // need to contract
@@ -184,6 +188,7 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
                 }
               });
             } else {
+              alert("sorry, no matching concept for: " + inpText);
               // TODO let the user know that no matching concept was found
             }
           }

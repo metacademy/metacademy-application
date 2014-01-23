@@ -59,6 +59,10 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
       },
 
       parse: function(resp, xhr){
+        if (xhr.parse == false) {
+          return;
+        }
+
         var thisGraph = this,
             deps = [],
             nodes = resp.nodes,

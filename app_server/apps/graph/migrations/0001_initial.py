@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Concept'
         db.create_table(u'graph_concept', (
-            ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=12, primary_key=True)),
             ('tag', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('summary', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True, blank=True)),
@@ -35,7 +35,7 @@ class Migration(SchemaMigration):
         # Adding model 'Flag'
         db.create_table(u'graph_flag', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('text', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('text', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
         db.send_create_signal(u'graph', ['Flag'])
 
@@ -66,7 +66,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'ConceptResource'
         db.create_table(u'graph_conceptresource', (
-            ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=12, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('url', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='concept_resource', to=orm['graph.Concept'])),
@@ -91,9 +91,8 @@ class Migration(SchemaMigration):
 
         # Adding model 'Graph'
         db.create_table(u'graph_graph', (
-            ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=12, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal(u'graph', ['Graph'])
 
@@ -115,6 +114,15 @@ class Migration(SchemaMigration):
 
         # Adding M2M table for field editors on 'GraphSettings'
         m2m_table_name = db.shorten_name(u'graph_graphsettings_editors')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('graphsettings', models.ForeignKey(orm[u'graph.graphsettings'], null=False)),
+            ('profile', models.ForeignKey(orm[u'user_management.profile'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['graphsettings_id', 'profile_id'])
+
+        # Adding M2M table for field creators on 'GraphSettings'
+        m2m_table_name = db.shorten_name(u'graph_graphsettings_creators')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('graphsettings', models.ForeignKey(orm[u'graph.graphsettings'], null=False)),
@@ -156,6 +164,9 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field editors on 'GraphSettings'
         db.delete_table(db.shorten_name(u'graph_graphsettings_editors'))
+
+        # Removing M2M table for field creators on 'GraphSettings'
+        db.delete_table(db.shorten_name(u'graph_graphsettings_creators'))
 
 
     models = {
@@ -200,7 +211,7 @@ class Migration(SchemaMigration):
             'exercises': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'flags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Flag']", 'null': 'True', 'blank': 'True'}),
             'goals': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '12', 'primary_key': 'True'}),
             'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'software': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
@@ -220,7 +231,7 @@ class Migration(SchemaMigration):
             'edition_years': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'extra': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'free': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '12', 'primary_key': 'True'}),
             'level': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
             'note': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
@@ -248,17 +259,17 @@ class Migration(SchemaMigration):
         u'graph.flag': {
             'Meta': {'object_name': 'Flag'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'text': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+            'text': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'graph.graph': {
             'Meta': {'object_name': 'Graph'},
             'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_concepts'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
-            'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '12', 'primary_key': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'graph.graphsettings': {
             'Meta': {'object_name': 'GraphSettings'},
+            'creators': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_creator'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'graph': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['graph.Graph']", 'unique': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})

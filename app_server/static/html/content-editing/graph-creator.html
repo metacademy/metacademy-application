@@ -20,6 +20,7 @@
   agfkGlobals.userInitData = {{ user_data|safe }};
   agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
   agfkGlobals.auxModel = null; // init in main js app
+  agfkGlobals.graphId = {% if graph_id %} "{{graph_id}}" {% else %} null {% endif %};
 </script>
 {% if debug %}
 <script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>

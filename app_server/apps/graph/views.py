@@ -1,4 +1,6 @@
 import json
+import random
+import string
 import pdb
 
 from django.shortcuts import render_to_response
@@ -7,6 +9,7 @@ from django.template import RequestContext
 
 from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data
 from apps.user_management.models import Profile
+from apps.graph.models import Graph
 from model_handler import sync_graph
 
 
@@ -22,7 +25,13 @@ def new_graph(request):
     if request.method == "GET":
         concepts = get_user_data(request)
         full_graph_json = get_full_graph_json_str()
-        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts)}, context_instance=RequestContext(request))
+        used = True
+        while used:
+            gid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
+            used = len(Graph.objects.filter(id=gid)) > 0
+
+        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts), "graph_id": gid}, context_instance=RequestContext(request))
+
     elif request.method == "PUT":
         graph_url = update_graph(request,return_url=True)
         return HttpResponse(json.dumps({"url": graph_url}), content_type="application/json", status=200)

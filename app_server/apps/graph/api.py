@@ -6,17 +6,21 @@ import random
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization # TODO change
+from tastypie.exceptions import ImmediateHttpResponse
 
-from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource
+from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource, GraphSettings
+from apps.user_management.models import Profile
+
 
 
 CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
-
 def normalize_concept(in_concept):
     """
     Temporary hack to normalize tag/id for new and old data and remove client-side fields
     """
-    pdb.set_trace()
+    if type(in_concept) != dict:
+        return
+
     if not in_concept["id"] or in_concept["id"][:4] == "-new":
         useid = ''
         while not useid or not len(Concept.objects.filter(id=useid)) == 0:
@@ -34,6 +38,54 @@ def normalize_concept(in_concept):
     for field in in_concept.keys():
         if field not in CONCEPT_SAVE_FIELDS:
             del in_concept[field]
+
+
+class CustomReversionResource(ModelResource):
+    """
+    ModelResource that uses django reversions
+    """
+    def save(self, bundle, skip_errors=False):
+        self.is_valid(bundle)
+
+        if bundle.errors and not skip_errors:
+            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+
+        # Check if they're authorized.
+        if bundle.obj.pk:
+            self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
+        else:
+            self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
+
+        # Save FKs just in case.
+        self.save_related(bundle)
+
+        # Save the main object.
+        bundle.obj.save()
+        bundle.objects_saved.add(self.create_identifier(bundle.obj))
+
+        # per resource post-save hook
+        self.post_save_hook(bundle)
+
+        # Now pick up the M2M bits.
+        m2m_bundle = self.hydrate_m2m(bundle)
+        self.save_m2m(m2m_bundle)
+        return bundle
+
+    def post_save_hook(self, bundle):
+        """
+        called after saving to db
+        must implement in subclass
+        """
+        return
+
+    def obj_create(self, bundle, **kwargs):
+        return super(ModelResource, self).obj_create(bundle, **kwargs)
+
+    def obj_update(self, bundle, **kwargs):
+        return super(ModelResource, self).obj_update(bundle, **kwargs)
+
+    def obj_get(self, bundle, **kwargs):
+        return super(ModelResource, self).obj_get(bundle, **kwargs)
 
 
 class FlagResource(ModelResource):
@@ -78,7 +130,7 @@ class ConceptResourceResource(ModelResource):
         resource_name = 'conceptresource'
         authorization = Authorization()
 
-class ConceptResource(ModelResource):
+class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
     """
@@ -157,18 +209,27 @@ class ConceptResource(ModelResource):
         return bundle
 
 
-class GraphResource(ModelResource):
+class GraphResource(CustomReversionResource):
     """
     """
     concepts = fields.ManyToManyField(ConceptResource, 'concepts', full=True)
     def alter_deserialized_detail_data(self, request, data):
+        # create the graph if it does not exist and associate the user with the graph
         for concept in data["concepts"]:
             normalize_concept(concept)
         return data
 
+    def post_save_hook(self, bundle):
+        # FIXME we're assuming a user is logged in
+        gsettings, new = GraphSettings.objects.get_or_create(graph=bundle.obj)
+        uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
+        gsettings.editors.add(uprof)
+        gsettings.save()
+
+
     class Meta:
         """ GraphResource Meta """
-        allowed = ("get", "post", "put", "delete", "patch", "options")
+        allowed_methods = ("get", "post", "put", "delete", "patch")
         max_limit = 0
         queryset = Graph.objects.all()
         resource_name = 'graph'

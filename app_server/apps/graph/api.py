@@ -11,11 +11,18 @@ from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource
 
 
 CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
+
 def normalize_concept(in_concept):
     """
     Temporary hack to normalize tag/id for new and old data and remove client-side fields
     """
-    if in_concept.has_key("sid") and len(in_concept["sid"]):
+    pdb.set_trace()
+    if not in_concept["id"] or in_concept["id"][:4] == "-new":
+        useid = ''
+        while not useid or not len(Concept.objects.filter(id=useid)) == 0:
+            useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
+        usetag = useid
+    elif in_concept.has_key("sid") and len(in_concept["sid"]):
         useid = in_concept["sid"]
         usetag = in_concept["id"]
     else:
@@ -73,20 +80,27 @@ class ConceptResourceResource(ModelResource):
 
 class ConceptResource(ModelResource):
     """
-
+    API for concepts, aka nodes
     """
     dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True)
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
     class Meta:
+        """ ConceptResource Meta """
         max_limit = 0
         queryset = Concept.objects.all()
         resource_name = 'concept'
         authorization = Authorization()
+        allowed_methods = ("get", "post", "put", "delete", "patch")
+        always_return_data = True
 
     def alter_deserialized_detail_data(self, request, data):
-        return normalize_concept(data)
+        normalize_concept(data)
+        return data
+
+    def alter_deserialized_list_data(self, request, data):
+        pdb.set_trace() # TODO
 
     def hydrate_flags(self, bundle):
         in_concept = bundle.data
@@ -135,7 +149,7 @@ class ConceptResource(ModelResource):
             # FIXME this shouldn't exist here, or at least, it should check
             # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
             if not resource.has_key("id"):
-                resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(12)])
+                resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             resource["concept"] = {"id": bundle.data["id"], "tag": bundle.data["tag"]}
             resource["additional_dependencies"] = resource["dependencies"]
             del resource["dependencies"]
@@ -153,6 +167,8 @@ class GraphResource(ModelResource):
         return data
 
     class Meta:
+        """ GraphResource Meta """
+        allowed = ("get", "post", "put", "delete", "patch", "options")
         max_limit = 0
         queryset = Graph.objects.all()
         resource_name = 'graph'

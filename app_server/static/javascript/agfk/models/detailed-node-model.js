@@ -14,6 +14,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
         exercises: "", // TODO new NodePropertyCollections.ExerciseCollection(),
         resources: new NodePropertyCollections.ResourceCollection(),
         flags: [],
+        useCsrf: true,
         goals: "",
         pointers: "",
         software: "",
@@ -30,12 +31,16 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
       return _.extend({}, Node.prototype.defaults(), dnDefaults);
     },
 
+    url: function () {
+      return 'http://127.0.0.1:8080/graphs/api/v1/concept/' + this.get("id") + "/";
+    },
+
     /**
      *  parse the incoming server data
      */
     parse: function(resp, xhr) {
       // check if we have a null response from the server
-      if (resp === null) {
+      if (resp === null || xhr.parse == false) {
         return {};
       }
       var output = this.defaults();

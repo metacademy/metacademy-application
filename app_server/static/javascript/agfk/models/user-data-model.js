@@ -1,21 +1,24 @@
+
 /*
  This file contains the user data model, which contains the user-specific data that synces with the app server
  */
+
+/*global define*/
 define(["backbone", "underscore"], function(Backbone, _){
 
   var USER_CONSTS = {
     userPath: "/user/",
     conceptPath: "/user/concepts/"
   };
-  
+
   // wrapper model for learned concepts
   var sharedVars = {};
-  
+
   var UserConcept = Backbone.Model.extend({
     url: function(){
       return USER_CONSTS.conceptPath + this.id;
     },
-    
+
     defaults: { id: "",
                 useCsrf: true,
                 learned: false,
@@ -26,7 +29,7 @@ define(["backbone", "underscore"], function(Backbone, _){
   // wrapper collection for user concepts
   var ConceptsCollection = (function(){
     var pvt = {};
-    
+
     /*
      *  Create or change a users concept state
      * returns true if the concept was created or changed and changes were propagated to the server
@@ -38,15 +41,15 @@ define(["backbone", "underscore"], function(Backbone, _){
           concept = thisColl.get(nodeSid);
       if (!concept){
         thisColl.create(props);
-      } else{        
+      } else{
         concept.save(props);
       }
       return true;
     };
-    
+
     return Backbone.Collection.extend({
       model: UserConcept,
-      
+
       initialize: function(args){
         this.type = args.type;
       },
@@ -62,7 +65,7 @@ define(["backbone", "underscore"], function(Backbone, _){
   })();
 
 
-  /** 
+  /**
    * UserData: model to store user data -- will eventually communicate with server for registered users
    */
   var UserModel = (function(){
@@ -75,7 +78,7 @@ define(["backbone", "underscore"], function(Backbone, _){
     return Backbone.Model.extend({
 
       url: USER_CONSTS.userPath,
-      
+
       /**
        * default user states
        */

@@ -99,7 +99,6 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
         toNodeEdit: false
       });
 
-      thisView.idct = 0; // TODO this shouldn't be handled in the view
       // use expand/contract icons in editor graph
       thisView.addECIcon = true;
 
@@ -433,7 +432,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       } else if (state.graphMouseDown && d3.event.shiftKey){
         // clicked not dragged from svg
         var xycoords = d3.mouse(thisView.d3SvgG.node()),
-            d = {id: "c" + thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]},
+            d = {title: "concept title", x: xycoords[0], y: xycoords[1]},
             model = thisView.model;
 
         // add new node and make title immediently editable

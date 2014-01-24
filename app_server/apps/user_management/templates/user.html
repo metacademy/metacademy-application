@@ -26,10 +26,20 @@
 
   <section id="graphs-section">
     <h2>
-      Your Graphs
+      Graphs You've Created/Edited
     </h2>
     <div class="user-graphs list-wrapper user-subsec">
-      <span class="no-content-message"> you have not yet created any graphs (metacademy currently does not have this functionality)</span>
+    {% if graphs %}
+    {% for entry in graphs %}
+    <li class="list-roadmaps-li">
+      <h3 class="list-roadmaps-title">
+        <a class="list-roadmaps-link internal-link" href="{{ entry.graphsettings.get_absolute_url }}"> {{ entry.title }} </a>
+      </h3>
+    </li>
+    {% endfor %}
+    {% else %}
+      <span class="no-content-message"> you have not yet created any graphs</span>
+    {% endif %}
     </div>
   </section>
 
@@ -48,6 +58,25 @@
     {% endfor %}
     {% else %}
       <span class="no-content-message"> you have not yet created any roadmaps</span>
+    {% endif %}
+    </div>
+  </section>
+
+  <section id="graphs-section">
+    <h2>
+      Concepts You've Created/Edited
+    </h2>
+    <div class="user-graphs list-wrapper user-subsec">
+    {% if concepts %}
+    {% for entry in concepts %}
+    <li class="list-roadmaps-li">
+      <h3 class="list-roadmaps-title">
+        <a class="list-roadmaps-link internal-link" href="{{ entry.conceptsettings.get_absolute_url }}"> {{ entry.title }} </a>
+      </h3>
+    </li>
+    {% endfor %}
+    {% else %}
+      <span class="no-content-message"> you have not yet created any concepts</span>
     {% endif %}
     </div>
   </section>

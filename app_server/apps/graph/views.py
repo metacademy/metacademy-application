@@ -60,19 +60,3 @@ def get_user_data(request):
     else:
         concepts = {"concepts": []}
     return concepts
-
-def save_graph_data(request):
-    """
-    Save the input graph data (update the graph and appropriate concept models and revisions)
-    TODO handle status of concepts/graphs automatically
-    check for errors and conflicts
-    """
-    pass
-
-def save_concept_data(request):
-    """
-    Save the input concept data (update the appropriate concept models and revisions)
-    TODO handle status of concepts automatically
-    check for errors and conflicts
-    """
-    pass

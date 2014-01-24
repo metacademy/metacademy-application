@@ -8,7 +8,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization # TODO change
 from tastypie.exceptions import ImmediateHttpResponse
 
-from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource, GraphSettings
+from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource, GraphSettings, ConceptSettings
 from apps.user_management.models import Profile
 
 
@@ -137,6 +137,14 @@ class ConceptResource(CustomReversionResource):
     dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True)
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
+
+    def post_save_hook(self, bundle):
+        pdb.set_trace()
+        # FIXME we're assuming a user is logged in
+        csettings, new = ConceptSettings.objects.get_or_create(concept=bundle.obj)
+        uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
+        csettings.editors.add(uprof)
+        csettings.save()
 
     class Meta:
         """ ConceptResource Meta """

@@ -23,6 +23,12 @@ def user_main(request):
 
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
 
+    # list graphs they've edited
+    graphs = [gs.graph for gs in uprof.graph_editors.all()]
+
+    # list concepts they've edited
+    concepts = [cs.concept for cs in uprof.concept_editors.all()]
+
     # list roadmaps where the user is listed as an owner
     roadmaps = [rs.roadmap for rs in uprof.roadmap_owners.all()]
 
@@ -42,7 +48,15 @@ def user_main(request):
     else:
         sconcepts = []
 
-    return render_to_response('user.html', {"lconcepts": lconcepts, "sconcepts": sconcepts, "roadmaps": roadmaps}, context_instance=RequestContext(request))
+    return render_to_response('user.html',
+                              {
+                                  "lconcepts": lconcepts,
+                                  "sconcepts": sconcepts,
+                                  "roadmaps": roadmaps,
+                                  "graphs": graphs,
+                                  "concepts": concepts
+                              },
+                              context_instance=RequestContext(request))
 
 @allow_lazy_user
 def register(request, redirect_addr="/user"):

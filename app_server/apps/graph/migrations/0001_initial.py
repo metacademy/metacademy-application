@@ -121,15 +121,6 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['graphsettings_id', 'profile_id'])
 
-        # Adding M2M table for field creators on 'GraphSettings'
-        m2m_table_name = db.shorten_name(u'graph_graphsettings_creators')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('graphsettings', models.ForeignKey(orm[u'graph.graphsettings'], null=False)),
-            ('profile', models.ForeignKey(orm[u'user_management.profile'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['graphsettings_id', 'profile_id'])
-
 
     def backwards(self, orm):
         # Deleting model 'Concept'
@@ -164,9 +155,6 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field editors on 'GraphSettings'
         db.delete_table(db.shorten_name(u'graph_graphsettings_editors'))
-
-        # Removing M2M table for field creators on 'GraphSettings'
-        db.delete_table(db.shorten_name(u'graph_graphsettings_creators'))
 
 
     models = {
@@ -269,7 +257,6 @@ class Migration(SchemaMigration):
         },
         u'graph.graphsettings': {
             'Meta': {'object_name': 'GraphSettings'},
-            'creators': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_creator'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'graph': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['graph.Graph']", 'unique': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})

@@ -27,7 +27,6 @@ class Concept(Model):
         # "approved" concepts get their very own tag
         return self.tag == self.id
 
-
 class Flag(Model):
     text = CharField(max_length=100)
 
@@ -47,6 +46,8 @@ class ConceptSettings(Model):
     concept = OneToOneField(Concept, primary_key=True)
     status = CharField(max_length=100) # TODO {public, provisional, private}, maybe?
     editors = ManyToManyField(Profile, related_name="concept_editors")
+    def get_absolute_url(self):
+        return "http://www.example.com"
 
 class ConceptResource(Model):
     """
@@ -91,3 +92,6 @@ class GraphSettings(Model):
     """
     graph = OneToOneField(Graph)
     editors = ManyToManyField(Profile, related_name="graph_editors")
+
+    def get_absolute_url(self):
+        return "/graphs/%s" % self.graph.id

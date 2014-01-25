@@ -10,6 +10,7 @@ from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization # TODO change
 from tastypie.exceptions import ImmediateHttpResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource, GraphSettings, ConceptSettings
 from apps.user_management.models import Profile
@@ -132,20 +133,33 @@ class ConceptResourceResource(ModelResource):
         resource_name = 'conceptresource'
         authorization = Authorization()
 
-    def hydrate_location(self, bundle, **kwargs):
-        # check if it's valid json or a string
-        bdl_type = type(bundle.data['location'])
-        # TODO parse string entry or expect parsed?
-        if bdl_type == list:
-            # assume json TODO add try/except block
-            bundle.data['location'] = json.dumps(bundle.data['location'])
-
-        return bundle
-
     def dehydrate(self, bundle):
-        # TODO why is this called so many times?
+        # TODO why is this called > 1 times? and why doesn't this flag stop it?
+        if not hasattr(self, "was_dehydrated"):
+            self.was_dehydrated = True
+        elif self.was_dehydrated:
+            return bundle
+
         bundle.data['authors'] = ast.literal_eval(bundle.data['authors'])
         bundle.data['location'] = json.loads(bundle.data['location'])
+        adeps = bundle.data["additional_dependencies"]
+        if type(adeps) == unicode:
+            adeps = ast.literal_eval(adeps)
+        for dep in adeps:
+            if dep.has_key("id"):
+                dconcept = Concept.objects.get(id=dep["id"])
+                dep["title"] = dconcept.title
+                dep["tag"] = dconcept.tag
+            elif dep.has_key("title"):
+                try:
+                    dconcept = Concept.objects.get(title=dep["title"])
+                    dep["title"] = dconcept.title
+                    dep["tag"] = dconcept.tag
+                    dep["id"] = dconcept.id
+                except ObjectDoesNotExist:
+                    pass # TODO
+        bundle.data["additional_dependencies"] = adeps
+
         return bundle
 
 class ConceptResource(CustomReversionResource):
@@ -216,7 +230,6 @@ class ConceptResource(CustomReversionResource):
                 continue
             if resource.has_key("year"):
                 try:
-                    # must access bundle "longhand"
                     resource["year"]  = int(resource["year"])
                 except:
                     resource["year"]  = None
@@ -225,8 +238,43 @@ class ConceptResource(CustomReversionResource):
             if not resource.has_key("id"):
                 resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             resource["concept"] = {"id": bundle.data["id"], "tag": bundle.data["tag"]}
-            resource["additional_dependencies"] = resource["dependencies"]
-            del resource["dependencies"]
+            bdl_type = type(resource['location'])
+            # TODO parse string entry or expect parsed?
+            if bdl_type == list:
+                # assume json TODO add try/except block
+                resource['location'] = json.dumps(resource['location'])
+
+            adeps_type = type(resource["additional_dependencies"])
+            if adeps_type == str:
+                adeps = ast.literal_eval(resource["additional_dependencies"])
+            elif adeps_type == list:
+                adeps = resource["additional_dependencies"]
+            else:
+                raise Exception("unable to parse additional dependencies for concept " + bundle.data["title"])
+            save_adeps = []
+            # if adeps don't have ids, try to associate an id with it -- only save the title if absolutely necessary
+            for dep in adeps:
+                did = ""
+                if dep.has_key("id"):
+                    did = dep["id"]
+                elif dep.has_key("title"):
+                    # try to find its id using the title
+                    # TODO which concepts should we filter on? e.g. all concepts, only approved concepts, [probably best solution: approved or user concepts]
+                    tobjs = Concept.objects.filter(title=dep["title"])
+                    if len(tobjs):
+                        # TODO what if title's are ambiguous
+                        did = tobjs[0].id
+                    else:
+                        # TODO if possible,
+                        # search input graph for a match
+                        pass
+                else:
+                    raise Exception("additional resource dependency for concept " +  bundle.data["title"] + " does not have id or title specified")
+                if did:
+                    save_adep = {"id": did}
+                else:
+                    save_adep = {"title": dep["title"]}
+                save_adeps.append(save_adep)
 
         return bundle
 

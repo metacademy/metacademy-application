@@ -32,7 +32,7 @@
   <input type="text" class="author-field" name="authors-<%=this.cid%>" placeholder="e.g. Jim Henry and Mark Lollipop" value="<%= this.model.getAuthorsString() %>">
 
   <label>Additional dependencies (enter concept title, separate with comma)</label>
-  <input type="text" class="deps-field" name="dependencies-<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= dependencies.map(function(d){return d.title;}).join(', ') %>">
+  <input type="text" class="deps-field" name="additional_dependencies-<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= additional_dependencies.map(function(d){return d.title;}).join(', ') %>">
 
   <label>Extra information</label>
   <textarea class="text-field" name="extra-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning"><%= extra %></textarea>

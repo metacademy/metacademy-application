@@ -1,4 +1,6 @@
 
+// FIXME TODO - must return errors to the user in an elegant way, both client side (here) and from the server
+
 /*global define*/
 define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
   return  (function(){
@@ -60,7 +62,7 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       },
 
       /**
-       * Expand/contract all the resource fields
+       * Expand/contract the resource fields
        */
       toggleEC: function (evt) {
         $(evt.currentTarget.parentElement).toggleClass(pvt.consts.ecClass);
@@ -77,7 +79,8 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       },
 
       /**
-       * changeCompositeField: change composite (text + url in brackets) field in the resource model
+       * changeCompositeField: change composite (text + url in brackets)
+       * field in the resource model
        */
       changeCompositeField: function (evt) {
         var thisView = this,
@@ -88,7 +91,8 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       },
 
       /**
-       * changeAuthorField: change authore field in the resource model  -- array separated by "and"
+       * changeAuthorField: change author field in the resource model
+       * -- array separated by "and"
        */
       changeAuthorField: function (evt) {
         var thisView = this,
@@ -100,7 +104,8 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       },
 
       /**
-       * changeDepsField: change dependency field in the resource model -- array of titles
+       * changeDepsField: change dependency field in the resource model
+       * -- array of titles
        */
       changeDepsField: function (evt) {
         var thisView = this,

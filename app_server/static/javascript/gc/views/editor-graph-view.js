@@ -103,7 +103,6 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
             console.log(resp && resp.responseText);
           }
         });
-        // update new title with server
       };
       return _.extend(GraphView.prototype.events, levts);
     },
@@ -234,10 +233,12 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
 
     // @override
     postrender: function() {
-      var thisView = this;
+      var thisView = this,
+          consts = pvt.consts;
       thisView.gPaths.classed(pvt.consts.selectedClass, function(d){
         return d === thisView.state.selectedEdge;
       });
+      thisView.$el.find("#" + consts.titleId).html(thisView.model.get("title"));
     },
 
     // @override

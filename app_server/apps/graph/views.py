@@ -10,7 +10,7 @@ from django.template import RequestContext
 from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data
 from apps.user_management.models import Profile
 from apps.graph.models import Graph
-from model_handler import sync_graph
+from apps.graph.api import GraphResource
 
 
 def get_agfk_app(request):
@@ -30,21 +30,23 @@ def new_graph(request):
             gid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             used = len(Graph.objects.filter(id=gid)) > 0
 
-        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts), "graph_id": gid}, context_instance=RequestContext(request))
-
-    elif request.method == "PUT":
-        graph_url = update_graph(request,return_url=True)
-        return HttpResponse(json.dumps({"url": graph_url}), content_type="application/json", status=200)
+        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts), "graph_id": gid, "graph_init_data": {"id": gid}}, context_instance=RequestContext(request))
     else:
         return HttpResponse(status=405)
 
-def update_graph(request, return_url=False):
-    if request.method == "PUT":
-        sync_graph(json.loads(request.body))
-        if return_url:
-            return "/user/graph/some_unique_id_should_probably_use_title_somehow_with_intelligent_redirects"
-        else:
-            return HttpResponse(status=200)
+def existing_graph(request, gid):
+    if request.method == "GET":
+        # get the graph data so we can bootstrap it
+        full_graph_json = get_full_graph_json_str()
+        concepts = get_user_data(request)
+        gr = GraphResource()
+        try:
+            graph = gr.obj_get(gr.build_bundle(request=request), id=gid)
+        except:
+            HttpResponse(status=404)
+        gr_bundle = gr.build_bundle(obj=graph, request=request)
+        graph_json = gr.serialize(request, gr.full_dehydrate(gr_bundle), "application/json")
+        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts), "graph_id": gid, "graph_init_data": graph_json}, context_instance=RequestContext(request))
     else:
         return HttpResponse(status=405)
 

@@ -18,9 +18,11 @@
 <script>
   window.agfkGlobals = {};
   agfkGlobals.userInitData = {{ user_data|safe }};
-  agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+  agfkGlobals.graphInitData = {{ graph_init_data | safe }};
   agfkGlobals.auxModel = null; // init in main js app
-  agfkGlobals.graphId = {% if graph_id %} "{{graph_id}}" {% else %} null {% endif %};
+  agfkGlobals.isCreating = true; // init in main js app
+  //agfkGlobals.graphId = {% if graph_id %} "{{graph_id|safe}}" {% else %} null {% endif %};
+  agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
 </script>
 {% if debug %}
 <script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>

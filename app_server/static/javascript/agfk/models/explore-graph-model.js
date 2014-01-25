@@ -60,31 +60,47 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
 
       parse: function(resp, xhr){
         if (xhr.parse == false) {
-          return;
+          return {};
         }
 
-        var thisGraph = this,
+        var thisModel = this,
             deps = [],
-            nodes = resp.nodes,
+            nodes = resp.concepts,
             nodeTag;
+
+        thisModel.set("id", resp.id);
+        thisModel.set("title", resp.title);
+
+        // parse is called before initialize - so these aren't guaranteed to be present
+        if (!thisModel.get("edges")){
+          thisModel.set("edges", thisModel.defaults().edges);
+          thisModel.edgeModel = thisModel.get("edges").model;
+        }
+        if (!thisModel.get("nodes")){
+          thisModel.set("nodes", thisModel.defaults().nodes);
+          thisModel.nodeModel = thisModel.get("nodes").model;
+        }
+
         for (nodeTag in nodes) {
           if (nodes.hasOwnProperty(nodeTag)) {
             var tmpNode = nodes[nodeTag];
             tmpNode.sid = tmpNode.id;
-            tmpNode.id = nodeTag;
+            //tmpNode.id = nodeTag;
 
             // parse deps separately (outlinks will be readded)
             tmpNode.dependencies.forEach(function(dep){
-              deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, from_tag: dep.from_tag, to_tag: dep.to_tag});
+              deps.push({source: dep.source.id, target: dep.target.id, reason: dep.reason});
             });
             delete tmpNode.dependencies;
             delete tmpNode.outlinks;
-            thisGraph.addNode(tmpNode);
+            thisModel.addNode(tmpNode);
           }
         }
         deps.forEach(function(dep){
-          thisGraph.addEdge(dep);
+          thisModel.addEdge(dep);
         });
+        return thisModel.attributes
+        ;
       },
 
       /**
@@ -92,14 +108,14 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
        */
       postinitialize: function () {
         // setup listeners
-        var thisGraph = this,
+        var thisModel = this,
             aux = window.agfkGlobals && window.agfkGlobals.auxModel;
         // Implicit learned listeners
         if (aux) {
-          thisGraph.listenTo(aux, aux.getConsts().learnedTrigger, thisGraph.changeILNodesFromTag);
+          thisModel.listenTo(aux, aux.getConsts().learnedTrigger, thisModel.changeILNodesFromTag);
         }
-        thisGraph.on("sync", function(){
-          thisGraph.changeILNodesFromTag();
+        thisModel.on("sync", function(){
+          thisModel.changeILNodesFromTag();
         });
       },
 
@@ -109,10 +125,10 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
        */
       changeILNodesFromTag: function(){
         // TODO cache learned/implicit learned nodes
-        var thisGraph = this,
-            nodes = thisGraph.getNodes(),
+        var thisModel = this,
+            nodes = thisModel.getNodes(),
             aux = window.agfkGlobals && window.agfkGlobals.auxModel,
-            depLeafs = thisGraph.get("leafs");
+            depLeafs = thisModel.get("leafs");
 
         if (!aux) return;
 

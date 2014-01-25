@@ -8,9 +8,7 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     defaults:function(){
       var exDef = {
         nodes: new EditableNodeCollection(),
-        edges: new EditableEdgeCollection(),
-        title: "New Graph Title",
-        id: window.agfkGlobals.graphId
+        edges: new EditableEdgeCollection()
       };
       return _.extend({}, ExploreGraphModel.prototype.defaults(), exDef);
     },

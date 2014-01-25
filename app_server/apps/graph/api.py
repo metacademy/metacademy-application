@@ -139,7 +139,6 @@ class ConceptResource(CustomReversionResource):
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
     def post_save_hook(self, bundle):
-        pdb.set_trace()
         # FIXME we're assuming a user is logged in
         csettings, new = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
@@ -239,6 +238,7 @@ class GraphResource(CustomReversionResource):
         """ GraphResource Meta """
         allowed_methods = ("get", "post", "put", "delete", "patch")
         max_limit = 0
+        include_resource_uri = False
         queryset = Graph.objects.all()
         resource_name = 'graph'
         authorization = Authorization()

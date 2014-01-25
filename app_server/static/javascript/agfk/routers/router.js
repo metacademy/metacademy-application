@@ -20,7 +20,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
     // constants
     pvt.consts = {
-      createName: "new", // /graphs/create <- url defines this value
       qViewMode: "mode",
       qFocusConcept: "focus",
       pExploreMode: "explore",
@@ -206,7 +205,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
       nodeRoute: function(nodeId, paramsObj) {
         var thisRoute = this,
             consts = pvt.consts,
-            isCreating = nodeId === consts.createName,
+            isCreating = window.agfkGlobals.isCreating,
             qViewMode = consts.qViewMode,
             qFocusConcept = consts.qFocusConcept,
             pExploreMode = consts.pExploreMode,
@@ -224,7 +223,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
         // init main app model
         if (!thisRoute.graphModel) {
-          thisRoute.graphModel = new thisRoute.GraphModel(isCreating ? {} : {leafs: [nodeId]});
+          thisRoute.graphModel = new thisRoute.GraphModel(_.extend(window.agfkGlobals.graphInitData, isCreating ? {} : {leafs: [nodeId]}), {parse: true});
         }
 
         if (!thisRoute.userModel) {
@@ -239,22 +238,23 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
         doRender = isCreating;
 
         // check if/how we need to acquire more data from the server FIXME
-        if(!thisRoute.graphModel.isPopulated()){
-          thisRoute.graphModel.fetch({
-            success: postNodePop,
-            error: function(emodel, eresp, eoptions){
-              thisRoute.showErrorMessageView(pvt.consts.ajaxErrorKey);
-              ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
-            }
-          });
-        }
-        else{
+        // if(!thisRoute.graphModel.isPopulated()){
+        //   thisRoute.graphModel.fetch({
+        //     success: postNodePop,
+        //     error: function(emodel, eresp, eoptions){
+        //       thisRoute.showErrorMessageView(pvt.consts.ajaxErrorKey);
+        //       ErrorHandler.reportAjaxError(eresp, eoptions, "ajax");
+        //     }
+        //   });
+        // }
+        // else{
           postNodePop();
-        }
+        //}
 
         // helper function to route change parameters appropriately
         // necessary because of AJAX calls to obtain new data
         function postNodePop() {
+          var topoSort;
           try{
             !isCreating && ErrorHandler.assert(thisRoute.graphModel.get("nodes").length > 0,
                                                "Fetch did not populate graph nodes for fetch: " + nodeId);
@@ -279,14 +279,12 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
           }
 
           if (paramsObj[qFocusConcept] === undefined){
-            paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
+            topoSort = thisRoute.graphModel.getTopoSort();
+            paramsObj[qFocusConcept] = topoSort[topoSort.length - 1];
           }
 
           switch (viewMode){
           case pExploreMode:
-            if (paramsObj[qFocusConcept] === undefined){
-              paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
-            }
             doRender = doRender || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
             if (doRender){ // UPDATE
               thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute, includeShortestOutlink: true });

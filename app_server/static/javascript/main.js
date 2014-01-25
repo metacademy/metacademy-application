@@ -116,7 +116,7 @@ requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router"
   var appRouter;
   // start the appropriate router
   // FIXME hardcoded hack
-  if (window.location.pathname.split("/").pop() === "new"){
+  if (window.agfkGlobals.isCreating) {
     appRouter = new GCRouter();
   } else {
     appRouter = new AppRouter();  }

@@ -60,7 +60,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
         var cv = this.collFields[i];
         output[cv].parent = this;
         if (resp[cv] !== undefined) {
-          output[cv].add(resp[cv]);
+          output[cv].add(resp[cv], {parse: true});
         }
       }
       return output;

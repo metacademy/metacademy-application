@@ -181,13 +181,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                }
              },
 
-             // /**
-             //  * Change transfer-click state (boolean to indicate when explore (learn) view was directly accessed from a specific concept in the learn (explore) view
-             //  */
-             // setELTransition: function(state){
-             //   this.elTransition = state;
-             // },
-
              /**
               * Show the error message view
               * key: the key for the given error message

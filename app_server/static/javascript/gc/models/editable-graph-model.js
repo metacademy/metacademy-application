@@ -8,7 +8,8 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     defaults:function(){
       var exDef = {
         nodes: new EditableNodeCollection(),
-        edges: new EditableEdgeCollection()
+        edges: new EditableEdgeCollection(),
+        title: "Untitled Graph"
       };
       return _.extend({}, ExploreGraphModel.prototype.defaults(), exDef);
     },

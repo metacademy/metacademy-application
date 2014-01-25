@@ -65,11 +65,15 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
 
         var thisModel = this,
             deps = [],
-            nodes = resp.concepts,
+            nodes = resp.concepts || resp.nodes, // FIXME normalize concepts and nodes
             nodeTag;
 
-        thisModel.set("id", resp.id);
-        thisModel.set("title", resp.title);
+        if (resp.id) {
+          thisModel.set("id", resp.id);
+        }
+        if (resp.title) {
+          thisModel.set("title", resp.title);
+        }
 
         // parse is called before initialize - so these aren't guaranteed to be present
         if (!thisModel.get("edges")){

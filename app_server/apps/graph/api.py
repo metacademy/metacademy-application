@@ -1,6 +1,9 @@
 import pdb
 import string
+import json
 import random
+import ast
+
 
 # myapp/api.py
 from tastypie import fields
@@ -117,7 +120,6 @@ class EdgeResource(ModelResource):
         authorization = Authorization()
 
     def dehydrate(self, bundle):
-        # TODO better way to rename?
         bundle.data["edge_id"] = bundle.data["id"]
         del bundle.data["id"]
         return bundle
@@ -129,6 +131,22 @@ class ConceptResourceResource(ModelResource):
         queryset = ConceptResource.objects.all()
         resource_name = 'conceptresource'
         authorization = Authorization()
+
+    def hydrate_location(self, bundle, **kwargs):
+        # check if it's valid json or a string
+        bdl_type = type(bundle.data['location'])
+        # TODO parse string entry or expect parsed?
+        if bdl_type == list:
+            # assume json TODO add try/except block
+            bundle.data['location'] = json.dumps(bundle.data['location'])
+
+        return bundle
+
+    def dehydrate(self, bundle):
+        # TODO why is this called so many times?
+        bundle.data['authors'] = ast.literal_eval(bundle.data['authors'])
+        bundle.data['location'] = json.loads(bundle.data['location'])
+        return bundle
 
 class ConceptResource(CustomReversionResource):
     """
@@ -157,9 +175,6 @@ class ConceptResource(CustomReversionResource):
     def alter_deserialized_detail_data(self, request, data):
         normalize_concept(data)
         return data
-
-    def alter_deserialized_list_data(self, request, data):
-        pdb.set_trace() # TODO
 
     def hydrate_flags(self, bundle):
         in_concept = bundle.data

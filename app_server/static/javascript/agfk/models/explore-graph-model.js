@@ -85,7 +85,6 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
           if (nodes.hasOwnProperty(nodeTag)) {
             var tmpNode = nodes[nodeTag];
             tmpNode.sid = tmpNode.id;
-            //tmpNode.id = nodeTag;
 
             // parse deps separately (outlinks will be readded)
             tmpNode.dependencies.forEach(function(dep){
@@ -99,8 +98,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         deps.forEach(function(dep){
           thisModel.addEdge(dep);
         });
-        return thisModel.attributes
-        ;
+        return thisModel.attributes;
       },
 
       /**

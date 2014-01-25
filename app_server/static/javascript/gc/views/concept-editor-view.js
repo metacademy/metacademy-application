@@ -98,7 +98,19 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
       addResource: function () {
         var thisView = this;
         // should do create
-        thisView.model.get("resources").add(new NodePropModels.Resource(), {at: 0});
+        var newRes = new NodePropModels.Resource({id: "-new-" + Math.random().toString(36).substr(3)});
+        newRes.parent = thisView.model;
+        newRes.set("concept", thisView.model);
+        newRes.save(null, {
+          parse: false,
+          success: function (mdl, resp) {
+            newRes.set("id", resp.id);
+          },
+          error: function (mdl, resp) {
+            console.error("unable to sync new resource -- TODO inform user -- msg: " + resp.responseText);
+          }
+        });
+        thisView.model.get("resources").add(newRes, {at: 0});
         thisView.render();
       },
 
@@ -129,7 +141,6 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
       isViewRendered: function(){
         return this.isRendered;
       }
-
     });
   })();
 });

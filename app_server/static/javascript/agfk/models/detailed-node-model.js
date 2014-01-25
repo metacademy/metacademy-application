@@ -32,6 +32,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
     },
 
     url: function () {
+      // FIXME localhost hardcoded
       return 'http://127.0.0.1:8080/graphs/api/v1/concept/' + this.get("id") + "/";
     },
 
@@ -39,26 +40,27 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
      *  parse the incoming server data
      */
     parse: function(resp, xhr) {
+      var thisModel = this;
       // check if we have a null response from the server
       if (resp === null || xhr.parse == false) {
         return {};
       }
-      var output = this.defaults();
+      var output = thisModel.defaults();
 
       // ---- parse the text values ---- //
-      var i = this.txtFields.length;
+      var i = thisModel.txtFields.length;
       while (i--) {
-        var tv = this.txtFields[i];
+        var tv = thisModel.txtFields[i];
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
         }
       }
 
       // ---- parse the collection values ---- //
-      i = this.collFields.length;
+      i = thisModel.collFields.length;
       while (i--) {
-        var cv = this.collFields[i];
-        output[cv].parent = this;
+        var cv = thisModel.collFields[i];
+        output[cv].parent = thisModel;
         if (resp[cv] !== undefined) {
           output[cv].add(resp[cv], {parse: true});
         }

@@ -12,36 +12,10 @@ from tastypie.authorization import Authorization # TODO change
 from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from apps.graph.models import Concept, Edge, Flag, Graph, ConceptResource, GraphSettings, ConceptSettings
+from apps.graph.models import Concept, Edge, Flag, Graph, GraphSettings, ConceptSettings
+from apps.graph.models import ConceptResource as CResource # avoid name collision
+
 from apps.user_management.models import Profile
-
-
-
-CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
-def normalize_concept(in_concept):
-    """
-    Temporary hack to normalize tag/id for new and old data and remove client-side fields
-    """
-    if type(in_concept) != dict:
-        return
-
-    if not in_concept["id"] or in_concept["id"][:4] == "-new":
-        useid = ''
-        while not useid or not len(Concept.objects.filter(id=useid)) == 0:
-            useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
-        usetag = useid
-    elif in_concept.has_key("sid") and len(in_concept["sid"]):
-        useid = in_concept["sid"]
-        usetag = in_concept["id"]
-    else:
-        useid = in_concept["id"]
-        usetag = in_concept["id"]
-    in_concept["id"] = useid
-    in_concept["tag"] = usetag
-
-    for field in in_concept.keys():
-        if field not in CONCEPT_SAVE_FIELDS:
-            del in_concept[field]
 
 
 class CustomReversionResource(ModelResource):
@@ -78,6 +52,7 @@ class CustomReversionResource(ModelResource):
     def post_save_hook(self, bundle):
         """
         called after saving to db
+
         must implement in subclass
         """
         return
@@ -93,6 +68,7 @@ class CustomReversionResource(ModelResource):
 
 
 class FlagResource(ModelResource):
+
     class Meta:
         max_limit = 0
         fields = ("text",)
@@ -101,7 +77,9 @@ class FlagResource(ModelResource):
         resource_name = 'flag'
         authorization = Authorization()
 
+
 class ShellConceptResource(ModelResource):
+
     class Meta:
         max_limit = 0
         fields = ("id", "tag")
@@ -110,9 +88,11 @@ class ShellConceptResource(ModelResource):
         include_resource_uri = False
         authorization = Authorization()
 
+
 class EdgeResource(ModelResource):
     source = fields.ForeignKey(ShellConceptResource, "source", full=True)
     target = fields.ForeignKey(ShellConceptResource, "target", full=True)
+
     class Meta:
         max_limit = 0
         queryset = Edge.objects.all()
@@ -125,13 +105,16 @@ class EdgeResource(ModelResource):
         del bundle.data["id"]
         return bundle
 
+
 class ConceptResourceResource(ModelResource):
     concept = fields.ForeignKey(ShellConceptResource, "concept", full=True)
+
     class Meta:
         max_limit = 0
-        queryset = ConceptResource.objects.all()
+        queryset = CResource.objects.all()
         resource_name = 'conceptresource'
         authorization = Authorization()
+        always_return_data = True
 
     def dehydrate(self, bundle):
         # TODO why is this called > 1 times? and why doesn't this flag stop it?
@@ -143,6 +126,7 @@ class ConceptResourceResource(ModelResource):
         bundle.data['authors'] = ast.literal_eval(bundle.data['authors'])
         bundle.data['location'] = json.loads(bundle.data['location'])
         adeps = bundle.data["additional_dependencies"]
+
         if type(adeps) == unicode:
             adeps = ast.literal_eval(adeps)
         for dep in adeps:
@@ -162,6 +146,77 @@ class ConceptResourceResource(ModelResource):
 
         return bundle
 
+    def hydrate(self, bundle, **kwargs):
+        """
+        prep the resource data for the database
+        """
+        resource = bundle.data
+        # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
+        if type(resource) != dict:
+            return bundle
+
+        # create new id if necessary
+        if not resource["id"] or resource["id"][:4] == "-new":
+            useid = ''
+            while not useid or not len(CResource.objects.filter(id=useid)) == 0:
+                useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
+            resource["id"] = useid
+
+
+        # normalize year TODO should we only allow ints
+        if resource.has_key("year"):
+            try:
+                resource["year"]  = int(resource["year"])
+            except:
+                resource["year"]  = None
+
+        # FIXME this shouldn't exist here, or at least, it should check
+        # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
+        if not resource.has_key("id"):
+            resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
+
+        # TODO check for temporary concept ids OFFLINE
+        bdl_type = type(resource['location'])
+        # TODO parse string entry or expect parsed?
+        if bdl_type == list:
+            # assume json TODO add try/except block
+            resource['location'] = json.dumps(resource['location'])
+
+        adeps_type = type(resource["additional_dependencies"])
+        if adeps_type == str:
+            adeps = ast.literal_eval(resource["additional_dependencies"])
+        elif adeps_type == list:
+            adeps = resource["additional_dependencies"]
+        else:
+            raise Exception("unable to parse additional dependencies for concept " + bundle.data["title"])
+        save_adeps = []
+        # if adeps don't have ids, try to associate an id with it -- only save the title if absolutely necessary
+        for dep in adeps:
+            did = ""
+            if dep.has_key("id"):
+                did = dep["id"]
+            elif dep.has_key("title"):
+                # try to find its id using the title
+                # TODO which concepts should we filter on? e.g. all concepts, only approved concepts, [probably best solution: approved or user concepts]
+                tobjs = Concept.objects.filter(title=dep["title"])
+                if len(tobjs):
+                    # TODO what if title's are ambiguous
+                    did = tobjs[0].id
+                else:
+                    # TODO if possible,
+                    # search input graph for a match
+                    pass
+            else:
+                raise Exception("additional resource dependency for concept " +  bundle.data["title"] + " does not have id or title specified")
+            if did:
+                save_adep = {"id": did}
+            else:
+                save_adep = {"title": dep["title"]}
+            save_adeps.append(save_adep)
+
+        return bundle
+
+
 class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
@@ -178,7 +233,7 @@ class ConceptResource(CustomReversionResource):
         csettings.save()
 
     class Meta:
-        """ ConceptResource Meta """
+        """ ConceptResource Meta"""
         max_limit = 0
         queryset = Concept.objects.all()
         resource_name = 'concept'
@@ -217,67 +272,6 @@ class ConceptResource(CustomReversionResource):
                 in_concept["dependencies"][i] = inlink
         return bundle
 
-    def hydrate_resources(self, bundle, **kwargs):
-        """
-        prep the resource data
-        (can't do in ConceptResourceResouce hydrate because we need the tag/id
-        from the concept)
-        """
-
-        for resource in bundle.data["resources"]:
-            if type(resource) != dict:
-                # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
-                continue
-            if resource.has_key("year"):
-                try:
-                    resource["year"]  = int(resource["year"])
-                except:
-                    resource["year"]  = None
-            # FIXME this shouldn't exist here, or at least, it should check
-            # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
-            if not resource.has_key("id"):
-                resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
-            resource["concept"] = {"id": bundle.data["id"], "tag": bundle.data["tag"]}
-            bdl_type = type(resource['location'])
-            # TODO parse string entry or expect parsed?
-            if bdl_type == list:
-                # assume json TODO add try/except block
-                resource['location'] = json.dumps(resource['location'])
-
-            adeps_type = type(resource["additional_dependencies"])
-            if adeps_type == str:
-                adeps = ast.literal_eval(resource["additional_dependencies"])
-            elif adeps_type == list:
-                adeps = resource["additional_dependencies"]
-            else:
-                raise Exception("unable to parse additional dependencies for concept " + bundle.data["title"])
-            save_adeps = []
-            # if adeps don't have ids, try to associate an id with it -- only save the title if absolutely necessary
-            for dep in adeps:
-                did = ""
-                if dep.has_key("id"):
-                    did = dep["id"]
-                elif dep.has_key("title"):
-                    # try to find its id using the title
-                    # TODO which concepts should we filter on? e.g. all concepts, only approved concepts, [probably best solution: approved or user concepts]
-                    tobjs = Concept.objects.filter(title=dep["title"])
-                    if len(tobjs):
-                        # TODO what if title's are ambiguous
-                        did = tobjs[0].id
-                    else:
-                        # TODO if possible,
-                        # search input graph for a match
-                        pass
-                else:
-                    raise Exception("additional resource dependency for concept " +  bundle.data["title"] + " does not have id or title specified")
-                if did:
-                    save_adep = {"id": did}
-                else:
-                    save_adep = {"title": dep["title"]}
-                save_adeps.append(save_adep)
-
-        return bundle
-
 
 class GraphResource(CustomReversionResource):
     """
@@ -296,7 +290,6 @@ class GraphResource(CustomReversionResource):
         gsettings.editors.add(uprof)
         gsettings.save()
 
-
     class Meta:
         """ GraphResource Meta """
         allowed_methods = ("get", "post", "put", "delete", "patch")
@@ -305,3 +298,30 @@ class GraphResource(CustomReversionResource):
         queryset = Graph.objects.all()
         resource_name = 'graph'
         authorization = Authorization()
+
+# helper methods
+CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
+def normalize_concept(in_concept):
+    """
+    Temporary hack to normalize tag/id for new and old data and remove client-side fields
+    """
+    if type(in_concept) != dict:
+        return
+
+    if not in_concept["id"] or in_concept["id"][:4] == "-new":
+        useid = ''
+        while not useid or not len(Concept.objects.filter(id=useid)) == 0:
+            useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
+        usetag = useid
+    elif in_concept.has_key("sid") and len(in_concept["sid"]):
+        useid = in_concept["sid"]
+        usetag = in_concept["id"]
+    else:
+        useid = in_concept["id"]
+        usetag = in_concept["id"]
+    in_concept["id"] = useid
+    in_concept["tag"] = usetag
+
+    for field in in_concept.keys():
+        if field not in CONCEPT_SAVE_FIELDS:
+            del in_concept[field]

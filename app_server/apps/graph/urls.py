@@ -1,12 +1,13 @@
 from django.conf.urls import patterns, url, include
 
 from tastypie.api import Api
-from apps.graph.api import ConceptResource, GraphResource
+from apps.graph.api import ConceptResource, GraphResource, ConceptResourceResource
 from views import get_agfk_app, new_graph, existing_graph
 
 # api v1
 v1_api = Api(api_name='v1')
 v1_api.register(ConceptResource())
+v1_api.register(ConceptResourceResource())
 v1_api.register(GraphResource())
 
 urlpatterns = patterns('',

@@ -47,8 +47,41 @@ define(["backbone"], function(Backbone){
         additional_dependencies: [],
         extra: "",
         year: "",
-        edition_years: []
+        edition_years: [],
+        concept: null
       };
+    },
+
+    url: function () {
+      // FIXME localhost hardcoded
+      // TODO what if concept is not present yet...
+      return 'http://127.0.0.1:8080/graphs/api/v1/conceptresource/' + this.get("id") + "/";
+    },
+
+    parse: function (resp, xhr) {
+      if (xhr.parse === false) {
+        return {};
+      }
+
+      resp.concept = (xhr && xhr.collection && xhr.collection.parent) || resp.concept;
+      return xhr.parse === false ? {} : resp;
+    },
+
+    toJSON: function () {
+      var thisModel = this,
+          retObj = {},
+          attrs = thisModel.attributes,
+          attrib;
+      // avoid infinite recurse with concept property
+      for (attrib in attrs) {
+        if (attrs.hasOwnProperty(attrib) && attrib !== "concept") {
+          retObj[attrib] = thisModel.get(attrib);
+        }
+      }
+      var concept = thisModel.get("concept");
+      retObj["concept"] = {"id": concept.get("id") , "tag": concept.get("tag")};
+
+      return retObj;
     },
 
     getLocationString: function () {

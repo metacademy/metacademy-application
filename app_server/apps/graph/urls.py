@@ -13,7 +13,7 @@ v1_api.register(GraphResource())
 urlpatterns = patterns('',
                        url(r'^new/?', new_graph, name="graph-creator"),
                        # /mapi/graph (should handle get/post/put requests
-                       url('^api/', include(v1_api.urls)),
+                       url('^api/', include(v1_api.urls), name="api"),
                        url(r'^(?i)concepts/', get_agfk_app, name="concepts"),
                        url('^([^/]+)/', existing_graph),
 )

@@ -4,19 +4,39 @@ import json
 import random
 import ast
 
-
 # myapp/api.py
 from tastypie import fields
 from tastypie.resources import ModelResource
-from tastypie.authorization import Authorization # TODO change
+from tastypie.authorization import DjangoAuthorization
+from tastypie.exceptions import Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
 from apps.graph.models import Concept, Edge, Flag, Graph, GraphSettings, ConceptSettings
 from apps.graph.models import ConceptResource as CResource # avoid name collision
-
 from apps.user_management.models import Profile
 
+
+class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
+    def update_list(self, object_list, bundle):
+        pdb.set_trace()
+        allowed = []
+
+        # Since they may not all be saved, iterate over them.
+        for obj in object_list:
+            if bundle.obj.editable_by(bundle.request.user):
+                allowed.append(obj)
+
+        return allowed
+
+    def update_detail(self, object_list, bundle):
+        return bundle.obj.editable_by(bundle.request.user)
+
+    def delete_list(self, object_list, bundle):
+        raise Unauthorized("Sorry, no deletes yet. TODO")
+
+    def delete_detail(self, object_list, bundle):
+        raise Unauthorized("Sorry, no deletes yet. TODO")
 
 class CustomReversionResource(ModelResource):
     """
@@ -75,7 +95,7 @@ class FlagResource(ModelResource):
         include_resource_uri = False
         queryset = Flag.objects.all()
         resource_name = 'flag'
-        authorization = Authorization()
+        authorization = ModAndUserObjectsOnlyAuthorization()
 
 
 class ShellConceptResource(ModelResource):
@@ -86,7 +106,7 @@ class ShellConceptResource(ModelResource):
         queryset = Concept.objects.all()
         resource_name = 'concept'
         include_resource_uri = False
-        authorization = Authorization()
+        authorization = ModAndUserObjectsOnlyAuthorization()
 
 
 class EdgeResource(ModelResource):
@@ -98,7 +118,7 @@ class EdgeResource(ModelResource):
         queryset = Edge.objects.all()
         resource_name = 'edge'
         include_resource_uri = False
-        authorization = Authorization()
+        authorization = ModAndUserObjectsOnlyAuthorization()
 
     def dehydrate(self, bundle):
         bundle.data["edge_id"] = bundle.data["id"]
@@ -113,7 +133,7 @@ class ConceptResourceResource(ModelResource):
         max_limit = 0
         queryset = CResource.objects.all()
         resource_name = 'conceptresource'
-        authorization = Authorization()
+        authorization = ModAndUserObjectsOnlyAuthorization()
         always_return_data = True
 
     def dehydrate(self, bundle):
@@ -161,7 +181,6 @@ class ConceptResourceResource(ModelResource):
             while not useid or not len(CResource.objects.filter(id=useid)) == 0:
                 useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             resource["id"] = useid
-
 
         # normalize year TODO should we only allow ints
         if resource.has_key("year"):
@@ -227,7 +246,7 @@ class ConceptResource(CustomReversionResource):
 
     def post_save_hook(self, bundle):
         # FIXME we're assuming a user is logged in
-        csettings, new = ConceptSettings.objects.get_or_create(concept=bundle.obj)
+        csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)
         csettings.save()
@@ -237,7 +256,7 @@ class ConceptResource(CustomReversionResource):
         max_limit = 0
         queryset = Concept.objects.all()
         resource_name = 'concept'
-        authorization = Authorization()
+        authorization = ModAndUserObjectsOnlyAuthorization()
         allowed_methods = ("get", "post", "put", "delete", "patch")
         always_return_data = True
 
@@ -285,8 +304,9 @@ class GraphResource(CustomReversionResource):
 
     def post_save_hook(self, bundle):
         # FIXME we're assuming a user is logged in
-        gsettings, new = GraphSettings.objects.get_or_create(graph=bundle.obj)
+        gsettings, gsnew = GraphSettings.objects.get_or_create(graph=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
+        # TODO add check that the edit actally made a difference
         gsettings.editors.add(uprof)
         gsettings.save()
 
@@ -297,7 +317,7 @@ class GraphResource(CustomReversionResource):
         include_resource_uri = False
         queryset = Graph.objects.all()
         resource_name = 'graph'
-        authorization = Authorization()
+        authorization = ModAndUserObjectsOnlyAuthorization()
 
 # helper methods
 CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]

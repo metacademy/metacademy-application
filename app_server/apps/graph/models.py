@@ -27,6 +27,10 @@ class Concept(Model):
         # "approved" concepts get their very own tag
         return self.tag == self.id
 
+    def editable_by(self, user):
+        return user.is_superuser or (user.is_authenticated() and (self.is_provisional() or self.conceptsettings.is_editor(user)))
+
+
 class Flag(Model):
     text = CharField(max_length=100)
 
@@ -46,6 +50,10 @@ class ConceptSettings(Model):
     concept = OneToOneField(Concept, primary_key=True)
     status = CharField(max_length=100) # TODO {public, provisional, private}, maybe?
     editors = ManyToManyField(Profile, related_name="concept_editors")
+
+    def is_editor(self, user):
+        return self.editors.filter(user=user).exists()
+
     def get_absolute_url(self):
         return "http://www.example.com"
 
@@ -84,6 +92,9 @@ class Graph(Model):
     id = CharField(max_length=12, primary_key=True)
     title = CharField(max_length=100)
     concepts = ManyToManyField(Concept, related_name="graph_concepts")
+
+    def editable_by(self, user):
+        return user.is_authenticated()
 
 
 class GraphSettings(Model):

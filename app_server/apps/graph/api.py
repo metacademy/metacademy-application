@@ -19,7 +19,6 @@ from apps.user_management.models import Profile
 
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     def update_list(self, object_list, bundle):
-        pdb.set_trace()
         allowed = []
 
         # Since they may not all be saved, iterate over them.

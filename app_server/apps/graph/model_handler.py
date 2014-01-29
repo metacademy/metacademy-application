@@ -45,7 +45,7 @@ def sync_concept(in_concept):
         inlink_reason = in_inlink['reason']
         #  create the concept first if it doesn't exist
         inlink_source, created = Concept.objects.get_or_create(id=inlink_id ,tag=inlink_tag)
-        inlink, link_created = Edge.objects.get_or_create(source=inlink_source, target=concept)
+        inlink, link_created = Edge.objects.get_or_create(source=inlink_source.id, target=concept.id)
         changed = changed or link_created or inlink.reason != in_inlink["reason"]
         inlink.reason = in_inlink["reason"]
         inlink.save()

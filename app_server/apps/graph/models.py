@@ -39,9 +39,17 @@ class Edge(Model):
     Concept edge
     """
     id = CharField(max_length=30, primary_key=True)
-    source = ForeignKey("Concept", related_name="edge_source")
-    target = ForeignKey("Concept", related_name="edge_target")
+    # use charfield because foreignkey causes race conditions with tastypie api
+    source = CharField(max_length=12)
+    target = CharField(max_length=12)
     reason = CharField(max_length=500)
+
+    def editable_by(self, user):
+        # TODO figure out non-provisional authentication scheme
+        return user.is_authenticated()
+
+    class Meta:
+        unique_together = (("source", "target"),)
 
 class ConceptSettings(Model):
     """

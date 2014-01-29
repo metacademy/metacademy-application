@@ -8,6 +8,7 @@ import ast
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import DjangoAuthorization
+from tastypie.authentication import SessionAuthentication
 from tastypie.exceptions import Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,15 +21,30 @@ from apps.user_management.models import Profile
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     def update_list(self, object_list, bundle):
         allowed = []
-
         # Since they may not all be saved, iterate over them.
+        print "When is this called, exactly?"
+        pdb.set_trace
         for obj in object_list:
             if bundle.obj.editable_by(bundle.request.user):
                 allowed.append(obj)
-
+            # TODO verify that we're not changing ids
         return allowed
 
     def update_detail(self, object_list, bundle):
+
+        # check if we're trying to change the id or create a new object using patch
+        # TODO I couldn't find a better way to do this --CJR
+        reqmeth = bundle.request.META["REQUEST_METHOD"]
+        if  reqmeth == "PATCH" or reqmeth == "PUT":
+            split_path = bundle.request.META["PATH_INFO"].split("/")
+            split_path = [p for p in split_path if p]
+            model_name = split_path[-2]
+            model_patch_id = split_path[-1]
+            # make sure we're not trying to change the id
+            if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
+
+                raise Unauthorized("cannot replace id")
+
         return bundle.obj.editable_by(bundle.request.user)
 
     def delete_list(self, object_list, bundle):
@@ -41,7 +57,7 @@ class CustomReversionResource(ModelResource):
     """
     ModelResource that uses django reversions
     """
-    def save(self, bundle, skip_errors=False):
+    def save(self, bundle, skip_errors=False, **kwargs):
         self.is_valid(bundle)
 
         if bundle.errors and not skip_errors:
@@ -56,16 +72,17 @@ class CustomReversionResource(ModelResource):
         # Save FKs just in case.
         self.save_related(bundle)
 
-        # Save the main object.
+        # Save the main object. # CJR TODO we can somehow check if we should save here (are we calling from an edge?)
         bundle.obj.save()
         bundle.objects_saved.add(self.create_identifier(bundle.obj))
+
+        # Now pick up the M2M bits. (must occur after the main obj)
+        m2m_bundle = self.hydrate_m2m(bundle)
+        self.save_m2m(m2m_bundle)
 
         # per resource post-save hook
         self.post_save_hook(bundle)
 
-        # Now pick up the M2M bits.
-        m2m_bundle = self.hydrate_m2m(bundle)
-        self.save_m2m(m2m_bundle)
         return bundle
 
     def post_save_hook(self, bundle):
@@ -109,9 +126,6 @@ class ShellConceptResource(ModelResource):
 
 
 class EdgeResource(ModelResource):
-    source = fields.ForeignKey(ShellConceptResource, "source", full=True)
-    target = fields.ForeignKey(ShellConceptResource, "target", full=True)
-
     class Meta:
         max_limit = 0
         queryset = Edge.objects.all()
@@ -169,6 +183,9 @@ class ConceptResourceResource(ModelResource):
         """
         prep the resource data for the database
         """
+
+        # TODO make sure we're not trying to change ids, and keep track of what we are changing
+
         resource = bundle.data
         # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
         if type(resource) != dict:
@@ -239,7 +256,6 @@ class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
     """
-    dependencies = fields.ToManyField(EdgeResource, 'edge_target', full=True)
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
@@ -280,8 +296,8 @@ class ConceptResource(CustomReversionResource):
                 continue
 
             inlink = {}
-            inlink['source'] = {"id": in_inlink['sid_source'], "tag": in_inlink['source']}
-            inlink['target'] = {"id": in_inlink['sid_target'], "tag": in_concept["tag"]}
+            inlink['source'] = in_inlink['sid_source']
+            inlink['target'] = in_inlink['sid_target']
             inlink['reason'] = in_inlink['reason']
             if not in_inlink.has_key("id"):
                 inlink["id"] = in_inlink["sid_source"] + in_inlink["sid_target"]

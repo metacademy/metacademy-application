@@ -69,6 +69,8 @@ class CustomReversionResource(ModelResource):
         else:
             self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
 
+        self.pre_save_hook(bundle)
+
         # Save FKs just in case.
         self.save_related(bundle)
 
@@ -81,17 +83,25 @@ class CustomReversionResource(ModelResource):
         self.save_m2m(m2m_bundle)
 
         # per resource post-save hook
-        self.post_save_hook(bundle)
+        bundle = self.post_save_hook(bundle)
 
+        return bundle
+
+    def pre_save_hook(self, bundle):
+        """
+        called after saving to db
+
+        implement in subclass
+        """
         return bundle
 
     def post_save_hook(self, bundle):
         """
         called after saving to db
 
-        must implement in subclass
+        implement in subclass
         """
-        return
+        return bundle
 
     def obj_create(self, bundle, **kwargs):
         return super(ModelResource, self).obj_create(bundle, **kwargs)
@@ -115,7 +125,9 @@ class FlagResource(ModelResource):
 
 
 class ShellConceptResource(ModelResource):
-
+    """
+    A simple "shell" concept (id and tag) to avoid infinite recursion with CRUD requests
+    """
     class Meta:
         max_limit = 0
         fields = ("id", "tag")
@@ -124,19 +136,18 @@ class ShellConceptResource(ModelResource):
         include_resource_uri = False
         authorization = ModAndUserObjectsOnlyAuthorization()
 
+# class EdgeResource(ModelResource):
+#     class Meta:
+#         max_limit = 0
+#         queryset = Edge.objects.all()
+#         resource_name = 'edge'
+#         include_resource_uri = False
+#         authorization = ModAndUserObjectsOnlyAuthorization()
 
-class EdgeResource(ModelResource):
-    class Meta:
-        max_limit = 0
-        queryset = Edge.objects.all()
-        resource_name = 'edge'
-        include_resource_uri = False
-        authorization = ModAndUserObjectsOnlyAuthorization()
-
-    def dehydrate(self, bundle):
-        bundle.data["edge_id"] = bundle.data["id"]
-        del bundle.data["id"]
-        return bundle
+#     def dehydrate(self, bundle):
+#         bundle.data["edge_id"] = bundle.data["id"]
+#         del bundle.data["id"]
+#         return bundle
 
 
 class ConceptResourceResource(ModelResource):
@@ -259,12 +270,30 @@ class ConceptResource(CustomReversionResource):
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
+    def dehydrate(self, bundle):
+        # find the set of prereqs
+        deps = Edge.objects.filter(target=bundle.data["id"])
+        bundle.data["dependencies"] = [{"id": dep.id, "source": dep.source, "reason": dep.reason} for dep in deps]
+        return bundle
+
+    def pre_save_hook(self, bundle):
+        # save edges and remove from bundle
+        for in_edge in bundle.data["dependencies"]:
+            edge, created = Edge.objects.get_or_create(id=in_edge["id"])
+            edge.source = in_edge["source"]
+            edge.target = in_edge["target"]
+            edge.reason = in_edge["reason"]
+            edge.save()
+        del bundle.data["dependencies"]
+        return bundle
+
     def post_save_hook(self, bundle):
         # FIXME we're assuming a user is logged in
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)
         csettings.save()
+        return bundle
 
     class Meta:
         """ ConceptResource Meta"""
@@ -288,22 +317,18 @@ class ConceptResource(CustomReversionResource):
             in_concept["flags"] = flag_arr
         return bundle
 
-    def hydrate_dependencies(self, bundle):
+    def hydrate(self, bundle):
         in_concept = bundle.data
-        for i, in_inlink in enumerate(in_concept["dependencies"]):
+        for in_inlink in in_concept["dependencies"]:
             if type(in_inlink) != dict:
                 # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
                 continue
-
-            inlink = {}
-            inlink['source'] = in_inlink['sid_source']
-            inlink['target'] = in_inlink['sid_target']
-            inlink['reason'] = in_inlink['reason']
+            if in_inlink.has_key('sid_source'):
+                in_inlink['source'] = in_inlink['sid_source']
+            if in_inlink.has_key('sid_target'):
+                in_inlink['target'] = in_inlink['sid_target']
             if not in_inlink.has_key("id"):
-                inlink["id"] = in_inlink["sid_source"] + in_inlink["sid_target"]
-            else:
-                inlink["id"] = in_inlink["id"]
-                in_concept["dependencies"][i] = inlink
+                in_inlink["id"] = in_inlink["source"] + in_inlink["target"]
         return bundle
 
 
@@ -324,6 +349,7 @@ class GraphResource(CustomReversionResource):
         # TODO add check that the edit actally made a difference
         gsettings.editors.add(uprof)
         gsettings.save()
+        return bundle
 
     class Meta:
         """ GraphResource Meta """

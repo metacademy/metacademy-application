@@ -92,7 +92,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
 
             // parse deps separately (outlinks will be readded)
             tmpNode.dependencies.forEach(function(dep){
-              deps.push({source: dep.source.id, target: dep.target.id, reason: dep.reason});
+              deps.push({id: dep.id, source: dep.source, target: tmpNode.id, reason: dep.reason});
             });
             delete tmpNode.dependencies;
             delete tmpNode.outlinks;

@@ -42,11 +42,14 @@ class Migration(SchemaMigration):
         # Adding model 'Edge'
         db.create_table(u'graph_edge', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
-            ('source', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edge_source', to=orm['graph.Concept'])),
-            ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edge_target', to=orm['graph.Concept'])),
+            ('source', self.gf('django.db.models.fields.CharField')(max_length=12)),
+            ('target', self.gf('django.db.models.fields.CharField')(max_length=12)),
             ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
         ))
         db.send_create_signal(u'graph', ['Edge'])
+
+        # Adding unique constraint on 'Edge', fields ['source', 'target']
+        db.create_unique(u'graph_edge', ['source', 'target'])
 
         # Adding model 'ConceptSettings'
         db.create_table(u'graph_conceptsettings', (
@@ -123,6 +126,9 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Removing unique constraint on 'Edge', fields ['source', 'target']
+        db.delete_unique(u'graph_edge', ['source', 'target'])
+
         # Deleting model 'Concept'
         db.delete_table(u'graph_concept')
 
@@ -238,11 +244,11 @@ class Migration(SchemaMigration):
             'status': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'graph.edge': {
-            'Meta': {'object_name': 'Edge'},
+            'Meta': {'unique_together': "(('source', 'target'),)", 'object_name': 'Edge'},
             'id': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
             'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edge_source'", 'to': u"orm['graph.Concept']"}),
-            'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edge_target'", 'to': u"orm['graph.Concept']"})
+            'source': ('django.db.models.fields.CharField', [], {'max_length': '12'}),
+            'target': ('django.db.models.fields.CharField', [], {'max_length': '12'})
         },
         u'graph.flag': {
             'Meta': {'object_name': 'Flag'},

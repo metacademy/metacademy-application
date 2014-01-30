@@ -20,10 +20,8 @@ from apps.user_management.models import Profile
 
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     def update_list(self, object_list, bundle):
+        # called when PUTing a list
         allowed = []
-        # Since they may not all be saved, iterate over them.
-        print "When is this called, exactly?"
-        pdb.set_trace
         for obj in object_list:
             if bundle.obj.editable_by(bundle.request.user):
                 allowed.append(obj)
@@ -135,20 +133,6 @@ class ShellConceptResource(ModelResource):
         resource_name = 'concept'
         include_resource_uri = False
         authorization = ModAndUserObjectsOnlyAuthorization()
-
-# class EdgeResource(ModelResource):
-#     class Meta:
-#         max_limit = 0
-#         queryset = Edge.objects.all()
-#         resource_name = 'edge'
-#         include_resource_uri = False
-#         authorization = ModAndUserObjectsOnlyAuthorization()
-
-#     def dehydrate(self, bundle):
-#         bundle.data["edge_id"] = bundle.data["id"]
-#         del bundle.data["id"]
-#         return bundle
-
 
 class ConceptResourceResource(ModelResource):
     concept = fields.ForeignKey(ShellConceptResource, "concept", full=True)
@@ -303,6 +287,11 @@ class ConceptResource(CustomReversionResource):
         authorization = ModAndUserObjectsOnlyAuthorization()
         allowed_methods = ("get", "post", "put", "delete", "patch")
         always_return_data = True
+
+    def alter_deserialized_list_data(self, request, data):
+        for concept in data["objects"]:
+            normalize_concept(concept)
+        return data
 
     def alter_deserialized_detail_data(self, request, data):
         normalize_concept(data)

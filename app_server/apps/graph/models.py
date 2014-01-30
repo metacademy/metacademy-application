@@ -89,8 +89,11 @@ class ConceptResource(Model):
     description = CharField(max_length=500, null=True, blank=True)
     extra = CharField(max_length=500, null=True, blank=True)
     note = CharField(max_length=500, null=True, blank=True)
-    resource_type = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
+
+    def editable_by(self, user):
+        # TODO figure out non-provisional authentication scheme
+        return user.is_authenticated()
 
 class Graph(Model):
     """

@@ -19,13 +19,20 @@ class BaseResourceTest(ResourceTestCase):
 
     def setUp(self):
         super(BaseResourceTest, self).setUp()
+
         # Create a normal user.
         self.username = 'test' # use un as pw
-        self.user = User.objects.create_user(self.username, 'test@example.com', self.username)
-        self.prof = Profile(user=self.user)
-        self.prof.save()
-        self.user.save()
+        user = User.objects.create_user(self.username, 'test@example.com', self.username)
+        prof = Profile(user=user)
+        prof.save()
+        user.save()
 
+        # create a super user
+        self.super_username = 'super_test' # use un as pw
+        suser = User.objects.create_superuser(self.super_username, self.super_username + "@test.com", self.super_username)
+        suser.save()
+        sprof = Profile(user=suser)
+        sprof.save()
 
     def verify_db_graph(self, in_graph):
         """
@@ -45,8 +52,12 @@ class BaseResourceTest(ResourceTestCase):
         for in_concept in post_concepts:
             self.verify_db_concept(in_concept)
 
-
     def verify_db_concept(self, in_concept):
+        """
+        Arguments:
+        - `in_concept`: a python dictionary obj with the desired concept attributes
+        """
+
         concept = Concept.objects.get(id=in_concept["id"])
         # verify flat attributes
         flat_attrs = ["id", "tag", "title", "goals", "pointers", "software", "exercises", "summary"]
@@ -239,8 +250,16 @@ class ConceptResourceTest(BaseResourceTest):
 
     def auth_verb_concept(self, *args, **kwargs):
         vtype = kwargs.pop("vtype", None)
+        auth_type = kwargs.pop("atype", None)
         resp = None
-        self.api_client.client.login(username=self.username, password=self.username)
+
+        if auth_type is None:
+            self.api_client.client.login(username=self.username, password=self.username)
+        elif auth_type == "super":
+            self.api_client.client.login(username=self.super_username, password=self.super_username)
+        else:
+            raise Exception("auth_verb_concept argument 'atype' must be 'super' or None, not '" + atype + "'")
+
         if vtype == "list":
             resp = self.verb_concept_list(**kwargs)
         elif vtype == "detail":
@@ -249,6 +268,10 @@ class ConceptResourceTest(BaseResourceTest):
             raise Exception("auth_verb_concept argument 'vtype' must be 'list' or 'detail', not '" + vtype + "'")
         self.api_client.client.logout()
         return resp
+
+    def super_auth_verb_concept(self, *args, **kwargs):
+        kwargs["atype"] = "super"
+        return self.auth_verb_concept(**kwargs)
 
     def test_put_list_unauth(self):
         resp = self.verb_concept_list(verb="put", data=self.list_data)
@@ -324,5 +347,60 @@ class ConceptResourceTest(BaseResourceTest):
         self.assertHttpOK(resp)
         self.verify_db_concept(json.loads(resp.content))
 
-    # TODO need to test different id/tag (not allowed by default user)
-    # TODO need to test changing accepted concepts
+    def test_put_detail_diff_tag_id_normal_user(self):
+        tdata = self.detail_data.copy()
+        tdata["tag"] = "nomatch"
+        resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        self.assertHttpUnauthorized(resp)
+        self.assertEqual(len(Concept.objects.all()), 0)
+
+    def create_accepted_concept(self):
+        tdata = self.detail_data.copy()
+        tdata["tag"] = "nomatch"
+        return self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata), tdata
+
+    def test_put_detail_diff_tag_id_super_user(self):
+        resp, tdata = self.create_accepted_concept()
+        self.assertHttpCreated(resp)
+        self.assertEqual(len(Concept.objects.all()), 1)
+        self.verify_db_concept(tdata)
+
+    def test_put_list_diff_tag_id_normal_user(self):
+        tlist_data = self.list_data.copy()
+        tlist_data["objects"][0]["tag"] = "different_tag"
+        resp = self.auth_verb_concept(verb="put", vtype="list", data=tlist_data)
+        self.assertHttpUnauthorized(resp)
+        self.assertEqual(len(Concept.objects.all()), 0)
+
+    def test_put_list_diff_tag_id_super_user(self):
+        tlist_data = self.list_data.copy()
+        tlist_data["objects"][0]["tag"] = "different_tag"
+        resp = self.super_auth_verb_concept(verb="put", vtype="list", data=tlist_data)
+        self.assertHttpOK(resp)
+        self.assertEqual(len(Concept.objects.all()),len(tlist_data['objects']))
+        self.assertEqual(Concept.objects.get(id=tlist_data["objects"][0]["id"]).tag, unicode("different_tag"))
+
+    def test_put_list_diff_tag_id_normal_user(self):
+        tlist_data = self.list_data
+        tlist_data["objects"][0]["tag"] = "different_tag"
+        resp = self.auth_verb_concept(verb="put", vtype="list", data=tlist_data)
+        self.assertHttpUnauthorized(resp)
+        self.assertEqual(len(Concept.objects.all()), 0)
+
+    def test_put_detail_accepted_concept_normal_user(self):
+        # create an "accepted" concept
+        fresp, tdata = self.create_accepted_concept()
+        otitle = tdata["title"]
+        tdata["title"] = "a different title"
+        resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        self.assertHttpUnauthorized(resp)
+        self.assertEqual(Concept.objects.all()[0].title, otitle)
+
+    def test_put_detail_accepted_concept_super_user(self):
+        # create an "accepted" concept
+        fresp, tdata = self.create_accepted_concept()
+        otitle = tdata["title"]
+        tdata["title"] = "a different title"
+        resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        self.assertHttpOK(resp)
+        self.assertEqual(Concept.objects.all()[0].title, tdata["title"])

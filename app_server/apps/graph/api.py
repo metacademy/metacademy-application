@@ -23,9 +23,28 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         # called when PUTing a list
         allowed = []
         for obj in object_list:
-            if bundle.obj.editable_by(bundle.request.user):
-                allowed.append(obj)
-            # TODO verify that we're not changing ids
+            if not bundle.obj.editable_by(bundle.request.user):
+                raise Unauthorized("not authorized to edit concept")
+            # TODO DRY with update_detail (bad!)
+            reqmeth = bundle.request.META["REQUEST_METHOD"]
+            if  reqmeth == "PATCH" or reqmeth == "PUT":
+                split_path = bundle.request.META["PATH_INFO"].split("/")
+                split_path = [p for p in split_path if p]
+                model_name = split_path[-2]
+                model_patch_id = split_path[-1]
+
+                # check for changing ids
+                if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id\
+                   and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
+                    raise Unauthorized("cannot replace id")
+
+                # make sure non-supers are not commiting updating with non-matching ids/tags
+                if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
+                   and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
+                    raise Unauthorized("normal users cannot push non-matching ids and tags")
+
+
+            allowed.append(obj)
         return allowed
 
     def update_detail(self, object_list, bundle):
@@ -37,11 +56,20 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
             split_path = bundle.request.META["PATH_INFO"].split("/")
             split_path = [p for p in split_path if p]
             model_name = split_path[-2]
-            model_patch_id = split_path[-1]
+            if model_name == "v1":
+                model_name = split_path[-1]
+                model_patch_id = ""
+            else:
+                model_patch_id = split_path[-1]
+
             # make sure we're not trying to change the id
             if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
-
                 raise Unauthorized("cannot replace id")
+
+            # make sure non-supers are not commiting updating with non-matching ids/tags
+            if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
+               and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
+                raise Unauthorized("normal users cannot push non-matching ids and tags")
 
         return bundle.obj.editable_by(bundle.request.user)
 
@@ -121,22 +149,8 @@ class FlagResource(ModelResource):
         resource_name = 'flag'
         authorization = ModAndUserObjectsOnlyAuthorization()
 
-
-class ShellConceptResource(ModelResource):
-    """
-    A simple "shell" concept (id and tag) to avoid infinite recursion with CRUD requests
-    """
-    class Meta:
-        max_limit = 0
-        fields = ("id", "tag")
-        queryset = Concept.objects.all()
-        resource_name = 'concept'
-        include_resource_uri = False
-        authorization = ModAndUserObjectsOnlyAuthorization()
-
 class ConceptResourceResource(ModelResource):
-    concept = fields.ForeignKey(ShellConceptResource, "concept", full=True)
-
+    concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
     class Meta:
         max_limit = 0
         queryset = CResource.objects.all()
@@ -178,13 +192,14 @@ class ConceptResourceResource(ModelResource):
         """
         prep the resource data for the database
         """
-
-        # TODO make sure we're not trying to change ids, and keep track of what we are changing
-
         resource = bundle.data
         # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
         if type(resource) != dict:
             return bundle
+
+        if not resource.has_key("concept_id"):
+            resource["concept_id"] = bundle.data["concept"]["id"]
+            del resource["concept"]
 
         # create new id if necessary
         if not resource["id"] or resource["id"][:4] == "-new":
@@ -251,7 +266,7 @@ class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
     """
-    resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True)
+    resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True, related_name="concept")
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
     def dehydrate(self, bundle):
@@ -272,7 +287,7 @@ class ConceptResource(CustomReversionResource):
         return bundle
 
     def post_save_hook(self, bundle):
-        # FIXME we're assuming a user is logged in
+        # FIXME we're currently assuming a user is logged in
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)
@@ -365,12 +380,10 @@ def normalize_concept(in_concept):
         usetag = useid
     elif in_concept.has_key("sid") and len(in_concept["sid"]):
         useid = in_concept["sid"]
-        usetag = in_concept["id"]
     else:
         useid = in_concept["id"]
-        usetag = in_concept["id"]
+    usetag = in_concept.setdefault("tag", useid)
     in_concept["id"] = useid
-    in_concept["tag"] = usetag
 
     for field in in_concept.keys():
         if field not in CONCEPT_SAVE_FIELDS:

@@ -9,7 +9,7 @@ from django.template import RequestContext
 
 from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data
 from apps.user_management.models import Profile
-from apps.graph.models import Graph, Concept
+from apps.graph.models import Graph, Concept, GlobalResource
 from apps.graph.models import ConceptResource as CResource
 from apps.graph.api import GraphResource
 
@@ -29,6 +29,8 @@ def check_id(request):
             dobj = Concept
         elif gtype == "resource":
             dobj = CResource
+        elif gtype == "global_resource":
+            dobj = GlobalResource
         else:
             return HttpResponse(status=404)
 

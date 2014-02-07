@@ -10,34 +10,12 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       ecClass: "expanded"
     };
 
-    // /**
-    //  * use a regex to parse composite text [link] fields with newline \n separators
-    //  */
-    // pvt.parseCompositeField = function (inpText) {
-    //   var retArr = [],
-    //       inpArr = inpText.split("\n"),
-    //       linkRE = /([^\[]*)\[([^\]]+)\]/,
-    //       reRes;
-    //   inpArr.forEach(function (itm) {
-    //     reRes = linkRE.exec(itm);
-    //     var locItm = {text: null, link: null};
-    //     if (reRes) {
-    //       locItm.text = reRes[1];
-    //       locItm.link = reRes[2];
-    //     } else {
-    //       locItm.text = itm;
-    //     }
-    //     retArr.push(locItm);
-    //   });
-    //   return retArr;
-    // };
-
     return Backbone.View.extend({
 
       events: function(){
       // TODO why are some of these events firing twice?
         return {
-          "blur .text-field": "changeTextField",
+          "blur .text-field": "blurTextField",
           "change .boolean-field": "changeBooleanField",
           "change .select-field": "changeSelectField",
           /*"blur .composite-field": "changeCompositeField",*/
@@ -78,9 +56,9 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       },
 
       /**
-       * changeTextField: change text field in the resource model
+       * blurTextField: change text field in the resource model
        */
-      changeTextField: function (evt) {
+      blurTextField: function (evt) {
         var thisView = this,
             curTar = evt.currentTarget,
             attrName = curTar.name.split("-")[0];

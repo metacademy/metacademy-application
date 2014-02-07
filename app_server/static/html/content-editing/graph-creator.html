@@ -21,7 +21,7 @@
   agfkGlobals.graphInitData = {{ graph_init_data | safe }};
   agfkGlobals.auxModel = null; // init in main js app
   agfkGlobals.isCreating = true; // init in main js app
-  //agfkGlobals.graphId = {% if graph_id %} "{{graph_id|safe}}" {% else %} null {% endif %};
+  agfkGlobals.globalResources = {};
   agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
 </script>
 {% if debug %}

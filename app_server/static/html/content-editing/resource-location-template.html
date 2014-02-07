@@ -4,4 +4,12 @@
 
   <label>Location display text</label>
   <textarea  class="text-field" name="location_text-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods"><%= location_text %></textarea>
+
+  <label>Location type</label>
+  <select name="location_type-<%=this.cid%>" class="select-field">
+    <option value="lec" <% if (location_type=="lec"){ %> selected  <% } %>>lecture</option>
+    <option value="lsc" <% if (location_type=="lsc"){ %> selected  <% } %>>lecture sequence</option>
+    <option value="chp" <% if (location_type=="chp"){ %> selected  <% } %>>chapter</option>
+    <option value="sec" <% if (location_type=="sec"){ %> selected  <% } %>>section</option>
+  </select>
 </script>

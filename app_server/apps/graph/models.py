@@ -80,6 +80,7 @@ class GlobalResource(Model):
     """
     Model to maintain resources used across concepts
     """
+    id = CharField(max_length=16, primary_key=True)
     # fields specific to GlobalResource
     title = CharField(max_length=100)
     authors = CharField(max_length=200, null=True, blank=True)

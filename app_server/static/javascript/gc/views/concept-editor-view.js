@@ -98,20 +98,35 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       addResource: function () {
         var thisView = this,
             rid = Math.random().toString(36).substr(3),
+            grid = Math.random().toString(36).substr(3),
             newRes = new ConceptResource({id: rid});
+        newRes.get("global_resource").set("id", grid);
         newRes.parent = thisView.model;
         newRes.set("concept", thisView.model);
         // make sure the id works
+
         // TODO fix hardcoded URLS!
+        var failFun = function (resp){
+          // failure
+          console.error("unable to verify new resource id -- TODO inform user -- msg: "
+                        + resp.responseText);
+        };
+
         $.get("http://127.0.0.1:8080/graphs/idchecker/", {id: rid, type: "resource" })
         .success(function (resp) {
             newRes.set("id", resp.id);
         })
-        .fail(function (resp){
-            // failure
-            console.error("unable to verify new resource id -- TODO inform user -- msg: "
-                          + resp.responseText);
-          });
+        .fail(failFun);
+
+        $.get("http://127.0.0.1:8080/graphs/idchecker/", {id: grid, type: "global_resource" })
+          .success(function (resp) {
+            // change the id if it hasn't taken on a different global resource
+            var gresource = newRes.get("global_resource");
+            if (gresource.id === grid && resp.id != grid) {
+              gresource.set("id", resp.id);
+            }
+          })
+          .fail(failFun);
 
         thisView.model.get("resources").add(newRes, {at: 0});
         thisView.render();

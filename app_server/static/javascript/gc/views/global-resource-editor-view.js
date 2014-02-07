@@ -16,6 +16,8 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
       events: function () {
         var oevts = BaseEditorView.prototype.events();
         oevts["blur .author-field"] = "changeAuthorField";
+        oevts["keyUp .gresource-title"] = "keyUpGlobalResourceTitle";
+        oevts["blur .gresource-title"] = "blurGlobalResourceTitle";
         return oevts;
       },
 
@@ -30,6 +32,20 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
 
         thisView.isRendered = true;
         return thisView;
+      },
+
+      blurGlobalResourceTitle: function (evt) {
+        var thisView = this,
+            globalGResources = window.agfkGlobals.globalResources,
+            gid = thisView.model.id;
+        if (!globalGResources.hasOwnProperty(gid)){
+          globalGResources[gid] = thisView.model;
+        }
+        thisView.blurTextField(evt);
+      },
+
+      keyUpGlobalResourceTitle: function () {
+        // TODO FIXME this should match preexisting titles, i.e. check local gresources and also check server gresources
       },
 
       /**

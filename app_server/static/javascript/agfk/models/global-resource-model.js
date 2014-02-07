@@ -10,7 +10,7 @@ define(["backbone"], function(Backbone){
     defaults: function () {
       return {
         id: "",
-        title: "testdiff",
+        title: "",
         resource_type: "",
         year: "",
         url: "",

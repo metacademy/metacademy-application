@@ -13,6 +13,19 @@ define(["backbone"], function(Backbone){
         location_type: "",
         location_text: ""
       };
+    },
+    toJSON: function () {
+      var thisModel = this,
+          cresource = thisModel.get("concept_resource"),
+          cres_id = cresource ? cresource.id : "",
+          attrbs = thisModel.attributes;
+
+      return {
+        concept_resource: {id: cres_id},
+        url: thisModel.get("url"),
+        location_type: thisModel.get("location_type"),
+        location_text: thisModel.get("location_text")
+      };
     }
   });
 });

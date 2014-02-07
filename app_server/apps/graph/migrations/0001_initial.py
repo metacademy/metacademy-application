@@ -92,7 +92,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'GlobalResource'
         db.create_table(u'graph_globalresource', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('authors', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
             ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100)),
@@ -302,7 +302,7 @@ class Migration(SchemaMigration):
             'authors': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'edition_years': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'notes': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),

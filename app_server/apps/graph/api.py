@@ -23,7 +23,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         # called when PUTing a list
         allowed = []
         for obj in object_list:
-            if not bundle.obj.editable_by(bundle.request.user):
+            if not obj.editable_by(bundle.request.user):
                 raise Unauthorized("not authorized to edit concept")
             # TODO DRY with update_detail (bad!)
             reqmeth = bundle.request.META["REQUEST_METHOD"]
@@ -48,7 +48,6 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         return allowed
 
     def update_detail(self, object_list, bundle):
-
         # check if we're trying to change the id or create a new object using patch
         # TODO I couldn't find a better way to do this --CJR
         reqmeth = bundle.request.META["REQUEST_METHOD"]

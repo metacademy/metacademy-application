@@ -260,18 +260,22 @@ class BaseConceptResourceTest(BaseResourceTest):
             resp = self.api_client.get(url)
         else:
             raise RuntimeError("Unknown verb: %s" % verb)
+
+        if user_type in ["super", "auth"]:
+            self.api_client.client.logout()
         
         return resp
 
-    def create_accepted_concept(self):
+    def create_concept(self, provisional):
         tdata = self.detail_data.copy()
-        tdata["tag"] = "nomatch"
+        if not provisional:
+            tdata["tag"] = "nomatch"
         return self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata), tdata
 
 class ConceptResourceTest(BaseConceptResourceTest):
     def test_put_detail_accepted_concept_normal_user(self):
         # create an "accepted" concept
-        fresp, tdata = self.create_accepted_concept()
+        fresp, tdata = self.create_concept(False)
         otitle = tdata["title"]
         tdata["title"] = "a different title"
         #resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
@@ -281,7 +285,7 @@ class ConceptResourceTest(BaseConceptResourceTest):
 
     def test_put_detail_accepted_concept_super_user(self):
         # create an "accepted" concept
-        fresp, tdata = self.create_accepted_concept()
+        fresp, tdata = self.create_concept(False)
         otitle = tdata["title"]
         tdata["title"] = "a different title"
         #resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
@@ -291,21 +295,29 @@ class ConceptResourceTest(BaseConceptResourceTest):
 
 
 class ConceptResourceAuthTest(BaseConceptResourceTest):
-    def __init__(self, verb, vtype, user_type, tag_match):
+    def __init__(self, verb, vtype, user_type, tag_match, existing_concept):
         self.verb = verb
         self.vtype = vtype
         self.user_type = user_type
         self.tag_match = tag_match
+        self.existing_concept = existing_concept
+        if existing_concept in ['provisional', 'accepted']:
+            self.initial_count = 1
+        else:
+            self.initial_count = 0
         BaseConceptResourceTest.__init__(self, 'tst_auth')
 
     def __str__(self):
-        return 'ConceptResourceAuthTest(verb=%s, vtype=%s, user_type=%s, tag_match=%s)' % \
-               (self.verb, self.vtype, self.user_type, self.tag_match)
+        return 'ConceptResourceAuthTest(verb=%s, vtype=%s, user_type=%s, tag_match=%s, existing_concept=%s)' % \
+               (self.verb, self.vtype, self.user_type, self.tag_match, self.existing_concept)
 
 
     def correct_response_code(self):
         if self.verb == 'get':
-            return 'OK'
+            if self.existing_concept is not 'none' or self.vtype == 'list':
+                return 'OK'
+            else:
+                return 'NotFound'
 
         if self.vtype == 'detail' and self.verb == 'post':
             return 'NotImplemented'
@@ -316,10 +328,11 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         if self.user_type == 'super':
             return 'Created'
         elif self.user_type == 'auth':
-            if self.tag_match:
-                return 'Created'
-            else:
+            if not self.tag_match:
                 return 'Unauthorized'
+            if self.existing_concept == 'accepted':
+                return 'Unauthorized'
+            return 'Created'
         elif self.user_type == 'unauth':
             return 'Unauthorized'
 
@@ -337,10 +350,10 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
     def check_result(self, resp, data):
         # check results of GET operations against database
-        if self.verb == 'get' and self.vtype == 'list':
+        if self.verb == 'get' and self.vtype == 'list' and self.succeeds():
             for in_concept in json.loads(resp.content)["objects"]:
                 self.verify_db_concept(in_concept)
-        if self.verb == 'get' and self.vtype == 'detail':
+        if self.verb == 'get' and self.vtype == 'detail' and self.succeeds():
             self.verify_db_concept(json.loads(resp.content))
 
         # check successful modification operations
@@ -356,7 +369,7 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
         # check that unsuccessful modifications don't do anything
         if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
-            self.assertEqual(len(Concept.objects.all()), 0)
+            self.assertEqual(len(Concept.objects.all()), self.initial_count)
 
 
     def data_type(self):
@@ -387,8 +400,16 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         # name disguised so test discoverer doesn't pick it up
         if self.verb == 'patch':
             raise unittest.SkipTest()
-        if self.verb == 'get':
-            self.create_accepted_concept()
+        
+        if self.existing_concept == 'provisional':
+            self.create_concept(True)
+        elif self.existing_concept == 'accepted':
+            self.create_concept(False)
+        elif self.existing_concept == 'none':
+            pass
+        else:
+            raise RuntimeError('Unrecognized existing_concept: %s' % self.existing_concept)
+            
         data = self.get_data()
         resp = self.verb_concept(verb=self.verb, vtype=self.vtype, data=data, user_type=self.user_type)
         self.check_response_code(resp)
@@ -401,7 +422,9 @@ def load_tests(loader, suite, pattern):
         for vtype in ['detail', 'list']:
             for user_type in ['unauth', 'auth', 'super']:
                 for tag_match in [False, True]:
-                    suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type, tag_match))
+                    for existing_concept in ['none', 'provisional', 'accepted']:
+                        suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
+                                                              tag_match, existing_concept))
 
     return suite
 

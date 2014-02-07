@@ -30,7 +30,7 @@ class Concept(Model):
         return self.tag == self.id
 
     def editable_by(self, user):
-        return user.is_superuser or (user.is_authenticated() and (self.is_provisional() or self.conceptsettings.is_editor(user)))
+        return user.is_superuser or (user.is_authenticated() and (self.is_provisional() or (hasattr(self, "conceptsettings") and self.conceptsettings.is_editor(user))))
 
 
 class Goal(Model):

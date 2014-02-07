@@ -1,13 +1,14 @@
 import pdb
 import ast
 import json
+import unittest
 
 from django.contrib.auth.models import User
 from tastypie.test import ResourceTestCase
 
 from apps.graph.models import Graph, Concept, ConceptResource
 from apps.user_management.models import Profile
-from test_data.data import THREE_NODE_GRAPH, THREE_CONCEPT_LIST, SINGLE_CONCEPT
+from test_data.data import three_node_graph, three_concept_list, single_concept
 
 class BaseResourceTest(ResourceTestCase):
     """
@@ -105,7 +106,7 @@ class GraphResourceTest(BaseResourceTest):
         super(GraphResourceTest, self).setUp()
 
         # The data we'll send on POST requests - copied from an actual post request
-        self.post_data = THREE_NODE_GRAPH
+        self.post_data = three_node_graph()
         self.graph_id = "4dt4kusg"
         self.graph_title = "first graph title"
         self.post_data["id"] = self.graph_id
@@ -215,18 +216,37 @@ class GraphResourceTest(BaseResourceTest):
     def test_get_list_auth(self):
         self.get_list_test(auth=True)
 
-class ConceptResourceTest(BaseResourceTest):
-    def setUp(self):
-        super(ConceptResourceTest, self).setUp()
-        self.concept_list_url = "/graphs/api/v1/concept/"
-        self.concept_detail_url = self.concept_list_url + SINGLE_CONCEPT["id"] + "/"
-        self.list_data = THREE_CONCEPT_LIST
-        self.detail_data = SINGLE_CONCEPT
 
-    def verb_concept(self, url=None, *args, **kwargs):
+
+    
+
+class BaseConceptResourceTest(BaseResourceTest):
+    def setUp(self):
+        super(BaseConceptResourceTest, self).setUp()
+        self.concept_list_url = "/graphs/api/v1/concept/"
+        self.concept_detail_url = self.concept_list_url + single_concept()["id"] + "/"
+        self.list_data = three_concept_list()
+        self.detail_data = single_concept()
+
+    def verb_concept(self, verb, vtype, data, user_type):
         resp = None
-        verb = kwargs.pop("verb", None)
-        data= kwargs.pop("data", None)
+
+        if vtype == "detail":
+            url = self.concept_detail_url
+        elif vtype == "list":
+            url = self.concept_list_url
+        else:
+            raise RuntimeError("Unrecognized vtype: %s" % vtype)
+
+        if user_type == "super":
+            self.api_client.client.login(username=self.super_username, password=self.super_username)
+        elif user_type == "auth":
+            self.api_client.client.login(username=self.username, password=self.username)
+        elif user_type == "unauth":
+            pass
+        else:
+            raise RuntimeError("Unrecognized user_type: %s" % user_type)
+        
         if verb == "post":
             resp = self.api_client.post(url, format='json', data=data)
         elif verb == "put":
@@ -236,160 +256,23 @@ class ConceptResourceTest(BaseResourceTest):
         elif verb == "get":
             resp = self.api_client.get(url)
         else:
-            raise Exception("verb_concept argument 'verb' must be post, put, patch, or get not '" + verb + "'")
+            raise RuntimeError("Unknown verb: %s" % verb)
+        
         return resp
-
-    def verb_concept_detail(self, *args, **kwargs):
-        return self.verb_concept(url=self.concept_detail_url, **kwargs)
-
-    def verb_concept_list(self, *args, **kwargs):
-        return self.verb_concept(url=self.concept_list_url, **kwargs)
-
-    def auth_verb_concept(self, *args, **kwargs):
-        vtype = kwargs.pop("vtype", None)
-        auth_type = kwargs.pop("atype", None)
-        resp = None
-
-        if auth_type is None:
-            self.api_client.client.login(username=self.username, password=self.username)
-        elif auth_type == "super":
-            self.api_client.client.login(username=self.super_username, password=self.super_username)
-        else:
-            raise Exception("auth_verb_concept argument 'atype' must be 'super' or None, not '" + atype + "'")
-
-        if vtype == "list":
-            resp = self.verb_concept_list(**kwargs)
-        elif vtype == "detail":
-            resp = self.verb_concept_detail(**kwargs)
-        else:
-            raise Exception("auth_verb_concept argument 'vtype' must be 'list' or 'detail', not '" + vtype + "'")
-        self.api_client.client.logout()
-        return resp
-
-    def super_auth_verb_concept(self, *args, **kwargs):
-        kwargs["atype"] = "super"
-        return self.auth_verb_concept(**kwargs)
-
-    def test_put_list_unauth(self):
-        resp = self.verb_concept_list(verb="put", data=self.list_data)
-        self.assertHttpUnauthorized(resp)
-
-    def test_put_list_auth(self):
-        resp = self.auth_verb_concept(verb="put", vtype="list", data=self.list_data)
-        self.assertHttpOK(resp)
-        self.assertEqual(Concept.objects.count(), len(self.list_data["objects"]))
-        for in_concept in self.list_data["objects"]:
-            self.verify_db_concept(in_concept)
-
-    def test_patch_list_unauth(self):
-        # TODO
-        pass
-
-    def test_patch_list_auth(self):
-        # TODO
-        pass
-
-    def test_get_list_unauth(self):
-        self.auth_verb_concept(verb="put", vtype="list", data=self.list_data)
-        resp = self.verb_concept_list(verb="get")
-        self.assertHttpOK(resp)
-        for in_concept in json.loads(resp.content)["objects"]:
-            self.verify_db_concept(in_concept)
-
-    def test_get_list_auth(self):
-        self.auth_verb_concept(verb="put", vtype="list", data=self.list_data)
-        resp = self.auth_verb_concept(vtype="list", verb="get")
-        self.assertHttpOK(resp)
-        for in_concept in json.loads(resp.content)["objects"]:
-            self.verify_db_concept(in_concept)
-
-    def test_post_list_unauth(self):
-        resp = self.verb_concept_list(verb="post", data=self.detail_data)
-        self.assertHttpUnauthorized(resp)
-
-    def test_post_list_auth(self):
-        resp = self.auth_verb_concept(verb="post", vtype="list", data=self.detail_data)
-        self.assertHttpCreated(resp)
-        self.assertEqual(Concept.objects.count(), 1)
-        self.verify_db_concept(self.detail_data)
-
-    def test_put_detail_unauth(self):
-        resp = self.verb_concept_detail(verb="put", data=self.detail_data)
-        self.assertHttpUnauthorized(resp)
-
-    def test_put_detail_auth(self):
-        resp = self.auth_verb_concept(verb="put", vtype="detail", data=self.detail_data)
-        self.assertHttpCreated(resp)
-        self.assertEqual(Concept.objects.count(), 1)
-        self.verify_db_concept(self.detail_data)
-
-    def test_patch_detail_unauth(self):
-        # TODO
-        pass
-
-    def test_patch_detail_auth(self):
-        # TODO
-        pass
-
-    def test_get_detail_unauth(self):
-        self.auth_verb_concept(verb="put", vtype="detail", data=self.detail_data)
-        resp = self.verb_concept_detail(verb="get")
-        # resp = self.verb_concept_list(verb="get")
-        self.assertHttpOK(resp)
-        self.verify_db_concept(json.loads(resp.content))
-
-    def test_get_detail_auth(self):
-        self.auth_verb_concept(verb="put", vtype="detail", data=self.detail_data)
-        resp = self.auth_verb_concept(verb="get", vtype="detail")
-        self.assertHttpOK(resp)
-        self.verify_db_concept(json.loads(resp.content))
-
-    def test_put_detail_diff_tag_id_normal_user(self):
-        tdata = self.detail_data.copy()
-        tdata["tag"] = "nomatch"
-        resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
-        self.assertHttpUnauthorized(resp)
-        self.assertEqual(len(Concept.objects.all()), 0)
 
     def create_accepted_concept(self):
         tdata = self.detail_data.copy()
         tdata["tag"] = "nomatch"
-        return self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata), tdata
+        return self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata), tdata
 
-    def test_put_detail_diff_tag_id_super_user(self):
-        resp, tdata = self.create_accepted_concept()
-        self.assertHttpCreated(resp)
-        self.assertEqual(len(Concept.objects.all()), 1)
-        self.verify_db_concept(tdata)
-
-    def test_put_list_diff_tag_id_normal_user(self):
-        tlist_data = self.list_data.copy()
-        tlist_data["objects"][0]["tag"] = "different_tag"
-        resp = self.auth_verb_concept(verb="put", vtype="list", data=tlist_data)
-        self.assertHttpUnauthorized(resp)
-        self.assertEqual(len(Concept.objects.all()), 0)
-
-    def test_put_list_diff_tag_id_super_user(self):
-        tlist_data = self.list_data.copy()
-        tlist_data["objects"][0]["tag"] = "different_tag"
-        resp = self.super_auth_verb_concept(verb="put", vtype="list", data=tlist_data)
-        self.assertHttpOK(resp)
-        self.assertEqual(len(Concept.objects.all()),len(tlist_data['objects']))
-        self.assertEqual(Concept.objects.get(id=tlist_data["objects"][0]["id"]).tag, unicode("different_tag"))
-
-    def test_put_list_diff_tag_id_normal_user(self):
-        tlist_data = self.list_data
-        tlist_data["objects"][0]["tag"] = "different_tag"
-        resp = self.auth_verb_concept(verb="put", vtype="list", data=tlist_data)
-        self.assertHttpUnauthorized(resp)
-        self.assertEqual(len(Concept.objects.all()), 0)
-
+class ConceptResourceTest(BaseConceptResourceTest):
     def test_put_detail_accepted_concept_normal_user(self):
         # create an "accepted" concept
         fresp, tdata = self.create_accepted_concept()
         otitle = tdata["title"]
         tdata["title"] = "a different title"
-        resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        #resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        resp = self.verb_concept(verb="put", vtype="detail", user_type="auth", data=tdata)
         self.assertHttpUnauthorized(resp)
         self.assertEqual(Concept.objects.all()[0].title, otitle)
 
@@ -398,6 +281,127 @@ class ConceptResourceTest(BaseResourceTest):
         fresp, tdata = self.create_accepted_concept()
         otitle = tdata["title"]
         tdata["title"] = "a different title"
-        resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        #resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
+        resp = self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata)
         self.assertHttpOK(resp)
         self.assertEqual(Concept.objects.all()[0].title, tdata["title"])
+
+
+class ConceptResourceAuthTest(BaseConceptResourceTest):
+    def __init__(self, verb, vtype, user_type, tag_match):
+        self.verb = verb
+        self.vtype = vtype
+        self.user_type = user_type
+        self.tag_match = tag_match
+        BaseConceptResourceTest.__init__(self, 'tst_auth')
+
+    def __str__(self):
+        return 'ConceptResourceAuthTest(verb=%s, vtype=%s, user_type=%s, tag_match=%s)' % \
+               (self.verb, self.vtype, self.user_type, self.tag_match)
+
+
+    def correct_response_code(self):
+        if self.verb == 'get':
+            return 'OK'
+
+        if self.vtype == 'detail' and self.verb == 'post':
+            return 'NotImplemented'
+        if self.vtype == 'list' and self.verb == 'patch':
+            return 'NotImplemented'
+
+        # legal PUT, POST, or PATCH request
+        if self.user_type == 'super':
+            return 'Created'
+        elif self.user_type == 'auth':
+            if self.tag_match:
+                return 'Created'
+            else:
+                return 'Unauthorized'
+        elif self.user_type == 'unauth':
+            return 'Unauthorized'
+
+    def succeeds(self):
+        return self.correct_response_code() in ['OK', 'Created']
+
+    def check_response_code(self, resp):
+        rc = self.correct_response_code()
+
+        # returns 200 instead of 201 for PUT to list, which is fine
+        if rc == 'Created' and resp.status_code == 200:
+            return
+        
+        getattr(self, 'assertHttp' + rc)(resp)
+
+    def check_result(self, resp, data):
+        # check results of GET operations against database
+        if self.verb == 'get' and self.vtype == 'list':
+            for in_concept in json.loads(resp.content)["objects"]:
+                self.verify_db_concept(in_concept)
+        if self.verb == 'get' and self.vtype == 'detail':
+            self.verify_db_concept(json.loads(resp.content))
+
+        # check successful modification operations
+        if self.verb == 'post' and self.succeeds():
+            self.verify_db_concept(data)
+        if self.verb == 'put' and self.vtype == 'detail' and self.succeeds():
+            self.verify_db_concept(data)
+        if self.verb == 'put' and self.vtype == 'list' and self.succeeds():
+            self.assertEqual(len(Concept.objects.all()),len(data['objects']))
+            if not self.tag_match:
+                self.assertEqual(Concept.objects.get(id=data["objects"][0]["id"]).tag, unicode("nomatch"))
+        # TODO: PATCH
+
+        # check that unsuccessful modifications don't do anything
+        if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
+            self.assertEqual(len(Concept.objects.all()), 0)
+
+
+    def data_type(self):
+        if self.verb == 'get':
+            return 'none'
+        elif self.verb == 'put' and self.vtype == 'list':
+            return 'list'
+        else:
+            return 'detail'
+
+    def get_data(self):
+        if self.data_type() == 'list':
+            data = self.list_data.copy()
+            if not self.tag_match:
+                data["objects"][0]["tag"] = "nomatch"
+        elif self.data_type() == 'detail':
+            data = self.detail_data.copy()
+            if not self.tag_match:
+                data["tag"] = "nomatch"
+        elif self.data_type() == 'none':
+            data = None
+        else:
+            raise RuntimeError('Unknown data_type: %s' % self.data_type())
+
+        return data
+
+    def tst_auth(self):
+        # name disguised so test discoverer doesn't pick it up
+        if self.verb == 'patch':
+            raise unittest.SkipTest()
+        if self.verb == 'get':
+            self.create_accepted_concept()
+        data = self.get_data()
+        resp = self.verb_concept(verb=self.verb, vtype=self.vtype, data=data, user_type=self.user_type)
+        self.check_response_code(resp)
+        self.check_result(resp, data)
+
+        
+
+def load_tests(loader, suite, pattern):
+    for verb in ['get', 'post', 'put', 'patch']:
+        for vtype in ['detail', 'list']:
+            for user_type in ['unauth', 'auth', 'super']:
+                for tag_match in [False, True]:
+                    suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type, tag_match))
+
+    return suite
+
+    
+
+

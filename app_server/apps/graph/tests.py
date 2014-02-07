@@ -324,6 +324,10 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         if self.vtype == 'list' and self.verb == 'patch':
             return 'NotImplemented'
 
+        # nobody can PUT to a list
+        if self.vtype == 'list' and self.verb == 'put':
+            return 'Unauthorized'
+
         # legal PUT, POST, or PATCH request
         if self.user_type == 'super':
             return 'Created'

@@ -22,6 +22,10 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     def update_list(self, object_list, bundle):
         # called when PUTing a list
         allowed = []
+
+        # nobody can PUT to a list
+        if bundle.request.META["REQUEST_METHOD"] == 'PUT':
+            raise Unauthorized("PUT to list not allowed")
         
         for obj in object_list:
             if not obj.editable_by(bundle.request.user):

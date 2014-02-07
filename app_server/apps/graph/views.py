@@ -9,17 +9,47 @@ from django.template import RequestContext
 
 from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data
 from apps.user_management.models import Profile
-from apps.graph.models import Graph
+from apps.graph.models import Graph, Concept
+from apps.graph.models import ConceptResource as CResource
 from apps.graph.api import GraphResource
 
 
-def get_agfk_app(request):
+def _gen_random_id(rlen):
+    return ''.join([random.choice(string.lowercase + string.digits) for i in range(rlen)])
+
+
+def check_id(request):
+    if request.method == "GET":
+        gtype = request.GET.get("type")
+        in_id = request.GET.get("id", default="")
+        useid = in_id
+        if gtype == "graph":
+            dobj = Graph
+        elif gtype == "concept":
+            dobj = Concept
+        elif gtype == "resource":
+            dobj = CResource
+        else:
+            return HttpResponse(status=404)
+
+        while len(useid) == 0 or len(dobj.objects.filter(id=useid)) > 0:
+            useid = _gen_random_id(12)
+        resp = {"id": useid, "changed": useid != in_id}
+        return HttpResponse(json.dumps(resp), "application/json")
+    else:
+        return HttpResponse(status=405)
+
+
+def get_agfk_app(request, concept_tag=""):
+    pdb.set_trace()
     concepts = get_user_data(request)
-    concept_tag = request.path.split("/")[-1].split("#")[0]
     concept_data = get_concept_data(concept_tag)
+    # TODO remove full_graph_skeleton, we shouldn't need this client side
     return render_to_response("agfk-app.html",
-                              {"full_graph_skeleton": get_full_graph_json_str(), "user_data": json.dumps(concepts), "concept_data": concept_data},
+                              {"full_graph_skeleton": get_full_graph_json_str(),
+                               "user_data": json.dumps(concepts), "concept_data": concept_data},
                               context_instance=RequestContext(request))
+
 
 def new_graph(request):
     if request.method == "GET":
@@ -30,9 +60,13 @@ def new_graph(request):
             gid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             used = len(Graph.objects.filter(id=gid)) > 0
 
-        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts), "graph_id": gid, "graph_init_data": {"id": gid}}, context_instance=RequestContext(request))
+        return render_to_response("graph-creator.html",
+                                  {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
+                                   "graph_id": gid, "graph_init_data": {"id": gid}},
+                                  context_instance=RequestContext(request))
     else:
         return HttpResponse(status=405)
+
 
 def existing_graph(request, gid):
     if request.method == "GET":
@@ -46,7 +80,10 @@ def existing_graph(request, gid):
             HttpResponse(status=404)
         gr_bundle = gr.build_bundle(obj=graph, request=request)
         graph_json = gr.serialize(request, gr.full_dehydrate(gr_bundle), "application/json")
-        return render_to_response("graph-creator.html", {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts), "graph_id": gid, "graph_init_data": graph_json}, context_instance=RequestContext(request))
+        return render_to_response("graph-creator.html",
+                                  {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
+                                   "graph_id": gid, "graph_init_data": graph_json},
+                                  context_instance=RequestContext(request))
     else:
         return HttpResponse(status=405)
 

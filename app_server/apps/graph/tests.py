@@ -1,14 +1,11 @@
-import datetime
 import pdb
 import ast
 import json
 
 from django.contrib.auth.models import User
-from django.test.client import Client
-from django.core.urlresolvers import reverse
 from tastypie.test import ResourceTestCase
 
-from apps.graph.models import Graph, Concept, Edge, ConceptResource
+from apps.graph.models import Graph, Concept, ConceptResource
 from apps.user_management.models import Profile
 from test_data.data import THREE_NODE_GRAPH, THREE_CONCEPT_LIST, SINGLE_CONCEPT
 
@@ -69,10 +66,10 @@ class BaseResourceTest(ResourceTestCase):
         # verify dependencies
         for in_dep in in_concept["dependencies"]:
             if in_dep.has_key("id"):
-                dep = Edge.objects.get(id=in_dep["id"])
+                dep = Dependency.objects.get(id=in_dep["id"])
                 self.assertEqual(dep.id, in_dep["id"])
             else:
-                dep = Edge.objects.get(source=in_dep["source"], target=concept.id)
+                dep = Dependency.objects.get(source=in_dep["source"], target=concept.id)
             self.assertEqual(dep.source, in_dep["source"])
             self.assertEqual(dep.target, concept.id)
             self.assertEqual(dep.reason, in_dep["reason"])

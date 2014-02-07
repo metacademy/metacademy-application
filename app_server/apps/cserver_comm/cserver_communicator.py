@@ -88,6 +88,13 @@ def get_id_to_concept_dict():
     _load_dicts()
     return id_to_concept_dict
 
+def get_tag_to_concept_dict():
+    """
+    obtain the id to title dictionary from the content server
+    """
+    _load_dicts()
+    return tag_to_concept_dict
+
 def get_title_to_tag_dict():
     """
     obtain title-to-id dictionary

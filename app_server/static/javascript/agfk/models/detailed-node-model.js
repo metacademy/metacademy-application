@@ -1,5 +1,6 @@
+
 /*global define*/
-define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
+define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-resource-collection", "agfk/collections/detailed-edge-collection"], function(_, Node, ConceptResourceCollection, DetailedEdgeCollection){
 
   var DetailedNode = Node.extend({
     // FIXME these shouldn't be hardcoded
@@ -11,8 +12,8 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
       var dnDefaults = {
         dependencies: new DetailedEdgeCollection(),
         outlinks: new DetailedEdgeCollection(),
-        exercises: "", // TODO new NodePropertyCollections.ExerciseCollection(),
-        resources: new NodePropertyCollections.ResourceCollection(),
+        exercises: "",
+        resources: new ConceptResourceCollection(),
         flags: [],
         useCsrf: true,
         goals: "",

@@ -1,15 +1,8 @@
-/*
- Collections that are properties of the Node model
- */
 
 /*global define*/
-define(["backbone", "agfk/models/node-property-models"], function(Backbone, NodePropertyModels){
-
-  /**
-   * collection of resource models
-   */
-  var ResourceCollection = Backbone.Collection.extend({
-    model: NodePropertyModels.Resource,
+define(["backbone", "agfk/models/concept-resource-model"], function(Backbone, ConceptResource){
+return Backbone.Collection.extend({
+    model: ConceptResource,
 
     /**
      * Returns a backbone collection of the free resources TODO does this maintain the cid correctly?
@@ -38,17 +31,4 @@ define(["backbone", "agfk/models/node-property-models"], function(Backbone, Node
     }
 
   });
-
-
-  /**
-   * Collection of exercise models
-   */
-  var ExerciseCollection = Backbone.Collection.extend({
-    model: NodePropertyModels.Question
-  });
-
-  return {
-    ExerciseCollection: ExerciseCollection,
-    ResourceCollection: ResourceCollection
-  };
 });

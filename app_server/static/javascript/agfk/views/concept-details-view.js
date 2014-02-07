@@ -587,7 +587,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       isViewRendered: function(){
         return this.isRendered;
       }
-
     });
   })();
 

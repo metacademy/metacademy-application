@@ -1,6 +1,6 @@
 
 /*global define*/
-define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/node-property-models"], function(Backbone, _, ResourceEditorView, NodePropModels){
+define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model"], function($, Backbone, _, ResourceEditorView, ConceptResource){
 
   return (function(){
     var pvt = {};
@@ -96,20 +96,23 @@ define(["backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/
       },
 
       addResource: function () {
-        var thisView = this;
-        // should do create
-        var newRes = new NodePropModels.Resource({id: "-new-" + Math.random().toString(36).substr(3)});
+        var thisView = this,
+            rid = Math.random().toString(36).substr(3),
+            newRes = new ConceptResource({id: rid});
         newRes.parent = thisView.model;
         newRes.set("concept", thisView.model);
-        newRes.save(null, {
-          parse: false,
-          success: function (mdl, resp) {
+        // make sure the id works
+        // TODO fix hardcoded URLS!
+        $.get("http://127.0.0.1:8080/graphs/idchecker/", {id: rid, type: "resource" })
+        .success(function (resp) {
             newRes.set("id", resp.id);
-          },
-          error: function (mdl, resp) {
-            console.error("unable to sync new resource -- TODO inform user -- msg: " + resp.responseText);
-          }
-        });
+        })
+        .fail(function (resp){
+            // failure
+            console.error("unable to verify new resource id -- TODO inform user -- msg: "
+                          + resp.responseText);
+          });
+
         thisView.model.get("resources").add(newRes, {at: 0});
         thisView.render();
       },

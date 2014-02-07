@@ -323,11 +323,11 @@ g.connect-node circle{
     border: 2px solid #B4ADAD;
     border-radius: 4px;
     padding: 1em;
+    padding-left: 15%;
     text-align: left;
 }
 
 .resource-form label{
-    margin-left: 15%;
     font-size: 0.9em;
     font-weight: bold;
     display: block;
@@ -337,7 +337,6 @@ g.connect-node circle{
 }
 
 .resource-form input{
-    margin-left: 15%;
     display: block;
     margin-bottom: 1.5em;
 }
@@ -350,8 +349,8 @@ g.connect-node circle{
 }
 
 .resource-form input[type="text"], .resource-form textarea{
-    width: 70%;
+    width: 85%;
     line-height: 1.4em;
     display: block;
-    margin: 0 auto 1.5em auto;
+    margin: 0 0 1.5em 0;
 }

@@ -8,13 +8,13 @@ import ast
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import DjangoAuthorization
-from tastypie.authentication import SessionAuthentication
 from tastypie.exceptions import Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from apps.graph.models import Concept, Edge, Flag, Graph, GraphSettings, ConceptSettings
-from apps.graph.models import ConceptResource as CResource # avoid name collision
+from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings
+# avoid name collision
+from apps.graph.models import ConceptResource as CResource
 from apps.user_management.models import Profile
 
 
@@ -27,7 +27,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
                 raise Unauthorized("not authorized to edit concept")
             # TODO DRY with update_detail (bad!)
             reqmeth = bundle.request.META["REQUEST_METHOD"]
-            if  reqmeth == "PATCH" or reqmeth == "PUT":
+            if reqmeth == "PATCH" or reqmeth == "PUT":
                 split_path = bundle.request.META["PATH_INFO"].split("/")
                 split_path = [p for p in split_path if p]
                 model_name = split_path[-2]
@@ -39,10 +39,9 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
                     raise Unauthorized("cannot replace id")
 
                 # make sure non-supers are not commiting updating with non-matching ids/tags
-                if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
+                if model_name == "concept" and "tag" in bundle.data and "id" in bundle.data\
                    and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
                     raise Unauthorized("normal users cannot push non-matching ids and tags")
-
 
             allowed.append(obj)
         return allowed
@@ -52,7 +51,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         # check if we're trying to change the id or create a new object using patch
         # TODO I couldn't find a better way to do this --CJR
         reqmeth = bundle.request.META["REQUEST_METHOD"]
-        if  reqmeth == "PATCH" or reqmeth == "PUT":
+        if reqmeth == "PATCH" or reqmeth == "PUT":
             split_path = bundle.request.META["PATH_INFO"].split("/")
             split_path = [p for p in split_path if p]
             model_name = split_path[-2]
@@ -63,11 +62,12 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
                 model_patch_id = split_path[-1]
 
             # make sure we're not trying to change the id
-            if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
+            if model_name == bundle.obj._meta.model_name\
+               and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
                 raise Unauthorized("cannot replace id")
 
             # make sure non-supers are not commiting updating with non-matching ids/tags
-            if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
+            if model_name == "concept" and "tag" in bundle.data and "id" in bundle.data\
                and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
                 raise Unauthorized("normal users cannot push non-matching ids and tags")
 
@@ -78,6 +78,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
 
     def delete_detail(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes yet. TODO")
+
 
 class CustomReversionResource(ModelResource):
     """
@@ -149,8 +150,10 @@ class FlagResource(ModelResource):
         resource_name = 'flag'
         authorization = ModAndUserObjectsOnlyAuthorization()
 
+
 class ConceptResourceResource(ModelResource):
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
+
     class Meta:
         max_limit = 0
         queryset = CResource.objects.all()
@@ -172,11 +175,11 @@ class ConceptResourceResource(ModelResource):
         if type(adeps) == unicode:
             adeps = ast.literal_eval(adeps)
         for dep in adeps:
-            if dep.has_key("id"):
+            if "id" in dep:
                 dconcept = Concept.objects.get(id=dep["id"])
                 dep["title"] = dconcept.title
                 dep["tag"] = dconcept.tag
-            elif dep.has_key("title"):
+            elif "title" in dep:
                 try:
                     dconcept = Concept.objects.get(title=dep["title"])
                     dep["title"] = dconcept.title
@@ -197,19 +200,19 @@ class ConceptResourceResource(ModelResource):
         if type(resource) != dict:
             return bundle
 
-        if not resource.has_key("concept_id"):
+        if not "concept_id" in resource:
             resource["concept_id"] = bundle.data["concept"]["id"]
             del resource["concept"]
 
         # create new id if necessary
-        if not resource["id"] or resource["id"][:4] == "-new":
+        if not resource["id"]:
             useid = ''
             while not useid or not len(CResource.objects.filter(id=useid)) == 0:
-                useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
+                useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(12)])
             resource["id"] = useid
 
         # normalize year TODO should we only allow ints
-        if resource.has_key("year"):
+        if "year" in resource:
             try:
                 resource["year"]  = int(resource["year"])
             except:
@@ -217,7 +220,7 @@ class ConceptResourceResource(ModelResource):
 
         # FIXME this shouldn't exist here, or at least, it should check
         # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
-        if not resource.has_key("id"):
+        if not "id" in resource:
             resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
 
         # TODO check for temporary concept ids OFFLINE
@@ -238,9 +241,9 @@ class ConceptResourceResource(ModelResource):
         # if adeps don't have ids, try to associate an id with it -- only save the title if absolutely necessary
         for dep in adeps:
             did = ""
-            if dep.has_key("id"):
+            if "id" in dep:
                 did = dep["id"]
-            elif dep.has_key("title"):
+            elif "title" in dep:
                 # try to find its id using the title
                 # TODO which concepts should we filter on? e.g. all concepts, only approved concepts, [probably best solution: approved or user concepts]
                 tobjs = Concept.objects.filter(title=dep["title"])
@@ -252,7 +255,8 @@ class ConceptResourceResource(ModelResource):
                     # search input graph for a match
                     pass
             else:
-                raise Exception("additional resource dependency for concept " +  bundle.data["title"] + " does not have id or title specified")
+                raise Exception("additional resource dependency for concept "
+                                + bundle.data["title"] + " does not have id or title specified")
             if did:
                 save_adep = {"id": did}
             else:
@@ -266,23 +270,23 @@ class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
     """
-    resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full = True, related_name="concept")
+    resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full=True, related_name="concept")
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
     def dehydrate(self, bundle):
         # find the set of prereqs
-        deps = Edge.objects.filter(target=bundle.data["id"])
+        deps = Dependency.objects.filter(target=bundle.data["id"])
         bundle.data["dependencies"] = [{"id": dep.id, "source": dep.source, "reason": dep.reason} for dep in deps]
         return bundle
 
     def pre_save_hook(self, bundle):
         # save edges and remove from bundle
         for in_edge in bundle.data["dependencies"]:
-            edge, created = Edge.objects.get_or_create(id=in_edge["id"])
-            edge.source = in_edge["source"]
-            edge.target = in_edge["target"]
-            edge.reason = in_edge["reason"]
-            edge.save()
+            dependency, created = Dependency.objects.get_or_create(id=in_edge["id"])
+            dependency.source = in_edge["source"]
+            dependency.target = in_edge["target"]
+            dependency.reason = in_edge["reason"]
+            dependency.save()
         del bundle.data["dependencies"]
         return bundle
 
@@ -327,11 +331,11 @@ class ConceptResource(CustomReversionResource):
             if type(in_inlink) != dict:
                 # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
                 continue
-            if in_inlink.has_key('sid_source'):
+            if "sid_source" in in_inlink:
                 in_inlink['source'] = in_inlink['sid_source']
-            if in_inlink.has_key('sid_target'):
+            if "sid_target" in in_inlink:
                 in_inlink['target'] = in_inlink['sid_target']
-            if not in_inlink.has_key("id"):
+            if not "id" in in_inlink:
                 in_inlink["id"] = in_inlink["source"] + in_inlink["target"]
         return bundle
 
@@ -340,6 +344,7 @@ class GraphResource(CustomReversionResource):
     """
     """
     concepts = fields.ManyToManyField(ConceptResource, 'concepts', full=True)
+
     def alter_deserialized_detail_data(self, request, data):
         # create the graph if it does not exist and associate the user with the graph
         for concept in data["concepts"]:
@@ -365,7 +370,10 @@ class GraphResource(CustomReversionResource):
         authorization = ModAndUserObjectsOnlyAuthorization()
 
 # helper methods
-CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises", "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
+CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises",
+                       "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
+
+
 def normalize_concept(in_concept):
     """
     Temporary hack to normalize tag/id for new and old data and remove client-side fields
@@ -377,12 +385,10 @@ def normalize_concept(in_concept):
         useid = ''
         while not useid or not len(Concept.objects.filter(id=useid)) == 0:
             useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
-        usetag = useid
-    elif in_concept.has_key("sid") and len(in_concept["sid"]):
+    elif "sid" in in_concept and len(in_concept["sid"]):
         useid = in_concept["sid"]
     else:
         useid = in_concept["id"]
-    usetag = in_concept.setdefault("tag", useid)
     in_concept["id"] = useid
 
     for field in in_concept.keys():

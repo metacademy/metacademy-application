@@ -400,7 +400,7 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         # name disguised so test discoverer doesn't pick it up
         if self.verb == 'patch':
             raise unittest.SkipTest()
-        
+
         if self.existing_concept == 'provisional':
             self.create_concept(True)
         elif self.existing_concept == 'accepted':

@@ -22,53 +22,38 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     def update_list(self, object_list, bundle):
         # called when PUTing a list
         allowed = []
+        
         for obj in object_list:
             if not obj.editable_by(bundle.request.user):
                 raise Unauthorized("not authorized to edit concept")
-            # TODO DRY with update_detail (bad!)
-            reqmeth = bundle.request.META["REQUEST_METHOD"]
-            if  reqmeth == "PATCH" or reqmeth == "PUT":
-                split_path = bundle.request.META["PATH_INFO"].split("/")
-                split_path = [p for p in split_path if p]
-                model_name = split_path[-2]
-                model_patch_id = split_path[-1]
-
-                # check for changing ids
-                if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id\
-                   and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
-                    raise Unauthorized("cannot replace id")
-
-                # make sure non-supers are not commiting updating with non-matching ids/tags
-                if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
-                   and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
-                    raise Unauthorized("normal users cannot push non-matching ids and tags")
-
-
             allowed.append(obj)
         return allowed
 
     def update_detail(self, object_list, bundle):
         # check if we're trying to change the id or create a new object using patch
         # TODO I couldn't find a better way to do this --CJR
-        reqmeth = bundle.request.META["REQUEST_METHOD"]
-        if  reqmeth == "PATCH" or reqmeth == "PUT":
-            split_path = bundle.request.META["PATH_INFO"].split("/")
-            split_path = [p for p in split_path if p]
-            model_name = split_path[-2]
-            if model_name == "v1":
-                model_name = split_path[-1]
-                model_patch_id = ""
-            else:
-                model_patch_id = split_path[-1]
 
-            # make sure we're not trying to change the id
-            if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
-                raise Unauthorized("cannot replace id")
+        for obj in object_list:
+            if not obj.editable_by(bundle.request.user):
+                raise Unauthorized('not authorized to edit concept')
+            
+        split_path = bundle.request.META["PATH_INFO"].split("/")
+        split_path = [p for p in split_path if p]
+        model_name = split_path[-2]
+        if model_name == "v1":
+            model_name = split_path[-1]
+            model_patch_id = ""
+        else:
+            model_patch_id = split_path[-1]
 
-            # make sure non-supers are not commiting updating with non-matching ids/tags
-            if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
-               and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
-                raise Unauthorized("normal users cannot push non-matching ids and tags")
+        # make sure we're not trying to change the id
+        if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
+            raise Unauthorized("cannot replace id")
+
+        # make sure non-supers are not commiting updating with non-matching ids/tags
+        if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
+           and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
+            raise Unauthorized("normal users cannot push non-matching ids and tags")
 
         return bundle.obj.editable_by(bundle.request.user)
 

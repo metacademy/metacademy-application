@@ -131,6 +131,7 @@ class ResourceLocation(Model):
     """
     Specifies the location of the resources
     """
+    id = CharField(max_length=16, primary_key=True)
     cresource = ForeignKey(ConceptResource, related_name='locations')
     url = CharField(max_length=100, null=True, blank=True)
     location_type = CharField(max_length=3, choices=(("chp", "chapter (no section)"),

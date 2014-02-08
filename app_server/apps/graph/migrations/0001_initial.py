@@ -131,7 +131,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'ResourceLocation'
         db.create_table(u'graph_resourcelocation', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('cresource', self.gf('django.db.models.fields.related.ForeignKey')(related_name='locations', to=orm['graph.ConceptResource'])),
             ('url', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('location_type', self.gf('django.db.models.fields.CharField')(max_length=3)),
@@ -345,7 +345,7 @@ class Migration(SchemaMigration):
         u'graph.resourcelocation': {
             'Meta': {'object_name': 'ResourceLocation'},
             'cresource': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'locations'", 'to': u"orm['graph.ConceptResource']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'location_text': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location_type': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),

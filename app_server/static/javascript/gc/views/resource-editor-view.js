@@ -39,8 +39,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
 
         // make sure we have at least one resource location
         if (thisView.resourceLocationsView.model.length == 0){
-          var resLoc = new ResourceLocation({concept_resource: thisView.model});
-          thisView.resourceLocationsView.model.add(resLoc);
+          thisView.addResourceLocation();
         }
 
         assignObj["." + consts.globalResClass] = thisView.globalResourceView;
@@ -53,6 +52,28 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
 
         thisView.isRendered = true;
         return thisView;
+      },
+
+      addResourceLocation: function () {
+        var thisView = this,
+            rlid = Math.random().toString(36).substr(8),
+            resLoc = new ResourceLocation({id: rlid, concept_resource: thisView.model});
+        thisView.resourceLocationsView = thisView.resourceLocationsView || new ResourceLocationsView({model: thisView.model.get("locations")});
+        thisView.resourceLocationsView.model.add(resLoc);
+        // verify the rl id is okay
+        // TODO fix hardcoded URLS!
+        $.get("http://127.0.0.1:8080/graphs/idchecker/",
+          {id: rlid, type: "resource_location" })
+          .success(function (resp) {
+            resLoc.set("id", resp.id);
+        })
+          .fail(function (resp){
+            // failure
+            console.error("unable to verify new resource location id -- TODO inform user -- msg: "
+                          + resp.responseText);
+          });
+
+
       },
 
       /**

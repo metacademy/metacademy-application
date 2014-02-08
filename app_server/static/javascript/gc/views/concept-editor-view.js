@@ -97,8 +97,8 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
       addResource: function () {
         var thisView = this,
-            rid = Math.random().toString(36).substr(3),
-            grid = Math.random().toString(36).substr(3),
+            rid = Math.random().toString(36).substr(8),
+            grid = Math.random().toString(36).substr(8),
             newRes = new ConceptResource({id: rid});
         newRes.get("global_resource").set("id", grid);
         newRes.parent = thisView.model;

@@ -9,7 +9,7 @@ from django.template import RequestContext
 
 from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_concept_data
 from apps.user_management.models import Profile
-from apps.graph.models import Graph, Concept, GlobalResource
+from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation
 from apps.graph.models import ConceptResource as CResource
 from apps.graph.api import GraphResource
 
@@ -31,11 +31,13 @@ def check_id(request):
             dobj = CResource
         elif gtype == "global_resource":
             dobj = GlobalResource
+        elif gtype == "resource_location":
+            dobj = ResourceLocation
         else:
             return HttpResponse(status=404)
 
         while len(useid) == 0 or len(dobj.objects.filter(id=useid)) > 0:
-            useid = _gen_random_id(12)
+            useid = _gen_random_id(10)
         resp = {"id": useid, "changed": useid != in_id}
         return HttpResponse(json.dumps(resp), "application/json")
     else:

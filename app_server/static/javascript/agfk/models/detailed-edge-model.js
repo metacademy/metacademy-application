@@ -10,19 +10,6 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model"], function(Back
         isTransitive: false
       };
       return _.extend({}, EdgeModel.prototype.defaults(), enDef);
-    },
-
-    /**
-     * return a dot (graphviz) representation of the edge
-     */
-    getDotStr: function(){
-      if (this.get("from_tag")){
-        return this.get("from_tag") + "->" + this.get("to_tag") + ';';
-      }
-      else{
-        return "";
-      }
     }
-
   });
 });

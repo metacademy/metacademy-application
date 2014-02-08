@@ -12,13 +12,21 @@ from tastypie.exceptions import Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings
+from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource
 # avoid name collision
 from apps.graph.models import ConceptResource as CResource
 from apps.user_management.models import Profile
 
 
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
+    # def create_list(self, object_list, bundle):
+    #     # Assuming they're auto-assigned to ``user``.
+    #     return object_list
+
+    def create_detail(self, object_list, bundle):
+        # TODO when is this called?
+        return bundle.obj.editable_by(bundle.request.user)
+
     def update_list(self, object_list, bundle):
         # called when PUTing a list
         allowed = []
@@ -26,7 +34,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         # nobody can PUT to a list
         if bundle.request.META["REQUEST_METHOD"] == 'PUT':
             raise Unauthorized("PUT to list not allowed")
-        
+
         for obj in object_list:
             if not obj.editable_by(bundle.request.user):
                 raise Unauthorized("not authorized to edit concept")
@@ -40,7 +48,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         for obj in object_list:
             if not obj.editable_by(bundle.request.user):
                 raise Unauthorized('not authorized to edit concept')
-            
+
         split_path = bundle.request.META["PATH_INFO"].split("/")
         split_path = [p for p in split_path if p]
         model_name = split_path[-2]
@@ -51,11 +59,13 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
             model_patch_id = split_path[-1]
 
         # make sure we're not trying to change the id
-        if model_name == bundle.obj._meta.model_name and model_patch_id != bundle.obj.id and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
+        if model_name == bundle.obj._meta.model_name\
+           and model_patch_id != bundle.obj.id\
+           and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
             raise Unauthorized("cannot replace id")
 
         # make sure non-supers are not commiting updating with non-matching ids/tags
-        if model_name == "concept" and bundle.data.has_key("tag") and bundle.data.has_key("id")\
+        if model_name == "concept" and "tag" in bundle.data and "id" in bundle.data\
            and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
             raise Unauthorized("normal users cannot push non-matching ids and tags")
 
@@ -95,6 +105,7 @@ class CustomReversionResource(ModelResource):
 
         # Now pick up the M2M bits. (must occur after the main obj)
         m2m_bundle = self.hydrate_m2m(bundle)
+
         self.save_m2m(m2m_bundle)
 
         # per resource post-save hook
@@ -139,8 +150,66 @@ class FlagResource(ModelResource):
         authorization = ModAndUserObjectsOnlyAuthorization()
 
 
+class ResourceLocationResource(ModelResource):
+    cresource = fields.ForeignKey("apps.graph.api.ConceptResourceResource", "cresource")
+
+    class Meta:
+        max_limit = 0
+        authorization = ModAndUserObjectsOnlyAuthorization()
+        queryset = ResourceLocation.objects.all()
+        resource_name = 'resourcelocation'
+        always_return_data = True
+
+    def dehydrate(self, bundle, **kwargs):
+        del bundle.data["cresource"]
+        return bundle
+
+
+class GlobalResourceResource(CustomReversionResource):
+    """
+    tastypie resource for global resources
+    """
+
+    def dehydrate(self, bundle, **kwargs):
+        bundle.data["authors"] = ast.literal_eval(bundle.data["authors"])
+        bundle.data["edition_years"] = ast.literal_eval(bundle.data["edition_years"])
+        return bundle
+
+    def hydrate(self, bundle, **kwargs):
+        gresource = bundle.data
+        # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
+        if type(gresource) != dict:
+            return bundle
+
+        # create new id if necessary
+        # TODO DRY with cresource hydrate
+        if not gresource["id"]:
+            useid = ''
+            while not useid or not len(GlobalResource.objects.filter(id=useid)) == 0:
+                useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(12)])
+                gresource["id"] = useid
+
+        # normalize year TODO should we only allow ints
+        if "year" in gresource:
+            try:
+                gresource["year"]  = int(gresource["year"])
+            except:
+                gresource["year"]  = None
+
+        return bundle
+
+    class Meta:
+        max_limit = 0
+        queryset = GlobalResource.objects.all()
+        resource_name = 'globalresource'
+        authorization = ModAndUserObjectsOnlyAuthorization()
+        always_return_data = True
+
+
 class ConceptResourceResource(ModelResource):
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
+    locations = fields.ToManyField(ResourceLocationResource, 'locations', full=True, related_name="cresource")
+    global_resource = fields.ForeignKey(GlobalResourceResource, "global_resource", full=True)
 
     class Meta:
         max_limit = 0
@@ -156,8 +225,7 @@ class ConceptResourceResource(ModelResource):
         elif self.was_dehydrated:
             return bundle
 
-        bundle.data['authors'] = ast.literal_eval(bundle.data['authors'])
-        bundle.data['location'] = json.loads(bundle.data['location'])
+        # bundle.data['location'] = json.loads(bundle.data['location'])
         adeps = bundle.data["additional_dependencies"]
 
         if type(adeps) == unicode:
@@ -174,7 +242,8 @@ class ConceptResourceResource(ModelResource):
                     dep["tag"] = dconcept.tag
                     dep["id"] = dconcept.id
                 except ObjectDoesNotExist:
-                    pass # TODO
+                    # TODO
+                    pass
         bundle.data["additional_dependencies"] = adeps
 
         return bundle
@@ -199,24 +268,10 @@ class ConceptResourceResource(ModelResource):
                 useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(12)])
             resource["id"] = useid
 
-        # normalize year TODO should we only allow ints
-        if "year" in resource:
-            try:
-                resource["year"]  = int(resource["year"])
-            except:
-                resource["year"]  = None
-
         # FIXME this shouldn't exist here, or at least, it should check
         # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
         if not "id" in resource:
             resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
-
-        # TODO check for temporary concept ids OFFLINE
-        bdl_type = type(resource['location'])
-        # TODO parse string entry or expect parsed?
-        if bdl_type == list:
-            # assume json TODO add try/except block
-            resource['location'] = json.dumps(resource['location'])
 
         adeps_type = type(resource["additional_dependencies"])
         if adeps_type == str:
@@ -233,7 +288,8 @@ class ConceptResourceResource(ModelResource):
                 did = dep["id"]
             elif "title" in dep:
                 # try to find its id using the title
-                # TODO which concepts should we filter on? e.g. all concepts, only approved concepts, [probably best solution: approved or user concepts]
+                # TODO which concepts should we filter on? e.g. all concepts, only approved concepts,
+                # [probably best solution: approved or user concepts]
                 tobjs = Concept.objects.filter(title=dep["title"])
                 if len(tobjs):
                     # TODO what if title's are ambiguous
@@ -254,6 +310,7 @@ class ConceptResourceResource(ModelResource):
         return bundle
 
 
+
 class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
@@ -263,17 +320,19 @@ class ConceptResource(CustomReversionResource):
 
     def dehydrate(self, bundle):
         # find the set of prereqs
-        deps = Dependency.objects.filter(target=bundle.data["id"])
-        bundle.data["dependencies"] = [{"id": dep.id, "source": dep.source, "reason": dep.reason} for dep in deps]
+        deps = Dependency.objects.filter(target_id=bundle.data["id"])
+        bundle.data["dependencies"] = [{"id": dep.id, "source": dep.source_id, "reason": dep.reason} for dep in deps]
         return bundle
 
     def pre_save_hook(self, bundle):
         # save edges and remove from bundle
+
         for in_edge in bundle.data["dependencies"]:
             dependency, created = Dependency.objects.get_or_create(id=in_edge["id"])
-            dependency.source = in_edge["source"]
-            dependency.target = in_edge["target"]
+            dependency.source_id = in_edge["source_id"]
+            dependency.target_id = in_edge["target_id"]
             dependency.reason = in_edge["reason"]
+            # TODO add goals
             dependency.save()
         del bundle.data["dependencies"]
         return bundle
@@ -319,10 +378,11 @@ class ConceptResource(CustomReversionResource):
             if type(in_inlink) != dict:
                 # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
                 continue
+
             if "sid_source" in in_inlink:
-                in_inlink['source'] = in_inlink['sid_source']
+                in_inlink['source_id'] = in_inlink['sid_source']
             if "sid_target" in in_inlink:
-                in_inlink['target'] = in_inlink['sid_target']
+                in_inlink['target_id'] = in_inlink['sid_target']
             if not "id" in in_inlink:
                 in_inlink["id"] = in_inlink["source"] + in_inlink["target"]
         return bundle

@@ -108,7 +108,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'ConceptResource'
         db.create_table(u'graph_conceptresource', (
-            ('global_resource', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['graph.GlobalResource'])),
+            ('global_resource', self.gf('django.db.models.fields.related.ForeignKey')(related_name='cresources', to=orm['graph.GlobalResource'])),
             ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='concept_resource', to=orm['graph.Concept'])),
             ('core', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -128,6 +128,17 @@ class Migration(SchemaMigration):
             ('goal', models.ForeignKey(orm[u'graph.goal'], null=False))
         ))
         db.create_unique(m2m_table_name, ['conceptresource_id', 'goal_id'])
+
+        # Adding model 'ResourceLocation'
+        db.create_table(u'graph_resourcelocation', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('cresource', self.gf('django.db.models.fields.related.ForeignKey')(related_name='locations', to=orm['graph.ConceptResource'])),
+            ('url', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('location_type', self.gf('django.db.models.fields.CharField')(max_length=3)),
+            ('location_text', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+        ))
+        db.send_create_signal(u'graph', ['ResourceLocation'])
 
         # Adding model 'Graph'
         db.create_table(u'graph_graph', (
@@ -198,6 +209,9 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field goals_covered on 'ConceptResource'
         db.delete_table(db.shorten_name(u'graph_conceptresource_goals_covered'))
+
+        # Deleting model 'ResourceLocation'
+        db.delete_table(u'graph_resourcelocation')
 
         # Deleting model 'Graph'
         db.delete_table(u'graph_graph')
@@ -270,7 +284,7 @@ class Migration(SchemaMigration):
             'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'concept_resource'", 'to': u"orm['graph.Concept']"}),
             'core': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'edition': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'global_resource': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['graph.GlobalResource']"}),
+            'global_resource': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cresources'", 'to': u"orm['graph.GlobalResource']"}),
             'goals_covered': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'goals_covered'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'notes': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
@@ -327,6 +341,15 @@ class Migration(SchemaMigration):
             'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'graph': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['graph.Graph']", 'unique': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        u'graph.resourcelocation': {
+            'Meta': {'object_name': 'ResourceLocation'},
+            'cresource': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'locations'", 'to': u"orm['graph.ConceptResource']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'location_text': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'location_type': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
+            'url': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         },
         u'user_management.profile': {
             'Meta': {'object_name': 'Profile'},

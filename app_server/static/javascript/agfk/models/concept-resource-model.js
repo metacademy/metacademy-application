@@ -57,17 +57,16 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       */
 
       // TODO test this parsing
-      window.agfk.globalResources = window.agfkGlobals.globalResources || {};
-      var grs = window.agfk.globalResources;
+      var grs = window.agfkGlobals.globalResources;
       if (grs.hasOwnProperty(resp.global_resource.id)) {
-        resp.global_resource =  grs[resp.global_resource.id];
+        output.global_resource =  grs[resp.global_resource.id];
       } else {
-        resp.global_resource =  new GlobalResource(resp.global_resource);
-        grs[resp.global_resource.id] = resp.global_resource;
+        output.global_resource =  new GlobalResource(resp.global_resource);
+        grs[output.global_resource.id] = output.global_resource;
       }
 
-      resp.concept = (xhr && xhr.collection && xhr.collection.parent) || resp.concept;
-      return resp;
+      output.concept = (xhr && xhr.collection && xhr.collection.parent) || resp.concept;
+      return output;
     },
 
     toJSON: function () {

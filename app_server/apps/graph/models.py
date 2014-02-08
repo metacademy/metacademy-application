@@ -97,6 +97,9 @@ class GlobalResource(Model):
     # fields that can be overwritten/used by the ResourceLocation
     url = CharField(max_length=200)
 
+    def editable_by(self, user):
+        return user.is_authenticated()
+
 
 class ConceptResource(Model):
     """
@@ -104,7 +107,7 @@ class ConceptResource(Model):
     NOTE: should use functions to obtain fields
     """
     # ConceptResource specific
-    global_resource = ForeignKey(GlobalResource)
+    global_resource = ForeignKey(GlobalResource, related_name="cresources")
     id = CharField(max_length=16, primary_key=True)
     concept = ForeignKey(Concept, related_name="concept_resource")
     goals_covered = ManyToManyField(Goal, related_name="goals_covered", null=True, blank=True)
@@ -124,16 +127,20 @@ class ConceptResource(Model):
         return user.is_authenticated()
 
 
-class ResourceLocation:
+class ResourceLocation(Model):
     """
     Specifies the location of the resources
     """
-    concept_resource = ForeignKey(ConceptResource)
+    cresource = ForeignKey(ConceptResource, related_name='locations')
     url = CharField(max_length=100, null=True, blank=True)
     location_type = CharField(max_length=3, choices=(("chp", "chapter (no section)"),
                                                      ("sec", "section"), ("lec", "lecture"), ("lsc", "lecture sequence")))
     location_text = CharField(max_length=100, null=True, blank=True)
-    version_num = IntegerField()
+    version_num = IntegerField(default=0, null=True, blank=True)
+
+    def editable_by(self, user):
+        # TODO figure out non-provisional authentication scheme
+        return user.is_authenticated()
 
 
 class Graph(Model):

@@ -51,7 +51,7 @@ class Migration(SchemaMigration):
         db.create_table(u'graph_dependency', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=32, primary_key=True)),
             ('source_id', self.gf('django.db.models.fields.CharField')(max_length=16)),
-            ('target_id', self.gf('django.db.models.fields.CharField')(max_length=16)),
+            ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='dep_target', to=orm['graph.Concept'])),
             ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
         ))
         db.send_create_signal(u'graph', ['Dependency'])
@@ -302,8 +302,8 @@ class Migration(SchemaMigration):
             'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             'source_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'source_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
             'source_id': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'target_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
-            'target_id': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+            'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dep_target'", 'to': u"orm['graph.Concept']"}),
+            'target_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"})
         },
         u'graph.flag': {
             'Meta': {'object_name': 'Flag'},

@@ -1,3 +1,4 @@
+
 import pdb
 import string
 import json
@@ -139,7 +140,7 @@ class CustomReversionResource(ModelResource):
         return super(ModelResource, self).obj_get(bundle, **kwargs)
 
 
-class FlagResource(ModelResource):
+class FlagResource(CustomReversionResource):
 
     class Meta:
         max_limit = 0
@@ -150,7 +151,7 @@ class FlagResource(ModelResource):
         authorization = ModAndUserObjectsOnlyAuthorization()
 
 
-class ResourceLocationResource(ModelResource):
+class ResourceLocationResource(CustomReversionResource):
     cresource = fields.ForeignKey("apps.graph.api.ConceptResourceResource", "cresource")
 
     class Meta:
@@ -206,7 +207,7 @@ class GlobalResourceResource(CustomReversionResource):
         always_return_data = True
 
 
-class ConceptResourceResource(ModelResource):
+class ConceptResourceResource(CustomReversionResource):
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
     locations = fields.ToManyField(ResourceLocationResource, 'locations', full=True, related_name="cresource")
     global_resource = fields.ForeignKey(GlobalResourceResource, "global_resource", full=True)
@@ -257,8 +258,7 @@ class ConceptResourceResource(ModelResource):
         if type(resource) != dict:
             return bundle
 
-        if not "concept_id" in resource:
-            resource["concept_id"] = bundle.data["concept"]["id"]
+        if "concept" in resource:
             del resource["concept"]
 
         # create new id if necessary
@@ -306,9 +306,31 @@ class ConceptResourceResource(ModelResource):
             else:
                 save_adep = {"title": dep["title"]}
             save_adeps.append(save_adep)
-
         return bundle
 
+
+class DependencyResource(CustomReversionResource):
+    """
+    API for Dependencies
+    """
+    # source = fields.ToOneField("apps.graph.api.ConceptResource", "dep_source")
+    target = fields.ToOneField("apps.graph.api.ConceptResource", "target")
+
+    class Meta:
+        max_limit = 0
+        queryset = Dependency.objects.all()
+        resource_name = 'dependency'
+        authorization = ModAndUserObjectsOnlyAuthorization()
+        allowed_methods = ("get", "post", "put", "delete", "patch")
+        always_return_data = True
+
+    def dehydrate(self, bundle, **kwargs):
+        dep = bundle.data
+        if "source_id" in dep:
+            dep["source"] = dep["source_id"]
+            del dep["source_id"]
+            dep["target"] = bundle.obj.target.id
+        return bundle
 
 
 class ConceptResource(CustomReversionResource):
@@ -316,29 +338,10 @@ class ConceptResource(CustomReversionResource):
     API for concepts, aka nodes
     """
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full=True, related_name="concept")
+    dependencies = fields.ToManyField(DependencyResource, 'dep_target', full=True, related_name="target")
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
-    def dehydrate(self, bundle):
-        # find the set of prereqs
-        deps = Dependency.objects.filter(target_id=bundle.data["id"])
-        bundle.data["dependencies"] = [{"id": dep.id, "source": dep.source_id, "reason": dep.reason} for dep in deps]
-        return bundle
-
-    def pre_save_hook(self, bundle):
-        # save edges and remove from bundle
-
-        for in_edge in bundle.data["dependencies"]:
-            dependency, created = Dependency.objects.get_or_create(id=in_edge["id"])
-            dependency.source_id = in_edge["source_id"]
-            dependency.target_id = in_edge["target_id"]
-            dependency.reason = in_edge["reason"]
-            # TODO add goals
-            dependency.save()
-        del bundle.data["dependencies"]
-        return bundle
-
     def post_save_hook(self, bundle):
-        # FIXME we're currently assuming a user is logged in
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)

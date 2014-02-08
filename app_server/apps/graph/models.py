@@ -48,9 +48,9 @@ class Dependency(Model):
     Concept edge
     """
     id = CharField(max_length=32, primary_key=True)
-    # use charfield because foreignkey causes race conditions with tastypie api (maybe using resource uris would fix this problem?)
+    # use source_id rather than source since source may not be in db at first commit
     source_id = CharField(max_length=16)
-    target_id = CharField(max_length=16)
+    target = ForeignKey(Concept, related_name="dep_target")
     reason = CharField(max_length=500)
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")

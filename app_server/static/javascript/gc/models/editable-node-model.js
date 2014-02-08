@@ -41,13 +41,9 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
           var tmpDep = {},
               src = dep.get("source"),
               tar = dep.get("target");
-          tmpDep.source = src.get("id");
           tmpDep.id = dep.id;
           tmpDep.source_id = src.get("sid")|| src.get("id");
-          tmpDep.target_id = tar.get("sid")|| tar.get("id");
           tmpDep.reason = dep.get("reason");
-          tmpDep.middlePts = dep.get("middlePts");
-          tmpDep.isContracted = dep.get("isContracted");
           dependencies.push(tmpDep);
         });
         retObj.dependencies = dependencies;

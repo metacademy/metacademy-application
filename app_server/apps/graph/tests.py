@@ -6,7 +6,7 @@ import unittest
 from django.contrib.auth.models import User
 from tastypie.test import ResourceTestCase
 
-from apps.graph.models import Graph, Concept, ConceptResource
+from apps.graph.models import Graph, Dependency, Concept, ConceptResource
 from apps.user_management.models import Profile
 from test_data.data import three_node_graph, three_concept_list, single_concept
 
@@ -71,9 +71,10 @@ class BaseResourceTest(ResourceTestCase):
                 self.assertEqual(dep.id, in_dep["id"])
             else:
                 dep = Dependency.objects.get(source=in_dep["source"], target=concept.id)
-            self.assertEqual(dep.source, in_dep["source"])
-            self.assertEqual(dep.target, concept.id)
+            self.assertEqual(dep.source_id, in_dep["source"])
+            self.assertEqual(dep.target_id, concept.id)
             self.assertEqual(dep.reason, in_dep["reason"])
+            # TODO add goal checking
 
         # verify resources
         res_flat_attrs = ["id", "title", "url", "specific_url_base", "resource_type", "edition", "extra", "note", "level", "description"]
@@ -218,7 +219,7 @@ class GraphResourceTest(BaseResourceTest):
 
 
 
-    
+
 
 class BaseConceptResourceTest(BaseResourceTest):
     def setUp(self):
@@ -246,7 +247,7 @@ class BaseConceptResourceTest(BaseResourceTest):
             pass
         else:
             raise RuntimeError("Unrecognized user_type: %s" % user_type)
-        
+
         if verb == "post":
             resp = self.api_client.post(url, format='json', data=data)
         elif verb == "put":
@@ -260,7 +261,7 @@ class BaseConceptResourceTest(BaseResourceTest):
 
         if user_type in ["super", "auth"]:
             self.api_client.client.logout()
-        
+
         return resp
 
     def create_concept(self, provisional):
@@ -346,7 +347,7 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         # returns 200 instead of 201 for PUT to list, which is fine
         if rc == 'Created' and resp.status_code == 200:
             return
-        
+
         getattr(self, 'assertHttp' + rc)(resp)
 
     def check_result(self, resp, data):
@@ -410,13 +411,13 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
             pass
         else:
             raise RuntimeError('Unrecognized existing_concept: %s' % self.existing_concept)
-            
+
         data = self.get_data()
         resp = self.verb_concept(verb=self.verb, vtype=self.vtype, data=data, user_type=self.user_type)
         self.check_response_code(resp)
         self.check_result(resp, data)
 
-        
+
 
 def load_tests(loader, suite, pattern):
     for verb in ['get', 'post', 'put', 'patch']:
@@ -428,7 +429,3 @@ def load_tests(loader, suite, pattern):
                                                               tag_match, existing_concept))
 
     return suite
-
-    
-
-

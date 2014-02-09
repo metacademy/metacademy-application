@@ -30,13 +30,14 @@ class Concept(Model):
         return self.tag == self.id
 
     def editable_by(self, user):
-        return user.is_superuser or (user.is_authenticated() and (self.is_provisional() or (hasattr(self, "conceptsettings") and self.conceptsettings.is_editor(user))))
+        return user.is_superuser or (user.is_authenticated()
+                                     and (self.is_provisional() or (hasattr(self, "conceptsettings")
+                                                                    and self.conceptsettings.is_editor(user))))
 
 
 class Goal(Model):
     concept = ForeignKey(Concept)
     text = CharField(max_length=500)
-    # TODO preqs (use goals or concepts)
 
 
 class Flag(Model):
@@ -48,9 +49,10 @@ class Dependency(Model):
     Concept edge
     """
     id = CharField(max_length=32, primary_key=True)
-    # use source_id rather than source since source may not be in db at first commit
+    source = ForeignKey(Concept, related_name="dep_source")
     source_id = CharField(max_length=16)
     target = ForeignKey(Concept, related_name="dep_target")
+    target_id = CharField(max_length=16)
     reason = CharField(max_length=500)
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")
@@ -152,6 +154,7 @@ class Graph(Model):
     id = CharField(max_length=16, primary_key=True)
     title = CharField(max_length=100)
     concepts = ManyToManyField(Concept, related_name="graph_concepts")
+    dependencies = ManyToManyField(Dependency, related_name="graph_dependencies")
 
     def editable_by(self, user):
         return user.is_authenticated()

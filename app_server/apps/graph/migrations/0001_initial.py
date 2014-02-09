@@ -50,7 +50,7 @@ class Migration(SchemaMigration):
         # Adding model 'Dependency'
         db.create_table(u'graph_dependency', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=32, primary_key=True)),
-            ('source_id', self.gf('django.db.models.fields.CharField')(max_length=16)),
+            ('source', self.gf('django.db.models.fields.related.ForeignKey')(related_name='dep_source', to=orm['graph.Concept'])),
             ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='dep_target', to=orm['graph.Concept'])),
             ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
         ))
@@ -156,6 +156,15 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['graph_id', 'concept_id'])
 
+        # Adding M2M table for field dependencies on 'Graph'
+        m2m_table_name = db.shorten_name(u'graph_graph_dependencies')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('graph', models.ForeignKey(orm[u'graph.graph'], null=False)),
+            ('dependency', models.ForeignKey(orm[u'graph.dependency'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['graph_id', 'dependency_id'])
+
         # Adding model 'GraphSettings'
         db.create_table(u'graph_graphsettings', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -218,6 +227,9 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field concepts on 'Graph'
         db.delete_table(db.shorten_name(u'graph_graph_concepts'))
+
+        # Removing M2M table for field dependencies on 'Graph'
+        db.delete_table(db.shorten_name(u'graph_graph_dependencies'))
 
         # Deleting model 'GraphSettings'
         db.delete_table(u'graph_graphsettings')
@@ -300,8 +312,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Dependency'},
             'id': ('django.db.models.fields.CharField', [], {'max_length': '32', 'primary_key': 'True'}),
             'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
+            'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dep_source'", 'to': u"orm['graph.Concept']"}),
             'source_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'source_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
-            'source_id': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
             'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dep_target'", 'to': u"orm['graph.Concept']"}),
             'target_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"})
         },
@@ -333,6 +345,7 @@ class Migration(SchemaMigration):
         u'graph.graph': {
             'Meta': {'object_name': 'Graph'},
             'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_concepts'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
+            'dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_dependencies'", 'symmetrical': 'False', 'to': u"orm['graph.Dependency']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },

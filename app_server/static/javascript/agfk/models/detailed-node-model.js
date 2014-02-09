@@ -1,12 +1,12 @@
 
 /*global define*/
-define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-resource-collection", "agfk/collections/detailed-edge-collection"], function(_, Node, ConceptResourceCollection, DetailedEdgeCollection){
+define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-resource-collection", "agfk/collections/detailed-edge-collection", "agfk/collections/goal-collection"], function(_, Node, ConceptResourceCollection, DetailedEdgeCollection, GoalCollection){
 
   var DetailedNode = Node.extend({
     // FIXME these shouldn't be hardcoded
-    collFields: ["dependencies", "outlinks", "resources"],
+    collFields: ["dependencies", "outlinks", "resources", "goals"],
 
-    txtFields: ["id", "exercises", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
+    txtFields: ["id", "exercises", "sid", "title", "summary", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
 
     defaults: function(){
       var dnDefaults = {
@@ -16,7 +16,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         resources: new ConceptResourceCollection(),
         flags: [],
         useCsrf: true,
-        goals: "",
+        goals: new GoalCollection(),
         pointers: "",
         software: "",
         x: 0,
@@ -147,6 +147,36 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
      */
     isFinished: function(){
       return this.get("summary") && this.get("resources").length > 0;
+    },
+
+    toJSON: function() {
+      var thisModel = this,
+          attrs = thisModel.attributes,
+          attrib,
+          retObj = {};
+
+      // handle flat attributes
+      for (attrib in attrs) {
+        if (attrs.hasOwnProperty(attrib) && thisModel.collFields.indexOf(attrib) === -1) {
+          retObj[attrib] = thisModel.get(attrib);
+        }
+      }
+
+      // handle collection attributes (don't pass edges)
+      retObj.resources = thisModel.get("resources").toJSON();
+      // var dependencies = [];
+      // thisModel.get("dependencies").forEach(function(dep) {
+      //   var tmpDep = {},
+      //       src = dep.get("source"),
+      //       tar = dep.get("target");
+      //   tmpDep.id = dep.id;
+      //   tmpDep.source_id = src.get("sid")|| src.get("id");
+      //   tmpDep.reason = dep.get("reason");
+      //   dependencies.push(tmpDep);
+      // });
+      // retObj.dependencies = dependencies;
+
+      return retObj;
     }
   });
 

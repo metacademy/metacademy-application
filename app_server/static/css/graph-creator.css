@@ -254,12 +254,12 @@ g.connect-node circle{
     width: 70%;
 }
 
-#resources-tidbit-wrap{
+.tidbit-wrap{
     position: relative;
     margin-top: 1.5em;
 }
 
-#add-resource-button{
+.add-item-button{
     border: 0;
     cursor: pointer;
     border-radius: 4px;

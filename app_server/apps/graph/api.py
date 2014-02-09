@@ -313,8 +313,6 @@ class DependencyResource(CustomReversionResource):
     """
     API for Dependencies
     """
-    # source = fields.ToOneField("apps.graph.api.ConceptResource", "dep_source")
-    target = fields.ToOneField("apps.graph.api.ConceptResource", "target")
 
     class Meta:
         max_limit = 0
@@ -322,14 +320,30 @@ class DependencyResource(CustomReversionResource):
         resource_name = 'dependency'
         authorization = ModAndUserObjectsOnlyAuthorization()
         allowed_methods = ("get", "post", "put", "delete", "patch")
-        always_return_data = True
+        always_return_data = True,
+        include_resource_uri = False
+
+    def pre_save_hook(self, bundle):
+        """
+        called before saving to db
+        """
+        # verify the source and target are in db
+        if not Concept.objects.filter(id=bundle.data["source_id"]).exists():
+            raise Unauthorized("source " + bundle.data["source_id"] + " does not exist")
+        if not Concept.objects.filter(id=bundle.data["target_id"]).exists():
+            raise Unauthorized("target " + bundle.data["target_id"] + " does not exist")
+        return bundle
+
+    def post_save_hook(self, bundle):
+        # associate the appropriate source and target
+        bundle.obj.source = Concept.objects.get(id=bundle.data["source_id"])
+        bundle.obj.target = Concept.objects.get(id=bundle.data["target_id"])
+        return bundle
 
     def dehydrate(self, bundle, **kwargs):
         dep = bundle.data
-        if "source_id" in dep:
-            dep["source"] = dep["source_id"]
-            del dep["source_id"]
-            dep["target"] = bundle.obj.target.id
+        dep["source"] = bundle.obj.source.id
+        dep["target"] = bundle.obj.target.id
         return bundle
 
 
@@ -338,7 +352,6 @@ class ConceptResource(CustomReversionResource):
     API for concepts, aka nodes
     """
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full=True, related_name="concept")
-    dependencies = fields.ToManyField(DependencyResource, 'dep_target', full=True, related_name="target")
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
 
     def post_save_hook(self, bundle):
@@ -375,32 +388,42 @@ class ConceptResource(CustomReversionResource):
             in_concept["flags"] = flag_arr
         return bundle
 
-    def hydrate(self, bundle):
-        in_concept = bundle.data
-        for in_inlink in in_concept["dependencies"]:
-            if type(in_inlink) != dict:
-                # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
-                continue
+    # def hydrate(self, bundle):
+    #     in_concept = bundle.data
+    #     # for in_inlink in in_concept["dependencies"]:
+    #     #     if type(in_inlink) != dict:
+    #     #         # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
+    #     #         continue
 
-            if "sid_source" in in_inlink:
-                in_inlink['source_id'] = in_inlink['sid_source']
-            if "sid_target" in in_inlink:
-                in_inlink['target_id'] = in_inlink['sid_target']
-            if not "id" in in_inlink:
-                in_inlink["id"] = in_inlink["source"] + in_inlink["target"]
-        return bundle
+    #     #     if "sid_source" in in_inlink:
+    #     #         in_inlink['source_id'] = in_inlink['sid_source']
+    #     #     if "sid_target" in in_inlink:
+    #     #         in_inlink['target_id'] = in_inlink['sid_target']
+    #     #     if not "id" in in_inlink:
+    #     #         in_inlink["id"] = in_inlink["source"] + in_inlink["target"]
+    #     return bundle
 
 
 class GraphResource(CustomReversionResource):
     """
+    NOTE: can't commit dependencies if concepts are not already present in graph'
     """
-    concepts = fields.ManyToManyField(ConceptResource, 'concepts', full=True)
+    concepts = fields.ManyToManyField(ConceptResource, 'concepts', full=True, null=True)
+    dependencies = fields.ManyToManyField(DependencyResource, 'dependencies', full=True, null=True)
 
     def alter_deserialized_detail_data(self, request, data):
         # create the graph if it does not exist and associate the user with the graph
-        for concept in data["concepts"]:
-            normalize_concept(concept)
+
+        id_to_concept = {}
+        if data["concepts"]:
+            for concept in data["concepts"]:
+                normalize_concept(concept)
+                id_to_concept[concept["id"]] = concept
+
         return data
+
+    def dehydrate(self, bundle, **kwargs):
+        return bundle
 
     def post_save_hook(self, bundle):
         # FIXME we're assuming a user is logged in

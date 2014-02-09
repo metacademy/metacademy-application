@@ -66,6 +66,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         var thisModel = this,
             deps = [],
             nodes = resp.concepts || resp.nodes, // FIXME normalize concepts and nodes
+            edges = resp.dependencies,
             nodeTag;
 
         if (resp.id) {
@@ -89,19 +90,14 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
           if (nodes.hasOwnProperty(nodeTag)) {
             var tmpNode = nodes[nodeTag];
             tmpNode.sid = tmpNode.id;
-
-            // parse deps separately (outlinks will be readded)
-            tmpNode.dependencies.forEach(function(dep){
-              deps.push({id: dep.id, source: dep.source, target: tmpNode.id, reason: dep.reason});
-            });
-            delete tmpNode.dependencies;
-            delete tmpNode.outlinks;
             thisModel.addNode(tmpNode);
           }
         }
-        deps.forEach(function(dep){
-          thisModel.addEdge(dep);
-        });
+        if (edges) {
+          edges.forEach(function(dep){
+            thisModel.addEdge(dep);
+          });
+        }
         return thisModel.attributes;
       },
 

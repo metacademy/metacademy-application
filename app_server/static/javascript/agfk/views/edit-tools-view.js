@@ -117,21 +117,38 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
 
       syncWithServer: function () {
         var thisView = this,
-            jsonModelStr = JSON.stringify(this.model.toJSON());
+            jsonObj = this.model.toJSON(),
+            jsonConceptOnly = $.extend({}, jsonObj, {dependencies: null});
         $.ajax({ type: "POST",
+                 // TODO move hardcoded url
                  url: "/graphs/api/v1/graph/",
                  contentType: "application/json; charset=utf-8",
-                 data: jsonModelStr,
+                 data: JSON.stringify(jsonConceptOnly),
                  headers: {'X-CSRFToken': window.CSRF_TOKEN},
                  success: function (resp) {
-                   console.log("success!");
-                   console.log(resp.responseText);
-                   if (window.location.pathname.substr(-3) == "new") {
-                     var newPath = window.location.pathname.split("/");
-                     newPath.pop();
-                     newPath = newPath.join("/") + "/" + thisView.model.id;
-                     window.history.pushState({}, "", newPath);
-                   }
+                   $.ajax({ type: "PUT",
+                     // TODO move hardcoded url
+                     url: "/graphs/api/v1/graph/" + thisView.model.id + "/",
+                     contentType: "application/json; charset=utf-8",
+                     data: JSON.stringify(jsonObj),
+                     headers: {'X-CSRFToken': window.CSRF_TOKEN},
+                     success: function (resp) {
+                     console.log("success!");
+                       if (resp){
+                         console.log(resp.responseText);
+                       }
+                       if (window.location.pathname.substr(-3) == "new") {
+                         var newPath = window.location.pathname.split("/");
+                         newPath.pop();
+                         newPath = newPath.join("/") + "/" + thisView.model.id;
+                         window.history.pushState({}, "", newPath);
+                       }
+
+                   },
+                     error: function (resp) {
+                       console.log(resp.responseText);
+                     }
+                   });
                  },
                  error: function (resp) {
                    console.log(resp.responseText);

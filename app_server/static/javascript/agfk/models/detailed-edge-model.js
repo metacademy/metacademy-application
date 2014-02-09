@@ -10,6 +10,18 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model"], function(Back
         isTransitive: false
       };
       return _.extend({}, EdgeModel.prototype.defaults(), enDef);
+    },
+    toJSON: function () {
+      var thisModel = this;
+      if (!thisModel) { return {};}
+      var src = thisModel.get("source"),
+          tar = thisModel.get("target");
+      return {
+        source_id: src.id,
+        target_id: tar.id,
+        reason: thisModel.get("reason") || "",
+        id: thisModel.id
+      };
     }
   });
 });

@@ -10,8 +10,16 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
     pvt.consts = {
       templateId: "full-screen-content-editor",
       contentItemClass: "ec-display-wrap",
-      resourcesTidbitWrapId: "resources-tidbit-wrap"
+      resourcesTidbitWrapId: "resources-tidbit-wrap",
+      goalsTidbitWrapId: "goals-tidbit-wrap"
     };
+
+    pvt.failFun = function failFun (resp){
+          // failure
+          console.error("unable to verify new resource id -- TODO inform user -- msg: "
+                        + resp.responseText);
+        };
+
 
     return Backbone.View.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
@@ -21,7 +29,8 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         "blur .ec-display-wrap > textarea": "changeTextField",
         "blur input.dep-reason": "changeDepReason",
         "click .ec-tabs button": "changeDisplayedSection",
-        "click #add-resource-button": "addResource"
+        "click #add-resource-button": "addResource",
+        "click #add-goal-button": "addGoal"
       },
 
       render: function(){
@@ -95,6 +104,18 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         return thisView;
       },
 
+      addGoal: function () {
+        var thisView = this,
+            gid = Math.random().toString(36).substr(8),
+            newGoal = new Goal({id: gid});
+        thisView.model.get("goals").add(newGoal);
+        $.get("/graphs/idchecker/", {id: gid, type: "goal"})
+        .success(function (resp) {
+            newGoal.set("id", resp.id);
+        })
+        .fail(pvt.failFun);
+      },
+
       addResource: function () {
         var thisView = this,
             rid = Math.random().toString(36).substr(8),
@@ -106,17 +127,11 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // make sure the id works
 
         // TODO fix hardcoded URLS!
-        var failFun = function (resp){
-          // failure
-          console.error("unable to verify new resource id -- TODO inform user -- msg: "
-                        + resp.responseText);
-        };
-
-        $.get("http://127.0.0.1:8080/graphs/idchecker/", {id: rid, type: "resource" })
+        $.get("/graphs/idchecker/", {id: rid, type: "resource" })
         .success(function (resp) {
             newRes.set("id", resp.id);
         })
-        .fail(failFun);
+        .fail(pvt.failFun);
 
         $.get("http://127.0.0.1:8080/graphs/idchecker/", {id: grid, type: "global_resource" })
           .success(function (resp) {
@@ -126,7 +141,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
               gresource.set("id", resp.id);
             }
           })
-          .fail(failFun);
+          .fail(pvt.failFun);
 
         thisView.model.get("resources").add(newRes, {at: 0});
         thisView.render();

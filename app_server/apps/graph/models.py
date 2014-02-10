@@ -17,7 +17,6 @@ class Concept(Model):
     tag = CharField(max_length=30, unique=True, null=False)
     title = CharField(max_length=100)
     summary = CharField(max_length=1000, null=True, blank=True)
-    goals = CharField(max_length=2000, null=True, blank=True)
     exercises = CharField(max_length=2000, null=True, blank=True)
     software = CharField(max_length=2000, null=True, blank=True)
     pointers = CharField(max_length=2000, null=True, blank=True)
@@ -50,9 +49,7 @@ class Dependency(Model):
     """
     id = CharField(max_length=32, primary_key=True)
     source = ForeignKey(Concept, related_name="dep_source")
-    source_id = CharField(max_length=16)
     target = ForeignKey(Concept, related_name="dep_target")
-    target_id = CharField(max_length=16)
     reason = CharField(max_length=500)
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")

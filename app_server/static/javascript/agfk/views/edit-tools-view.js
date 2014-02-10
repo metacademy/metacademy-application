@@ -118,7 +118,8 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       syncWithServer: function () {
         var thisView = this,
             jsonObj = this.model.toJSON(),
-            jsonConceptOnly = $.extend({}, jsonObj, {dependencies: null});
+            jsonConceptOnly = $.extend({}, jsonObj, {dependencies: null}),
+            jsonEdgesOnly =  $.extend({}, jsonObj, {concepts: null});
         $.ajax({ type: "POST",
                  // TODO move hardcoded url
                  url: "/graphs/api/v1/graph/",
@@ -126,7 +127,7 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
                  data: JSON.stringify(jsonConceptOnly),
                  headers: {'X-CSRFToken': window.CSRF_TOKEN},
                  success: function (resp) {
-                   $.ajax({ type: "PUT",
+                   $.ajax({ type: "PATCH",
                      // TODO move hardcoded url
                      url: "/graphs/api/v1/graph/" + thisView.model.id + "/",
                      contentType: "application/json; charset=utf-8",

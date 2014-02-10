@@ -1,4 +1,3 @@
-
 import pdb
 import string
 import json
@@ -18,6 +17,8 @@ from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, C
 from apps.graph.models import ConceptResource as CResource
 from apps.user_management.models import Profile
 
+# global TODOs
+# hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
 
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     # def create_list(self, object_list, bundle):
@@ -323,27 +324,24 @@ class DependencyResource(CustomReversionResource):
         always_return_data = True,
         include_resource_uri = False
 
-    def pre_save_hook(self, bundle):
-        """
-        called before saving to db
-        """
-        # verify the source and target are in db
-        if not Concept.objects.filter(id=bundle.data["source_id"]).exists():
-            raise Unauthorized("source " + bundle.data["source_id"] + " does not exist")
-        if not Concept.objects.filter(id=bundle.data["target_id"]).exists():
-            raise Unauthorized("target " + bundle.data["target_id"] + " does not exist")
-        return bundle
-
     def post_save_hook(self, bundle):
-        # associate the appropriate source and target
-        bundle.obj.source = Concept.objects.get(id=bundle.data["source_id"])
-        bundle.obj.target = Concept.objects.get(id=bundle.data["target_id"])
         return bundle
 
     def dehydrate(self, bundle, **kwargs):
         dep = bundle.data
         dep["source"] = bundle.obj.source.id
         dep["target"] = bundle.obj.target.id
+        return bundle
+
+    def hydrate(self, bundle, **kwargs):
+        tar_id = bundle.data["target"]
+        src_id = bundle.data["source"]
+        if Concept.objects.filter(id=tar_id).exists() and Concept.objects.filter(id=src_id).exists():
+            bundle.obj.target = Concept.objects.get(id=tar_id)
+            bundle.obj.source = Concept.objects.get(id=src_id)
+        else:
+            # TODO raise a better error
+            raise Unauthorized("Concepts must exist in the database before adding the dependencies")
         return bundle
 
 
@@ -388,21 +386,6 @@ class ConceptResource(CustomReversionResource):
             in_concept["flags"] = flag_arr
         return bundle
 
-    # def hydrate(self, bundle):
-    #     in_concept = bundle.data
-    #     # for in_inlink in in_concept["dependencies"]:
-    #     #     if type(in_inlink) != dict:
-    #     #         # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
-    #     #         continue
-
-    #     #     if "sid_source" in in_inlink:
-    #     #         in_inlink['source_id'] = in_inlink['sid_source']
-    #     #     if "sid_target" in in_inlink:
-    #     #         in_inlink['target_id'] = in_inlink['sid_target']
-    #     #     if not "id" in in_inlink:
-    #     #         in_inlink["id"] = in_inlink["source"] + in_inlink["target"]
-    #     return bundle
-
 
 class GraphResource(CustomReversionResource):
     """
@@ -429,6 +412,7 @@ class GraphResource(CustomReversionResource):
         # FIXME we're assuming a user is logged in
         gsettings, gsnew = GraphSettings.objects.get_or_create(graph=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
+
         # TODO add check that the edit actally made a difference
         gsettings.editors.add(uprof)
         gsettings.save()

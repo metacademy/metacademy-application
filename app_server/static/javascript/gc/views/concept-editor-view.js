@@ -1,6 +1,6 @@
 
 /*global define*/
-define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model"], function($, Backbone, _, ResourceEditorView, ConceptResource){
+define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel){
 
   return (function(){
     var pvt = {};
@@ -107,7 +107,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       addGoal: function () {
         var thisView = this,
             gid = Math.random().toString(36).substr(8),
-            newGoal = new Goal({id: gid});
+            newGoal = new GoalModel({id: gid});
         thisView.model.get("goals").add(newGoal);
         $.get("/graphs/idchecker/", {id: gid, type: "goal"})
         .success(function (resp) {

@@ -24,7 +24,6 @@ from utils.roadmap_extension import RoadmapExtension
 from utils.mathjax_extension import MathJaxExtension
 from forms import RoadmapForm, RoadmapSettingsForm
 import models
-import settings
 
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',

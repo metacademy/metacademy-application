@@ -43,6 +43,7 @@ class RoadmapSettings(Model):
     owners = ManyToManyField(Profile, related_name="roadmap_owners")
     editors = ManyToManyField(Profile, related_name="roadmap_editors")
     listed_in_main = BooleanField('show this roadmap in the search results', default=False)
+    anyone_can_edit = BooleanField('anyone can edit this roadmap', default=False)
     sudo_listed_in_main = BooleanField('superuser only: allow this roadmap in the search results', default=True)
     published = BooleanField(default=False)
     url_tag = SlugField('URL tag', max_length=30, help_text='only letters, numbers, underscores, hyphens')
@@ -65,7 +66,7 @@ class RoadmapSettings(Model):
 
     def editable_by(self, user):
         # superusers, owners and editors can edit
-        return user.is_superuser or (user.is_authenticated() and (self.owners.filter(user=user).exists() or self.editors.filter(user=user).exists()))
+        return user.is_superuser or (user.is_authenticated() and (self.anyone_can_edit or self.owners.filter(user=user).exists() or self.editors.filter(user=user).exists()))
 
     def viewable_by(self, user):
         return self.is_published() or self.editable_by(user)

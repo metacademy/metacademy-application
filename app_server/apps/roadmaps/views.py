@@ -93,7 +93,7 @@ def show(request, in_username, tag, vnum=-1):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     vnum = int(vnum)
@@ -119,7 +119,7 @@ def show_history(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     cur_version_num = roadmap.version_num
@@ -177,7 +177,7 @@ def edit(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)

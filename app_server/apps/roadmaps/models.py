@@ -67,6 +67,9 @@ class RoadmapSettings(Model):
         # superusers, owners and editors can edit
         return user.is_superuser or (user.is_authenticated() and (self.owners.filter(user=user).exists() or self.editors.filter(user=user).exists()))
 
+    def viewable_by(self, user):
+        return self.is_published() or self.editable_by(user)
+
 def load_roadmap_settings(username, tag):
     try:
         return RoadmapSettings.objects.get(creator__user__username__exact=username, url_tag__exact=tag)

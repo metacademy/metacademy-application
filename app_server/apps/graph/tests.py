@@ -2,6 +2,7 @@ import pdb
 import ast
 import json
 import unittest
+import copy
 
 from django.contrib.auth.models import User
 from tastypie.test import ResourceTestCase
@@ -9,6 +10,7 @@ from tastypie.test import ResourceTestCase
 from apps.graph.models import Graph, Dependency, Concept, ConceptResource
 from apps.user_management.models import Profile
 from test_data.data import three_node_graph, three_concept_list, single_concept
+
 
 class BaseResourceTest(ResourceTestCase):
     """
@@ -41,7 +43,7 @@ class BaseResourceTest(ResourceTestCase):
         # check the flat attribs
         flat_attrs = ["title", "id"]
         for atrb in flat_attrs:
-            self.assertEqual(in_graph[atrb], getattr(graph,atrb))
+            self.assertEqual(in_graph[atrb], getattr(graph, atrb))
         self.assertEqual(graph.concepts.count(), len(in_graph["concepts"]))
 
         # verify concepts in graph
@@ -96,6 +98,7 @@ class BaseResourceTest(ResourceTestCase):
                     elif atrb in res_boolean_attrs:
                         self.assertEqual(bool(int(in_res[atrb])), getattr(res, atrb))
 
+
 class GraphResourceTest(BaseResourceTest):
     """
     Tests to add:
@@ -119,65 +122,70 @@ class GraphResourceTest(BaseResourceTest):
 
     def verb_graph(self, verb):
         resp = None
-        if verb == "post":
-            resp = self.api_client.post(self.graph_list_api_url, format='json', data=self.post_data)
-        elif verb == "put":
-            resp = self.api_client.put(self.graph_detail_api_url, format='json', data=self.post_data)
+        if verb == "create":
+            no_dep_data = copy.deepcopy(self.post_data)
+            no_dep_data["dependencies"] = []
+            resp1 = self.api_client.post(self.graph_list_api_url, format='json', data=no_dep_data)
+            resp2 = self.api_client.put(self.graph_list_api_url + self.graph_id + "/", format='json', data=self.post_data)
+            return resp1, resp2
+        # TODO should we test PUT separately?
         elif verb == "get":
             resp = self.api_client.get(self.graph_detail_api_url)
         return resp
 
     def auth_verb_graph(self, verb):
         self.api_client.client.login(username=self.username, password=self.username)
-        resp = self.verb_graph(verb)
+        resps = self.verb_graph(verb)
         self.api_client.client.logout()
-        return resp
+        return resps
 
-    def auth_post_graph(self):
-        return self.auth_verb_graph("post")
+    def auth_create_graph(self):
+        return self.auth_verb_graph("create")
 
-    def auth_put_graph(self):
-        return self.auth_verb_graph("put")
+    # def auth_put_graph(self):
+    #     return self.auth_verb_graph("put")
 
-    def test_post_list_unauthenticated(self):
-        resp = self.verb_graph("post")
-        self.assertHttpUnauthorized(resp)
+    def test_create_list_unauthenticated(self):
+        (resp1, resp2) = self.verb_graph("create")
+        self.assertHttpUnauthorized(resp1)
+        self.assertHttpUnauthorized(resp2)
 
     # TODO figure out authentication key
-    def test_post_list_session_auth(self):
+    def test_create_list_session_auth(self):
         # Check how many graphs exist
         self.assertEqual(Graph.objects.count(), 0)
         # create a graph
-        resp = self.auth_post_graph()
-        self.assertHttpCreated(resp)
+        resp1, resp2 = self.auth_create_graph()
+        self.assertHttpCreated(resp1)
+        self.assertHttpNoContent(resp2)
         # Verify a new one has been added to the db.
         self.assertEqual(Graph.objects.count(), 1)
         self.verify_db_graph(self.post_data)
 
-    def test_put_list_session_auth(self):
-        # Check how many graphs exist
-        self.assertEqual(Graph.objects.count(), 0)
-        # create a graph
-        resp = self.auth_put_graph()
-        self.assertHttpCreated(resp)
-        # Verify a new one has been added to the db.
-        self.assertEqual(Graph.objects.count(), 1)
-        self.verify_db_graph(self.post_data)
+    # def test_put_list_session_auth(self):
+    #     # Check how many graphs exist
+    #     self.assertEqual(Graph.objects.count(), 0)
+    #     # create a graph
+    #     resp = self.auth_put_graph()
+    #     self.assertHttpCreated(resp)
+    #     # Verify a new one has been added to the db.
+    #     self.assertEqual(Graph.objects.count(), 1)
+    #     self.verify_db_graph(self.post_data)
 
     def test_patch_list_unauth(self):
-        self.auth_post_graph()
+        self.auth_create_graph()
         resp = self.api_client.patch(self.graph_detail_api_url, format='json', data=self.patch_data)
         self.assertHttpUnauthorized(resp)
 
     def test_patch_detail_session_auth(self):
-        self.auth_post_graph()
+        self.auth_create_graph()
         self.api_client.client.login(username=self.username, password=self.username)
         resp = self.api_client.patch(self.graph_detail_api_url, format='json', data=self.patch_data)
         self.assertHttpAccepted(resp)
         self.assertEqual(Graph.objects.get(id=self.graph_id).title, self.patch_data["title"])
 
     def test_patch_id_session_auth(self):
-        self.auth_post_graph()
+        self.auth_create_graph()
         self.api_client.client.login(username=self.username, password=self.username)
         resp = self.api_client.patch(self.graph_detail_api_url, format='json', data={"id": "a_new_id"})
         self.assertHttpUnauthorized(resp)
@@ -185,7 +193,7 @@ class GraphResourceTest(BaseResourceTest):
         self.assertEqual(Graph.objects.all()[0].id, self.graph_id)
 
     def get_detail_test(self, auth=False):
-        self.auth_post_graph()
+        self.auth_create_graph()
         if auth:
             self.api_client.client.login(username=self.username, password=self.username)
         resp = self.api_client.get(self.graph_detail_api_url)
@@ -200,7 +208,7 @@ class GraphResourceTest(BaseResourceTest):
         self.get_detail_test(auth=True)
 
     def get_list_test(self, auth=False):
-        self.auth_post_graph()
+        self.auth_create_graph()
         if auth:
             self.api_client.client.login(username=self.username, password=self.username)
         resp = self.api_client.get(self.graph_list_api_url)

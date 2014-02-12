@@ -127,7 +127,7 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
                  data: JSON.stringify(jsonConceptOnly),
                  headers: {'X-CSRFToken': window.CSRF_TOKEN},
                  success: function (resp) {
-                   $.ajax({ type: "PATCH",
+                   $.ajax({ type: "PUT",
                      // TODO move hardcoded url
                      url: "/graphs/api/v1/graph/" + thisView.model.id + "/",
                      contentType: "application/json; charset=utf-8",

@@ -33,8 +33,8 @@ class Migration(SchemaMigration):
 
         # Adding model 'Goal'
         db.create_table(u'graph_goal', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('concept', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['graph.Concept'])),
+            ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
+            ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='goals', to=orm['graph.Concept'])),
             ('text', self.gf('django.db.models.fields.CharField')(max_length=500)),
         ))
         db.send_create_signal(u'graph', ['Goal'])
@@ -336,8 +336,8 @@ class Migration(SchemaMigration):
         },
         u'graph.goal': {
             'Meta': {'object_name': 'Goal'},
-            'concept': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['graph.Concept']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'goals'", 'to': u"orm['graph.Concept']"}),
+            'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'text': ('django.db.models.fields.CharField', [], {'max_length': '500'})
         },
         u'graph.graph': {

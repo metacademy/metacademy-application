@@ -318,7 +318,7 @@ g.connect-node circle{
     display: block;
 }
 
-.resource-form{
+.input-form{
     position: relative;
     border: 2px solid #B4ADAD;
     border-radius: 4px;
@@ -327,30 +327,40 @@ g.connect-node circle{
     text-align: left;
 }
 
-.resource-form label{
+.input-form label{
     font-size: 0.9em;
     font-weight: bold;
     display: block;
 }
-.resource-form + .resource-form{
+.input-form + .input-form{
     margin-top: 2em;
 }
 
-.resource-form input{
+.input-form input{
     display: block;
     margin-bottom: 1.5em;
 }
-.resource-form input[type="radio"]{
+.input-form input[type="radio"], .input-form input[type="checkbox"]{
     display: inline;
+    width: auto;
 }
 
-.resource-form textarea{
+.input-form textarea{
     height: 5em;
 }
 
-.resource-form input[type="text"], .resource-form textarea{
+.input-form input[type="text"], .input-form textarea{
     width: 85%;
     line-height: 1.4em;
     display: block;
-    margin: 0 0 1.5em 0;
+    margin:  0 0 1.5em 0;
+}
+
+#goals-tidbit-wrap input{
+    margin: 0;
+}
+
+.no-content-info {
+    font-size: 0.9em;
+    font-style: italic;
 }

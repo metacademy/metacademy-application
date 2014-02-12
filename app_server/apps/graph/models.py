@@ -6,6 +6,11 @@ from django.db.models import CharField, BooleanField, ForeignKey,\
 from apps.user_management.models import Profile
 
 
+class LoggedInEditable:
+    def editable_by(self, user):
+        return user.is_authenticated()
+
+
 class Concept(Model):
     """
     Model that contains the concept data under version control
@@ -34,16 +39,17 @@ class Concept(Model):
                                                                     and self.conceptsettings.is_editor(user))))
 
 
-class Goal(Model):
-    concept = ForeignKey(Concept)
+class Goal(Model, LoggedInEditable):
+    id = CharField(max_length=16, primary_key=True)
+    concept = ForeignKey(Concept, related_name="goals")
     text = CharField(max_length=500)
 
 
-class Flag(Model):
+class Flag(Model, LoggedInEditable):
     text = CharField(max_length=100)
 
 
-class Dependency(Model):
+class Dependency(Model, LoggedInEditable):
     """
     Concept edge
     """
@@ -54,12 +60,8 @@ class Dependency(Model):
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")
 
-    def editable_by(self, user):
-        # TODO figure out non-provisional authentication scheme
-        return user.is_authenticated()
 
-
-class ConceptSettings(Model):
+class ConceptSettings(Model, LoggedInEditable):
     """
     Model that contains the concept data not under version control
     """
@@ -75,7 +77,7 @@ class ConceptSettings(Model):
         return "http://www.example.com"
 
 
-class GlobalResource(Model):
+class GlobalResource(Model, LoggedInEditable):
     """
     Model to maintain resources used across concepts
     """
@@ -96,11 +98,8 @@ class GlobalResource(Model):
     # fields that can be overwritten/used by the ResourceLocation
     url = CharField(max_length=200)
 
-    def editable_by(self, user):
-        return user.is_authenticated()
 
-
-class ConceptResource(Model):
+class ConceptResource(Model, LoggedInEditable):
     """
     Model to maintain concept specific resources
     NOTE: should use functions to obtain fields
@@ -121,12 +120,8 @@ class ConceptResource(Model):
     # concats GlobalResource field ?
     notes = CharField(max_length=500, null=True, blank=True)
 
-    def editable_by(self, user):
-        # TODO figure out non-provisional authentication scheme
-        return user.is_authenticated()
 
-
-class ResourceLocation(Model):
+class ResourceLocation(Model, LoggedInEditable):
     """
     Specifies the location of the resources
     """
@@ -138,12 +133,8 @@ class ResourceLocation(Model):
     location_text = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
 
-    def editable_by(self, user):
-        # TODO figure out non-provisional authentication scheme
-        return user.is_authenticated()
 
-
-class Graph(Model):
+class Graph(Model, LoggedInEditable):
     """
     Model that contains graph data under version control
     """
@@ -153,11 +144,8 @@ class Graph(Model):
     concepts = ManyToManyField(Concept, related_name="graph_concepts")
     dependencies = ManyToManyField(Dependency, related_name="graph_dependencies")
 
-    def editable_by(self, user):
-        return user.is_authenticated()
 
-
-class GraphSettings(Model):
+class GraphSettings(Model, LoggedInEditable):
     """
     Model that contains graph data under version control.
     Effectively, a graph is a set of nodes, and for now, it's mostly used in the context of users creating graphs

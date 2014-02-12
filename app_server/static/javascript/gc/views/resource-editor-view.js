@@ -16,7 +16,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
     return BaseEditorView.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
-      className: "resource-form",
+      className: "resource-form input-form",
 
       events: function(){
         var oevts = BaseEditorView.prototype.events();
@@ -73,7 +73,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
                           + resp.responseText);
           });
 
-
+        // TODO fixme should add a new location element to the dom and rerender
       },
 
       /**

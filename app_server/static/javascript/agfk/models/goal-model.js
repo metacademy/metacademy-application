@@ -5,8 +5,17 @@ define(["backbone"], function(Backbone){
     defaults: function () {
       return {
         text: "",
-        id: ""
+        id: "",
+        concept: null
       };
+    },
+
+    toJSON: function () {
+      var thisModel = this;
+        return {
+          id: thisModel.id,
+          text: thisModel.get("text")
+        };
     }
   });
 });

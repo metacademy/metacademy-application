@@ -1,6 +1,5 @@
 import pdb
 import string
-import json
 import random
 import ast
 
@@ -12,13 +11,14 @@ from tastypie.exceptions import Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource
+from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource, Goal
 # avoid name collision
 from apps.graph.models import ConceptResource as CResource
 from apps.user_management.models import Profile
 
 # global TODOs
 # hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
+
 
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     # def create_list(self, object_list, bundle):
@@ -139,6 +139,21 @@ class CustomReversionResource(ModelResource):
 
     def obj_get(self, bundle, **kwargs):
         return super(ModelResource, self).obj_get(bundle, **kwargs)
+
+
+class GoalResource(CustomReversionResource):
+    """
+    """
+    concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
+
+    class Meta:
+        """ GoalResource Meta"""
+        max_limit = 0
+        queryset = Goal.objects.all()
+        resource_name = 'goal'
+        authorization = ModAndUserObjectsOnlyAuthorization()
+        allowed_methods = ("get", "post", "put", "delete", "patch")
+        always_return_data = True
 
 
 class FlagResource(CustomReversionResource):
@@ -314,6 +329,8 @@ class DependencyResource(CustomReversionResource):
     """
     API for Dependencies
     """
+    source_goals = fields.ManyToManyField(GoalResource, "source_goals", full=True)
+    target_goals = fields.ManyToManyField(GoalResource, "target_goals", full=True)
 
     class Meta:
         max_limit = 0
@@ -331,17 +348,23 @@ class DependencyResource(CustomReversionResource):
         dep = bundle.data
         dep["source"] = bundle.obj.source.id
         dep["target"] = bundle.obj.target.id
+        dep["source_goals"] = [sg.id for sg in bundle.obj.source_goals.all()]
+        dep["target_goals"] = [sg.id for sg in bundle.obj.target_goals.all()]
         return bundle
 
     def hydrate(self, bundle, **kwargs):
         tar_id = bundle.data["target"]
         src_id = bundle.data["source"]
+
         if Concept.objects.filter(id=tar_id).exists() and Concept.objects.filter(id=src_id).exists():
             bundle.obj.target = Concept.objects.get(id=tar_id)
             bundle.obj.source = Concept.objects.get(id=src_id)
         else:
             # TODO raise a better error
             raise Unauthorized("Concepts must exist in the database before adding the dependencies")
+
+        #bundle.obj.source_goals = [Goal.objects.get(id=gid) for gid in bundle.data["source_goals"]]
+        #bundle.obj.target_goals = [Goal.objects.get(id=gid) for gid in bundle.data["target_goals"]]
         return bundle
 
 
@@ -351,6 +374,7 @@ class ConceptResource(CustomReversionResource):
     """
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full=True, related_name="concept")
     flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
+    goals = fields.ToManyField(GoalResource, 'goals', full=True, related_name="concept")
 
     def post_save_hook(self, bundle):
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)

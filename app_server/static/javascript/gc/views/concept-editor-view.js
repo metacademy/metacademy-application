@@ -1,6 +1,6 @@
 
 /*global define*/
-define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel){
+define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model", "gc/views/goal-editor-view"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel, GoalEditorView){
 
   return (function(){
     var pvt = {};
@@ -20,7 +20,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
                         + resp.responseText);
         };
 
-
     return Backbone.View.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
@@ -30,7 +29,8 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         "blur input.dep-reason": "changeDepReason",
         "click .ec-tabs button": "changeDisplayedSection",
         "click #add-resource-button": "addResource",
-        "click #add-goal-button": "addGoal"
+        "click #add-goal-button": "addGoal",
+        "change .goal-check-input .check-field": "changeDepGoal"
       },
 
       render: function(){
@@ -43,7 +43,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // check the structure of goals, resources, problems, and relevant software
         // convert to free-form text for now
         // TODO extract this to a utils function
-        var freeFormFields = ["goals", "pointers", "exercises"];
+        var freeFormFields = ["pointers", "exercises"];
         var ffl = freeFormFields.length,
             httpRe = /http:/;
         while( ffl -- ){
@@ -90,10 +90,15 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // use attributes since toJSON changes the structure
         thisView.$el.html(thisView.template(thisModel.attributes));
 
-        // add the resources (they're the tricky part)
+        // add the resources and goals (they're the tricky parts)
         thisView.model.get("resources").each(function (res) {
           var rev = new ResourceEditorView({model: res});
           thisView.$el.find("#" + consts.resourcesTidbitWrapId).append(rev.render().$el);
+        });
+        // TODO DRY with resources, problems, etc
+        thisView.model.get("goals").each(function (goal) {
+          var gev = new GoalEditorView({model:goal});
+          thisView.$el.find("#" + consts.goalsTidbitWrapId).append(gev.render().$el);
         });
 
         pvt.state.rendered = true;
@@ -107,13 +112,41 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       addGoal: function () {
         var thisView = this,
             gid = Math.random().toString(36).substr(8),
-            newGoal = new GoalModel({id: gid});
-        thisView.model.get("goals").add(newGoal);
+            newGoal = new GoalModel({id: gid, concept: thisView.model});
         $.get("/graphs/idchecker/", {id: gid, type: "goal"})
         .success(function (resp) {
             newGoal.set("id", resp.id);
         })
         .fail(pvt.failFun);
+
+        // add goal to goal list
+        thisView.model.get("goals").add(newGoal, {at: 0});
+        // add goal to all preq and postreq dep lists by default
+        thisView.model.get("dependencies").each(function (dep) {
+            dep.get("target_goals").add(newGoal);
+        });
+        thisView.model.get("outlinks").each(function (ol) {
+          ol.get("source_goals").add(newGoal);
+        });
+
+        thisView.render();
+      },
+
+      changeDepGoal: function (evt) {
+        var thisView = this,
+            $domEl = $(evt.currentTarget),
+            depId = $domEl.data("dep"),
+            goalId = $domEl.prop("value"),
+            goalType = $domEl.prop("name").split("-")[0],
+            goal = goalType === "target_goals"
+            ? thisView.model.get("goals").get(goalId)
+            : thisView.model.get("dependencies").get(depId).get("source").get("goals").get(goalId);
+
+        if ($domEl.prop("checked")) {
+          thisView.model.get("dependencies").get(depId).get(goalType).add(goal);
+        } else {
+          thisView.model.get("dependencies").get(depId).get(goalType).remove(goal);
+        }
       },
 
       addResource: function () {
@@ -124,7 +157,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         newRes.get("global_resource").set("id", grid);
         newRes.parent = thisView.model;
         newRes.set("concept", thisView.model);
-        // make sure the id works
 
         // TODO fix hardcoded URLS!
         $.get("/graphs/idchecker/", {id: rid, type: "resource" })
@@ -133,7 +165,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         })
         .fail(pvt.failFun);
 
-        $.get("http://127.0.0.1:8080/graphs/idchecker/", {id: grid, type: "global_resource" })
+        $.get("/graphs/idchecker/", {id: grid, type: "global_resource" })
           .success(function (resp) {
             // change the id if it hasn't taken on a different global resource
             var gresource = newRes.get("global_resource");

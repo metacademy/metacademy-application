@@ -162,19 +162,9 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         }
       }
 
-      // handle collection attributes (don't pass edges)
+      // jsonify some of the collection attributes (don't pass edges)
       retObj.resources = thisModel.get("resources").toJSON();
-      // var dependencies = [];
-      // thisModel.get("dependencies").forEach(function(dep) {
-      //   var tmpDep = {},
-      //       src = dep.get("source"),
-      //       tar = dep.get("target");
-      //   tmpDep.id = dep.id;
-      //   tmpDep.source_id = src.get("sid")|| src.get("id");
-      //   tmpDep.reason = dep.get("reason");
-      //   dependencies.push(tmpDep);
-      // });
-      // retObj.dependencies = dependencies;
+      retObj.goals = thisModel.get("goals").toJSON();
 
       return retObj;
     }

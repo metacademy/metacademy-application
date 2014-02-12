@@ -27,8 +27,12 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       return "http://127.0.0.1:8080/graphs/api/v1/graph/" + this.id + "/";
     },
 
-    isPopulated: function(){
+    isPopulated: function() {
       return true;
+    },
+
+    postAddEdge: function (edge) {
+    // TODO this may no longer be necessary
     }
   });
 });

@@ -65,17 +65,6 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
         thisView.model.set(attrName, curTar.value);
       },
 
-      // /**
-      //  * changeCompositeField: change composite (text + url in brackets)
-      //  * field in the resource model
-      //  */
-      // changeCompositeField: function (evt) {
-      //   var thisView = this,
-      //       curTar = evt.currentTarget,
-      //       attrName = curTar.name.split("-")[0],
-      //       inpText = curTar.value;
-      //   thisView.model.set(attrName, pvt.parseCompositeField(inpText));
-      // },
 
       /**
        * changeBooleanField: change boolean field in the resource model

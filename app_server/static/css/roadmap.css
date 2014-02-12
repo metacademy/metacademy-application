@@ -355,11 +355,11 @@ ol.history-list{
     margin-top: 0.4em;
 }
 
-.revision-history-preview, .revision-history-revert{
+.revision-history-preview, .revision-history-revert, .revision-history-changes{
     float: right;
 }
 
-.revision-history-preview a, .revision-history-revert a{
+.revision-history-preview a, .revision-history-revert a, .revision-history-changes a{
     min-width: 3.5em;
     text-align: center;
     color: white;
@@ -372,6 +372,10 @@ ol.history-list{
     font-size: 0.9em;
     border-radius: 5px;
     border: none;
+}
+
+.revision-history-preview a{
+    margin-left: 0.8em;
 }
 
 .revision-history-revert a{
@@ -408,4 +412,18 @@ ol.history-list{
     .history-header{
         margin-left: 5%;
     }
+}
+
+.roadmap-diff {
+    line-height: 1.2em;
+}
+
+.roadmap-diff ins {
+    background: #AAFFAA;
+    text-decoration: none;
+}
+
+.roadmap-diff del {
+    background: #FFAAAA;
+    text-decoration: none;
 }

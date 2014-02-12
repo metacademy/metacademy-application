@@ -1,15 +1,20 @@
 window.onload = (function($){
   // handle previews
-  $(".cbox-preview").on("click", function(evt){
+  $(".cbox-preview, .cbox-changes").on("click", function(evt){
     evt.preventDefault();
     var curTar = evt.currentTarget;
+    var prevHTML = curTar.innerHTML;
     curTar.innerHTML = '<img src="/static/images/white-ajax-loader.gif">';
 
     var url = evt.currentTarget.href;
     $.ajax({url: url, type: "GET", dataType: "html",
       success: function(res){
-        curTar.innerHTML = 'Preview';
-        $.colorbox({inline: true, href: $(res).find(".container"), transition: "none", width: "85%", height: "85%"});
+        curTar.innerHTML = prevHTML;
+        var $iel = $(res).find(".container");
+        if ($iel.length == 0) {
+          $iel = $(res);
+        }
+        $.colorbox({inline: true, href: $iel, transition: "none", width: "85%", height: "85%"});
     }});
   });
 

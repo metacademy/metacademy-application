@@ -1,6 +1,7 @@
 import pdb
 
 import collections
+import difflib
 import os
 from operator import attrgetter
 
@@ -16,6 +17,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
+from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 
@@ -24,7 +26,6 @@ from utils.roadmap_extension import RoadmapExtension
 from utils.mathjax_extension import MathJaxExtension
 from forms import RoadmapForm, RoadmapSettingsForm
 import models
-import settings
 
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
@@ -93,7 +94,7 @@ def show(request, in_username, tag, vnum=-1):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     vnum = int(vnum)
@@ -111,6 +112,58 @@ def show(request, in_username, tag, vnum=-1):
         'page_class': "view"
         }, **common_rm_dict))
 
+def format_diff_line(line):
+    line = escape(line)
+    if line[0] == '+':
+        return '<ins>' + line + '</ins>'
+    elif line[0] == '-':
+        return '<del>' + line + '</del>'
+    else:
+        return line
+
+def show_changes(request, in_username, tag, vnum=-1):
+    try:
+        rm_dict = get_roadmap_objs(in_username, tag)
+    except:
+        return HttpResponse(status=404)
+
+    roadmap = rm_dict["roadmap"]
+    roadmap_settings = rm_dict["settings"]
+
+    if not roadmap_settings.viewable_by(request.user):
+        return HttpResponse(status=404)
+
+    vnum = int(vnum)
+    versions = get_versions_obj(roadmap)
+    num_versions = len(versions)
+
+    if num_versions > vnum >= 0 :
+        roadmap = versions[vnum].object_version.object
+
+    curr_body = roadmap.body
+    curr_lines = curr_body.splitlines()
+
+    if vnum > 0:
+        prev_roadmap = versions[vnum-1].object_version.object
+        prev_body = prev_roadmap.body
+    else:
+        prev_body = ''
+    prev_lines = prev_body.splitlines()
+
+    differ = difflib.Differ()
+    diff_lines = differ.compare(prev_lines, curr_lines)
+    diff_lines = filter(lambda l: l[0] != '?', diff_lines)
+    diff = '\n'.join(map(format_diff_line, diff_lines))
+
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
+
+    return render(request, 'roadmap-diff.html', dict({
+        'diff': diff,
+        }, **common_rm_dict))
+
+    
+    
+
 def show_history(request, in_username, tag):
     try:
         rm_dict = get_roadmap_objs(in_username, tag)
@@ -119,7 +172,7 @@ def show_history(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     cur_version_num = roadmap.version_num
@@ -177,7 +230,7 @@ def edit(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)

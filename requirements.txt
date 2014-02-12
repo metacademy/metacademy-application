@@ -4,7 +4,7 @@ Flask-Cache==0.12
 Jinja2==2.7.1
 Markdown==2.3.1
 MarkupSafe==0.18
-Pillow==2.0.0
+Pillow==2.3.0
 South==0.8.4
 Werkzeug==0.9.4
 Whoosh==2.5.4

@@ -60,23 +60,9 @@ class BaseResourceTest(ResourceTestCase):
 
         concept = Concept.objects.get(id=in_concept["id"])
         # verify flat attributes
-        flat_attrs = ["id", "tag", "title", "goals", "pointers", "software", "exercises", "summary"]
+        flat_attrs = ["id", "tag", "title", "pointers", "software", "exercises", "summary"]
         for attr in flat_attrs:
             self.assertEqual(in_concept[attr], getattr(concept, attr))
-
-        ## verify complex attributes ##
-
-        # verify dependencies
-        for in_dep in in_concept["dependencies"]:
-            if in_dep.has_key("id"):
-                dep = Dependency.objects.get(id=in_dep["id"])
-                self.assertEqual(dep.id, in_dep["id"])
-            else:
-                dep = Dependency.objects.get(source=in_dep["source"], target=concept.id)
-            self.assertEqual(dep.source_id, in_dep["source"])
-            self.assertEqual(dep.target_id, concept.id)
-            self.assertEqual(dep.reason, in_dep["reason"])
-            # TODO add goal checking
 
         # verify resources
         res_flat_attrs = ["id", "title", "url", "specific_url_base", "resource_type", "edition", "extra", "note", "level", "description"]
@@ -157,7 +143,7 @@ class GraphResourceTest(BaseResourceTest):
         # create a graph
         resp1, resp2 = self.auth_create_graph()
         self.assertHttpCreated(resp1)
-        self.assertHttpNoContent(resp2)
+        self.assertEqual(resp2.status_code, 204)  # 204 = no content
         # Verify a new one has been added to the db.
         self.assertEqual(Graph.objects.count(), 1)
         self.verify_db_graph(self.post_data)

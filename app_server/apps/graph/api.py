@@ -420,10 +420,11 @@ class GraphResource(CustomReversionResource):
 
     def alter_deserialized_detail_data(self, request, data):
         # create the graph if it does not exist and associate the user with the graph
-
         id_to_concept = {}
         if data["concepts"]:
             for concept in data["concepts"]:
+                if type(concept) != dict:     # if it's a Bundle, this function has already been called
+                    continue
                 normalize_concept(concept)
                 id_to_concept[concept["id"]] = concept
 

@@ -19,6 +19,7 @@ class Migration(SchemaMigration):
             ('pointers', self.gf('django.db.models.fields.CharField')(max_length=2000, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('is_shortcut', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('learn_time', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['Concept'])
 
@@ -133,7 +134,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('cresource', self.gf('django.db.models.fields.related.ForeignKey')(related_name='locations', to=orm['graph.ConceptResource'])),
             ('url', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('location_type', self.gf('django.db.models.fields.CharField')(max_length=3)),
+            ('location_type', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('location_text', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
@@ -280,6 +281,7 @@ class Migration(SchemaMigration):
             'flags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Flag']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'learn_time': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'software': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'summary': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
@@ -358,7 +360,7 @@ class Migration(SchemaMigration):
             'cresource': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'locations'", 'to': u"orm['graph.ConceptResource']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'location_text': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'location_type': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
+            'location_type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         },

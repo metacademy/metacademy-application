@@ -155,6 +155,7 @@ class GraphResourceTest(BaseResourceTest):
         # Check how many graphs exist
         self.assertEqual(Graph.objects.count(), 0)
         # create a graph
+        pdb.set_trace()
         resp1, resp2 = self.auth_create_graph()
         self.assertHttpCreated(resp1)
         self.assertHttpNoContent(resp2)

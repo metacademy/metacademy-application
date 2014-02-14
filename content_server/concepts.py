@@ -32,7 +32,7 @@ def compute_outlinks(tag, db):
             result.append({'from_tag': tag, 'to_tag': t})
 
     return result
-    
+
 
 class Concept:
     """A struct containing the information relevant to a single concept node.
@@ -61,7 +61,7 @@ class Concept:
 
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
-        
+
         outlinks = compute_outlinks(self.tag, db)
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.tag, 'reason': dep.reason}
@@ -90,7 +90,7 @@ class Concept:
             d['time'] = max(db.concept_times[self.tag], work_estimates.MIN_TIME)
 
         return d
-             
+
 
     def get_resource_keys(self):
         keys = None
@@ -122,7 +122,7 @@ class Shortcut:
 
     def json_repr(self, db):
         res = [resources.json_repr(resources.add_defaults(r, db.resources), db) for r in self.resources]
-        
+
         outlinks = compute_outlinks(self.concept.tag, db)
 
         dependencies = [{'from_tag': dep.tag, 'to_tag': self.concept.tag, 'reason': dep.reason}
@@ -132,7 +132,7 @@ class Shortcut:
         goals = [p.json_repr(db.nodes) for p in self.goals]
 
         flags = [db.flags[f] for f in self.concept.flags if f in db.flags]
-        
+
         d = {'tag': self.concept.tag,
              'title': self.concept.title,
              'id': self.concept.id,
@@ -155,4 +155,3 @@ class Shortcut:
 def random_id():
     """Generate a random ID for a concept. The IDs are arbitrary, apart from the requirement that they be distinct."""
     return ''.join([random.choice(string.lowercase + string.digits) for i in range(ID_LENGTH)])
-

@@ -11,35 +11,40 @@ from apps.cserver_comm.cserver_communicator import get_full_graph_json_str, get_
 from apps.user_management.models import Profile
 from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation, Goal
 from apps.graph.models import ConceptResource as CResource
-from apps.graph.api import GraphResource
+from apps.graph import api_communicator
 
 
 def _gen_random_id(rlen):
     return ''.join([random.choice(string.lowercase + string.digits) for i in range(rlen)])
 
 
+def check_model_id(mtype, mid=""):
+    if mtype == "graph":
+        dobj = Graph
+    elif mtype == "concept":
+        dobj = Concept
+    elif mtype == "resource":
+        dobj = CResource
+    elif mtype == "global_resource":
+        dobj = GlobalResource
+    elif mtype == "goal":
+        dobj = Goal
+    elif mtype == "resource_location":
+        dobj = ResourceLocation
+    else:
+        raise KeyError("check_model_id: model type unkown: " + mtype)
+
+    while len(mid) == 0 or len(dobj.objects.filter(id=mid)) > 0:
+        mid = _gen_random_id(10)
+
+    return mid
+
+
 def check_id(request):
     if request.method == "GET":
         gtype = request.GET.get("type")
         in_id = request.GET.get("id", default="")
-        useid = in_id
-        if gtype == "graph":
-            dobj = Graph
-        elif gtype == "concept":
-            dobj = Concept
-        elif gtype == "resource":
-            dobj = CResource
-        elif gtype == "global_resource":
-            dobj = GlobalResource
-        elif gtype == "goal":
-            dobj = Goal
-        elif gtype == "resource_location":
-            dobj = ResourceLocation
-        else:
-            return HttpResponse(status=404)
-
-        while len(useid) == 0 or len(dobj.objects.filter(id=useid)) > 0:
-            useid = _gen_random_id(10)
+        useid = check_model_id(gtype, in_id)
         resp = {"id": useid, "changed": useid != in_id}
         return HttpResponse(json.dumps(resp), "application/json")
     else:
@@ -77,15 +82,9 @@ def new_graph(request):
 def existing_graph(request, gid):
     if request.method == "GET":
         # get the graph data so we can bootstrap it
-        full_graph_json = get_full_graph_json_str()
         concepts = get_user_data(request)
-        gr = GraphResource()
-        try:
-            graph = gr.obj_get(gr.build_bundle(request=request), id=gid)
-        except:
-            HttpResponse(status=404)
-        gr_bundle = gr.build_bundle(obj=graph, request=request)
-        graph_json = gr.serialize(request, gr.full_dehydrate(gr_bundle), "application/json")
+        full_graph_json = get_full_graph_json_str()
+        graph_json = api_communicator.get_graph(request, gid)
         return render_to_response("graph-creator.html",
                                   {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
                                    "graph_id": gid, "graph_init_data": graph_json},

@@ -1,7 +1,7 @@
 import pdb
 
 from django.db.models import CharField, BooleanField, ForeignKey,\
-    Model, IntegerField, OneToOneField, ManyToManyField
+    Model, IntegerField, OneToOneField, ManyToManyField, FloatField
 
 from apps.user_management.models import Profile
 
@@ -28,6 +28,7 @@ class Concept(Model):
     version_num = IntegerField(default=0, null=True, blank=True)
     flags = ManyToManyField("Flag", blank=True, null=True)
     is_shortcut = BooleanField(default=False)
+    learn_time = FloatField(null=True, blank=True)
 
     def is_provisional(self):
         # "approved" concepts get their very own tag
@@ -128,8 +129,7 @@ class ResourceLocation(Model, LoggedInEditable):
     id = CharField(max_length=16, primary_key=True)
     cresource = ForeignKey(ConceptResource, related_name='locations')
     url = CharField(max_length=100, null=True, blank=True)
-    location_type = CharField(max_length=3, choices=(("chp", "chapter (no section)"),
-                                                     ("sec", "section"), ("lec", "lecture"), ("lsc", "lecture sequence")))
+    location_type = CharField(max_length=30)
     location_text = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
 

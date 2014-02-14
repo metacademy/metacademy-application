@@ -188,8 +188,11 @@ class GlobalResourceResource(CustomReversionResource):
     """
 
     def dehydrate(self, bundle, **kwargs):
-        bundle.data["authors"] = ast.literal_eval(bundle.data["authors"])
-        bundle.data["edition_years"] = ast.literal_eval(bundle.data["edition_years"])
+        if "authors" in bundle.data and bundle.data["authors"]:
+            bundle.data["authors"] = ast.literal_eval(bundle.data.get("authors"))
+
+        if "edition_years" in bundle.data and bundle.data["edition_years"]:
+            bundle.data["edition_years"] = ast.literal_eval(bundle.data.get("edition_years"))
         return bundle
 
     def hydrate(self, bundle, **kwargs):
@@ -249,6 +252,7 @@ class ConceptResourceResource(CustomReversionResource):
             adeps = ast.literal_eval(adeps)
         for dep in adeps:
             if "id" in dep:
+                pdb.set_trace()
                 dconcept = Concept.objects.get(id=dep["id"])
                 dep["title"] = dconcept.title
                 dep["tag"] = dconcept.tag
@@ -403,7 +407,7 @@ class ConceptResource(CustomReversionResource):
 
     def hydrate_flags(self, bundle):
         in_concept = bundle.data
-        if in_concept["flags"]:
+        if in_concept.get("flags") and type(in_concept.get("flags")[0]) == unicode:
             flag_arr = []
             for flag in in_concept["flags"]:
                 flag_arr.append({"text": flag})

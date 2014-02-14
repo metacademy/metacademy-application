@@ -60,6 +60,9 @@ class Dependency(Model, LoggedInEditable):
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")
 
+    def editable_by(self, user):
+        return self.target.editable_by(user)
+
 
 class ConceptSettings(Model, LoggedInEditable):
     """

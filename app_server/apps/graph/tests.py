@@ -9,7 +9,7 @@ from tastypie.test import ResourceTestCase
 
 from apps.graph.models import Graph, Dependency, Concept, ConceptResource
 from apps.user_management.models import Profile
-from test_data.data import three_node_graph, three_concept_list, single_concept
+from test_data.data import three_node_graph, three_concept_list, single_concept, two_dependency_list, concept1, concept2, concept3, dependency1, dependency2
 
 
 class BaseResourceTest(ResourceTestCase):
@@ -83,6 +83,18 @@ class BaseResourceTest(ResourceTestCase):
                         self.assertEqual(int(in_res[atrb]), getattr(res, atrb))
                     elif atrb in res_boolean_attrs:
                         self.assertEqual(bool(int(in_res[atrb])), getattr(res, atrb))
+
+    def succeeds(self):
+        return self.correct_response_code() in ['OK', 'Created']
+
+    def check_response_code(self, resp):
+        rc = self.correct_response_code()
+
+        # returns 200 instead of 201 for PUT to list, which is fine
+        if rc == 'Created' and resp.status_code == 200:
+            return
+
+        getattr(self, 'assertHttp' + rc)(resp)
 
 
 class GraphResourceTest(BaseResourceTest):
@@ -220,8 +232,12 @@ class BaseConceptResourceTest(BaseResourceTest):
         super(BaseConceptResourceTest, self).setUp()
         self.concept_list_url = "/graphs/api/v1/concept/"
         self.concept_detail_url = self.concept_list_url + single_concept()["id"] + "/"
-        self.list_data = three_concept_list()
-        self.detail_data = single_concept()
+
+    def list_data(self):
+        return three_concept_list()
+
+    def detail_data(self):
+        return single_concept()
 
     def verb_concept(self, verb, vtype, data, user_type):
         resp = None
@@ -259,10 +275,12 @@ class BaseConceptResourceTest(BaseResourceTest):
         return resp
 
     def create_concept(self, provisional):
-        tdata = self.detail_data.copy()
+        tdata = self.detail_data()
         if not provisional:
             tdata["tag"] = "nomatch"
         return self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata), tdata
+
+    
 
 class ConceptResourceTest(BaseConceptResourceTest):
     def test_put_detail_accepted_concept_normal_user(self):
@@ -299,6 +317,12 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
             self.initial_count = 0
         BaseConceptResourceTest.__init__(self, 'tst_auth')
 
+    def list_data(self):
+        return three_concept_list(self.tag_match)
+
+    def detail_data(self):
+        return single_concept(self.tag_match)
+
     def __str__(self):
         return 'ConceptResourceAuthTest(verb=%s, vtype=%s, user_type=%s, tag_match=%s, existing_concept=%s)' % \
                (self.verb, self.vtype, self.user_type, self.tag_match, self.existing_concept)
@@ -332,17 +356,6 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         elif self.user_type == 'unauth':
             return 'Unauthorized'
 
-    def succeeds(self):
-        return self.correct_response_code() in ['OK', 'Created']
-
-    def check_response_code(self, resp):
-        rc = self.correct_response_code()
-
-        # returns 200 instead of 201 for PUT to list, which is fine
-        if rc == 'Created' and resp.status_code == 200:
-            return
-
-        getattr(self, 'assertHttp' + rc)(resp)
 
     def check_result(self, resp, data):
         # check results of GET operations against database
@@ -378,13 +391,9 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
     def get_data(self):
         if self.data_type() == 'list':
-            data = self.list_data.copy()
-            if not self.tag_match:
-                data["objects"][0]["tag"] = "nomatch"
+            data = self.list_data()
         elif self.data_type() == 'detail':
-            data = self.detail_data.copy()
-            if not self.tag_match:
-                data["tag"] = "nomatch"
+            data = self.detail_data()
         elif self.data_type() == 'none':
             data = None
         else:
@@ -412,6 +421,145 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
         self.check_result(resp, data)
 
 
+class DependencyResourceAuthTest(BaseConceptResourceTest):
+    def __init__(self, verb, vtype, user_type, dependency_exists):
+        BaseResourceTest.__init__(self, 'tst_auth')
+        self.verb = verb
+        self.vtype = vtype
+        self.user_type = user_type
+        self.dependency_exists = dependency_exists
+
+
+    def dependency_list_url(self):
+        return '/graphs/api/v1/dependency/'
+
+    def dependency_detail_url(self, dep_id):
+        return self.dependency_list_url() + dep_id + '/'
+
+
+    def __str__(self):
+        return 'DependencyResourceAuthTest(verb=%s, vtype=%s, user_type=%s, dependency_exists=%s)' % \
+               (self.verb, self.vtype, self.user_type, self.dependency_exists)
+
+    def setUp(self):
+        super(DependencyResourceAuthTest, self).setUp()
+
+        # login as superuser
+        self.api_client.client.login(username=self.super_username, password=self.super_username)
+
+        # add initial concepts
+        for concept in [concept1(), concept2(), concept3()]:
+            self.api_client.post(self.concept_list_url, format='json', data=concept)
+
+        if self.dependency_exists:
+            # add initial dependencies
+            for dep in [dependency1(), dependency2()]:
+                self.api_client.post(self.dependency_list_url(), format='json', data=dep)
+
+        # log out superuser
+        self.api_client.client.logout()
+
+    def get_data(self):
+        if self.vtype == 'list' and self.verb != 'post':
+            return two_dependency_list()
+        else:
+            return dependency1()
+
+    def verb_dependency(self, verb, vtype, data, user_type):
+        resp = None
+
+        if vtype == "detail":
+            url = self.dependency_detail_url(dependency1()['id'])
+        elif vtype == "list":
+            url = self.dependency_list_url()
+        else:
+            raise RuntimeError("Unrecognized vtype: %s" % vtype)
+
+        if user_type == "super":
+            self.api_client.client.login(username=self.super_username, password=self.super_username)
+        elif user_type == "non_editor":
+            self.api_client.client.login(username=self.username, password=self.username)
+        elif user_type == "anon":
+            pass
+        else:
+            raise RuntimeError("Unrecognized user_type: %s" % user_type)
+
+        if verb == "post":
+            resp = self.api_client.post(url, format='json', data=data)
+        elif verb == "put":
+            resp = self.api_client.put(url, format='json', data=data)
+        elif verb == "patch":
+            resp = self.api_client.patch(url, format='json', data=data)
+        elif verb == "get":
+            resp = self.api_client.get(url)
+        else:
+            raise RuntimeError("Unknown verb: %s" % verb)
+
+        if user_type != 'anon':
+            self.api_client.client.logout()
+
+        return resp
+
+        
+        
+        
+    def correct_response_code(self):
+        if self.verb == 'get':
+            if self.dependency_exists:
+                return 'OK'
+            else:
+                return 'NotFound'
+
+        if self.vtype == 'detail' and self.verb == 'post':
+            return 'NotImplemented'
+        if self.vtype == 'list' and self.verb == 'patch':
+            return 'NotImplemented'
+
+        # nobody can PUT to a list
+        if self.vtype == 'list' and self.verb == 'put':
+            return 'Unauthorized'
+
+        # legal PUT, POST, or PATCH request
+        if self.user_type in ['anon', 'non_editor']:
+            return 'Unauthorized'
+        elif self.user_type in ['editor', 'super']:
+            return 'Created'
+        else:
+            raise RuntimeError('Unknown user_type: %s' % self.user_type)
+
+    def check_result(self, resp, data):
+        # check results of GET operations against database
+        if self.verb == 'get' and self.vtype == 'list' and self.succeeds():
+            for in_dep in json.loads(resp.content)["objects"]:
+                self.verify_db_dependency(in_dep)
+        if self.verb == 'get' and self.vtype == 'detail' and self.succeeds():
+            self.verify_db_dependency(json.loads(resp.content))
+
+        # check successful modification operations
+        if self.verb == 'post' and self.succeeds():
+            self.verify_db_dependency(data)
+        if self.verb == 'put' and self.vtype == 'detail' and self.succeeds():
+            self.verify_db_dependency(data)
+        if self.verb == 'put' and self.vtype == 'list' and self.succeeds():
+            self.assertEqual(len(Concept.objects.all()),len(data['objects']))
+
+        # check that unsuccessful modifications don't do anything
+        if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
+            self.assertEqual(len(Dependency.objects.all()), self.initial_count)
+
+    def tst_auth(self):
+        # name disguised so test discoverer doesn't pick it up
+        if self.verb == 'patch':
+            raise unittest.SkipTest()
+        if self.user_type == 'editor':
+            raise unittest.SkipTest()
+
+        data = self.get_data()
+        resp = self.verb_dependency(verb=self.verb, vtype=self.vtype, data=data, user_type=self.user_type)
+        self.check_response_code(resp)
+        self.check_result(resp, data)
+        
+
 
 def load_tests(loader, suite, pattern):
     for verb in ['get', 'post', 'put', 'patch']:
@@ -421,5 +569,11 @@ def load_tests(loader, suite, pattern):
                     for existing_concept in ['none', 'provisional', 'accepted']:
                         suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
                                                               tag_match, existing_concept))
+
+    for verb in ['get', 'post', 'put', 'patch']:
+        for vtype in ['detail', 'list']:
+            for user_type in ['anon', 'non_editor', 'editor', 'super']:
+                for dependency_exists in [False, True]:
+                    suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
 
     return suite

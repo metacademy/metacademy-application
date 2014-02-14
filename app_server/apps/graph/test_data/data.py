@@ -1,9 +1,178 @@
+
+def concept1():
+    return {'editNote': '',
+            'exercises': 'mum exercises',
+            'flags': [],
+            'goals': [{'id': 'wiemte29', 'text': 'a third goal for mom'},
+                      {'id': 'f5oln2ke29', 'text': 'another goal for mom'},
+                      {'id': 'sr1cxzjjor', 'text': 'a goal for mom'}],
+            'hasContractedDeps': False,
+            'hasContractedOLs': False,
+            'id': 'tvat4s6ja6bhuxr',
+            'isContracted': False,
+            'isNew': 1,
+            'is_shortcut': 0,
+            'pointers': 'mum see also',
+            'resources': [{'access': '',
+                           'additional_dependencies': [],
+                           'concept': {'id': 'tvat4s6ja6bhuxr'},
+                           'core': 0,
+                           'edition': '',
+                           'global_resource': {'access': '',
+                                               'authors': [],
+                                               'description': "it's edx",
+                                               'edition_years': [],
+                                               'id': 'o2g0wo2yb9',
+                                               'notes': '',
+                                               'resource_type': 'edx!',
+                                               'title': 'EdX',
+                                               'url': 'http://www.edx.org',
+                                               'year': ''},
+                           'id': 'enixhzd7vi',
+                           'locations': [{'concept_resource': {'id': 'enixhzd7vi'},
+                                          'location_text': '',
+                                          'location_type': '',
+                                          'url': ''}],
+                           'notes': ''}],
+            'sid': '',
+            'software': 'mum software',
+            'summary': 'mum summary',
+            'tag': 'tvat4s6ja6bhuxr',
+            'time': '',
+            'title': 'mom',
+            'useCsrf': True,
+            'x': 443.6666666666667,
+            'y': 154}
+
+def concept2():
+    return {'editNote': '',
+            'exercises': 'yaya',
+            'flags': [],
+            'goals': [{'id': '749ylul3di', 'text': 'dad goal'}],
+            'hasContractedDeps': False,
+            'hasContractedOLs': False,
+            'id': 'uqdaziy5h4cxr',
+            'isContracted': False,
+            'isNew': 1,
+            'is_shortcut': 0,
+            'pointers': '',
+            'resources': [{'access': '',
+                           'additional_dependencies': [],
+                           'concept': {'id': 'uqdaziy5h4cxr'},
+                           'core': 0,
+                           'edition': '',
+                           'global_resource': {'access': '',
+                                               'authors': [],
+                                               'description': '',
+                                               'edition_years': [],
+                                               'id': 'zmsz41jor',
+                                               'notes': '',
+                                               'resource_type': '',
+                                               'title': '',
+                                               'url': '',
+                                               'year': ''},
+                           'id': '9ha4gkqpvi',
+                           'locations': [{'concept_resource': {'id': '9ha4gkqpvi'},
+                                          'location_text': '',
+                                          'location_type': '',
+                                          'url': ''}],
+                           'notes': ''}],
+            'sid': '',
+            'software': '',
+            'summary': 'dad summary',
+            'tag': 'uqdaziy5h4cxr',
+            'time': '',
+            'title': 'dad',
+            'useCsrf': True,
+            'x': 613.6666666666667,
+            'y': 154}
+
+def concept3():
+    return {'editNote': '',
+            'exercises': "here's some exercises (this will change)",
+            'flags': [],
+            'goals': [{'id': '32j5kfyldi', 'text': 'goal 2 for the child'},
+                      {'id': 'kxktiysyvi', 'text': 'goal 1 for the child'}],
+            'hasContractedDeps': False,
+            'hasContractedOLs': False,
+            'id': '9jgljchjobc5wmi',
+            'isContracted': False,
+            'isNew': 1,
+            'is_shortcut': 0,
+            'pointers': 'see also (may change)',
+            'resources': [{'access': 'reg',
+                           'additional_dependencies': [{'title': 'logistic regression'},
+                                                       {'title': 'gradient descent'}],
+                           'concept': {'id': '9jgljchjobc5wmi'},
+                           'core': 1,
+                           'edition': '3',
+                           'global_resource': {'access': '',
+                                               'authors': ['larry page', 'serge brin'],
+                                               'description': "here's a resource",
+                                               'edition_years': [],
+                                               'id': 'qdo8yqfr',
+                                               'notes': '',
+                                               'resource_type': 'google!',
+                                               'title': 'a test resource',
+                                               'url': 'http://www.google.com',
+                                               'year': '1998'},
+                           'id': 't8gk0dlsor',
+                           'locations': [{'concept_resource': {'id': 't8gk0dlsor'},
+                                          'location_text': 'the one and only location display text',
+                                          'location_type': 'chp',
+                                          'url': 'http://www.google.com'}],
+                           'notes': 'this is a note'}],
+            'sid': '',
+            'software': 'some software (will also change)',
+            'summary': 'son summary',
+            'tag': '9jgljchjobc5wmi',
+            'time': '',
+            'title': 'son',
+            'useCsrf': True,
+            'x': 528.6666666666667,
+            'y': 284}
+
+def dependency1():
+    return {'id': 'tvat4s6ja6bhuxr9jgljchjobc5wmi',
+            'reason': "she's my mum",
+            'source': 'tvat4s6ja6bhuxr',
+            'source_goals': [{'id': 'sr1cxzjjor', 'text': 'a goal for mom'},
+                             {'id': 'wiemte29', 'text': 'a third goal for mom'}],
+            'target': '9jgljchjobc5wmi',
+            'target_goals': [{'id': 'kxktiysyvi', 'text': 'goal 1 for the child'},
+                             {'id': '32j5kfyldi', 'text': 'goal 2 for the child'}]}
+
+def dependency2():
+    return {'id': 'uqdaziy5h4cxr9jgljchjobc5wmi',
+            'reason': "he's my dad",
+            'source': 'uqdaziy5h4cxr',
+            'source_goals': [{'id': '749ylul3di', 'text': 'dad goal'}],
+            'target': '9jgljchjobc5wmi',
+            'target_goals': [{'id': 'kxktiysyvi', 'text': 'goal 1 for the child'}]}
+
+
 # directly copied from a post request ()
 def three_node_graph():
-    return {"id":"5oxj6rjp","title":"A test graph","concepts":[{"title":"mom","id":"tvat4s6ja6bhuxr","exercises":"mum exercises","flags":[],"useCsrf":True,"pointers":"mum see also","software":"mum software","x":443.6666666666667,"y":154,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"mum summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"tvat4s6ja6bhuxr","resources":[{"id":"enixhzd7vi","access":"","core":0,"edition":"","additional_dependencies":[],"notes":"","concept":{"id":"tvat4s6ja6bhuxr"},"locations":[{"concept_resource":{"id":"enixhzd7vi"},"url":"","location_type":"","location_text":""}],"global_resource":{"id":"o2g0wo2yb9","title":"EdX","resource_type":"edx!","year":"","url":"http://www.edx.org","authors":[],"edition_years":[],"description":"it's edx","notes":"","access":""}}],"goals":[{"id":"wiemte29","text":"a third goal for mom"},{"id":"f5oln2ke29","text":"another goal for mom"},{"id":"sr1cxzjjor","text":"a goal for mom"}]},{"title":"dad","id":"uqdaziy5h4cxr","exercises":"yaya","flags":[],"useCsrf":True,"pointers":"","software":"","x":613.6666666666667,"y":154,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"dad summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"uqdaziy5h4cxr","resources":[{"id":"9ha4gkqpvi","access":"","core":0,"edition":"","additional_dependencies":[],"notes":"","concept":{"id":"uqdaziy5h4cxr"},"locations":[{"concept_resource":{"id":"9ha4gkqpvi"},"url":"","location_type":"","location_text":""}],"global_resource":{"id":"zmsz41jor","title":"","resource_type":"","year":"","url":"","authors":[],"edition_years":[],"description":"","notes":"","access":""}}],"goals":[{"id":"749ylul3di","text":"dad goal"}]},{"title":"son","id":"9jgljchjobc5wmi","exercises":"here's some exercises (this will change)","flags":[],"useCsrf":True,"pointers":"see also (may change)","software":"some software (will also change)","x":528.6666666666667,"y":284,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"son summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"9jgljchjobc5wmi","resources":[{"id":"t8gk0dlsor","access":"reg","core":1,"edition":"3","additional_dependencies":[{"title":"logistic regression"},{"title":"gradient descent"}],"notes":"this is a note","concept":{"id":"9jgljchjobc5wmi"},"locations":[{"concept_resource":{"id":"t8gk0dlsor"},"url":"http://www.google.com","location_type":"chp","location_text":"the one and only location display text"}],"global_resource":{"id":"qdo8yqfr","title":"a test resource","resource_type":"google!","year":"1998","url":"http://www.google.com","authors":["larry page","serge brin"],"edition_years":[],"description":"here's a resource","notes":"","access":""}}],"goals":[{"id":"32j5kfyldi","text":"goal 2 for the child"},{"id":"kxktiysyvi","text":"goal 1 for the child"}]}],"dependencies":[{"source":"tvat4s6ja6bhuxr","target":"9jgljchjobc5wmi","reason":"she's my mum","id":"tvat4s6ja6bhuxr9jgljchjobc5wmi","source_goals":[{"id":"sr1cxzjjor","text":"a goal for mom"},{"id":"wiemte29","text":"a third goal for mom"}],"target_goals":[{"id":"kxktiysyvi","text":"goal 1 for the child"},{"id":"32j5kfyldi","text":"goal 2 for the child"}]},{"source":"uqdaziy5h4cxr","target":"9jgljchjobc5wmi","reason":"he's my dad","id":"uqdaziy5h4cxr9jgljchjobc5wmi","source_goals":[{"id":"749ylul3di","text":"dad goal"}],"target_goals":[{"id":"kxktiysyvi","text":"goal 1 for the child"}]}]}
+    return {'concepts': [concept1(), concept2(), concept3()],
+            'dependencies': [dependency1(), dependency2()],
+            'id': '5oxj6rjp',
+            'title': 'A test graph'}
 
-def three_concept_list():
-    return {"objects": [{"title":"mom","id":"tvat4s6ja6bhuxr","exercises":"mum exercises","flags":[],"useCsrf":True,"pointers":"mum see also","software":"mum software","x":443.6666666666667,"y":154,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"mum summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"tvat4s6ja6bhuxr","resources":[{"id":"enixhzd7vi","access":"","core":0,"edition":"","additional_dependencies":[],"notes":"","concept":{"id":"tvat4s6ja6bhuxr"},"locations":[{"concept_resource":{"id":"enixhzd7vi"},"url":"","location_type":"","location_text":""}],"global_resource":{"id":"o2g0wo2yb9","title":"EdX","resource_type":"edx!","year":"","url":"http://www.edx.org","authors":[],"edition_years":[],"description":"it's edx","notes":"","access":""}}],"goals":[{"id":"wiemte29","text":"a third goal for mom"},{"id":"f5oln2ke29","text":"another goal for mom"},{"id":"sr1cxzjjor","text":"a goal for mom"}]},{"title":"dad","id":"uqdaziy5h4cxr","exercises":"yaya","flags":[],"useCsrf":True,"pointers":"","software":"","x":613.6666666666667,"y":154,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"dad summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"uqdaziy5h4cxr","resources":[{"id":"9ha4gkqpvi","access":"","core":0,"edition":"","additional_dependencies":[],"notes":"","concept":{"id":"uqdaziy5h4cxr"},"locations":[{"concept_resource":{"id":"9ha4gkqpvi"},"url":"","location_type":"","location_text":""}],"global_resource":{"id":"zmsz41jor","title":"","resource_type":"","year":"","url":"","authors":[],"edition_years":[],"description":"","notes":"","access":""}}],"goals":[{"id":"749ylul3di","text":"dad goal"}]},{"title":"son","id":"9jgljchjobc5wmi","exercises":"here's some exercises (this will change)","flags":[],"useCsrf":True,"pointers":"see also (may change)","software":"some software (will also change)","x":528.6666666666667,"y":284,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"son summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"9jgljchjobc5wmi","resources":[{"id":"t8gk0dlsor","access":"reg","core":1,"edition":"3","additional_dependencies":[{"title":"logistic regression"},{"title":"gradient descent"}],"notes":"this is a note","concept":{"id":"9jgljchjobc5wmi"},"locations":[{"concept_resource":{"id":"t8gk0dlsor"},"url":"http://www.google.com","location_type":"chp","location_text":"the one and only location display text"}],"global_resource":{"id":"qdo8yqfr","title":"a test resource","resource_type":"google!","year":"1998","url":"http://www.google.com","authors":["larry page","serge brin"],"edition_years":[],"description":"here's a resource","notes":"","access":""}}],"goals":[{"id":"32j5kfyldi","text":"goal 2 for the child"},{"id":"kxktiysyvi","text":"goal 1 for the child"}]}]}
+def three_concept_list(tag_match=True):
+    data = {'objects': [concept1(), concept2(), concept3()]}
+    if not tag_match:
+        data['objects'][0]['tag'] = 'nomatch'
+    return data
+    
+def single_concept(tag_match=True):
+    concept = concept3()
+    if not tag_match:
+        concept['tag'] = 'nomatch'
+    return concept
 
-def single_concept():
-    return {"title":"son","id":"9jgljchjobc5wmi","exercises":"here's some exercises (this will change)","flags":[],"useCsrf":True,"pointers":"see also (may change)","software":"some software (will also change)","x":528.6666666666667,"y":284,"isContracted":False,"hasContractedDeps":False,"hasContractedOLs":False,"sid":"","summary":"son summary","time":"","is_shortcut":0,"isNew":1,"editNote":"","tag":"9jgljchjobc5wmi","resources":[{"id":"t8gk0dlsor","access":"reg","core":1,"edition":"3","additional_dependencies":[{"title":"logistic regression"},{"title":"gradient descent"}],"notes":"this is a note","concept":{"id":"9jgljchjobc5wmi"},"locations":[{"concept_resource":{"id":"t8gk0dlsor"},"url":"http://www.google.com","location_type":"chp","location_text":"the one and only location display text"}],"global_resource":{"id":"qdo8yqfr","title":"a test resource","resource_type":"google!","year":"1998","url":"http://www.google.com","authors":["larry page","serge brin"],"edition_years":[],"description":"here's a resource","notes":"","access":""}}],"goals":[{"id":"32j5kfyldi","text":"goal 2 for the child"},{"id":"kxktiysyvi","text":"goal 1 for the child"}]}
+def two_dependency_list():
+    return {'objects': [dependency1(), dependency2()]}
+
+
+
+

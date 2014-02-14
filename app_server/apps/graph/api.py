@@ -464,6 +464,9 @@ def normalize_concept(in_concept):
     if type(in_concept) != dict:
         return
 
+    if 'id' not in in_concept:
+        pdb.set_trace()
+
     if not in_concept["id"] or in_concept["id"][:4] == "-new":
         useid = ''
         while not useid or not len(Concept.objects.filter(id=useid)) == 0:

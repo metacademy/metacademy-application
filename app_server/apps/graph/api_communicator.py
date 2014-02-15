@@ -12,23 +12,29 @@ from settings_local import tmp_super_user, tmp_super_pw
 from apps.graph.api import GraphResource
 from config import DEBUG
 
+ss = None
+
 
 # for security, this should not be used in production
 # comment out after using
 def _post_to_api(purl, pdata):
+    global ss
     if not DEBUG:
         raise Exception("for security, api posts only allowed in debug mode")
     try:
         # login
-        User.objects.create_superuser(tmp_super_user, "tmp@metacademy.org", tmp_super_pw)
+
+        if not User.objects.all().filter(username=tmp_super_user).exists():
+            User.objects.create_superuser(tmp_super_user, "tmp@metacademy.org", tmp_super_pw)
         # TODO switch to auth keys once it's implemented
-        ss = requests.Session()
-        lresp = ss.get("http://127.0.0.1:8080/user/login")
-        ss.post("http://127.0.0.1:8080/user/login",
-                data={"username": tmp_super_user, "password": tmp_super_pw},
-                cookies=lresp.cookies,
-                headers={"X-CSRFToken": lresp.cookies["csrftoken"]},
-                allow_redirects=True)
+        if not ss:
+            ss = requests.Session()
+            lresp = ss.get("http://127.0.0.1:8080/user/login")
+            ss.post("http://127.0.0.1:8080/user/login",
+                    data={"username": tmp_super_user, "password": tmp_super_pw},
+                    cookies=lresp.cookies,
+                    headers={"X-CSRFToken": lresp.cookies["csrftoken"]},
+                    allow_redirects=True)
 
         pheaders = {
             "Content-Type": "application/json"
@@ -66,4 +72,4 @@ def post_concept(cdata):
 
 
 def post_dependency(ddata):
-    pass
+    return _post_to_api("http://127.0.0.1:8080/graphs/api/v1/dependency/", ddata)

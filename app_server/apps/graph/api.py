@@ -5,10 +5,9 @@ import ast
 
 # myapp/api.py
 from tastypie import fields
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, Resource
 from tastypie.authorization import DjangoAuthorization
-from tastypie.exceptions import Unauthorized
-from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.exceptions import Unauthorized, NotFound, ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
 from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource, Goal
@@ -44,12 +43,13 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         return allowed
 
     def update_detail(self, object_list, bundle):
+
         # check if we're trying to change the id or create a new object using patch
         # TODO I couldn't find a better way to do this --CJR
 
-        for obj in object_list:
-            if not obj.editable_by(bundle.request.user):
-                raise Unauthorized('not authorized to edit concept')
+        # for obj in object_list:
+        #     if not obj.editable_by(bundle.request.user):
+        #         raise Unauthorized('not authorized to edit concept')
 
         split_path = bundle.request.META["PATH_INFO"].split("/")
         split_path = [p for p in split_path if p]
@@ -484,3 +484,44 @@ def normalize_concept(in_concept):
     for field in in_concept.keys():
         if field not in CONCEPT_SAVE_FIELDS:
             del in_concept[field]
+
+
+class TargetGraphResource(Resource):
+    """
+    GET-only resource for target graphs (graphs with a single "target" concept and all dependenies)
+    NB: this is _not_ a model resource
+    """
+
+    class Meta:
+        allowed_methods = ["get"]
+        list_allowed_methods = []
+
+    def obj_get(self, bundle, **kwargs):
+        id_or_tag = kwargs.get("id_or_tag")
+        leaf = None
+
+        pdb.set_trace()
+        try:
+            leaf = Concept.objects.get(id=id_or_tag)
+        except ObjectDoesNotExist:
+            leaf = Concept.objects.get(tag=id_or_tag)
+
+        if not leaf:
+            raise NotFound("could not find concept with id or tag: " + id_or_tag)
+
+        concepts = []
+        dependencies = []
+
+        concepts_to_add = [leaf]
+        concepts_added = {}
+        cur_con = leaf
+        for dep in cur_con.dep_target.all():
+            dependencies.append(dep)
+            concepts.append
+        return bundle
+
+    def full_dehydrate(self, bundle):
+        """
+        prepare the TargetGraph
+        """
+        pdb.set_trace()

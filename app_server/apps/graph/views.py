@@ -51,7 +51,7 @@ def check_id(request):
         return HttpResponse(status=405)
 
 
-def get_agfk_app(request, concept_tag=""):
+def get_concept_dep_graph(request, concept_tag=""):
     pdb.set_trace()
     concepts = get_user_data(request)
     concept_data = get_concept_data(concept_tag)
@@ -79,7 +79,7 @@ def new_graph(request):
         return HttpResponse(status=405)
 
 
-def existing_graph(request, gid):
+def edit_existing_graph(request, gid):
     if request.method == "GET":
         # get the graph data so we can bootstrap it
         concepts = get_user_data(request)

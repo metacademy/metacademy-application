@@ -10,9 +10,10 @@ NB: the content server must be listening for requests
 import pdb
 
 from django.core.management.base import BaseCommand
-from apps.graph.api_communicator import post_concept
+from apps.graph.api_communicator import post_concept, post_dependency
 from apps.graph.views import check_model_id
 from app_server.apps.cserver_comm.cserver_communicator import get_full_graph_data, get_concept_data, get_tag_to_concept_dict
+from apps.graph.models import Concept
 
 
 def markdown_obj_to_markdown(mdobj):
@@ -51,7 +52,13 @@ class Command(BaseCommand):
         global_res_dicts = {}
         # parse the dependencies after the concepts
         all_deps = []
+        conct = 0
         for concept_skeleton in graph_data["nodes"]:
+            break
+            # conct += 1
+            # if conct > 100:
+            #     break
+
             concept = get_concept_data(concept_skeleton["tag"])
             api_con = {}
 
@@ -63,10 +70,15 @@ class Command(BaseCommand):
                     if int(goal.get("depth")) == 1:
                         if goal_arr:
                             mtxt = markdown_obj_to_markdown(goal_arr)
+                            # FIXME TODO goals are added multiple times if concept already exists in DB
                             api_goal_list.append({"id": check_model_id("goal"), "text": mtxt})
                         goal_arr = [goal]
                     else:
                         goal_arr.append(goal)
+                # TODO fix DRY
+                if goal_arr:
+                    mtxt = markdown_obj_to_markdown(goal_arr)
+                    api_goal_list.append({"id": check_model_id("goal"), "text": mtxt})
             api_con["goals"] = api_goal_list
 
             # create see-also object
@@ -151,10 +163,7 @@ class Command(BaseCommand):
             api_dep["id"] = src["id"] + target["id"]
             api_dep["source"] = src["id"]
             api_dep["target"] = target["id"]
-            # add all source goals
-
-            # add all target goals
-
-
-
-            # id source target source_goals target_goals reason
+            api_dep["reason"] = dep["reason"]
+            api_dep["source_goals"] = [{"pk": sgoal.pk} for sgoal in Concept.objects.get(id=src["id"]).goals.all()]
+            api_dep["target_goals"] = [{"pk": tgoal.pk} for tgoal in Concept.objects.get(id=target["id"]).goals.all()]
+            post_dependency(api_dep)

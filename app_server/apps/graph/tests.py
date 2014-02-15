@@ -281,7 +281,7 @@ class BaseConceptResourceTest(BaseResourceTest):
             tdata["tag"] = "nomatch"
         return self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata), tdata
 
-    
+
 
 class ConceptResourceTest(BaseConceptResourceTest):
     def test_put_detail_accepted_concept_normal_user(self):
@@ -501,9 +501,9 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
         return resp
 
-        
-        
-        
+
+
+
     def correct_response_code(self):
         if self.verb == 'get':
             if self.dependency_exists:
@@ -559,7 +559,7 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         resp = self.verb_dependency(verb=self.verb, vtype=self.vtype, data=data, user_type=self.user_type)
         self.check_response_code(resp)
         self.check_result(resp, data)
-        
+
 
 
 def load_tests(loader, suite, pattern):

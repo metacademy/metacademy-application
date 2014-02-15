@@ -157,7 +157,7 @@ class GraphResourceTest(BaseResourceTest):
         # Check how many graphs exist
         self.assertEqual(Graph.objects.count(), 0)
         # create a graph
-        pdb.set_trace()
+        #pdb.set_trace()
         resp1, resp2 = self.auth_create_graph()
         self.assertHttpCreated(resp1)
         self.assertEqual(resp2.status_code, 204)  # 204 = no content
@@ -593,10 +593,10 @@ def load_tests(loader, suite, pattern):
     #                    suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
     #                                                          tag_match, existing_concept))
 
-    ## for verb in ['get', 'post', 'put', 'patch']:
-    ##     for vtype in ['detail', 'list']:
-    ##         for user_type in ['anon', 'non_editor', 'editor', 'super']:
-    ##             for dependency_exists in [False, True]:
-    ##                 suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+    for verb in ['get', 'post', 'put', 'patch']:
+        for vtype in ['detail', 'list']:
+            for user_type in ['anon', 'non_editor', 'editor', 'super']:
+                for dependency_exists in [False, True]:
+                    suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
 
     return suite

@@ -7,7 +7,10 @@ import requests
 import json
 
 from django.contrib.auth.models import User
-from settings_local import tmp_super_user, tmp_super_pw
+try:
+    from settings_local import tmp_super_user, tmp_super_pw
+except:
+    pass
 
 from apps.graph.api import GraphResource
 from config import DEBUG

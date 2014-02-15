@@ -411,11 +411,11 @@ class DependencyResource(CustomReversionResource):
         always_return_data = True,
         include_resource_uri = False
 
-    def hydrate(self, bundle):
-        import config
-        #if hasattr(config, 'TCLSA'):
-        #    pdb.set_trace()
-        return bundle
+    ## def hydrate(self, bundle):
+    ##     import config
+    ##     #if hasattr(config, 'TCLSA'):
+    ##     #    pdb.set_trace()
+    ##     return bundle
 
 
 

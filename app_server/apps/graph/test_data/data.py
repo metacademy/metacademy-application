@@ -133,12 +133,10 @@ def concept3():
             'y': 284}
 
 def concept_uri(id):
-    #return '/api/v1/concept/%s/' % id
-    return {'pk': id}
+    return '/graphs/api/v1/concept/%s/' % id
 
 def goal_uri(id):
-    #return '/api/v1/goal/%s/' % id
-    return {'pk': id}
+    return '/graphs/api/v1/goal/%s/' % id
 
 def dependency1():
     return {'id': 'tvat4s6ja6bhuxr9jgljchjobc5wmi',

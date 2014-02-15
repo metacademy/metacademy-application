@@ -539,13 +539,17 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
     def verify_db_dependency(self, in_dep):
         dep = Dependency.objects.get(id=in_dep['id'])
+
+        def extract_id(uri):
+            return uri.split('/')[-2]
         
-        self.assertEqual(dep.source.id, in_dep['source'])
-        self.assertEqual(dep.target.id, in_dep['target'])
+        self.assertEqual(dep.source.id, extract_id(in_dep['source']))
+        self.assertEqual(dep.target.id, extract_id(in_dep['target']))
         self.assertEqual(dep.reason, in_dep['reason'])
-        #pdb.set_trace()
-        self.assertEqual(set(sg.id for sg in dep.source_goals.all()), set(in_dep['source_goals']))
-        self.assertEqual(set(sg.id for sg in dep.target_goals.all()), set(in_dep['target_goals']))
+        self.assertEqual(set(sg.id for sg in dep.source_goals.all()),
+                         set(map(extract_id, in_dep['source_goals'])))
+        self.assertEqual(set(sg.id for sg in dep.target_goals.all()),
+                         set(map(extract_id, in_dep['target_goals'])))
         
 
     def check_result(self, resp, data):

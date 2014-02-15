@@ -123,7 +123,8 @@ class GraphResourceTest(BaseResourceTest):
         if verb == "create":
             no_dep_data = copy.deepcopy(self.post_data)
             no_dep_data["dependencies"] = []
-            resp1 = self.api_client.post(self.graph_list_api_url, format='json', data=no_dep_data)
+            #resp1 = self.api_client.post(self.graph_list_api_url, format='json', data=no_dep_data)
+            resp1 = self.api_client.put(self.graph_list_api_url + self.graph_id + "/", format='json', data=no_dep_data)
             resp2 = self.api_client.put(self.graph_list_api_url + self.graph_id + "/", format='json', data=self.post_data)
             return resp1, resp2
         # TODO should we test PUT separately?
@@ -150,6 +151,9 @@ class GraphResourceTest(BaseResourceTest):
 
     # TODO figure out authentication key
     def test_create_list_session_auth(self):
+        # temporary
+        import config; config.TCLSA = True
+        
         # Check how many graphs exist
         self.assertEqual(Graph.objects.count(), 0)
         # create a graph
@@ -430,6 +434,11 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         self.user_type = user_type
         self.dependency_exists = dependency_exists
 
+        if self.dependency_exists:
+            self.initial_count = 2
+        else:
+            self.initial_count = 0
+
 
     def dependency_list_url(self):
         return '/graphs/api/v1/dependency/'
@@ -506,7 +515,7 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
     def correct_response_code(self):
         if self.verb == 'get':
-            if self.dependency_exists:
+            if self.vtype == 'list' or self.dependency_exists:
                 return 'OK'
             else:
                 return 'NotFound'
@@ -528,10 +537,23 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         else:
             raise RuntimeError('Unknown user_type: %s' % self.user_type)
 
+    def verify_db_dependency(self, in_dep):
+        dep = Dependency.objects.get(id=in_dep['id'])
+        
+        self.assertEqual(dep.source.id, in_dep['source'])
+        self.assertEqual(dep.target.id, in_dep['target'])
+        self.assertEqual(dep.reason, in_dep['reason'])
+        #pdb.set_trace()
+        self.assertEqual(set(sg.id for sg in dep.source_goals.all()), set(in_dep['source_goals']))
+        self.assertEqual(set(sg.id for sg in dep.target_goals.all()), set(in_dep['target_goals']))
+        
+
     def check_result(self, resp, data):
         # check results of GET operations against database
         if self.verb == 'get' and self.vtype == 'list' and self.succeeds():
-            for in_dep in json.loads(resp.content)["objects"]:
+            objects = json.loads(resp.content)['objects']
+            self.assertEqual(len(objects), self.initial_count)
+            for in_dep in objects:
                 self.verify_db_dependency(in_dep)
         if self.verb == 'get' and self.vtype == 'detail' and self.succeeds():
             self.verify_db_dependency(json.loads(resp.content))
@@ -563,18 +585,18 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
 
 def load_tests(loader, suite, pattern):
-    for verb in ['get', 'post', 'put', 'patch']:
-        for vtype in ['detail', 'list']:
-            for user_type in ['unauth', 'auth', 'super']:
-                for tag_match in [False, True]:
-                    for existing_concept in ['none', 'provisional', 'accepted']:
-                        suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
-                                                              tag_match, existing_concept))
+    #for verb in ['get', 'post', 'put', 'patch']:
+    #    for vtype in ['detail', 'list']:
+    #        for user_type in ['unauth', 'auth', 'super']:
+    #            for tag_match in [False, True]:
+    #                for existing_concept in ['none', 'provisional', 'accepted']:
+    #                    suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
+    #                                                          tag_match, existing_concept))
 
-    for verb in ['get', 'post', 'put', 'patch']:
-        for vtype in ['detail', 'list']:
-            for user_type in ['anon', 'non_editor', 'editor', 'super']:
-                for dependency_exists in [False, True]:
-                    suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+    ## for verb in ['get', 'post', 'put', 'patch']:
+    ##     for vtype in ['detail', 'list']:
+    ##         for user_type in ['anon', 'non_editor', 'editor', 'super']:
+    ##             for dependency_exists in [False, True]:
+    ##                 suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
 
     return suite

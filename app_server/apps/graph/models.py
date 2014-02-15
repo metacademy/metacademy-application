@@ -3,6 +3,9 @@ import pdb
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
 
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from apps.user_management.models import Profile
 
 
@@ -63,7 +66,6 @@ class Dependency(Model, LoggedInEditable):
 
     def editable_by(self, user):
         return self.target.editable_by(user)
-
 
 class ConceptSettings(Model, LoggedInEditable):
     """
@@ -158,3 +160,10 @@ class GraphSettings(Model, LoggedInEditable):
 
     def get_absolute_url(self):
         return "/graphs/%s" % self.graph.id
+
+
+## temporary
+#@receiver(pre_save, sender=Dependency)
+#def on_pre_save(sender, **kwargs):
+#    pdb.set_trace()
+

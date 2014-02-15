@@ -132,23 +132,29 @@ def concept3():
             'x': 528.6666666666667,
             'y': 284}
 
+def concept_uri(id):
+    #return '/api/v1/concept/%s/' % id
+    return {'pk': id}
+
+def goal_uri(id):
+    #return '/api/v1/goal/%s/' % id
+    return {'pk': id}
+
 def dependency1():
     return {'id': 'tvat4s6ja6bhuxr9jgljchjobc5wmi',
             'reason': "she's my mum",
-            'source': 'tvat4s6ja6bhuxr',
-            'source_goals': [{'id': 'sr1cxzjjor', 'text': 'a goal for mom'},
-                             {'id': 'wiemte29', 'text': 'a third goal for mom'}],
-            'target': '9jgljchjobc5wmi',
-            'target_goals': [{'id': 'kxktiysyvi', 'text': 'goal 1 for the child'},
-                             {'id': '32j5kfyldi', 'text': 'goal 2 for the child'}]}
+            'source': concept_uri('tvat4s6ja6bhuxr'),
+            'source_goals': map(goal_uri, ['sr1cxzjjor', 'wiemte29']),
+            'target': concept_uri('9jgljchjobc5wmi'),
+            'target_goals': map(goal_uri, ['kxktiysyvi', '32j5kfyldi'])}
 
 def dependency2():
     return {'id': 'uqdaziy5h4cxr9jgljchjobc5wmi',
             'reason': "he's my dad",
-            'source': 'uqdaziy5h4cxr',
-            'source_goals': [{'id': '749ylul3di', 'text': 'dad goal'}],
-            'target': '9jgljchjobc5wmi',
-            'target_goals': [{'id': 'kxktiysyvi', 'text': 'goal 1 for the child'}]}
+            'source': concept_uri('uqdaziy5h4cxr'),
+            'source_goals': map(goal_uri, ['749ylul3di']),
+            'target': concept_uri('9jgljchjobc5wmi'),
+            'target_goals': map(goal_uri, ['kxktiysyvi'])}
 
 
 # directly copied from a post request ()

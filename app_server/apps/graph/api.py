@@ -66,18 +66,33 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
            and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
             raise Unauthorized("cannot replace id")
 
-        # make sure non-supers are not commiting updating with non-matching ids/tags
-        if model_name == "concept" and "tag" in bundle.data and "id" in bundle.data\
-           and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
-            raise Unauthorized("normal users cannot push non-matching ids and tags")
+        try:
+            return bundle.obj.editable_by(bundle.request.user)
+        except:
+            return True
 
-        return bundle.obj.editable_by(bundle.request.user)
+        #return bundle.obj.editable_by(bundle.request.user)
 
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes yet. TODO")
 
     def delete_detail(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes yet. TODO")
+
+class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
+    def update_detail(self, object_list, bundle):
+        result = super(ConceptAuthorization, self).update_detail(object_list, bundle)
+        if not result:
+            return False
+
+        # make sure non-supers are not commiting updating with non-matching ids/tags
+        if "tag" in bundle.data and "id" in bundle.data\
+           and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:
+            raise Unauthorized("normal users cannot push non-matching ids and tags")
+
+        return True
+
+    
 
 
 class CustomReversionResource(ModelResource):
@@ -102,11 +117,18 @@ class CustomReversionResource(ModelResource):
         self.save_related(bundle)
 
         # Save the main object. # CJR TODO we can somehow check if we should save here (are we calling from an edge?)
-        bundle.obj.save()
+        try:
+            bundle.obj.save()
+        except Exception, e:
+            pdb.set_trace()
         bundle.objects_saved.add(self.create_identifier(bundle.obj))
 
         # Now pick up the M2M bits. (must occur after the main obj)
         m2m_bundle = self.hydrate_m2m(bundle)
+        ## try:
+        ##     m2m_bundle = self.hydrate_m2m(bundle)
+        ## except Exception, e:
+        ##     pdb.set_trace()
 
         self.save_m2m(m2m_bundle)
 
@@ -329,49 +351,6 @@ class ConceptResourceResource(CustomReversionResource):
         return bundle
 
 
-class DependencyResource(CustomReversionResource):
-    """
-    API for Dependencies
-    """
-    source_goals = fields.ManyToManyField(GoalResource, "source_goals", full=True)
-    target_goals = fields.ManyToManyField(GoalResource, "target_goals", full=True)
-
-    class Meta:
-        max_limit = 0
-        queryset = Dependency.objects.all()
-        resource_name = 'dependency'
-        authorization = ModAndUserObjectsOnlyAuthorization()
-        allowed_methods = ("get", "post", "put", "delete", "patch")
-        always_return_data = True,
-        include_resource_uri = False
-
-    def post_save_hook(self, bundle):
-        return bundle
-
-    def dehydrate(self, bundle, **kwargs):
-        dep = bundle.data
-        dep["source"] = bundle.obj.source.id
-        dep["target"] = bundle.obj.target.id
-        dep["source_goals"] = [sg.id for sg in bundle.obj.source_goals.all()]
-        dep["target_goals"] = [sg.id for sg in bundle.obj.target_goals.all()]
-        return bundle
-
-    def hydrate(self, bundle, **kwargs):
-        tar_id = bundle.data["target"]
-        src_id = bundle.data["source"]
-
-        if Concept.objects.filter(id=tar_id).exists() and Concept.objects.filter(id=src_id).exists():
-            bundle.obj.target = Concept.objects.get(id=tar_id)
-            bundle.obj.source = Concept.objects.get(id=src_id)
-        else:
-            # TODO raise a better error
-            raise Unauthorized("Concepts must exist in the database before adding the dependencies")
-
-        #bundle.obj.source_goals = [Goal.objects.get(id=gid) for gid in bundle.data["source_goals"]]
-        #bundle.obj.target_goals = [Goal.objects.get(id=gid) for gid in bundle.data["target_goals"]]
-        return bundle
-
-
 class ConceptResource(CustomReversionResource):
     """
     API for concepts, aka nodes
@@ -392,7 +371,7 @@ class ConceptResource(CustomReversionResource):
         max_limit = 0
         queryset = Concept.objects.all()
         resource_name = 'concept'
-        authorization = ModAndUserObjectsOnlyAuthorization()
+        authorization = ConceptAuthorization()
         allowed_methods = ("get", "post", "put", "delete", "patch")
         always_return_data = True
 
@@ -413,6 +392,33 @@ class ConceptResource(CustomReversionResource):
                 flag_arr.append({"text": flag})
             in_concept["flags"] = flag_arr
         return bundle
+
+class DependencyResource(CustomReversionResource):
+    """
+    API for Dependencies
+    """
+    source = fields.ToOneField(ConceptResource, 'source')
+    target = fields.ToOneField(ConceptResource, 'target')
+    source_goals = fields.ManyToManyField(GoalResource, "source_goals")
+    target_goals = fields.ManyToManyField(GoalResource, "target_goals")
+
+    class Meta:
+        max_limit = 0
+        queryset = Dependency.objects.all()
+        resource_name = 'dependency'
+        authorization = ModAndUserObjectsOnlyAuthorization()
+        allowed_methods = ("get", "post", "put", "delete", "patch")
+        always_return_data = True,
+        include_resource_uri = False
+
+    def hydrate(self, bundle):
+        import config
+        #if hasattr(config, 'TCLSA'):
+        #    pdb.set_trace()
+        return bundle
+
+
+
 
 
 class GraphResource(CustomReversionResource):

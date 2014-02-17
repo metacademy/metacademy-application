@@ -1,5 +1,10 @@
 
-def concept1():
+def concept1(tag_match=True):
+    if tag_match:
+        tag = 'tvat4s6ja6bhuxr'
+    else:
+        tag = 'nomatch1'
+        
     return {'editNote': '',
             'exercises': 'mum exercises',
             'flags': [],
@@ -37,14 +42,19 @@ def concept1():
             'sid': '',
             'software': 'mum software',
             'summary': 'mum summary',
-            'tag': 'tvat4s6ja6bhuxr',
+            'tag': tag,
             'time': '',
             'title': 'mom',
             'useCsrf': True,
             'x': 443.6666666666667,
             'y': 154}
 
-def concept2():
+def concept2(tag_match=True):
+    if tag_match:
+        tag = 'uqdaziy5h4cxr'
+    else:
+        tag = 'nomatch2'
+        
     return {'editNote': '',
             'exercises': 'yaya',
             'flags': [],
@@ -80,14 +90,19 @@ def concept2():
             'sid': '',
             'software': '',
             'summary': 'dad summary',
-            'tag': 'uqdaziy5h4cxr',
+            'tag': tag,
             'time': '',
             'title': 'dad',
             'useCsrf': True,
             'x': 613.6666666666667,
             'y': 154}
 
-def concept3():
+def concept3(tag_match=True):
+    if tag_match:
+        tag = '9jgljchjobc5wmi'
+    else:
+        tag = 'nomatch3'
+        
     return {'editNote': '',
             'exercises': "here's some exercises (this will change)",
             'flags': [],
@@ -125,7 +140,7 @@ def concept3():
             'sid': '',
             'software': 'some software (will also change)',
             'summary': 'son summary',
-            'tag': '9jgljchjobc5wmi',
+            'tag': tag,
             'time': '',
             'title': 'son',
             'useCsrf': True,
@@ -133,12 +148,10 @@ def concept3():
             'y': 284}
 
 def concept_uri(id):
-    return '/api/v1/concept/%s/' % id
-    #return {'pk': id}
+    return '/graphs/api/v1/concept/%s/' % id
 
 def goal_uri(id):
-    #return '/api/v1/goal/%s/' % id
-    return {'pk': id}
+    return '/graphs/api/v1/goal/%s/' % id
 
 def dependency1():
     return {'id': 'tvat4s6ja6bhuxr9jgljchjobc5wmi',

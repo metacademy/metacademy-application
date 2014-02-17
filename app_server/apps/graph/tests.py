@@ -458,7 +458,7 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         self.api_client.client.login(username=self.super_username, password=self.super_username)
 
         # add initial concepts
-        for concept in [concept1(), concept2(), concept3()]:
+        for concept in [concept1(False), concept2(False), concept3(False)]:
             self.api_client.post(self.concept_list_url, format='json', data=concept)
 
         if self.dependency_exists:
@@ -540,12 +540,17 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
     def verify_db_dependency(self, in_dep):
         dep = Dependency.objects.get(id=in_dep['id'])
 
-        self.assertEqual(dep.source.id, in_dep['source'])
-        self.assertEqual(dep.target.id, in_dep['target'])
+        def extract_id(uri):
+            return uri.split('/')[-2]
+        
+        self.assertEqual(dep.source.id, extract_id(in_dep['source']))
+        self.assertEqual(dep.target.id, extract_id(in_dep['target']))
         self.assertEqual(dep.reason, in_dep['reason'])
-        #pdb.set_trace()
-        self.assertEqual(set(sg.id for sg in dep.source_goals.all()), set(in_dep['source_goals']))
-        self.assertEqual(set(sg.id for sg in dep.target_goals.all()), set(in_dep['target_goals']))
+        self.assertEqual(set(sg.id for sg in dep.source_goals.all()),
+                         set(map(extract_id, in_dep['source_goals'])))
+        self.assertEqual(set(sg.id for sg in dep.target_goals.all()),
+                         set(map(extract_id, in_dep['target_goals'])))
+        
 
 
     def check_result(self, resp, data):

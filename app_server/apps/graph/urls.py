@@ -1,12 +1,12 @@
 from django.conf.urls import patterns, url, include
 
-from tastypie.api import Api
+from tastypie.api import NamespacedApi
 
 from apps.graph.api import ConceptResource, GraphResource, ConceptResourceResource, DependencyResource, GoalResource, TargetGraphResource
 from views import new_graph, check_id, get_concept_dep_graph, edit_existing_graph
 
 # api v1
-v1_api = Api(api_name='v1')
+v1_api = NamespacedApi(api_name='v1', urlconf_namespace='graphs')
 v1_api.register(ConceptResource())
 v1_api.register(ConceptResourceResource())
 v1_api.register(GraphResource())

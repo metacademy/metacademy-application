@@ -484,7 +484,9 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         self.api_client.client.logout()
 
     def get_data(self):
-        if self.vtype == 'list' and self.verb != 'post':
+        if self.vtype == 'detail' and self.verb == 'patch':
+            return {'reason': 'because I can'}
+        elif self.vtype == 'list' and self.verb != 'post':
             return two_dependency_list()
         else:
             return dependency1()
@@ -587,6 +589,11 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
             self.verify_db_dependency(data)
         if self.verb == 'put' and self.vtype == 'list' and self.succeeds():
             self.assertEqual(len(Concept.objects.all()),len(data['objects']))
+        if self.verb == 'patch' and self.vtype == 'detail' and self.succeeds():
+            full_data = dependency1()
+            for k, v in self.get_data().items():
+                full_data[k] = v
+            self.verify_db_dependency(full_data)
 
         # check that unsuccessful modifications don't do anything
         if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
@@ -594,8 +601,6 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
     def tst_auth(self):
         # name disguised so test discoverer doesn't pick it up
-        if self.verb == 'patch':
-            raise unittest.SkipTest()
         if self.user_type == 'editor':
             raise unittest.SkipTest()
 

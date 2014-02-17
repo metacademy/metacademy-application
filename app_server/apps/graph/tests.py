@@ -85,13 +85,13 @@ class BaseResourceTest(ResourceTestCase):
                         self.assertEqual(bool(int(in_res[atrb])), getattr(res, atrb))
 
     def succeeds(self):
-        return self.correct_response_code() in ['OK', 'Created']
+        return self.correct_response_code() in ['OK', 'Created', 'Accepted']
 
     def check_response_code(self, resp):
         rc = self.correct_response_code()
 
-        # returns 200 instead of 201 for PUT to list, which is fine
-        if rc == 'Created' and resp.status_code == 200:
+        # treat successful response codes as interchangeable
+        if rc == 'OK' and resp.status_code in [200, 201, 202, 204]:
             return
 
         getattr(self, 'assertHttp' + rc)(resp)
@@ -305,7 +305,10 @@ class ConceptResourceTest(BaseConceptResourceTest):
         tdata["title"] = "a different title"
         #resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
         resp = self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata)
-        self.assertHttpOK(resp)
+        try:
+            self.assertHttpOK(resp)
+        except:
+            self.assertEqual(resp.status_code, 204)
         self.assertEqual(Concept.objects.all()[0].title, tdata["title"])
 
 
@@ -341,23 +344,27 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
                 return 'NotFound'
 
         if self.vtype == 'detail' and self.verb == 'post':
-            return 'NotImplemented'
+            return 'MethodNotAllowed'
         if self.vtype == 'list' and self.verb == 'patch':
-            return 'NotImplemented'
+            return 'MethodNotAllowed'
 
         # nobody can PUT to a list
         if self.vtype == 'list' and self.verb == 'put':
-            return 'Unauthorized'
+            return 'MethodNotAllowed'
+
+        # patch to nonexistent resource
+        if self.vtype == 'detail' and self.verb == 'patch' and self.existing_concept == 'none':
+            return 'NotFound'
 
         # legal PUT, POST, or PATCH request
         if self.user_type == 'super':
-            return 'Created'
+            return 'OK'
         elif self.user_type == 'auth':
             if not self.tag_match:
                 return 'Unauthorized'
             if self.existing_concept == 'accepted':
                 return 'Unauthorized'
-            return 'Created'
+            return 'OK'
         elif self.user_type == 'unauth':
             return 'Unauthorized'
 
@@ -379,6 +386,13 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
             self.assertEqual(len(Concept.objects.all()),len(data['objects']))
             if not self.tag_match:
                 self.assertEqual(Concept.objects.get(id=data["objects"][0]["id"]).tag, unicode("nomatch"))
+        elif self.verb == 'patch' and self.vtype == 'detail' and self.succeeds():
+            full_data = self.detail_data()
+            if self.existing_concept == 'accepted':
+                full_data['tag'] = 'nomatch'
+            for k, v in self.get_data().items():
+                full_data[k] = v
+            self.verify_db_concept(full_data)
         # TODO: PATCH
 
         # check that unsuccessful modifications don't do anything
@@ -395,7 +409,9 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
             return 'detail'
 
     def get_data(self):
-        if self.data_type() == 'list':
+        if self.vtype == 'detail' and self.verb == 'patch':
+            return {'title': 'new title'}
+        elif self.data_type() == 'list':
             data = self.list_data()
         elif self.data_type() == 'detail':
             data = self.detail_data()
@@ -408,9 +424,7 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
     def tst_auth(self):
         # name disguised so test discoverer doesn't pick it up
-        if self.verb == 'patch':
-            raise unittest.SkipTest()
-
+        
         if self.existing_concept == 'provisional':
             self.create_concept(True)
         elif self.existing_concept == 'accepted':
@@ -521,19 +535,23 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
                 return 'NotFound'
 
         if self.vtype == 'detail' and self.verb == 'post':
-            return 'NotImplemented'
+            return 'MethodNotAllowed'
         if self.vtype == 'list' and self.verb == 'patch':
-            return 'NotImplemented'
+            return 'MethodNotAllowed'
 
         # nobody can PUT to a list
         if self.vtype == 'list' and self.verb == 'put':
-            return 'Unauthorized'
+            return 'MethodNotAllowed'
+
+        # PATCH to nonexistent dependency
+        if self.vtype == 'detail' and self.verb == 'patch' and not self.dependency_exists:
+            return 'NotFound'
 
         # legal PUT, POST, or PATCH request
         if self.user_type in ['anon', 'non_editor']:
             return 'Unauthorized'
         elif self.user_type in ['editor', 'super']:
-            return 'Created'
+            return 'OK'
         else:
             raise RuntimeError('Unknown user_type: %s' % self.user_type)
 
@@ -589,13 +607,13 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
 
 def load_tests(loader, suite, pattern):
-    #for verb in ['get', 'post', 'put', 'patch']:
-    #    for vtype in ['detail', 'list']:
-    #        for user_type in ['unauth', 'auth', 'super']:
-    #            for tag_match in [False, True]:
-    #                for existing_concept in ['none', 'provisional', 'accepted']:
-    #                    suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
-    #                                                          tag_match, existing_concept))
+    for verb in ['get', 'post', 'put', 'patch']:
+        for vtype in ['detail', 'list']:
+            for user_type in ['unauth', 'auth', 'super']:
+                for tag_match in [False, True]:
+                    for existing_concept in ['none', 'provisional', 'accepted']:
+                        suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
+                                                              tag_match, existing_concept))
 
     for verb in ['get', 'post', 'put', 'patch']:
         for vtype in ['detail', 'list']:

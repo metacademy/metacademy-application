@@ -93,9 +93,15 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
         return True
 
     
+class BaseResource(NamespacedModelResource):
+    class Meta:
+        list_allowed_methods = ('get', 'post')
+        detail_allowed_methods = ('get', 'put', 'patch')
+        max_limit = 0
+        authorization = ModAndUserObjectsOnlyAuthorization()
+        
 
-
-class CustomReversionResource(NamespacedModelResource):
+class CustomReversionResource(BaseResource):
     """
     ModelResource that uses django reversions
     """
@@ -168,36 +174,27 @@ class GoalResource(CustomReversionResource):
     """
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
 
-    class Meta:
+    class Meta(CustomReversionResource.Meta):
         """ GoalResource Meta"""
-        max_limit = 0
         queryset = Goal.objects.all()
         resource_name = 'goal'
-        authorization = ModAndUserObjectsOnlyAuthorization()
-        allowed_methods = ("get", "post", "put", "delete", "patch")
-        always_return_data = True
 
 
 class FlagResource(CustomReversionResource):
 
-    class Meta:
-        max_limit = 0
+    class Meta(CustomReversionResource.Meta):
         fields = ("text",)
         include_resource_uri = False
         queryset = Flag.objects.all()
         resource_name = 'flag'
-        authorization = ModAndUserObjectsOnlyAuthorization()
 
 
 class ResourceLocationResource(CustomReversionResource):
     cresource = fields.ForeignKey("apps.graph.api.ConceptResourceResource", "cresource")
 
-    class Meta:
-        max_limit = 0
-        authorization = ModAndUserObjectsOnlyAuthorization()
+    class Meta(CustomReversionResource.Meta):
         queryset = ResourceLocation.objects.all()
         resource_name = 'resourcelocation'
-        always_return_data = True
 
     def dehydrate(self, bundle, **kwargs):
         del bundle.data["cresource"]
@@ -240,12 +237,9 @@ class GlobalResourceResource(CustomReversionResource):
 
         return bundle
 
-    class Meta:
-        max_limit = 0
+    class Meta(CustomReversionResource.Meta):
         queryset = GlobalResource.objects.all()
         resource_name = 'globalresource'
-        authorization = ModAndUserObjectsOnlyAuthorization()
-        always_return_data = True
 
 
 class ConceptResourceResource(CustomReversionResource):
@@ -253,12 +247,9 @@ class ConceptResourceResource(CustomReversionResource):
     locations = fields.ToManyField(ResourceLocationResource, 'locations', full=True, related_name="cresource")
     global_resource = fields.ForeignKey(GlobalResourceResource, "global_resource", full=True)
 
-    class Meta:
-        max_limit = 0
+    class Meta(CustomReversionResource.Meta):
         queryset = CResource.objects.all()
         resource_name = 'conceptresource'
-        authorization = ModAndUserObjectsOnlyAuthorization()
-        always_return_data = True
 
     def dehydrate(self, bundle):
         # TODO why is this called > 1 times? and why doesn't this flag stop it?
@@ -366,14 +357,11 @@ class ConceptResource(CustomReversionResource):
         csettings.save()
         return bundle
 
-    class Meta:
+    class Meta(CustomReversionResource.Meta):
         """ ConceptResource Meta"""
-        max_limit = 0
         queryset = Concept.objects.all()
         resource_name = 'concept'
         authorization = ConceptAuthorization()
-        allowed_methods = ("get", "post", "put", "delete", "patch")
-        always_return_data = True
 
     def alter_deserialized_list_data(self, request, data):
         for concept in data["objects"]:
@@ -393,7 +381,7 @@ class ConceptResource(CustomReversionResource):
             in_concept["flags"] = flag_arr
         return bundle
 
-class DependencyResource(CustomReversionResource):
+class DependencyResource(BaseResource):
     """
     API for Dependencies
     """
@@ -402,13 +390,9 @@ class DependencyResource(CustomReversionResource):
     source_goals = fields.ManyToManyField(GoalResource, "source_goals")
     target_goals = fields.ManyToManyField(GoalResource, "target_goals")
 
-    class Meta:
-        max_limit = 0
+    class Meta(BaseResource.Meta):
         queryset = Dependency.objects.all()
         resource_name = 'dependency'
-        authorization = ModAndUserObjectsOnlyAuthorization()
-        allowed_methods = ("get", "post", "put", "delete", "patch")
-        always_return_data = True,
         include_resource_uri = False
 
     ## def hydrate(self, bundle):
@@ -421,7 +405,7 @@ class DependencyResource(CustomReversionResource):
 
 
 
-class GraphResource(CustomReversionResource):
+class GraphResource(BaseResource):
     """
     NOTE: can't commit dependencies if concepts are not already present in graph'
     """
@@ -453,14 +437,11 @@ class GraphResource(CustomReversionResource):
         gsettings.save()
         return bundle
 
-    class Meta:
+    class Meta(BaseResource.Meta):
         """ GraphResource Meta """
-        allowed_methods = ("get", "post", "put", "delete", "patch")
-        max_limit = 0
         include_resource_uri = False
         queryset = Graph.objects.all()
         resource_name = 'graph'
-        authorization = ModAndUserObjectsOnlyAuthorization()
 
 # helper methods
 CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises",

@@ -133,8 +133,8 @@ def concept3():
             'y': 284}
 
 def concept_uri(id):
-    #return '/api/v1/concept/%s/' % id
-    return {'pk': id}
+    return '/api/v1/concept/%s/' % id
+    #return {'pk': id}
 
 def goal_uri(id):
     #return '/api/v1/goal/%s/' % id
@@ -169,7 +169,7 @@ def three_concept_list(tag_match=True):
     if not tag_match:
         data['objects'][0]['tag'] = 'nomatch'
     return data
-    
+
 def single_concept(tag_match=True):
     concept = concept3()
     if not tag_match:
@@ -178,7 +178,3 @@ def single_concept(tag_match=True):
 
 def two_dependency_list():
     return {'objects': [dependency1(), dependency2()]}
-
-
-
-

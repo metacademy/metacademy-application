@@ -12,7 +12,8 @@ try:
 except:
     pass
 
-from apps.graph.api import GraphResource
+from apps.graph.api import get_api_object, GraphResource, ConceptResource, DependencyResource
+
 from config import DEBUG
 
 ss = None
@@ -55,14 +56,21 @@ def get_graph(request, gid):
     """
     get json graph object for the given graph id (gid) and django http request object
     """
-    gr = GraphResource()
-    graph = gr.obj_get(gr.build_bundle(request=request), id=gid)
-    gr_bundle = gr.build_bundle(obj=graph, request=request)
-    return gr.serialize(request, gr.full_dehydrate(gr_bundle), "application/json")
+    return get_api_object(GraphResource, request, gid)
 
 
-def get_concept(cid):
-    pass
+def get_concept(request, cid):
+    """
+    get concept object for the given concept id (cid) and django http request object
+    """
+    return get_api_object(ConceptResource, request, cid)
+
+
+def get_dependency(request, did):
+    """
+    get dependency object for the given dependency id (did) and django http request object
+    """
+    return get_api_object(DependencyResource, request, did)
 
 
 def get_concept_dep_graph(cid):

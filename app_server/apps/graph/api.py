@@ -19,6 +19,17 @@ from apps.user_management.models import Profile
 # hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
 
 
+def get_api_object(ObjRes, request, oid):
+    """
+    helper function
+    get resource object from the tastypie api
+    """
+    ob_res = ObjRes()
+    robj = ob_res.obj_get(ob_res.build_bundle(request=request), id=oid)
+    ores_bundle = ob_res.build_bundle(obj=robj, request=request)
+    return ob_res.serialize(request, ob_res.full_dehydrate(ores_bundle), "application/json")
+
+
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     # def create_list(self, object_list, bundle):
     #     # Assuming they're auto-assigned to ``user``.
@@ -79,6 +90,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
     def delete_detail(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes yet. TODO")
 
+
 class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
     def update_detail(self, object_list, bundle):
         result = super(ConceptAuthorization, self).update_detail(object_list, bundle)
@@ -91,8 +103,6 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
             raise Unauthorized("normal users cannot push non-matching ids and tags")
 
         return True
-
-    
 
 
 class CustomReversionResource(ModelResource):
@@ -274,7 +284,6 @@ class ConceptResourceResource(CustomReversionResource):
             adeps = ast.literal_eval(adeps)
         for dep in adeps:
             if "id" in dep:
-                pdb.set_trace()
                 dconcept = Concept.objects.get(id=dep["id"])
                 dep["title"] = dconcept.title
                 dep["tag"] = dconcept.tag
@@ -393,6 +402,7 @@ class ConceptResource(CustomReversionResource):
             in_concept["flags"] = flag_arr
         return bundle
 
+
 class DependencyResource(CustomReversionResource):
     """
     API for Dependencies
@@ -416,9 +426,6 @@ class DependencyResource(CustomReversionResource):
     ##     #if hasattr(config, 'TCLSA'):
     ##     #    pdb.set_trace()
     ##     return bundle
-
-
-
 
 
 class GraphResource(CustomReversionResource):
@@ -497,22 +504,23 @@ class TargetGraphResource(Resource):
     GET-only resource for target graphs (graphs with a single "target" concept and all dependenies)
     NB: this is _not_ a model resource
     """
+    # concepts = fields.ToManyField(ConceptResource, "concept", full=True)
+    # dependencies = fields.ToManyField(DependencyResource, "dependency", full=True)
 
     class Meta:
         allowed_methods = ["get"]
         list_allowed_methods = []
 
     def obj_get(self, bundle, **kwargs):
-        id_or_tag = kwargs.get("id_or_tag")
+        id_or_tag = kwargs.get("pk")
         leaf = None
 
-        pdb.set_trace()
         try:
-            leaf = Concept.objects.get(id=id_or_tag)
+            try:
+                leaf = Concept.objects.get(id=id_or_tag)
+            except ObjectDoesNotExist:
+                leaf = Concept.objects.get(tag=id_or_tag)
         except ObjectDoesNotExist:
-            leaf = Concept.objects.get(tag=id_or_tag)
-
-        if not leaf:
             raise NotFound("could not find concept with id or tag: " + id_or_tag)
 
         concepts = []
@@ -520,14 +528,24 @@ class TargetGraphResource(Resource):
 
         concepts_to_add = [leaf]
         concepts_added = {}
-        cur_con = leaf
-        for dep in cur_con.dep_target.all():
-            dependencies.append(dep)
-            concepts.append
-        return bundle
+
+        while len(concepts_to_add):
+            cur_con = concepts_to_add.pop(0)
+            if cur_con.id in concepts_added:
+                continue
+            concepts.append(get_api_object(ConceptResource, bundle.request, cur_con.id))
+            concepts_added[cur_con.id] = True
+            for dep in cur_con.dep_target.all():
+                dependencies.append(get_api_object(DependencyResource, bundle.request, dep.id))
+                src = dep.source
+                concepts_to_add.append(src)
+        bundle.data = {"concepts": concepts, "dependencies": dependencies}
+
+        return bundle.data
 
     def full_dehydrate(self, bundle):
         """
-        prepare the TargetGraph
+        prepare the TargetGraph data
         """
-        pdb.set_trace()
+        bundle.data = bundle.obj
+        return bundle

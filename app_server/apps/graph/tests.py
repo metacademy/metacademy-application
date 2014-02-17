@@ -153,7 +153,7 @@ class GraphResourceTest(BaseResourceTest):
     def test_create_list_session_auth(self):
         # temporary
         import config; config.TCLSA = True
-        
+
         # Check how many graphs exist
         self.assertEqual(Graph.objects.count(), 0)
         # create a graph
@@ -539,14 +539,14 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
     def verify_db_dependency(self, in_dep):
         dep = Dependency.objects.get(id=in_dep['id'])
-        
+
         self.assertEqual(dep.source.id, in_dep['source'])
         self.assertEqual(dep.target.id, in_dep['target'])
         self.assertEqual(dep.reason, in_dep['reason'])
         #pdb.set_trace()
         self.assertEqual(set(sg.id for sg in dep.source_goals.all()), set(in_dep['source_goals']))
         self.assertEqual(set(sg.id for sg in dep.target_goals.all()), set(in_dep['target_goals']))
-        
+
 
     def check_result(self, resp, data):
         # check results of GET operations against database

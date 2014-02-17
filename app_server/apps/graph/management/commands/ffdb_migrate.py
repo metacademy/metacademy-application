@@ -54,7 +54,7 @@ class Command(BaseCommand):
         all_deps = []
         conct = 0
         for concept_skeleton in graph_data["nodes"]:
-            break
+            # break
             # conct += 1
             # if conct > 100:
             #     break
@@ -161,9 +161,11 @@ class Command(BaseCommand):
             src = tag_to_concept_dict[dep["from_tag"]]
             target = tag_to_concept_dict[dep["to_tag"]]
             api_dep["id"] = src["id"] + target["id"]
-            api_dep["source"] = src["id"]
-            api_dep["target"] = target["id"]
+            api_dep["source"] = "/graphs/api/v1/concept/" + src["id"] + "/"
+            api_dep["target"] = "/graphs/api/v1/concept/" + target["id"] + "/"
             api_dep["reason"] = dep["reason"]
-            api_dep["source_goals"] = [{"pk": sgoal.pk} for sgoal in Concept.objects.get(id=src["id"]).goals.all()]
-            api_dep["target_goals"] = [{"pk": tgoal.pk} for tgoal in Concept.objects.get(id=target["id"]).goals.all()]
+            api_dep["source_goals"] = ["/graphs/api/v1/goal/" + sgoal.id + "/"
+                                       for sgoal in Concept.objects.get(id=src["id"]).goals.all()]
+            api_dep["target_goals"] = ["/graphs/api/v1/goal/" + tgoal.id + "/"
+                                       for tgoal in Concept.objects.get(id=target["id"]).goals.all()]
             post_dependency(api_dep)

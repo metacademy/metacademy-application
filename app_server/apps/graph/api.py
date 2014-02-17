@@ -10,7 +10,7 @@ from tastypie.authorization import DjangoAuthorization
 from tastypie.exceptions import Unauthorized, NotFound, ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from apps.graph.models import Concept, Dependency, Flag, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource, Goal
+from apps.graph.models import Concept, Dependency, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource, Goal
 # avoid name collision
 from apps.graph.models import ConceptResource as CResource
 from apps.user_management.models import Profile
@@ -188,17 +188,6 @@ class GoalResource(CustomReversionResource):
         always_return_data = True
 
 
-class FlagResource(CustomReversionResource):
-
-    class Meta:
-        max_limit = 0
-        fields = ("text",)
-        include_resource_uri = False
-        queryset = Flag.objects.all()
-        resource_name = 'flag'
-        authorization = ModAndUserObjectsOnlyAuthorization()
-
-
 class ResourceLocationResource(CustomReversionResource):
     cresource = fields.ForeignKey("apps.graph.api.ConceptResourceResource", "cresource")
 
@@ -365,7 +354,6 @@ class ConceptResource(CustomReversionResource):
     API for concepts, aka nodes
     """
     resources = fields.ToManyField(ConceptResourceResource, 'concept_resource', full=True, related_name="concept")
-    flags = fields.ManyToManyField(FlagResource, 'flags', full=True)
     goals = fields.ToManyField(GoalResource, 'goals', full=True, related_name="concept")
 
     def post_save_hook(self, bundle):

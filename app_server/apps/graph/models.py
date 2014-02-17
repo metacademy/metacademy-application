@@ -29,7 +29,6 @@ class Concept(Model):
     software = CharField(max_length=2000, null=True, blank=True)
     pointers = CharField(max_length=2000, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
-    flags = ManyToManyField("Flag", blank=True, null=True)
     is_shortcut = BooleanField(default=False)
     learn_time = FloatField(null=True, blank=True)
 
@@ -49,10 +48,6 @@ class Goal(Model, LoggedInEditable):
     text = CharField(max_length=500)
 
 
-class Flag(Model, LoggedInEditable):
-    text = CharField(max_length=100)
-
-
 class Dependency(Model, LoggedInEditable):
     """
     Concept edge
@@ -66,6 +61,7 @@ class Dependency(Model, LoggedInEditable):
 
     def editable_by(self, user):
         return self.target.editable_by(user)
+
 
 class ConceptSettings(Model, LoggedInEditable):
     """
@@ -166,4 +162,3 @@ class GraphSettings(Model, LoggedInEditable):
 #@receiver(pre_save, sender=Dependency)
 #def on_pre_save(sender, **kwargs):
 #    pdb.set_trace()
-

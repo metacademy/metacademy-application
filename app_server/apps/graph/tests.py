@@ -12,6 +12,10 @@ from apps.user_management.models import Profile
 from test_data.data import three_node_graph, three_concept_list, single_concept, two_dependency_list, concept1, concept2, concept3, dependency1, dependency2
 
 
+ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
+                 ('post', 'list')]
+
+
 class BaseResourceTest(ResourceTestCase):
     """
     base resource test for graph related models
@@ -311,20 +315,14 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
 
     def correct_response_code(self):
+        if (self.verb, self.vtype) not in ALLOWED_PAIRS:
+            return 'MethodNotAllowed'
+        
         if self.verb == 'get':
             if self.existing_concept is not 'none' or self.vtype == 'list':
                 return 'OK'
             else:
                 return 'NotFound'
-
-        if self.vtype == 'detail' and self.verb == 'post':
-            return 'MethodNotAllowed'
-        if self.vtype == 'list' and self.verb == 'patch':
-            return 'MethodNotAllowed'
-
-        # nobody can PUT to a list
-        if self.vtype == 'list' and self.verb == 'put':
-            return 'MethodNotAllowed'
 
         # patch to nonexistent resource
         if self.vtype == 'detail' and self.verb == 'patch' and self.existing_concept == 'none':
@@ -504,20 +502,14 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
 
     def correct_response_code(self):
+        if (self.verb, self.vtype) not in ALLOWED_PAIRS:
+            return 'MethodNotAllowed'
+        
         if self.verb == 'get':
             if self.vtype == 'list' or self.dependency_exists:
                 return 'OK'
             else:
                 return 'NotFound'
-
-        if self.vtype == 'detail' and self.verb == 'post':
-            return 'MethodNotAllowed'
-        if self.vtype == 'list' and self.verb == 'patch':
-            return 'MethodNotAllowed'
-
-        # nobody can PUT to a list
-        if self.vtype == 'list' and self.verb == 'put':
-            return 'MethodNotAllowed'
 
         # PATCH to nonexistent dependency
         if self.vtype == 'detail' and self.verb == 'patch' and not self.dependency_exists:
@@ -588,16 +580,22 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 def load_tests(loader, suite, pattern):
     for verb in ['get', 'post', 'put', 'patch']:
         for vtype in ['detail', 'list']:
-            for user_type in ['unauth', 'auth', 'super']:
-                for tag_match in [False, True]:
-                    for existing_concept in ['none', 'provisional', 'accepted']:
-                        suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
+            if (verb, vtype) in ALLOWED_PAIRS:
+                for user_type in ['unauth', 'auth', 'super']:
+                    for tag_match in [False, True]:
+                        for existing_concept in ['none', 'provisional', 'accepted']:
+                            suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
                                                               tag_match, existing_concept))
+            else:
+                suite.addTest(ConceptResourceAuthTest(verb, vtype, 'super', True, 'none'))
 
     for verb in ['get', 'post', 'put', 'patch']:
         for vtype in ['detail', 'list']:
-            for user_type in ['anon', 'non_editor', 'editor', 'super']:
-                for dependency_exists in [False, True]:
-                    suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+            if (verb, vtype) in ALLOWED_PAIRS:
+                for user_type in ['anon', 'non_editor', 'editor', 'super']:
+                    for dependency_exists in [False, True]:
+                        suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+            else:
+                suite.addTest(DependencyResourceAuthTest(verb, vtype, 'super', False))
 
     return suite

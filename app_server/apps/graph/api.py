@@ -85,6 +85,10 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
         if not result:
             return False
 
+        for obj in object_list:
+            if not obj.editable_by(bundle.request.user):
+                raise Unauthorized('not authorized to edit concept')
+
         # make sure non-supers are not commiting updating with non-matching ids/tags
         if "tag" in bundle.data and "id" in bundle.data\
            and bundle.data["tag"] != bundle.data["id"] and not bundle.request.user.is_superuser:

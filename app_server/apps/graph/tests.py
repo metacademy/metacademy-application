@@ -286,32 +286,6 @@ class BaseConceptResourceTest(BaseResourceTest):
         return self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata), tdata
 
 
-
-class ConceptResourceTest(BaseConceptResourceTest):
-    def test_put_detail_accepted_concept_normal_user(self):
-        # create an "accepted" concept
-        fresp, tdata = self.create_concept(False)
-        otitle = tdata["title"]
-        tdata["title"] = "a different title"
-        #resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
-        resp = self.verb_concept(verb="put", vtype="detail", user_type="auth", data=tdata)
-        self.assertHttpUnauthorized(resp)
-        self.assertEqual(Concept.objects.all()[0].title, otitle)
-
-    def test_put_detail_accepted_concept_super_user(self):
-        # create an "accepted" concept
-        fresp, tdata = self.create_concept(False)
-        otitle = tdata["title"]
-        tdata["title"] = "a different title"
-        #resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
-        resp = self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata)
-        try:
-            self.assertHttpOK(resp)
-        except:
-            self.assertEqual(resp.status_code, 204)
-        self.assertEqual(Concept.objects.all()[0].title, tdata["title"])
-
-
 class ConceptResourceAuthTest(BaseConceptResourceTest):
     def __init__(self, verb, vtype, user_type, tag_match, existing_concept):
         self.verb = verb

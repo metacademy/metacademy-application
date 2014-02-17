@@ -5,7 +5,7 @@ import ast
 
 # myapp/api.py
 from tastypie import fields
-from tastypie.resources import ModelResource, Resource
+from tastypie.resources import NamespacedModelResource, Resource
 from tastypie.authorization import DjangoAuthorization
 from tastypie.exceptions import Unauthorized, NotFound, ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -95,7 +95,7 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
     
 
 
-class CustomReversionResource(ModelResource):
+class CustomReversionResource(NamespacedModelResource):
     """
     ModelResource that uses django reversions
     """
@@ -154,13 +154,13 @@ class CustomReversionResource(ModelResource):
         return bundle
 
     def obj_create(self, bundle, **kwargs):
-        return super(ModelResource, self).obj_create(bundle, **kwargs)
+        return super(NamespacedModelResource, self).obj_create(bundle, **kwargs)
 
     def obj_update(self, bundle, **kwargs):
-        return super(ModelResource, self).obj_update(bundle, **kwargs)
+        return super(NamespacedModelResource, self).obj_update(bundle, **kwargs)
 
     def obj_get(self, bundle, **kwargs):
-        return super(ModelResource, self).obj_get(bundle, **kwargs)
+        return super(NamespacedModelResource, self).obj_get(bundle, **kwargs)
 
 
 class GoalResource(CustomReversionResource):

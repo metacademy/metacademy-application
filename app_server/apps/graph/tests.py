@@ -458,7 +458,7 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         self.api_client.client.login(username=self.super_username, password=self.super_username)
 
         # add initial concepts
-        for concept in [concept1(), concept2(), concept3()]:
+        for concept in [concept1(False), concept2(False), concept3(False)]:
             self.api_client.post(self.concept_list_url, format='json', data=concept)
 
         if self.dependency_exists:

@@ -142,10 +142,7 @@ class CustomReversionResource(BaseResource):
         self.save_related(bundle)
 
         # Save the main object. # CJR TODO we can somehow check if we should save here (are we calling from an edge?)
-        try:
-            bundle.obj.save()
-        except Exception, e:
-            pdb.set_trace()
+        bundle.obj.save()
         bundle.objects_saved.add(self.create_identifier(bundle.obj))
 
         # Now pick up the M2M bits. (must occur after the main obj)
@@ -424,9 +421,8 @@ class GraphResource(BaseResource):
 
         return data
 
-    def dehydrate(self, bundle, **kwargs):
-        pdb.set_trace()
-        return bundle
+    #def dehydrate(self, bundle, **kwargs):
+    #    return bundle
 
     def post_save_hook(self, bundle):
         # FIXME we're assuming a user is logged in

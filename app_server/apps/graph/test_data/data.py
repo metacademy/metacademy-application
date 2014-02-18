@@ -1,4 +1,5 @@
 
+
 def concept1(tag_match=True):
     if tag_match:
         tag = 'tvat4s6ja6bhuxr'
@@ -144,6 +145,55 @@ def concept3(tag_match=True):
             'x': 528.6666666666667,
             'y': 284}
 
+def concept4(tag_match=True):
+    if tag_match:
+        tag = 'c95j43nx8dj4ne8'
+    else:
+        tag = 'nomatch4'
+        
+    return {'editNote': '',
+            'exercises': "here's some exercises (this will change)",
+            'flags': [],
+            'goals': [{'id': '9c84hgiske', 'text': 'yet another goal'}],
+            'hasContractedDeps': False,
+            'hasContractedOLs': False,
+            'id': 'c95j43nx8dj4ne8',
+            'isContracted': False,
+            'isNew': 1,
+            'is_shortcut': 0,
+            'pointers': 'see also (may change)',
+            'resources': [{'access': 'reg',
+                           'additional_dependencies': [{'title': 'something'},
+                                                       {'title': 'something else'}],
+                           'concept': {'id': 'c95j43nx8dj4ne8'},
+                           'core': 1,
+                           'edition': '3',
+                           'global_resource': {'access': '',
+                                               'authors': ['somebody', 'nobody'],
+                                               'description': "yet another resource",
+                                               'edition_years': [],
+                                               'id': 'c985jdic',
+                                               'notes': '',
+                                               'resource_type': 'some type!',
+                                               'title': 'what a title',
+                                               'url': 'http://www.somethingsomething.com',
+                                               'year': '1994'},
+                           'id': 'd8cu3bdd',
+                           'locations': [{'concept_resource': {'id': 'd8cu3bdd'},
+                                          'location_text': 'some sort of text',
+                                          'location_type': 'chp',
+                                          'url': 'http://www.somethingelse.com'}],
+                           'notes': 'this is another note'}],
+            'sid': '',
+            'software': 'some software (will also change)',
+            'summary': 'yet another summary',
+            'tag': tag,
+            'time': '',
+            'title': 'yet another concept',
+            'useCsrf': True,
+            'x': 528.6666666666667,
+            'y': 284}
+
 def concept_uri(id):
     return '/graphs/api/v1/concept/%s/' % id
 
@@ -166,6 +216,15 @@ def dependency2():
             'target': concept_uri('9jgljchjobc5wmi'),
             'target_goals': map(goal_uri, ['kxktiysyvi'])}
 
+def dependency3():
+    return {'id': 'c9erhj3n4oi8dhfwjen43',
+            'reason': 'yet another reason',
+            'source': concept_uri('tvat4s6ja6bhuxr'),
+            'source_goals': map(goal_uri, ['sr1cxzjjor', 'wiemte29']),
+            'target': concept_uri('uqdaziy5h4cxr'),
+            'target_goals': map(goal_uri, ['749ylul3di'])}
+            
+
 
 # directly copied from a post request ()
 def three_node_graph():
@@ -174,17 +233,14 @@ def three_node_graph():
             'id': '5oxj6rjp',
             'title': 'A test graph'}
 
-def three_concept_list(tag_match=True):
-    data = {'objects': [concept1(), concept2(), concept3()]}
-    if not tag_match:
-        data['objects'][0]['tag'] = 'nomatch'
-    return data
+def initial_concepts(tag_match):
+    return [concept1(tag_match), concept2(tag_match), concept3(tag_match)]
 
-def single_concept(tag_match=True):
-    concept = concept3()
-    if not tag_match:
-        concept['tag'] = 'nomatch'
-    return concept
+def new_concepts(tag_match):
+    return [concept4(tag_match)]
 
-def two_dependency_list():
-    return {'objects': [dependency1(), dependency2()]}
+def initial_dependencies():
+    return [dependency1(), dependency2()]
+
+def new_dependencies():
+    return [dependency3()]

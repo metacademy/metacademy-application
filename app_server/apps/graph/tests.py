@@ -9,11 +9,24 @@ from tastypie.test import ResourceTestCase
 
 from apps.graph.models import Graph, Dependency, Concept, ConceptResource
 from apps.user_management.models import Profile
-from test_data.data import three_node_graph, three_concept_list, single_concept, two_dependency_list, concept1, concept2, concept3, dependency1, dependency2
+import test_data
+from test_data.data import three_node_graph
 
 
 ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
                  ('post', 'list')]
+
+def concept_list_url():
+    return '/graphs/api/v1/concept/'
+
+def concept_detail_url(cid):
+    return concept_list_url() + cid + '/'
+
+def dependency_list_url():
+    return '/graphs/api/v1/dependency/'
+
+def dependency_detail_url(dep_id):
+    return dependency_list_url() + dep_id + '/'
 
 
 class BaseResourceTest(ResourceTestCase):
@@ -38,23 +51,73 @@ class BaseResourceTest(ResourceTestCase):
         sprof = Profile(user=suser)
         sprof.save()
 
-    def verify_db_graph(self, in_graph):
-        """
-        verify in_graph (python obj) corresponds with the associated graph in the db
-        """
-        graph = Graph.objects.get(id=self.graph_id)
+        self.populate_initial_graph()
 
-        # check the flat attribs
-        flat_attrs = ["title", "id"]
-        for atrb in flat_attrs:
-            self.assertEqual(in_graph[atrb], getattr(graph, atrb))
-        self.assertEqual(graph.concepts.count(), len(in_graph["concepts"]))
+    def init_tag_match(self):
+        return True
 
-        # verify concepts in graph
-        post_concepts = in_graph["concepts"]
-        self.assertEqual(len(post_concepts), graph.concepts.count())
-        for in_concept in post_concepts:
-            self.verify_db_concept(in_concept)
+    def data_type(self):
+        if self.verb == 'get':
+            return 'none'
+        elif self.verb == 'put' and self.vtype == 'list':
+            return 'list'
+        else:
+            return 'detail'
+
+    def populate_initial_graph(self):
+        # login as superuser
+        self.api_client.client.login(username=self.super_username, password=self.super_username)
+        
+        for concept in test_data.data.initial_concepts(self.init_tag_match()):
+            self.api_client.post(concept_list_url(), format='json', data=concept)
+        for dep in test_data.data.initial_dependencies():
+            self.api_client.post(dependency_list_url(), format='json', data=dep)
+
+        # log out superuser
+        self.api_client.client.logout()
+
+    def detail_data(self):
+        return self.list_data()[0]
+
+    def get_request_data(self):
+        if self.vtype == 'detail' and self.verb == 'patch':
+            return self.patch_data()
+        elif self.data_type() == 'list':
+            return self.list_data()
+        elif self.data_type() == 'detail':
+            return self.detail_data()
+        elif self.data_type() == 'none':
+            return None
+        else:
+            raise RuntimeError('Unknown data_type: %s' % self.data_type())
+
+    def do_request(self, url, verb, vtype, data, user_type):
+        resp = None
+
+        if user_type == "super":
+            self.api_client.client.login(username=self.super_username, password=self.super_username)
+        elif user_type == "auth":
+            self.api_client.client.login(username=self.username, password=self.username)
+        elif user_type == "unauth":
+            pass
+        else:
+            raise RuntimeError("Unrecognized user_type: %s" % user_type)
+
+        if verb == "post":
+            resp = self.api_client.post(url, format='json', data=data)
+        elif verb == "put":
+            resp = self.api_client.put(url, format='json', data=data)
+        elif verb == "patch":
+            resp = self.api_client.patch(url, format='json', data=data)
+        elif verb == "get":
+            resp = self.api_client.get(url)
+        else:
+            raise RuntimeError("Unknown verb: %s" % verb)
+
+        if user_type in ["super", "auth"]:
+            self.api_client.client.logout()
+
+        return resp
 
     def verify_db_concept(self, in_concept):
         """
@@ -88,6 +151,55 @@ class BaseResourceTest(ResourceTestCase):
                     elif atrb in res_boolean_attrs:
                         self.assertEqual(bool(int(in_res[atrb])), getattr(res, atrb))
 
+    def check_result(self, resp, data):
+        # check results of GET operations against database
+        if self.verb == 'get' and self.vtype == 'list' and self.succeeds():
+            for in_concept in json.loads(resp.content)["objects"]:
+                self.verify_db_obj(in_concept)
+        if self.verb == 'get' and self.vtype == 'detail' and self.succeeds():
+            self.verify_db_obj(json.loads(resp.content))
+
+        # check successful modification operations
+        if self.verb == 'post' and self.succeeds():
+            self.verify_db_obj(data)
+        if self.verb == 'put' and self.vtype == 'detail' and self.succeeds():
+            self.verify_db_obj(data)
+        elif self.verb == 'patch' and self.vtype == 'detail' and self.succeeds():
+            full_data = self.detail_data()
+            for k, v in self.patch_data().items():
+                full_data[k] = v
+            self.verify_db_obj(full_data)
+
+
+        # check that unsuccessful modifications don't do anything
+        if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
+            self.assertEqual(len(self.objects_in_db()), self.initial_count())
+
+
+
+class ResourceAuthTest(BaseResourceTest):
+    def __init__(self):
+        BaseResourceTest.__init__(self, 'tst_auth')
+        
+    def correct_response_code(self):
+        if (self.verb, self.vtype) not in ALLOWED_PAIRS:
+            return 'MethodNotAllowed'
+        
+        if self.verb == 'get':
+            if self.vtype == 'list' or self.resource_exists():
+                return 'OK'
+            else:
+                return 'NotFound'
+
+        # PATCH to nonexistent dependency
+        if self.vtype == 'detail' and self.verb == 'patch' and not self.resource_exists():
+            return 'NotFound'
+
+        if self.user_can_edit():
+            return 'OK'
+        else:
+            return 'Unauthorized'
+
     def succeeds(self):
         return self.correct_response_code() in ['OK', 'Created', 'Accepted']
 
@@ -100,6 +212,126 @@ class BaseResourceTest(ResourceTestCase):
 
         getattr(self, 'assertHttp' + rc)(resp)
 
+    def tst_auth(self):
+        # name disguised so test discoverer doesn't pick it up
+        
+        data = self.get_request_data()
+        resp = self.do_request(self.resource_url(), verb=self.verb, vtype=self.vtype, data=data,
+                               user_type=self.user_type)
+        self.check_response_code(resp)
+        self.check_result(resp, data)
+
+
+    
+
+class ConceptResourceAuthTest(ResourceAuthTest):
+    def __init__(self, verb, vtype, user_type, tag_match, existing_concept):
+        ResourceAuthTest.__init__(self)
+        self.verb = verb
+        self.vtype = vtype
+        self.user_type = user_type
+        self.tag_match = tag_match
+        self.existing_concept = existing_concept
+
+    def initial_count(self):
+        return len(test_data.data.initial_concepts(True))
+
+    def __str__(self):
+        return 'ConceptResourceAuthTest(verb=%s, vtype=%s, user_type=%s, tag_match=%s, existing_concept=%s)' % \
+               (self.verb, self.vtype, self.user_type, self.tag_match, self.existing_concept)
+
+    def init_tag_match(self):
+        return self.existing_concept == 'provisional'
+
+    def resource_url(self):
+        if self.vtype == 'detail':
+            return concept_detail_url(self.detail_data()['id'])
+        else:
+            return concept_list_url()
+    
+    def user_can_edit(self):
+        return self.user_type == 'super' or \
+               (self.user_type == 'auth' and self.tag_match and self.existing_concept != 'accepted')
+
+    def list_data(self):
+        if self.existing_concept in ['provisional', 'accepted']:
+            return test_data.data.initial_concepts(self.tag_match)
+        elif self.existing_concept == 'none':
+            return test_data.data.new_concepts(self.tag_match)
+        else:
+            raise RuntimeError('Unknown existing_concept: %s' % self.existing_concept)
+
+    def patch_data(self):
+        if self.tag_match:
+            return {'title': 'new title', 'tag': self.detail_data()['id']}
+        else:
+            return {'title': 'new title', 'tag': 'nomatch'}
+
+    def verify_db_obj(self, in_obj):
+        self.verify_db_concept(in_obj)
+
+    def objects_in_db(self):
+        return Concept.objects.all()
+
+    def resource_exists(self):
+        return self.existing_concept in ['provisional', 'accepted']
+
+    
+
+
+class DependencyResourceAuthTest(ResourceAuthTest):
+    def __init__(self, verb, vtype, user_type, dependency_exists):
+        ResourceAuthTest.__init__(self)
+        self.verb = verb
+        self.vtype = vtype
+        self.user_type = user_type
+        self.dependency_exists = dependency_exists
+
+    def initial_count(self):
+        return len(test_data.data.initial_dependencies())
+
+    def resource_url(self):
+        if self.vtype == 'detail':
+            return dependency_detail_url(self.detail_data()['id'])
+        else:
+            return dependency_list_url()
+
+    def __str__(self):
+        return 'DependencyResourceAuthTest(verb=%s, vtype=%s, user_type=%s, dependency_exists=%s)' % \
+               (self.verb, self.vtype, self.user_type, self.dependency_exists)
+
+    def patch_data(self):
+        return {'reason': 'because I can'}
+
+    def list_data(self):
+        if self.dependency_exists:
+            return test_data.data.initial_dependencies()
+        else:
+            return test_data.data.new_dependencies()
+        
+    def user_can_edit(self):
+        return self.user_type == 'super'
+
+    def verify_db_obj(self, in_dep):
+        dep = Dependency.objects.get(id=in_dep['id'])
+
+        def extract_id(uri):
+            return uri.split('/')[-2]
+        
+        self.assertEqual(dep.source.id, extract_id(in_dep['source']))
+        self.assertEqual(dep.target.id, extract_id(in_dep['target']))
+        self.assertEqual(dep.reason, in_dep['reason'])
+        self.assertEqual(set(sg.id for sg in dep.source_goals.all()),
+                         set(map(extract_id, in_dep['source_goals'])))
+        self.assertEqual(set(sg.id for sg in dep.target_goals.all()),
+                         set(map(extract_id, in_dep['target_goals'])))
+
+    def objects_in_db(self):
+        return Dependency.objects.all()
+
+    def resource_exists(self):
+        return self.dependency_exists
+        
 
 class GraphResourceTest(BaseResourceTest):
     """
@@ -135,6 +367,24 @@ class GraphResourceTest(BaseResourceTest):
         elif verb == "get":
             resp = self.api_client.get(self.graph_detail_api_url)
         return resp
+
+    def verify_db_graph(self, in_graph):
+        """
+        verify in_graph (python obj) corresponds with the associated graph in the db
+        """
+        graph = Graph.objects.get(id=self.graph_id)
+
+        # check the flat attribs
+        flat_attrs = ["title", "id"]
+        for atrb in flat_attrs:
+            self.assertEqual(in_graph[atrb], getattr(graph, atrb))
+        self.assertEqual(graph.concepts.count(), len(in_graph["concepts"]))
+
+        # verify concepts in graph
+        post_concepts = in_graph["concepts"]
+        self.assertEqual(len(post_concepts), graph.concepts.count())
+        for in_concept in post_concepts:
+            self.verify_db_concept(in_concept)
 
     def auth_verb_graph(self, verb):
         self.api_client.client.login(username=self.username, password=self.username)
@@ -233,6 +483,7 @@ class GraphResourceTest(BaseResourceTest):
         self.get_list_test(auth=True)
 
 
+<<<<<<< HEAD
 
 
 
@@ -593,7 +844,7 @@ def load_tests(loader, suite, pattern):
     for verb in ['get', 'post', 'put', 'patch']:
         for vtype in ['detail', 'list']:
             if (verb, vtype) in ALLOWED_PAIRS:
-                for user_type in ['anon', 'non_editor', 'editor', 'super']:
+                for user_type in ['unauth', 'auth', 'super']:
                     for dependency_exists in [False, True]:
                         suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
             else:

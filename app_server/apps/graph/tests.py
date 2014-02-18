@@ -12,6 +12,10 @@ from apps.user_management.models import Profile
 from test_data.data import three_node_graph, three_concept_list, single_concept, two_dependency_list, concept1, concept2, concept3, dependency1, dependency2
 
 
+ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
+                 ('post', 'list')]
+
+
 class BaseResourceTest(ResourceTestCase):
     """
     base resource test for graph related models
@@ -85,13 +89,13 @@ class BaseResourceTest(ResourceTestCase):
                         self.assertEqual(bool(int(in_res[atrb])), getattr(res, atrb))
 
     def succeeds(self):
-        return self.correct_response_code() in ['OK', 'Created']
+        return self.correct_response_code() in ['OK', 'Created', 'Accepted']
 
     def check_response_code(self, resp):
         rc = self.correct_response_code()
 
-        # returns 200 instead of 201 for PUT to list, which is fine
-        if rc == 'Created' and resp.status_code == 200:
+        # treat successful response codes as interchangeable
+        if rc == 'OK' and resp.status_code in [200, 201, 202, 204]:
             return
 
         getattr(self, 'assertHttp' + rc)(resp)
@@ -286,29 +290,6 @@ class BaseConceptResourceTest(BaseResourceTest):
         return self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata), tdata
 
 
-
-class ConceptResourceTest(BaseConceptResourceTest):
-    def test_put_detail_accepted_concept_normal_user(self):
-        # create an "accepted" concept
-        fresp, tdata = self.create_concept(False)
-        otitle = tdata["title"]
-        tdata["title"] = "a different title"
-        #resp = self.auth_verb_concept(verb="put", vtype="detail", data=tdata)
-        resp = self.verb_concept(verb="put", vtype="detail", user_type="auth", data=tdata)
-        self.assertHttpUnauthorized(resp)
-        self.assertEqual(Concept.objects.all()[0].title, otitle)
-
-    def test_put_detail_accepted_concept_super_user(self):
-        # create an "accepted" concept
-        fresp, tdata = self.create_concept(False)
-        otitle = tdata["title"]
-        tdata["title"] = "a different title"
-        #resp = self.super_auth_verb_concept(verb="put", vtype="detail", data=tdata)
-        resp = self.verb_concept(verb="put", vtype="detail", user_type="super", data=tdata)
-        self.assertHttpOK(resp)
-        self.assertEqual(Concept.objects.all()[0].title, tdata["title"])
-
-
 class ConceptResourceAuthTest(BaseConceptResourceTest):
     def __init__(self, verb, vtype, user_type, tag_match, existing_concept):
         self.verb = verb
@@ -334,30 +315,28 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
 
     def correct_response_code(self):
+        if (self.verb, self.vtype) not in ALLOWED_PAIRS:
+            return 'MethodNotAllowed'
+        
         if self.verb == 'get':
             if self.existing_concept is not 'none' or self.vtype == 'list':
                 return 'OK'
             else:
                 return 'NotFound'
 
-        if self.vtype == 'detail' and self.verb == 'post':
-            return 'NotImplemented'
-        if self.vtype == 'list' and self.verb == 'patch':
-            return 'NotImplemented'
-
-        # nobody can PUT to a list
-        if self.vtype == 'list' and self.verb == 'put':
-            return 'Unauthorized'
+        # patch to nonexistent resource
+        if self.vtype == 'detail' and self.verb == 'patch' and self.existing_concept == 'none':
+            return 'NotFound'
 
         # legal PUT, POST, or PATCH request
         if self.user_type == 'super':
-            return 'Created'
+            return 'OK'
         elif self.user_type == 'auth':
             if not self.tag_match:
                 return 'Unauthorized'
             if self.existing_concept == 'accepted':
                 return 'Unauthorized'
-            return 'Created'
+            return 'OK'
         elif self.user_type == 'unauth':
             return 'Unauthorized'
 
@@ -379,6 +358,13 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
             self.assertEqual(len(Concept.objects.all()),len(data['objects']))
             if not self.tag_match:
                 self.assertEqual(Concept.objects.get(id=data["objects"][0]["id"]).tag, unicode("nomatch"))
+        elif self.verb == 'patch' and self.vtype == 'detail' and self.succeeds():
+            full_data = self.detail_data()
+            if self.existing_concept == 'accepted':
+                full_data['tag'] = 'nomatch'
+            for k, v in self.get_data().items():
+                full_data[k] = v
+            self.verify_db_concept(full_data)
         # TODO: PATCH
 
         # check that unsuccessful modifications don't do anything
@@ -395,7 +381,9 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
             return 'detail'
 
     def get_data(self):
-        if self.data_type() == 'list':
+        if self.vtype == 'detail' and self.verb == 'patch':
+            return {'title': 'new title'}
+        elif self.data_type() == 'list':
             data = self.list_data()
         elif self.data_type() == 'detail':
             data = self.detail_data()
@@ -408,9 +396,7 @@ class ConceptResourceAuthTest(BaseConceptResourceTest):
 
     def tst_auth(self):
         # name disguised so test discoverer doesn't pick it up
-        if self.verb == 'patch':
-            raise unittest.SkipTest()
-
+        
         if self.existing_concept == 'provisional':
             self.create_concept(True)
         elif self.existing_concept == 'accepted':
@@ -470,7 +456,9 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
         self.api_client.client.logout()
 
     def get_data(self):
-        if self.vtype == 'list' and self.verb != 'post':
+        if self.vtype == 'detail' and self.verb == 'patch':
+            return {'reason': 'because I can'}
+        elif self.vtype == 'list' and self.verb != 'post':
             return two_dependency_list()
         else:
             return dependency1()
@@ -514,26 +502,24 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
 
     def correct_response_code(self):
+        if (self.verb, self.vtype) not in ALLOWED_PAIRS:
+            return 'MethodNotAllowed'
+        
         if self.verb == 'get':
             if self.vtype == 'list' or self.dependency_exists:
                 return 'OK'
             else:
                 return 'NotFound'
 
-        if self.vtype == 'detail' and self.verb == 'post':
-            return 'NotImplemented'
-        if self.vtype == 'list' and self.verb == 'patch':
-            return 'NotImplemented'
-
-        # nobody can PUT to a list
-        if self.vtype == 'list' and self.verb == 'put':
-            return 'Unauthorized'
+        # PATCH to nonexistent dependency
+        if self.vtype == 'detail' and self.verb == 'patch' and not self.dependency_exists:
+            return 'NotFound'
 
         # legal PUT, POST, or PATCH request
         if self.user_type in ['anon', 'non_editor']:
             return 'Unauthorized'
         elif self.user_type in ['editor', 'super']:
-            return 'Created'
+            return 'OK'
         else:
             raise RuntimeError('Unknown user_type: %s' % self.user_type)
 
@@ -570,6 +556,11 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
             self.verify_db_dependency(data)
         if self.verb == 'put' and self.vtype == 'list' and self.succeeds():
             self.assertEqual(len(Concept.objects.all()),len(data['objects']))
+        if self.verb == 'patch' and self.vtype == 'detail' and self.succeeds():
+            full_data = dependency1()
+            for k, v in self.get_data().items():
+                full_data[k] = v
+            self.verify_db_dependency(full_data)
 
         # check that unsuccessful modifications don't do anything
         if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
@@ -577,8 +568,6 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
     def tst_auth(self):
         # name disguised so test discoverer doesn't pick it up
-        if self.verb == 'patch':
-            raise unittest.SkipTest()
         if self.user_type == 'editor':
             raise unittest.SkipTest()
 
@@ -590,18 +579,24 @@ class DependencyResourceAuthTest(BaseConceptResourceTest):
 
 
 def load_tests(loader, suite, pattern):
-    #for verb in ['get', 'post', 'put', 'patch']:
-    #    for vtype in ['detail', 'list']:
-    #        for user_type in ['unauth', 'auth', 'super']:
-    #            for tag_match in [False, True]:
-    #                for existing_concept in ['none', 'provisional', 'accepted']:
-    #                    suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
-    #                                                          tag_match, existing_concept))
+    for verb in ['get', 'post', 'put', 'patch']:
+        for vtype in ['detail', 'list']:
+            if (verb, vtype) in ALLOWED_PAIRS:
+                for user_type in ['unauth', 'auth', 'super']:
+                    for tag_match in [False, True]:
+                        for existing_concept in ['none', 'provisional', 'accepted']:
+                            suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
+                                                              tag_match, existing_concept))
+            else:
+                suite.addTest(ConceptResourceAuthTest(verb, vtype, 'super', True, 'none'))
 
     for verb in ['get', 'post', 'put', 'patch']:
         for vtype in ['detail', 'list']:
-            for user_type in ['anon', 'non_editor', 'editor', 'super']:
-                for dependency_exists in [False, True]:
-                    suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+            if (verb, vtype) in ALLOWED_PAIRS:
+                for user_type in ['anon', 'non_editor', 'editor', 'super']:
+                    for dependency_exists in [False, True]:
+                        suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+            else:
+                suite.addTest(DependencyResourceAuthTest(verb, vtype, 'super', False))
 
     return suite

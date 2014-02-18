@@ -6,7 +6,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
     // FIXME these shouldn't be hardcoded
     collFields: ["dependencies", "outlinks", "resources", "goals"],
 
-    txtFields: ["id", "exercises", "sid", "title", "summary", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
+    txtFields: ["id", "exercises", "sid", "title", "summary", "pointers", "is_shortcut", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
 
     defaults: function(){
       var dnDefaults = {
@@ -14,7 +14,6 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         outlinks: new DetailedEdgeCollection(),
         exercises: "",
         resources: new ConceptResourceCollection(),
-        flags: [],
         useCsrf: true,
         goals: new GoalCollection(),
         pointers: "",
@@ -33,8 +32,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
     },
 
     url: function () {
-      // FIXME localhost hardcoded
-      return 'http://127.0.0.1:8080/graphs/api/v1/concept/' + this.get("id") + "/";
+        return window.agfkGlobals.apiBase + "concept/" + this.id + "/";
     },
 
     /**
@@ -54,6 +52,8 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         var tv = thisModel.txtFields[i];
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
+        } else {
+          output[tv] = [];
         }
       }
 

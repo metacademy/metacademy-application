@@ -10,6 +10,10 @@ define(["backbone"], function(Backbone){
       };
     },
 
+    url: function () {
+        return window.agfkGlobals.apiBase + "goal/" + this.id + "/";
+    },
+
     toJSON: function () {
       var thisModel = this;
         return {

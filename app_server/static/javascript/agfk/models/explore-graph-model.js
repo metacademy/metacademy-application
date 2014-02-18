@@ -50,13 +50,13 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         return _.extend({}, GraphModel.prototype.defaults(), enDef);
       },
 
-      url: function(){
-        var leaf = this.get("leafs")[0] || this.fetchTag;
-        if (!leaf){
-          throw new Error("Must set graph leaf in graph-model to fetch graph data");
-        }
-        return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
-      },
+      // url: function(){
+      //   var leaf = this.get("leafs")[0] || this.fetchTag;
+      //   if (!leaf){
+      //     throw new Error("Must set graph leaf in graph-model to fetch graph data");
+      //   }
+      //   return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
+      // },
 
       parse: function(resp, xhr){
         if (xhr.parse == false) {
@@ -65,7 +65,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
 
         var thisModel = this,
             deps = [],
-            nodes = resp.concepts || resp.nodes, // FIXME normalize concepts and nodes
+            nodes = resp.concepts,
             edges = resp.dependencies,
             nodeTag;
 
@@ -77,6 +77,9 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         }
 
         // parse is called before initialize - so these aren't guaranteed to be present
+        if (resp.hasOwnProperty("leafs")) {
+          thisModel.set("leafs", resp.leafs);
+        }
         if (!thisModel.get("edges")){
           thisModel.set("edges", thisModel.defaults().edges);
           thisModel.edgeModel = thisModel.get("edges").model;
@@ -95,6 +98,9 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         }
         if (edges) {
           edges.forEach(function(dep){
+            // convert source/target uri to id
+            dep.source = dep.source.split("concept/")[1].slice(0,-1);
+            dep.target = dep.target.split("concept/")[1].slice(0,-1);
             thisModel.addEdge(dep);
           });
         }

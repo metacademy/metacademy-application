@@ -12,7 +12,7 @@ try:
 except:
     pass
 
-from apps.graph.api import get_api_object, GraphResource, ConceptResource, DependencyResource
+from apps.graph.api import get_api_object, GraphResource, ConceptResource, DependencyResource, TargetGraphResource
 
 from config import DEBUG
 
@@ -52,29 +52,25 @@ def _post_to_api(purl, pdata):
         tmp_user.delete()
 
 
-def get_graph(request, gid):
+def get_graph(request, gid, serialize=True):
     """
     get json graph object for the given graph id (gid) and django http request object
     """
-    return get_api_object(GraphResource, request, gid)
+    return get_api_object(GraphResource, request, gid, serialize=serialize)
 
 
-def get_concept(request, cid):
+def get_concept(request, cid, serialize=True):
     """
     get concept object for the given concept id (cid) and django http request object
     """
-    return get_api_object(ConceptResource, request, cid)
+    return get_api_object(ConceptResource, request, cid, serialize=serialize)
 
 
-def get_dependency(request, did):
+def get_dependency(request, did, serialize=True):
     """
     get dependency object for the given dependency id (did) and django http request object
     """
-    return get_api_object(DependencyResource, request, did)
-
-
-def get_concept_dep_graph(cid):
-    pass
+    return get_api_object(DependencyResource, request, did, serialize=serialize)
 
 
 def post_concept(cdata):

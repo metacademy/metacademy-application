@@ -37,7 +37,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
        */
       render: function(){
         var thisView = this;
-        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH,
+        var temp = _.extend(thisView.model.attributes, {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH,
                                                       yearString: this.model.getYearString()});
         thisView.$el.html(thisView.template(temp));
         return thisView;
@@ -161,7 +161,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       render: function(){
         var thisView = this,
             thisModel = thisView.model;
-        thisView.$el.html(thisView.template(thisModel.toJSON()));
+        thisView.$el.html(thisView.template(thisModel.attributes));
         return thisView;
       }
 
@@ -229,7 +229,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       render: function(){
         var thisView = this,
             thisModel = thisView.model;
-        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("to_tag"))})));
+        thisView.$el.html(thisView.template(_.extend(thisModel.attributes, {toTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("to_tag"))})));
         return thisView;
       }
 
@@ -310,7 +310,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
        */
       render: function(){
         var thisView = this;
-        thisView.$el.html(thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
+        // FIXME
+        thisView.$el.html(""); // thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
         return thisView;
       },
 
@@ -449,7 +450,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
             goalsLocClass = "." + viewConsts.goalsLocClass;
 
         thisView.isRendered = false;
-        var templateVars = _.extend(thisView.model.toJSON(), {"neededFor": thisView.model.computeNeededFor(),
+        var templateVars = _.extend(thisView.model.attributes, {"neededFor": thisView.model.computeNeededFor(),
                                                               "notes": thisView.notesList(),
                                                               "time": Utils.formatTimeEstimate(thisView.model.get("time")),
                                                               "displayTitle": thisView.model.getLearnViewTitle()});

@@ -142,12 +142,12 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
               */
              routeParams: function(params){
                var thisRoute = this,
-                   nodeName = window.location.href.split('/').pop().split('#').shift(),
+                   targetId = window.agfkGlobals.targetId,
                    paramsObj = thisRoute.getParamsFromStr(params || ""),
                    consts = pvt.consts;
                // default mode to learn view
                paramsObj[consts.qViewMode] = paramsObj[consts.qViewMode] || thisRoute.defaultMode;
-               thisRoute.nodeRoute(nodeName, paramsObj);
+               thisRoute.nodeRoute(targetId, paramsObj);
              },
 
              /**

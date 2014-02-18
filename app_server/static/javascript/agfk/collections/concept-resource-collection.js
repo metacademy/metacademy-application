@@ -1,7 +1,7 @@
 
 /*global define*/
 define(["backbone", "agfk/models/concept-resource-model"], function(Backbone, ConceptResource){
-return Backbone.Collection.extend({
+var ResourceCollection =  Backbone.Collection.extend({
     model: ConceptResource,
 
     /**
@@ -29,6 +29,7 @@ return Backbone.Collection.extend({
     getSupplemental: function(){
       return new ResourceCollection(this.where({core: 0}));
     }
-
   });
+
+  return ResourceCollection;
 });

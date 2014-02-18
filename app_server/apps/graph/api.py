@@ -5,9 +5,9 @@ import ast
 
 # myapp/api.py
 from tastypie import fields
-from tastypie.resources import NamespacedModelResource, Resource
+from tastypie.resources import NamespacedModelResource
 from tastypie.authorization import DjangoAuthorization
-from tastypie.exceptions import Unauthorized, NotFound, ImmediateHttpResponse
+from tastypie.exceptions import Unauthorized, ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
 from apps.graph.models import Concept, Dependency, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource, Goal
@@ -19,7 +19,7 @@ from apps.user_management.models import Profile
 # hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
 
 
-def get_api_object(ObjRes, request, oid):
+def get_api_object(ObjRes, request, oid, serialize=True):
     """
     helper function
     get resource object from the tastypie api
@@ -27,7 +27,10 @@ def get_api_object(ObjRes, request, oid):
     ob_res = ObjRes()
     robj = ob_res.obj_get(ob_res.build_bundle(request=request), id=oid)
     ores_bundle = ob_res.build_bundle(obj=robj, request=request)
-    return ob_res.serialize(request, ob_res.full_dehydrate(ores_bundle), "application/json")
+    ret_obj = ob_res.full_dehydrate(ores_bundle)
+    if serialize:
+        ret_obj = ob_res.serialize(request, ret_obj, "application/json")
+    return ret_obj
 
 
 class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
@@ -436,6 +439,7 @@ class GraphResource(CustomReversionResource):
         return data
 
     def dehydrate(self, bundle, **kwargs):
+        pdb.set_trace()
         return bundle
 
     def post_save_hook(self, bundle):
@@ -487,7 +491,7 @@ def normalize_concept(in_concept):
             del in_concept[field]
 
 
-class TargetGraphResource(Resource):
+class TargetGraphResource(NamespacedModelResource):
     """
     GET-only resource for target graphs (graphs with a single "target" concept and all dependenies)
     NB: this is _not_ a model resource
@@ -500,40 +504,17 @@ class TargetGraphResource(Resource):
         list_allowed_methods = []
 
     def obj_get(self, bundle, **kwargs):
-        id_or_tag = kwargs.get("pk")
-        leaf = None
+        if "pk" in kwargs:
+            get_id = "pk"
+        elif "id" in kwargs:
+            get_id = "id"
+        elif "tag" in kwargs:
+            get_id = "tag"
 
-        try:
-            try:
-                leaf = Concept.objects.get(id=id_or_tag)
-            except ObjectDoesNotExist:
-                leaf = Concept.objects.get(tag=id_or_tag)
-        except ObjectDoesNotExist:
-            raise NotFound("could not find concept with id or tag: " + id_or_tag)
-
-        concepts = []
-        dependencies = []
-
-        concepts_to_add = [leaf]
-        concepts_added = {}
-
-        while len(concepts_to_add):
-            cur_con = concepts_to_add.pop(0)
-            if cur_con.id in concepts_added:
-                continue
-            concepts.append(get_api_object(ConceptResource, bundle.request, cur_con.id))
-            concepts_added[cur_con.id] = True
-            for dep in cur_con.dep_target.all():
-                dependencies.append(get_api_object(DependencyResource, bundle.request, dep.id))
-                src = dep.source
-                concepts_to_add.append(src)
-        bundle.data = {"concepts": concepts, "dependencies": dependencies}
-
-        return bundle.data
-
-    def full_dehydrate(self, bundle):
-        """
-        prepare the TargetGraph data
-        """
-        bundle.data = bundle.obj
-        return bundle
+    # def full_dehydrate(self, bundle):
+    #     """
+    #     prepare the TargetGraph data
+    #     """
+    #     pdb.set_trace()
+    #     bundle.data = bundle.obj
+    #     return bundle

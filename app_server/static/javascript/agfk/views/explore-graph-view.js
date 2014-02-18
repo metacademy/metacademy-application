@@ -403,11 +403,14 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
        * @return {boolean} true if the node is visible
        */
       isNodeVisible: function(node){
-        var aux = window.agfkGlobals.auxModel,
-            thisView = this;
-        return !node.get("isContracted")
-          && ( !node.isLearnedOrImplicitLearned()
-               ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
+        // var aux = window.agfkGlobals.auxModel,
+        //     thisView = this;
+        // FIXME once db migration is complete
+        return true;
+
+        // !node.get("isContracted")
+          // && ( !node.isLearnedOrImplicitLearned()
+         // ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
       }
     }); // end Backbone.View.extend({
   })();

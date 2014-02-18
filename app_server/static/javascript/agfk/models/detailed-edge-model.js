@@ -63,19 +63,26 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
       return resp;
     },
 
+    url: function () {
+        return window.agfkGlobals.apiBase + "dependency/" + this.id + "/";
+    },
+
     toJSON: function () {
       var thisModel = this;
       if (!thisModel) { return {};}
+
       var src = thisModel.get("source"),
           tar = thisModel.get("target"),
-          srcGoals,
-          tarGoals;
-      srcGoals = thisModel.get("source_goals").toJSON();
-      tarGoals = thisModel.get("target_goals").toJSON();
+          srcGoals = thisModel.get("source_goals").map(function (sg) {
+            return sg.url();
+          }),
+          tarGoals = thisModel.get("target_goals").map(function (tg) {
+            return tg.url();
+          });
 
       return {
-        source: src.id,
-        target: tar.id,
+        source: src.url(),
+        target: tar.url(),
         reason: thisModel.get("reason") || "",
         id: thisModel.id,
         source_goals: srcGoals,

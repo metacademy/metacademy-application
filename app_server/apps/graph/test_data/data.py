@@ -4,10 +4,9 @@ def concept1(tag_match=True):
         tag = 'tvat4s6ja6bhuxr'
     else:
         tag = 'nomatch1'
-        
+
     return {'editNote': '',
             'exercises': 'mum exercises',
-            'flags': [],
             'goals': [{'id': 'wiemte29', 'text': 'a third goal for mom'},
                       {'id': 'f5oln2ke29', 'text': 'another goal for mom'},
                       {'id': 'sr1cxzjjor', 'text': 'a goal for mom'}],
@@ -54,10 +53,9 @@ def concept2(tag_match=True):
         tag = 'uqdaziy5h4cxr'
     else:
         tag = 'nomatch2'
-        
+
     return {'editNote': '',
             'exercises': 'yaya',
-            'flags': [],
             'goals': [{'id': '749ylul3di', 'text': 'dad goal'}],
             'hasContractedDeps': False,
             'hasContractedOLs': False,
@@ -102,10 +100,9 @@ def concept3(tag_match=True):
         tag = '9jgljchjobc5wmi'
     else:
         tag = 'nomatch3'
-        
+
     return {'editNote': '',
             'exercises': "here's some exercises (this will change)",
-            'flags': [],
             'goals': [{'id': '32j5kfyldi', 'text': 'goal 2 for the child'},
                       {'id': 'kxktiysyvi', 'text': 'goal 1 for the child'}],
             'hasContractedDeps': False,

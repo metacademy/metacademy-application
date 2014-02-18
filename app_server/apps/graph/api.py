@@ -111,14 +111,14 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
 
         return True
 
-    
+
 class BaseResource(NamespacedModelResource):
     class Meta:
         list_allowed_methods = ('get', 'post')
         detail_allowed_methods = ('get', 'put', 'patch')
         max_limit = 0
         authorization = ModAndUserObjectsOnlyAuthorization()
-        
+
 
 class CustomReversionResource(BaseResource):
     """
@@ -197,15 +197,6 @@ class GoalResource(CustomReversionResource):
         """ GoalResource Meta"""
         queryset = Goal.objects.all()
         resource_name = 'goal'
-
-
-class FlagResource(CustomReversionResource):
-
-    class Meta(CustomReversionResource.Meta):
-        fields = ("text",)
-        include_resource_uri = False
-        queryset = Flag.objects.all()
-        resource_name = 'flag'
 
 
 class ResourceLocationResource(CustomReversionResource):
@@ -389,14 +380,6 @@ class ConceptResource(CustomReversionResource):
         normalize_concept(data)
         return data
 
-    def hydrate_flags(self, bundle):
-        in_concept = bundle.data
-        if in_concept.get("flags") and type(in_concept.get("flags")[0]) == unicode:
-            flag_arr = []
-            for flag in in_concept["flags"]:
-                flag_arr.append({"text": flag})
-            in_concept["flags"] = flag_arr
-        return bundle
 
 class DependencyResource(BaseResource):
     """
@@ -463,7 +446,7 @@ class GraphResource(BaseResource):
 
 # helper methods
 CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises",
-                       "software", "pointers", "is_shortcut", "flags", "dependencies", "resources"]
+                       "software", "pointers", "is_shortcut", "dependencies", "resources"]
 
 
 def normalize_concept(in_concept):

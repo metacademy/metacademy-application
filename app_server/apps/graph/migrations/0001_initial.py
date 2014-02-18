@@ -23,15 +23,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'graph', ['Concept'])
 
-        # Adding M2M table for field flags on 'Concept'
-        m2m_table_name = db.shorten_name(u'graph_concept_flags')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('concept', models.ForeignKey(orm[u'graph.concept'], null=False)),
-            ('flag', models.ForeignKey(orm[u'graph.flag'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['concept_id', 'flag_id'])
-
         # Adding model 'Goal'
         db.create_table(u'graph_goal', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
@@ -39,13 +30,6 @@ class Migration(SchemaMigration):
             ('text', self.gf('django.db.models.fields.CharField')(max_length=500)),
         ))
         db.send_create_signal(u'graph', ['Goal'])
-
-        # Adding model 'Flag'
-        db.create_table(u'graph_flag', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('text', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal(u'graph', ['Flag'])
 
         # Adding model 'Dependency'
         db.create_table(u'graph_dependency', (
@@ -186,14 +170,8 @@ class Migration(SchemaMigration):
         # Deleting model 'Concept'
         db.delete_table(u'graph_concept')
 
-        # Removing M2M table for field flags on 'Concept'
-        db.delete_table(db.shorten_name(u'graph_concept_flags'))
-
         # Deleting model 'Goal'
         db.delete_table(u'graph_goal')
-
-        # Deleting model 'Flag'
-        db.delete_table(u'graph_flag')
 
         # Deleting model 'Dependency'
         db.delete_table(u'graph_dependency')
@@ -278,7 +256,6 @@ class Migration(SchemaMigration):
         u'graph.concept': {
             'Meta': {'object_name': 'Concept'},
             'exercises': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
-            'flags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['graph.Flag']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'learn_time': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
@@ -316,11 +293,6 @@ class Migration(SchemaMigration):
             'source_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'source_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
             'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dep_target'", 'to': u"orm['graph.Concept']"}),
             'target_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"})
-        },
-        u'graph.flag': {
-            'Meta': {'object_name': 'Flag'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'text': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'graph.globalresource': {
             'Meta': {'object_name': 'GlobalResource'},

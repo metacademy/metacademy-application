@@ -1,3 +1,5 @@
+# DEFUNCT FILE
+
 import pdb
 
 from apps.graph.models import Concept, ConceptSettings, Graph, GraphSettings, Edge, Flag, ConceptResource
@@ -51,11 +53,6 @@ def sync_concept(in_concept):
         inlink.save()
 
 
-    # handle flags - should have foreignkey relationship (get or create the flag)
-    for in_flag in in_concept["flags"]:
-        if not len(concept.flags.filter(text=in_flag)):
-            concept.flags.create(text=in_flag)
-            changed = True
 
     # handle resource (this should generalize for software and exercises as well)
     for in_resource in in_concept["resources"]:

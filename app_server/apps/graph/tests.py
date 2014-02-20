@@ -287,6 +287,9 @@ class DependencyResourceAuthTest(ResourceAuthTest):
         self.user_type = user_type
         self.dependency_exists = dependency_exists
 
+    def init_tag_match(self):
+        return False
+
     def initial_count(self):
         return len(test_data.data.initial_dependencies())
 

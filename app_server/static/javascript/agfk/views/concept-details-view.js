@@ -274,88 +274,88 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
    * View to display additional notes/pointers
    * NOTE: expects a javascript model as input (for now) with one field: text
    */
-  var NestedListView = (function(){
-    // define private variables and methods
-    var pvt = {
-    };
+  // var NestedListView = (function(){
+  //   // define private variables and methods
+  //   var pvt = {
+  //   };
 
-    pvt.viewConsts = {
-      templateId: "pointers-view-template"
-    };
+  //   pvt.viewConsts = {
+  //     templateId: "pointers-view-template"
+  //   };
 
-    pvt.itemToStr = function(item){
-      if (item.link) {
-        return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '">' + item.text + '</a>';
-      } else {
-        return item.text;
-      }
-    };
+    // pvt.itemToStr = function(item){
+    //   if (item.link) {
+    //     return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '">' + item.text + '</a>';
+    //   } else {
+    //     return item.text;
+    //   }
+    // };
 
-    pvt.lineToStr = function(parts){
-      var i, result = '';
-      for (i = 0; i < parts.length; i++){
-        result += pvt.itemToStr(parts[i]);
-      }
-      return result;
-    };
+    // pvt.lineToStr = function(parts){
+    //   var i, result = '';
+    //   for (i = 0; i < parts.length; i++){
+    //     result += pvt.itemToStr(parts[i]);
+    //   }
+    //   return result;
+    // };
 
-    // return public object
-    return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return this.prefix + "-view-" + this.model.cid; },
-      className: function() { return this.prefix + "-view"; },
+  //   // return public object
+  //   return Backbone.View.extend({
+  //     template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
+  //     id: function(){ return this.prefix + "-view-" + this.model.cid; },
+  //     className: function() { return this.prefix + "-view"; },
 
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this;
-        // FIXME
-        thisView.$el.html(""); // thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
-        return thisView;
-      },
+  //     /**
+  //      * Render the learning view given the supplied model
+  //      */
+  //     render: function(){
+  //       var thisView = this;
+  //       // FIXME
+  //       thisView.$el.html(""); // thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
+  //       return thisView;
+  //     },
 
-      /**
-       * Parse the markup-style pointer text to html list
-       * TODO separate HTML generation better
-       */
-      parsePtrTextToHtml: function(lines){
-        var i,
-            prevDepth = 0,
-            htmlStr = "",
-            liStr;
+  //     /**
+  //      * Parse the markup-style pointer text to html list
+  //      * TODO separate HTML generation better
+  //      */
+  //     parsePtrTextToHtml: function(lines){
+  //       var i,
+  //           prevDepth = 0,
+  //           htmlStr = "",
+  //           liStr;
 
-        // array depth corresponds to list depth
-        for (i = 0; i < lines.length; i++){
-          var line = lines[i],
-              depth = line.depth;
+  //       // array depth corresponds to list depth
+  //       for (i = 0; i < lines.length; i++){
+  //         var line = lines[i],
+  //             depth = line.depth;
 
-          while (depth < prevDepth){
-            htmlStr += '</ul>\n';
-            depth++;
-          }
+  //         while (depth < prevDepth){
+  //           htmlStr += '</ul>\n';
+  //           depth++;
+  //         }
 
-          while (depth > prevDepth){
-            htmlStr += '<ul>';
-            depth--;
-          }
-          liStr = pvt.lineToStr(line.items);
-          htmlStr += "<li>" + liStr + "</li>\n";
-          prevDepth = line.depth;
-        }
+  //         while (depth > prevDepth){
+  //           htmlStr += '<ul>';
+  //           depth--;
+  //         }
+  //         liStr = pvt.lineToStr(line.items);
+  //         htmlStr += "<li>" + liStr + "</li>\n";
+  //         prevDepth = line.depth;
+  //       }
 
-        while (prevDepth--){
-          htmlStr += '</ul>\n';
-        }
+  //       while (prevDepth--){
+  //         htmlStr += '</ul>\n';
+  //       }
 
-        return htmlStr;
-      }
-    });
-  })();
+  //       return htmlStr;
+  //     }
+  //   });
+  // })();
 
 
   /**
-   * Return view thad displays the detailed node information
+   * Return view that displays the detailed node information
    */
   return  (function(){
     // define private variables and methods
@@ -454,6 +454,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
                                                               "notes": thisView.notesList(),
                                                               "time": Utils.formatTimeEstimate(thisView.model.get("time")),
                                                               "displayTitle": thisView.model.getLearnViewTitle()});
+
+        thisView.parsedPointers = thisView.parsedPointers || Utils.simpleMdToHtml(thisView.model.get("pointers"));
+
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources
             || new ResourcesSectionView({model: thisView.model.get("resources"),
@@ -462,12 +465,13 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
             || new DependencySectionView({model: thisView.model.get("dependencies")});
         thisView.outlinks = thisView.outlinks
             || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
-        thisView.pointers = thisView.pointers
-            || new NestedListView({model: {text: thisView.model.get("pointers")},
-                                                                     prefix: "pointers"});
-        thisView.goals = thisView.goals
-            || new NestedListView({model: {text: thisView.model.get("goals")},
-                                                               prefix: "goals"});
+
+        // thisView.pointers = thisView.pointers
+        //     || new NestedListView({model: {text: thisView.model.get("pointers")},
+        //                                                              prefix: "pointers"});
+        // thisView.goals = thisView.goals
+        //     || new NestedListView({model: {text: thisView.model.get("goals")},
+        //                                                        prefix: "goals"});
         if (thisView.resources.model.length > 0){
           assignObj[resourcesLocClass] = thisView.resources;
         }
@@ -477,12 +481,12 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         if (thisView.outlinks.model.length > 0){
           assignObj[outlinkLocClass] = thisView.outlinks;
         }
-        if (thisView.pointers.model.text.length > 0){
-          assignObj[ptrLocClass] = thisView.pointers;
-        }
-        if (thisView.goals.model.text.length > 0){
-          assignObj[goalsLocClass] = thisView.goals;
-        }
+        // if (thisView.pointers.model.text.length > 0){
+        //   assignObj[ptrLocClass] = thisView.pointers;
+        // }
+        // if (thisView.goals.model.text.length > 0){
+        //   assignObj[goalsLocClass] = thisView.goals;
+        // }
 
         // update the hovertext when nodes are marked learned/unlearned
         var aux = window.agfkGlobals.auxModel;
@@ -543,8 +547,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       addHoverText: function() {
         var thisView = this;
         this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
-          var temp = _.last(this.href.split("/"));
-          var concept = _.last(temp.split("="));
+          var temp = _.last(this.href.split("/")),
+              concept = _.last(temp.split("="));
           return thisView.getHoverText(concept);
         });
       },

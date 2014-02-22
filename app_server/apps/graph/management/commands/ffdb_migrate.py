@@ -45,7 +45,7 @@ class Command(BaseCommand):
             # ignoring is_shortcut and outlinks
 
         # TODO figure out shortcuts
-        direct_copy_fields = ["title", "summary", "tag", "id", "pointers", "flags"]
+        direct_copy_fields = ["title", "summary", "tag", "id", "flags"]
         # match global resources using this field
         gres_match_field = "title"
         gres_direct_copy_fields = ["description", "authors", "year", "url", "resource_type", "title", "edition_years"]
@@ -83,6 +83,7 @@ class Command(BaseCommand):
 
             # create see-also object
             if "pointers" in concept and concept["pointers"]:
+
                 api_con["pointers"] = markdown_obj_to_markdown(concept["pointers"])
 
             # save the deps for later
@@ -92,7 +93,6 @@ class Command(BaseCommand):
 
             for dcf in direct_copy_fields:
                 api_con[dcf] = concept.get(dcf)
-
             api_con["learn_time"] = concept.get("time")
 
             # TODO FIXME need to figure out "goals covered"
@@ -130,6 +130,7 @@ class Command(BaseCommand):
                         loc_obj["url"] = loc.get("link")
                         loc_obj["location_text"] = loc.get("text")
                         # TODO add location type to previous resources
+                        loc_obj["id"] = check_model_id("resource_location")
                         loc_obj["location_type"] = res["resource_type"]
                         rlocs.append(loc_obj)
 
@@ -154,8 +155,8 @@ class Command(BaseCommand):
             api_con["resources"] = api_resources
             post_concept(api_con)
 
+        return
         # now send the deps
-        pdb.set_trace()
         for dep in all_deps:
             api_dep = {}
             src = tag_to_concept_dict[dep["from_tag"]]

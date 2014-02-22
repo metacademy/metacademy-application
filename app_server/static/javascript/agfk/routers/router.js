@@ -218,6 +218,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                if (!thisRoute.graphModel) {
                  thisRoute.graphModel = new thisRoute.GraphModel(_.extend(window.agfkGlobals.graphInitData, isCreating ? {} : {leafs: [nodeId]}), {parse: true});
                }
+               var graphModel = thisRoute.graphModel;
 
                if (!thisRoute.userModel) {
                  var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true});
@@ -230,7 +231,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                // default rendering determined by edit mode
                try{
                  !isCreating &&
-                   ErrorHandler.assert(thisRoute.graphModel.get("nodes").length > 0,
+                   ErrorHandler.assert(graphModel.get("nodes").length > 0,
                    "Fetch did not populate graph nodes for fetch: " + nodeId);
                }
                catch(err){
@@ -241,20 +242,20 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                // set the document title as the key concept
                if (!isCreating){
-                 document.title = thisRoute.graphModel.getNode(thisRoute.graphModel.get("leafs")[0]).get("title") + " - Metacademy";
+                 document.title = graphModel.getNode(graphModel.get("leafs")[0]).get("title") + " - Metacademy";
                } else {
                  document.title = "Graph Creation - Metacademy";
                }
 
                // add the concept list view if it is not already present
                if (thisRoute.viewMode !== pCreateMode && !thisRoute.conceptListView && thisRoute.viewMode !== pEditMode) {
-                 thisRoute.conceptListView = new ConceptListView({model: thisRoute.graphModel, appRouter: thisRoute});
+                 thisRoute.conceptListView = new ConceptListView({model: graphModel, appRouter: thisRoute});
                  $("#main").prepend(thisRoute.conceptListView.render().$el);
                }
                var topoSort;
 
                if (paramsObj[qFocusConcept] === undefined){
-                 topoSort = thisRoute.graphModel.getTopoSort();
+                 topoSort = graphModel.getTopoSort();
                  paramsObj[qFocusConcept] = topoSort[topoSort.length - 1];
                }
 
@@ -265,13 +266,13 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                case pExploreMode:
                  doRender = doRender || (thisRoute.viewMode === pExploreMode && typeof thisRoute.expView === "undefined");
                  if (doRender){ // UPDATE
-                   thisRoute.expView = new ExploreView({model: thisRoute.graphModel, appRouter: thisRoute, includeShortestOutlink: true });
+                   thisRoute.expView = new ExploreView({model: graphModel, appRouter: thisRoute, includeShortestOutlink: true });
                  }
                  thisRoute.showView(thisRoute.expView, doRender, "#" + consts.expViewId);
 
                  if (doRender || viewMode !== thisRoute.prevUrlParams[qViewMode]) {
                    // center the graph display: flicker animation
-                   fnode = thisRoute.graphModel.getNode( paramsObj[qFocusConcept]);
+                   fnode = graphModel.getNode(paramsObj[qFocusConcept]) || graphModel.getNodeByTag(paramsObj[qFocusConcept]);
                    thisRoute.expView.centerForNode(fnode);
                    thisRoute.expView.setFocusNode(fnode);
                  }
@@ -279,31 +280,28 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                  break;
                case pEditMode:
                  doRender = true;
-                 thisRoute.editView = new ConceptEditorView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept])});
+                 thisRoute.editView = new ConceptEditorView({model: graphModel.getNode(paramsObj[qFocusConcept])});
                  thisRoute.showView(thisRoute.editView, doRender, "#" + consts.editViewId, false, true);
                  break;
 
                case pCreateMode:
                  doRender = true;
                  thisRoute.createView = thisRoute.createView
-                   || new EditorGraphView({model: thisRoute.graphModel, appRouter: thisRoute});
-                 if (thisRoute.graphModel.get("nodes").length) {
+                   || new EditorGraphView({model: graphModel, appRouter: thisRoute});
+                 if (graphModel.get("nodes").length) {
                    thisRoute.createView.optimizeGraphPlacement();
                  }
                  thisRoute.showView(thisRoute.createView, doRender, "#" + consts.createViewId);
-                 fnode = thisRoute.graphModel.getNode( paramsObj[qFocusConcept]);
+                 fnode = graphModel.getNode( paramsObj[qFocusConcept]);
                  fnode && thisRoute.createView.centerForNode(fnode);
                  break;
 
                case pLearnMode:
-                 if (paramsObj[qFocusConcept] === undefined){
-                   paramsObj[qFocusConcept] = thisRoute.graphModel.getTopoSort().pop();
-                 }
-                 if (!thisRoute.learnView || paramsObj[qFocusConcept] !== thisRoute.learnView.model.id ){
+                 if (!thisRoute.learnView || paramsObj[qFocusConcept] !== thisRoute.learnView.model.get("tag") ){
                    // close the old learn view
                    thisRoute.learnView && thisRoute.learnView.close();
                    doRender = true;
-                   thisRoute.learnView = new ConceptDetailsView({model: thisRoute.graphModel.getNode(paramsObj[qFocusConcept]),
+                   thisRoute.learnView = new ConceptDetailsView({model: graphModel.getNode(paramsObj[qFocusConcept]) || graphModel.getNodeByTag(paramsObj[qFocusConcept]),
                                                                  appRouter: thisRoute});
                  }
                  thisRoute.showView(thisRoute.learnView, doRender, "#" + consts.lViewId);
@@ -319,7 +317,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                  paramQLearnConcept = nodeId;
                }
                if (thisRoute.conceptListView) {
-                 thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
+                 //thisRoute.conceptListView.changeSelectedTitle(paramsObj[qFocusConcept]);
                  thisRoute.conceptListView.changeActiveELButtonFromName(viewMode);
                }
 
@@ -331,7 +329,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                thisRoute.prevUrlParams = $.extend({}, paramsObj);
                thisRoute.prevNodeId = nodeId;
-
              },
 
              /**

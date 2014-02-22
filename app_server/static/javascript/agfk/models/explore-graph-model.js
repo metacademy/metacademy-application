@@ -147,6 +147,10 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
             }
           });
         });
+      },
+
+      getNodeByTag: function (tag) {
+        return this.get("nodes").findWhere({tag: tag});
       }
 
     });

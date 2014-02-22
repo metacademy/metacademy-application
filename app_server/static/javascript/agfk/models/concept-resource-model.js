@@ -69,6 +69,10 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       return output;
     },
 
+    getYearString: function () {
+      return this.get("global_resource").get("year");
+    },
+
     toJSON: function () {
       var thisModel = this,
           retObj = {},

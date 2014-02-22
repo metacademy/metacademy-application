@@ -123,6 +123,46 @@ define(["jquery"], function($){
     }
   };
 
+
+  var depthRe = depthRe = /^\*+/,
+      linkRe = /\[([^\]]*)\]\(([^\)]*)\)/,
+      httpRe = /http:\/\//;
+  var mdMatchToHtmlLink = function(match, $1, $2, offset, original) {
+    return '<a class="' + (httpRe.test($2) ? "external-link" : "internal-link") + '" href="' + $2 + '">' + $1 + '</a>';
+  };
+
+  /**
+   * Parse simple markdown to html
+   */
+  utils.simpleMdToHtml = function (inMd) {
+    var inLines = inMd.split("\n"),
+        depth,
+        retStr = "",
+        prevDepth = 0;
+    inLines.forEach(function (line) {
+      // strip depth specification
+      depth = depthRe.exec(line);
+      depth = depth ? depth[0].length : 0;
+      if (prevDepth == depth) {
+        retStr += "</li><li>";
+      }
+      while (prevDepth > depth) {
+        retStr += "</li></ul>";
+        prevDepth--;
+      }
+      while (prevDepth < depth) {
+        retStr += "<ul><li>";
+        prevDepth++;
+      }
+      retStr += line.substr(depth).replace(linkRe, mdMatchToHtmlLink);
+    });
+    while (prevDepth > 0) {
+      retStr += "</li></ul>";
+      prevDepth--;
+    }
+    return retStr;
+  };
+
   // return require.js object
   return utils;
 });

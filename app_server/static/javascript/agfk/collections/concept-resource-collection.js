@@ -8,26 +8,26 @@ var ResourceCollection =  Backbone.Collection.extend({
      * Returns a backbone collection of the free resources TODO does this maintain the cid correctly?
      */
     getFreeResources: function(){
-      return new ResourceCollection(this.where({free: 1, requires_signup: 0}));
+      return new ResourceCollection(this.where({access: "free"}));
     },
 
     getFreeSignupResources: function(){
-      return new ResourceCollection(this.where({free: 1, requires_signup: 1}));
+      return new ResourceCollection(this.where({access: "reg"}));
     },
 
     /**
      * Returns a backbone collection of the paid resources TODO does this maintain the cid correctly?
      */
     getPaidResources: function(){
-      return new ResourceCollection(this.where({free: 0}));
+      return new ResourceCollection(this.where({access: "paid"}));
     },
 
     getCore: function(){
-      return new ResourceCollection(this.where({core: 1}));
+      return new ResourceCollection(this.where({core: true}));
     },
 
     getSupplemental: function(){
-      return new ResourceCollection(this.where({core: 0}));
+      return new ResourceCollection(this.where({core: false}));
     }
   });
 

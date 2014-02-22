@@ -46,6 +46,9 @@
     <% if (goals.length > 0) { %>
       <h2 class="node-detail-title">Goals</h2>
       <div class="node-detail-comp-wrap goals-wrap" id="node-detail-goals-<%- id %>">
+        <% goals.each(function(goal){ %>
+           <%= goal.getParsedText() %>
+         <% }); %>
       </div>
     <% } %>
 
@@ -54,12 +57,12 @@
 
     <h2 class="node-detail-title">See also</h2>
     <div class="node-detail-comp-wrap pointers-wrap" id="node-detail-anotes-<%- id %>">
-      <%= pointers.length > 0 ? "" : '<span class="no-content-msg">-No Additional Notes-</span>' %>
+      <%=  this.parsedPointers || '<span class="no-content-msg">-No Additional Notes-</span>' %>
     </div>
 
-    
+
 </script>
 
 <script type="text/template" id="node-detail-resource-template">
-  
+
 </script>

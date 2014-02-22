@@ -3,9 +3,6 @@ import pdb
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
 
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-
 from apps.user_management.models import Profile
 
 

@@ -1,6 +1,6 @@
 
 /*global define*/
-define(["backbone"], function(Backbone){
+define(["backbone", "utils/utils"], function(Backbone, Utils){
   return Backbone.Model.extend({
     defaults: function () {
       return {
@@ -20,6 +20,10 @@ define(["backbone"], function(Backbone){
           id: thisModel.id,
           text: thisModel.get("text")
         };
+    },
+
+    getParsedText: function () {
+        return Utils.simpleMdToHtml(this.get("text"));
     }
   });
 });

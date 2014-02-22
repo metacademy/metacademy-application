@@ -57,7 +57,7 @@ class Dependency(Model, LoggedInEditable):
     target_goals = ManyToManyField(Goal, related_name="target_goals")
 
     def editable_by(self, user):
-        return self.target.editable_by(user)
+        return user.is_superuser or self.target.is_provisional()
 
 
 class ConceptSettings(Model, LoggedInEditable):

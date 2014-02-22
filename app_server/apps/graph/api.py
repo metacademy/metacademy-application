@@ -60,11 +60,6 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
 
         # check if we're trying to change the id or create a new object using patch
         # TODO I couldn't find a better way to do this --CJR
-
-        # for obj in object_list:
-        #     if not obj.editable_by(bundle.request.user):
-        #         raise Unauthorized('not authorized to edit concept')
-
         split_path = bundle.request.META["PATH_INFO"].split("/")
         split_path = [p for p in split_path if p]
         model_name = split_path[-2]
@@ -80,12 +75,16 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
            and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
             raise Unauthorized("cannot replace id")
 
+        
+        # make sure the existing DB entry is editable
         try:
-            return bundle.obj.editable_by(bundle.request.user)
-        except:
-            return True
+            match = bundle.obj.__class__.objects.get(id=bundle.obj.id)
+            if not match.editable_by(bundle.request.user):
+                return False
+        except bundle.obj.__class__.DoesNotExist:
+            pass
 
-        #return bundle.obj.editable_by(bundle.request.user)
+        return bundle.obj.editable_by(bundle.request.user)
 
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes yet. TODO")
@@ -99,10 +98,6 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
         result = super(ConceptAuthorization, self).update_detail(object_list, bundle)
         if not result:
             return False
-
-        for obj in object_list:
-            if not obj.editable_by(bundle.request.user):
-                raise Unauthorized('not authorized to edit concept')
 
         # make sure non-supers are not commiting updating with non-matching ids/tags
         if "tag" in bundle.data and "id" in bundle.data\

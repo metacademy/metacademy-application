@@ -59,6 +59,13 @@ def get_graph(request, gid, serialize=True):
     return get_api_object(GraphResource, request, gid, serialize=serialize)
 
 
+def get_targetgraph(request, gid, serialize=True):
+    """
+    get json targetgraph object for the given graph id (gid) and django http request object
+    """
+    return get_api_object(TargetGraphResource, request, gid, serialize=serialize, id_field="leaf")
+
+
 def get_concept(request, cid, serialize=True):
     """
     get concept object for the given concept id (cid) and django http request object

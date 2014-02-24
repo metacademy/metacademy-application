@@ -155,7 +155,6 @@ class Command(BaseCommand):
             api_con["resources"] = api_resources
             post_concept(api_con)
 
-        return
         # now send the deps
         for dep in all_deps:
             api_dep = {}

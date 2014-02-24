@@ -69,31 +69,9 @@ def get_concept_dep_graph(request, concept_tag=""):
             leaf = Concept.objects.get(tag=concept_tag)
     except ObjectDoesNotExist:
         raise Exception("could not find concept with id or tag: " + str(concept_tag))
-
-    concepts = []
-    dependencies = []
-    concepts_to_add = [leaf]
-    concepts_added = {}
-
-    while len(concepts_to_add):
-        cur_con = concepts_to_add.pop(0)
-        if cur_con.id in concepts_added:
-            continue
-        # TODO FIXME this is crazy inefficient
-        app_concept = api_communicator.get_concept(request, cur_con.id)
-        # app_concept["pointers"] = ast.literal_eval(app_concept["pointers"])
-        concepts.append(app_concept)
-        concepts_added[cur_con.id] = True
-        for dep in cur_con.dep_target.all():
-            dependencies.append(api_communicator.get_dependency(request, dep.id))
-            # get_api_object(DependencyResource, bundle.request, dep.id))
-            src = dep.source
-            concepts_to_add.append(src)
-    graph_data = {"concepts": concepts, "dependencies": dependencies}
-
-    # graph_data = api_communicator.get_targetgraph(request, concept_tag)
+    graph_data = api_communicator.get_targetgraph(request, leaf.id)
     uconcepts = get_user_data(request)
-    # TODO remove full_graph_skeleton, we shouldn't need this client side
+
     return render_to_response("agfk-app.html",
                               {"full_graph_skeleton": get_full_graph_json_str(),
                                "user_data": json.dumps(uconcepts),

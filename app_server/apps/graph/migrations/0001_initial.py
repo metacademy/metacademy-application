@@ -165,6 +165,30 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['graphsettings_id', 'profile_id'])
 
+        # Adding model 'TargetGraph'
+        db.create_table(u'graph_targetgraph', (
+            ('leaf', self.gf('django.db.models.fields.related.OneToOneField')(related_name='tgraph_leaf', unique=True, primary_key=True, to=orm['graph.Concept'])),
+        ))
+        db.send_create_signal(u'graph', ['TargetGraph'])
+
+        # Adding M2M table for field concepts on 'TargetGraph'
+        m2m_table_name = db.shorten_name(u'graph_targetgraph_concepts')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('targetgraph', models.ForeignKey(orm[u'graph.targetgraph'], null=False)),
+            ('concept', models.ForeignKey(orm[u'graph.concept'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['targetgraph_id', 'concept_id'])
+
+        # Adding M2M table for field dependencies on 'TargetGraph'
+        m2m_table_name = db.shorten_name(u'graph_targetgraph_dependencies')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('targetgraph', models.ForeignKey(orm[u'graph.targetgraph'], null=False)),
+            ('dependency', models.ForeignKey(orm[u'graph.dependency'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['targetgraph_id', 'dependency_id'])
+
 
     def backwards(self, orm):
         # Deleting model 'Concept'
@@ -214,6 +238,15 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field editors on 'GraphSettings'
         db.delete_table(db.shorten_name(u'graph_graphsettings_editors'))
+
+        # Deleting model 'TargetGraph'
+        db.delete_table(u'graph_targetgraph')
+
+        # Removing M2M table for field concepts on 'TargetGraph'
+        db.delete_table(db.shorten_name(u'graph_targetgraph_concepts'))
+
+        # Removing M2M table for field dependencies on 'TargetGraph'
+        db.delete_table(db.shorten_name(u'graph_targetgraph_dependencies'))
 
 
     models = {
@@ -335,6 +368,12 @@ class Migration(SchemaMigration):
             'location_type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
+        },
+        u'graph.targetgraph': {
+            'Meta': {'object_name': 'TargetGraph'},
+            'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_graphs'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
+            'dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'targetgraph_dependencies'", 'symmetrical': 'False', 'to': u"orm['graph.Dependency']"}),
+            'leaf': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'tgraph_leaf'", 'unique': 'True', 'primary_key': 'True', 'to': u"orm['graph.Concept']"})
         },
         u'user_management.profile': {
             'Meta': {'object_name': 'Profile'},

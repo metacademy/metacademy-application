@@ -40,7 +40,7 @@
       window.agfkGlobals = {};
       agfkGlobals.userInitData = {{ user_data|safe }};
       agfkGlobals.targetId = "{{ target_id | safe}}";
-      agfkGlobals.graphInitData = {concepts: [{% for cpt in graph_init_data.concepts %}{{ cpt | safe }}, {% endfor %}], dependencies: [{% for dep in graph_init_data.dependencies %} {{ dep | safe}}, {% endfor %}] };
+      agfkGlobals.graphInitData = {{ graph_init_data|safe }}
       agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
       agfkGlobals.auxModel = null; // init in main js app
       agfkGlobals.apiBase = "/graphs/api/v1/"; // TODO remove hardcoding if possible

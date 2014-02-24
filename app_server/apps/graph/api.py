@@ -10,7 +10,8 @@ from tastypie.authorization import DjangoAuthorization
 from tastypie.exceptions import Unauthorized, ImmediateHttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from apps.graph.models import Concept, Dependency, Graph, GraphSettings, ConceptSettings, ResourceLocation, GlobalResource, Goal
+from apps.graph.models import Concept, Dependency, Graph, GraphSettings,\
+    ConceptSettings, ResourceLocation, GlobalResource, Goal, TargetGraph
 # avoid name collision
 from apps.graph.models import ConceptResource as CResource
 from apps.user_management.models import Profile
@@ -19,13 +20,14 @@ from apps.user_management.models import Profile
 # hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
 
 
-def get_api_object(ObjRes, request, oid, serialize=True):
+def get_api_object(ObjRes, request, oid, id_field="id", serialize=True):
     """
     helper function
     get resource object from the tastypie api
     """
     ob_res = ObjRes()
-    robj = ob_res.obj_get(ob_res.build_bundle(request=request), id=oid)
+    sel_dict = {id_field: oid}
+    robj = ob_res.obj_get(ob_res.build_bundle(request=request), **sel_dict)
     ores_bundle = ob_res.build_bundle(obj=robj, request=request)
     ret_obj = ob_res.full_dehydrate(ores_bundle)
     if serialize:
@@ -75,7 +77,6 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
            and bundle.obj.__class__.objects.filter(id=model_patch_id).exists():
             raise Unauthorized("cannot replace id")
 
-        
         # make sure the existing DB entry is editable
         try:
             match = bundle.obj.__class__.objects.get(id=bundle.obj.id)
@@ -115,7 +116,7 @@ class BaseResource(NamespacedModelResource):
         authorization = ModAndUserObjectsOnlyAuthorization()
 
 
-class CustomReversionResource(BaseResource):
+class CustomSaveHookResource(BaseResource):
     """
     ModelResource that uses django reversions
     """
@@ -131,7 +132,7 @@ class CustomReversionResource(BaseResource):
         else:
             self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
 
-        self.pre_save_hook(bundle)
+        bundle = self.pre_save_hook(bundle)
 
         # Save FKs just in case.
         self.save_related(bundle)
@@ -146,7 +147,7 @@ class CustomReversionResource(BaseResource):
         ##     m2m_bundle = self.hydrate_m2m(bundle)
         ## except Exception, e:
         ##     pdb.set_trace()
-
+#/Users/cjrd/Dropbox/Metacademy/meta_venv/lib/python2.7/site-packages/tastypie/resources.py
         self.save_m2m(m2m_bundle)
 
         # per resource post-save hook
@@ -180,21 +181,21 @@ class CustomReversionResource(BaseResource):
         return super(NamespacedModelResource, self).obj_get(bundle, **kwargs)
 
 
-class GoalResource(CustomReversionResource):
+class GoalResource(CustomSaveHookResource):
     """
     """
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
 
-    class Meta(CustomReversionResource.Meta):
+    class Meta(CustomSaveHookResource.Meta):
         """ GoalResource Meta"""
         queryset = Goal.objects.all()
         resource_name = 'goal'
 
 
-class ResourceLocationResource(CustomReversionResource):
+class ResourceLocationResource(CustomSaveHookResource):
     cresource = fields.ForeignKey("apps.graph.api.ConceptResourceResource", "cresource")
 
-    class Meta(CustomReversionResource.Meta):
+    class Meta(CustomSaveHookResource.Meta):
         queryset = ResourceLocation.objects.all()
         resource_name = 'resourcelocation'
 
@@ -203,7 +204,7 @@ class ResourceLocationResource(CustomReversionResource):
         return bundle
 
 
-class GlobalResourceResource(CustomReversionResource):
+class GlobalResourceResource(CustomSaveHookResource):
     """
     tastypie resource for global resources
     """
@@ -239,17 +240,17 @@ class GlobalResourceResource(CustomReversionResource):
 
         return bundle
 
-    class Meta(CustomReversionResource.Meta):
+    class Meta(CustomSaveHookResource.Meta):
         queryset = GlobalResource.objects.all()
         resource_name = 'globalresource'
 
 
-class ConceptResourceResource(CustomReversionResource):
+class ConceptResourceResource(CustomSaveHookResource):
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
     locations = fields.ToManyField(ResourceLocationResource, 'locations', full=True, related_name="cresource")
     global_resource = fields.ForeignKey(GlobalResourceResource, "global_resource", full=True)
 
-    class Meta(CustomReversionResource.Meta):
+    class Meta(CustomSaveHookResource.Meta):
         queryset = CResource.objects.all()
         resource_name = 'conceptresource'
 
@@ -262,6 +263,9 @@ class ConceptResourceResource(CustomReversionResource):
 
         # bundle.data['location'] = json.loads(bundle.data['location'])
         adeps = bundle.data["additional_dependencies"]
+        notes = bundle.data["notes"]
+        if notes:
+            bundle.data["notes"] = ast.literal_eval(notes)
 
         if type(adeps) == unicode:
             adeps = ast.literal_eval(adeps)
@@ -343,7 +347,7 @@ class ConceptResourceResource(CustomReversionResource):
         return bundle
 
 
-class ConceptResource(CustomReversionResource):
+class ConceptResource(CustomSaveHookResource):
     """
     API for concepts, aka nodes
     """
@@ -351,13 +355,19 @@ class ConceptResource(CustomReversionResource):
     goals = fields.ToManyField(GoalResource, 'goals', full=True, related_name="concept")
 
     def post_save_hook(self, bundle):
+        # create profile if necessary
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)
         csettings.save()
+        # create targetgraph if necessary
+        tgraph, tnew = TargetGraph.objects.get_or_create(leaf=bundle.obj)
+        if tnew:
+            tgraph.concepts.add(bundle.obj)
+            tgraph.save()
         return bundle
 
-    class Meta(CustomReversionResource.Meta):
+    class Meta(CustomSaveHookResource.Meta):
         """ ConceptResource Meta"""
         queryset = Concept.objects.all()
         resource_name = 'concept'
@@ -373,9 +383,10 @@ class ConceptResource(CustomReversionResource):
         return data
 
 
-class DependencyResource(BaseResource):
+class DependencyResource(CustomSaveHookResource):
     """
     API for Dependencies
+    TODO handle deleting dependencies
     """
     source = fields.ToOneField(ConceptResource, 'source')
     target = fields.ToOneField(ConceptResource, 'target')
@@ -387,14 +398,41 @@ class DependencyResource(BaseResource):
         resource_name = 'dependency'
         include_resource_uri = False
 
-    ## def hydrate(self, bundle):
-    ##     import config
-    ##     #if hasattr(config, 'TCLSA'):
-    ##     #    pdb.set_trace()
-    ##     return bundle
+    def pre_save_hook(self, bundle, **kwargs):
+        """
+        updates target graphs when creating new dependencies
+        """
+        self.isnew = not Dependency.objects.filter(id=bundle.obj.id).exists()
+        return bundle
 
+    def post_save_hook(self, bundle, **kwargs):
+        """
+        updates target graphs when creating new dependencies
+        """
+        if self.isnew:
+            otarget = bundle.obj.target
+            osource = bundle.obj.source
+            concepts_to_traverse = [ol.target for ol in otarget.dep_source.all()]
+            add_concepts = osource.tgraph_leaf.concepts.all()
+            otarget.tgraph_leaf.concepts.add(*add_concepts)
+            otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())
+            otarget.tgraph_leaf.dependencies.add(bundle.obj)
+            add_dependencies = otarget.tgraph_leaf.dependencies.all()
+            concepts_traversed = {}
 
-
+            # DFS to add concept/deps to target graph
+            while len(concepts_to_traverse):
+                cur_con = concepts_to_traverse.pop(0)
+                if cur_con.id in concepts_traversed:
+                    continue
+                concepts_traversed[cur_con.id] = True
+                # add all concepts
+                cur_con.tgraph_leaf.concepts.add(*add_concepts)
+                # add all deps
+                cur_con.tgraph_leaf.dependencies.add(*add_dependencies)
+                for ol in cur_con.dep_source.all():
+                    concepts_to_traverse.append(ol.target)
+        return bundle
 
 
 class GraphResource(BaseResource):
@@ -415,9 +453,6 @@ class GraphResource(BaseResource):
                 id_to_concept[concept["id"]] = concept
 
         return data
-
-    #def dehydrate(self, bundle, **kwargs):
-    #    return bundle
 
     def post_save_hook(self, bundle):
         # FIXME we're assuming a user is logged in
@@ -447,9 +482,6 @@ def normalize_concept(in_concept):
     if type(in_concept) != dict:
         return
 
-    if 'id' not in in_concept:
-        pdb.set_trace()
-
     if not in_concept["id"] or in_concept["id"][:4] == "-new":
         useid = ''
         while not useid or not len(Concept.objects.filter(id=useid)) == 0:
@@ -470,25 +502,13 @@ class TargetGraphResource(NamespacedModelResource):
     GET-only resource for target graphs (graphs with a single "target" concept and all dependenies)
     NB: this is _not_ a model resource
     """
-    # concepts = fields.ToManyField(ConceptResource, "concept", full=True)
-    # dependencies = fields.ToManyField(DependencyResource, "dependency", full=True)
+    concepts = fields.ToManyField(ConceptResource, "concepts", full=True)
+    dependencies = fields.ToManyField(DependencyResource, "dependencies", full=True)
 
     class Meta:
+        """ TargetGraphResource Meta """
         allowed_methods = ["get"]
         list_allowed_methods = []
-
-    def obj_get(self, bundle, **kwargs):
-        if "pk" in kwargs:
-            get_id = "pk"
-        elif "id" in kwargs:
-            get_id = "id"
-        elif "tag" in kwargs:
-            get_id = "tag"
-
-    # def full_dehydrate(self, bundle):
-    #     """
-    #     prepare the TargetGraph data
-    #     """
-    #     pdb.set_trace()
-    #     bundle.data = bundle.obj
-    #     return bundle
+        include_resource_uri = False
+        queryset = TargetGraph.objects.all()
+        resource_name = 'targetgraph'

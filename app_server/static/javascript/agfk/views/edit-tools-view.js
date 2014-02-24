@@ -118,8 +118,8 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       syncWithServer: function () {
         var thisView = this,
             jsonObj = this.model.toJSON(),
-            jsonConceptOnly = $.extend({}, jsonObj, {dependencies: null}),
-            jsonEdgesOnly =  $.extend({}, jsonObj, {concepts: null});
+            jsonConceptOnly = $.extend({}, jsonObj, {dependencies: []}),
+            jsonEdgesOnly =  $.extend({}, jsonObj, {concepts: []});
         $.ajax({ type: "PUT",
                  // TODO move hardcoded url
                  url: "/graphs/api/v1/graph/" + thisView.model.id + "/",

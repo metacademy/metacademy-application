@@ -155,7 +155,10 @@ class GraphSettings(Model, LoggedInEditable):
         return "/graphs/%s" % self.graph.id
 
 
-## temporary
-#@receiver(pre_save, sender=Dependency)
-#def on_pre_save(sender, **kwargs):
-#    pdb.set_trace()
+class TargetGraph(Model, LoggedInEditable):
+    """
+    Model that contains target graph concept and dependency references
+    """
+    leaf = OneToOneField(Concept, primary_key=True, related_name="tgraph_leaf")
+    concepts = ManyToManyField(Concept, related_name="target_graphs")
+    dependencies = ManyToManyField(Dependency, related_name="targetgraph_dependencies")

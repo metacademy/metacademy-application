@@ -52,8 +52,8 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         var tv = thisModel.txtFields[i];
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
-        } else {
-          output[tv] = [];
+        } else if (output[tv] === undefined) {
+          output[tv] = "";
         }
       }
 

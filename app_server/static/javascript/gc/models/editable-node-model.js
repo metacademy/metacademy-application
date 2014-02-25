@@ -10,7 +10,7 @@ define(["backbone", "underscore", "agfk/models/detailed-node-model", "gc/collect
     return DetailedNodeModel.extend({
       collFields: ["dependencies", "outlinks", "resources", "goals"],
 
-      txtFields: ["id", "sid", "tag", "title", "summary", "pointers", "is_shortcut", "time", "x", "y", "isNew", "editNote", "exercises", "software", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
+      txtFields: ["id", "sid", "tag", "title", "summary", "pointers", "is_shortcut", "learn_time", "x", "y", "isNew", "editNote", "exercises", "software", "isContracted", "hasContractedDeps", "hasContractedOLs"], // FIXME this should inherit from superclass
 
       defaults: function() {
         var enDef = {

@@ -30,6 +30,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
       postrender: function () {
         var thisView = this;
         thisView.$el.find("#" + pvt.consts.olId).append(thisView.$list);
+        thisView.updateTimeEstimate();
       },
 
       /**
@@ -43,7 +44,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
 
         thisView.listenTo(window.agfkGlobals.auxModel,
                           gConsts.learnedTrigger, thisView.updateTimeEstimate);
-        thisView.listenTo(thisView.model, "sync", thisView.updateTimeEstimate);
+        // initialization
+        // thisView.listenTo(thisView.model, "sync", thisView.updateTimeEstimate);
         if (inp !== undefined) {
           thisView.appRouter = inp.appRouter;
         }

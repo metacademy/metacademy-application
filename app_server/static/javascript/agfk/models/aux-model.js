@@ -137,7 +137,7 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
         if (this.userModel){
               var node = this.get("nodes").get(tag);
           if (node){
-            return this.userModel.isLearned(node.get("sid"));
+            return this.userModel.isLearned(node.id);
           }
         }
         return false;
@@ -237,17 +237,17 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
           _.each(deps, function(dep) {
             var depShortcut = shortcuts.get(dep.from_tag),
                 depNode = nodes.get(dep.from_tag);
-            if (dep.shortcut && depShortcut && depShortcut.get("time")) {
-              total += depShortcut.get("time");
-            } else if (depNode && depNode.get("time")) {
-              total += depNode.get("time");
+            if (dep.shortcut && depShortcut && depShortcut.get("learn_time")) {
+              total += depShortcut.get("learn_time");
+            } else if (depNode && depNode.get("learn_time")) {
+              total += depNode.get("learn_time");
             } else {
               total += DEFAULT_LEARNING_TIME;
             }
           });
 
-          if (node.get("time")) {
-            total += node.get("time");
+          if (node.get("learn_time")) {
+            total += node.get("learn_time");
           } else {
             total += DEFAULT_LEARNING_TIME;
           }

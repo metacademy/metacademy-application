@@ -452,7 +452,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.isRendered = false;
         var templateVars = _.extend(thisView.model.attributes, {"neededFor": thisView.model.computeNeededFor(),
                                                               "notes": thisView.notesList(),
-                                                              "time": Utils.formatTimeEstimate(thisView.model.get("time")),
+                                                              "time": Utils.formatTimeEstimate(thisView.model.get("learn_time")),
                                                               "displayTitle": thisView.model.getLearnViewTitle()});
 
         thisView.parsedPointers = thisView.parsedPointers || Utils.simpleMdToHtml(thisView.model.get("pointers"));

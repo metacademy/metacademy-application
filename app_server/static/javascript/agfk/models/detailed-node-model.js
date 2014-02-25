@@ -6,7 +6,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
     // FIXME these shouldn't be hardcoded
     collFields: ["dependencies", "outlinks", "resources", "goals"],
 
-    txtFields: ["id", "tag", "exercises", "sid", "title", "summary", "pointers", "is_shortcut", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
+    txtFields: ["id", "tag", "exercises", "sid", "title", "summary", "pointers", "is_shortcut", "learn_time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
 
     defaults: function(){
       var dnDefaults = {

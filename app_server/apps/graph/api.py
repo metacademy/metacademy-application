@@ -146,7 +146,6 @@ class CustomSaveHookResource(BaseResource):
         ## try:
         ##     m2m_bundle = self.hydrate_m2m(bundle)
         ## except Exception, e:
-        ##     pdb.set_trace()
 #/Users/cjrd/Dropbox/Metacademy/meta_venv/lib/python2.7/site-packages/tastypie/resources.py
         self.save_m2m(m2m_bundle)
 
@@ -472,7 +471,7 @@ class GraphResource(BaseResource):
 
 # helper methods
 CONCEPT_SAVE_FIELDS = ["id", "tag", "title", "summary", "goals", "exercises",
-                       "software", "pointers", "is_shortcut", "dependencies", "resources"]
+                       "software", "pointers", "is_shortcut", "dependencies", "resources", "learn_time"]
 
 
 def normalize_concept(in_concept):

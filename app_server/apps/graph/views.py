@@ -2,7 +2,6 @@ import json
 import random
 import string
 import pdb
-import ast
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse

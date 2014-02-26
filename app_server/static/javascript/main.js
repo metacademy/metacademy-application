@@ -78,7 +78,7 @@ requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router"
   $("body").css("overflow", "hidden");
 
   // initialize global auxData
-  window.agfkGlobals.auxModel = new AuxModel(window.agfkGlobals.auxData, {parse: true});
+  window.agfkGlobals.auxModel = new AuxModel(); //window.agfkGlobals.auxData, {parse: true});
 
   // shim for CSRF token integration with backbone and django
   var oldSync = Backbone.sync;

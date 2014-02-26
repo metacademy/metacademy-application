@@ -57,13 +57,13 @@ define(["backbone", "underscore", "lib/kmapjs/views/concept-list-item"], functio
       // set the app router
       thisView.appRouter = inp.appRouter;
 
-      thisView.listenTo(aux, gConsts.learnedTrigger + nodeId, function(nodeId, nodeSid, status){
+      thisView.listenTo(aux, gConsts.learnedTrigger + nodeId, function(nodeId, status){
         thisView.changeTitleClass(learnedClass, status);
       });
-      thisView.listenTo(aux, gConsts.starredTrigger + nodeId, function(nodeId, nodeSid, status){
+      thisView.listenTo(aux, gConsts.starredTrigger + nodeId, function(nodeId, status){
         thisView.changeTitleClass(starredClass, status);
       });
-      thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
+      thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
         thisView.changeTitleClass(implicitLearnedClass, status);
       });
     },

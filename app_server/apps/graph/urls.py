@@ -22,5 +22,5 @@ urlpatterns = patterns('',
                        url(r'^idchecker/?', check_id, name="idchecker"),
                        # /mapi/graph (should handle get/post/put requests
                        url('^api/', include(v1_api.urls), name="api"),
-                       # url('^([^/]+)/', edit_existing_graph),
+                       url('^([^/]+)/?$', edit_existing_graph),
 )

@@ -32,14 +32,29 @@
     <div class="node-detail-comp-wrap">
     <% if (dependencies.length > 0) { %>
       <p>This concept has the prerequisites:</p>
-      <ul class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>"></ul>
+      <ul class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>">
+        <% dependencies.each(function(dep){ %>
+          <% var src = dep.get('source') %>
+          <li id="outlink-details-<%= dep.cid %>" class="outlink-view">
+          <a class="outlink focus-link" data-focus="<%= src.get('tag') %>" href="#focus=<%= src.get('tag')%>" target="_self"> <%- src.get('title') %></a><% if (dep.get("reason")) {%> <span class="dependency-reason">(<%- dep.get("reason") %>)</span><% } %>
+          </li>
+        <% }); %>
+
+      </ul>
     <% } else { %>
       <p class="no-content-msg">-this concept has no prerequisites-</p>
     <% } %>
 
-    <% if (neededFor.length > 0) { %>
+    <% if (outlinks.length > 0) { %>
       <p>This concept is needed for:</p>
-      <ul class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>"></ul>
+      <ul class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>">
+        <% outlinks.each(function(ol){ %>
+          <% var tar = ol.get('target') %>
+          <li id="outlink-details-<%= ol.cid %>" class="outlink-view">
+          <a class="outlink focus-link" href="#focus=<%= tar.get('tag')%>" data-focus="<%= tar.get('tag')%>" target="_self"> <%- tar.get('title') %></a>
+          </li>
+        <% }); %>
+      </ul>
     <% } %>
     </div>
 

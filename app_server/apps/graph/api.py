@@ -264,7 +264,10 @@ class ConceptResourceResource(CustomSaveHookResource):
         adeps = bundle.data["additional_dependencies"]
         notes = bundle.data["notes"]
         if notes:
-            bundle.data["notes"] = ast.literal_eval(notes)
+            try:
+                bundle.data["notes"] = ast.literal_eval(notes)
+            except:
+                pass
 
         if type(adeps) == unicode:
             adeps = ast.literal_eval(adeps)

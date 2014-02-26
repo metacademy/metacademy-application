@@ -164,19 +164,19 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         thisView.scopeNode = null;
 
         // dim nodes that are [implicitly] learned or starred
-        thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, nodeSid, status){
+        thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
             thisView.toggleNodeProps(thisModel.getNode(nodeId), d3El, status, "learned");
           }
         });
-        thisView.listenTo(aux, gConsts.starredTrigger, function(nodeId, nodeSid, status){
+        thisView.listenTo(aux, gConsts.starredTrigger, function(nodeId, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
             thisView.toggleNodeProps(thisModel.getNode(nodeId), d3El, status, "starred");
           }
         });
-        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
+        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
             thisView.toggleNodeProps(thisModel.getNode(nodeId), d3El, status, "implicitLearned");

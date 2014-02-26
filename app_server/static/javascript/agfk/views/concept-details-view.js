@@ -18,8 +18,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     pvt.viewConsts = {
       templateId: "resource-view-template",
       viewClass: "resource-view",
-      viewIdPrefix: "resource-details-",
-      extraResourceInfoClass: "extra-resource-details"
+      viewIdPrefix: "resource-details-"
     };
 
     // return public object
@@ -27,10 +26,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
       id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
       className: pvt.viewConsts.viewClass,
-
-      events: {
-        'click .more-resource-info': 'toggleAdditionalInfo'
-      },
 
       /**
        * Render the learning view given the supplied model
@@ -41,13 +36,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
                                                       yearString: this.model.getYearString()});
         thisView.$el.html(thisView.template(temp));
         return thisView;
-      },
-
-      toggleAdditionalInfo: function(evt){
-        this.$el.find("." + pvt.viewConsts.extraResourceInfoClass).toggle();
-        $(evt.currentTarget).remove();
       }
-
     });
   })();
 
@@ -130,229 +119,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.delegateEvents();
         return thisView;
       }
-
     });
   })();
-
-
-  /**
-   * View to display details of all provided resources (wrapper view)
-   */
-  var DependencyView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      templateId: "dependency-view-template",
-      viewClass: "dependency-view",
-      viewIdPrefix: "dependency-details-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-      tagName: "li",
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this,
-            thisModel = thisView.model;
-        thisView.$el.html(thisView.template(thisModel.attributes));
-        return thisView;
-      }
-
-    });
-  })();
-
-
-  /**
-   * Wrapper view to display all dependencies
-   */
-  var DependencySectionView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      viewClass: "dependencies-wrapper",
-      viewIdPrefix: "dependencies-wrapper-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this;
-        thisView.$el.html("");
-        thisView.model.each(function(itm){
-          thisView.$el.append(new DependencyView({model: itm}).render().el);
-        });
-        thisView.delegateEvents();
-        return thisView;
-      }
-
-    });
-  })();
-
-
-  /**
-   * View to display details of all provided resources (wrapper view)
-   */
-  var OutlinkView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      templateId: "outlink-view-template",
-      viewClass: "outlink-view",
-      viewIdPrefix: "outlink-details-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-      tagName: "li",
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this,
-            thisModel = thisView.model;
-        thisView.$el.html(thisView.template(_.extend(thisModel.attributes, {toTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("to_tag"))})));
-        return thisView;
-      }
-
-    });
-  })();
-
-
-  /**
-   * Wrapper view to display all outlinks
-   */
-  var OutlinkSectionView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      viewClass: "outlinks-wrapper",
-      viewIdPrefix: "outlinks-wrapper-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-
-      /**
-       * Render the view given the supplied model
-       */
-      render: function(){
-        var thisView = this;
-        thisView.$el.html("");
-        thisView.model.each(function(itm){
-          thisView.$el.append(new OutlinkView({model: itm}).render().el);
-        });
-        thisView.delegateEvents();
-        return thisView;
-      }
-    });
-  })();
-
-
-  /**
-   * View to display additional notes/pointers
-   * NOTE: expects a javascript model as input (for now) with one field: text
-   */
-  // var NestedListView = (function(){
-  //   // define private variables and methods
-  //   var pvt = {
-  //   };
-
-  //   pvt.viewConsts = {
-  //     templateId: "pointers-view-template"
-  //   };
-
-    // pvt.itemToStr = function(item){
-    //   if (item.link) {
-    //     return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '">' + item.text + '</a>';
-    //   } else {
-    //     return item.text;
-    //   }
-    // };
-
-    // pvt.lineToStr = function(parts){
-    //   var i, result = '';
-    //   for (i = 0; i < parts.length; i++){
-    //     result += pvt.itemToStr(parts[i]);
-    //   }
-    //   return result;
-    // };
-
-  //   // return public object
-  //   return Backbone.View.extend({
-  //     template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-  //     id: function(){ return this.prefix + "-view-" + this.model.cid; },
-  //     className: function() { return this.prefix + "-view"; },
-
-  //     /**
-  //      * Render the learning view given the supplied model
-  //      */
-  //     render: function(){
-  //       var thisView = this;
-  //       // FIXME
-  //       thisView.$el.html(""); // thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
-  //       return thisView;
-  //     },
-
-  //     /**
-  //      * Parse the markup-style pointer text to html list
-  //      * TODO separate HTML generation better
-  //      */
-  //     parsePtrTextToHtml: function(lines){
-  //       var i,
-  //           prevDepth = 0,
-  //           htmlStr = "",
-  //           liStr;
-
-  //       // array depth corresponds to list depth
-  //       for (i = 0; i < lines.length; i++){
-  //         var line = lines[i],
-  //             depth = line.depth;
-
-  //         while (depth < prevDepth){
-  //           htmlStr += '</ul>\n';
-  //           depth++;
-  //         }
-
-  //         while (depth > prevDepth){
-  //           htmlStr += '<ul>';
-  //           depth--;
-  //         }
-  //         liStr = pvt.lineToStr(line.items);
-  //         htmlStr += "<li>" + liStr + "</li>\n";
-  //         prevDepth = line.depth;
-  //       }
-
-  //       while (prevDepth--){
-  //         htmlStr += '</ul>\n';
-  //       }
-
-  //       return htmlStr;
-  //     }
-  //   });
-  // })();
-
 
   /**
    * Return view that displays the detailed node information
@@ -367,10 +135,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       viewIdPrefix: "node-detail-view-",
       viewClass: "node-detail-view",
       resourcesLocClass: 'resources-wrap', // classes are specified in the node-detail template
-      depLocClass: 'dep-wrap',
-      ptrLocClass: 'pointers-wrap',
-      goalsLocClass: 'goals-wrap',
-      outlinkLocClass: 'outlinks-wrap',
       learnViewCheckClass: 'learn-view-check',
       learnViewStarClass: 'learn-view-star',
       learnedClass: "learned-concept",
@@ -391,7 +155,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         "click .learn-view-star": function(evt){
           evt.stopPropagation();
           this.toggleConceptState(evt, "star");
-        }
+        },
+        "mousedown .focus-link": "changeFocusNode"
       },
 
       tagName: pvt.viewConsts.viewTag,
@@ -409,12 +174,13 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
           + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
       },
 
-      initialize: function(){
+      initialize: function(inp){
         var viewConsts = pvt.viewConsts,
             thisView = this,
             aux = window.agfkGlobals.auxModel,
             nodeTag = thisView.model.id,
             gConsts = aux.getConsts();
+            thisView.appRouter = inp.appRouter;
 
         function changeClass(sel, className, status){
           if(status){
@@ -426,10 +192,10 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         }
 
         // TODO refactor this code if we keep the star and check in current location
-        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
+        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, status){
           changeClass("." + viewConsts.learnViewCheckClass, viewConsts.learnedClass, status);
         });
-        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
+        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, status){
           changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
         });
 
@@ -443,17 +209,13 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         var thisView = this,
             viewConsts = pvt.viewConsts,
             assignObj = {},
-            resourcesLocClass = "." + viewConsts.resourcesLocClass,
-            depLocClass = "." + viewConsts.depLocClass,
-            outlinkLocClass = "." + viewConsts.outlinkLocClass,
-            ptrLocClass = "." + viewConsts.ptrLocClass,
-            goalsLocClass = "." + viewConsts.goalsLocClass;
+            resourcesLocClass = "." + viewConsts.resourcesLocClass;
 
         thisView.isRendered = false;
-        var templateVars = _.extend(thisView.model.attributes, {"neededFor": thisView.model.computeNeededFor(),
-                                                              "notes": thisView.notesList(),
-                                                              "time": Utils.formatTimeEstimate(thisView.model.get("learn_time")),
-                                                              "displayTitle": thisView.model.getLearnViewTitle()});
+        var templateVars = _.extend(thisView.model.attributes, {
+                             "notes": thisView.notesList(),
+                             "time": Utils.formatTimeEstimate(thisView.model.get("learn_time")),
+                             "displayTitle": thisView.model.getLearnViewTitle()});
 
         thisView.parsedPointers = thisView.parsedPointers || Utils.simpleMdToHtml(thisView.model.get("pointers"));
 
@@ -461,32 +223,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.resources = thisView.resources
             || new ResourcesSectionView({model: thisView.model.get("resources"),
                                                                              conceptId: thisView.model.get("id")});
-        thisView.dependencies = thisView.dependencies
-            || new DependencySectionView({model: thisView.model.get("dependencies")});
-        thisView.outlinks = thisView.outlinks
-            || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
-
-        // thisView.pointers = thisView.pointers
-        //     || new NestedListView({model: {text: thisView.model.get("pointers")},
-        //                                                              prefix: "pointers"});
-        // thisView.goals = thisView.goals
-        //     || new NestedListView({model: {text: thisView.model.get("goals")},
-        //                                                        prefix: "goals"});
         if (thisView.resources.model.length > 0){
           assignObj[resourcesLocClass] = thisView.resources;
         }
-        if (thisView.dependencies.model.length > 0){
-          assignObj[depLocClass] = thisView.dependencies;
-        }
-        if (thisView.outlinks.model.length > 0){
-          assignObj[outlinkLocClass] = thisView.outlinks;
-        }
-        // if (thisView.pointers.model.text.length > 0){
-        //   assignObj[ptrLocClass] = thisView.pointers;
-        // }
-        // if (thisView.goals.model.text.length > 0){
-        //   assignObj[goalsLocClass] = thisView.goals;
-        // }
 
         // update the hovertext when nodes are marked learned/unlearned
         var aux = window.agfkGlobals.auxModel;
@@ -529,6 +268,15 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         state === "learn" ? aux.toggleLearnedStatus(nodeTag) : aux.toggleStarredStatus(nodeTag);
       },
 
+      /**
+       * Set the focus node
+       */
+      changeFocusNode: function (evt) {
+        var thisView = this,
+            focus = $(evt.currentTarget).data("focus");
+        evt.preventDefault();
+        thisView.appRouter.changeUrlParams({focus: focus});
+      },
 
       getHoverText: function(conceptTag) {
         var aux = window.agfkGlobals.auxModel;
@@ -594,6 +342,4 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       }
     });
   })();
-
-
 });

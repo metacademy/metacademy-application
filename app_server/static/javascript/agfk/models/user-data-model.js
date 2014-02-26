@@ -37,8 +37,7 @@ define(["backbone", "underscore"], function(Backbone, _){
      */
     pvt.changeUserConceptState = function(props){
       var thisColl = this,
-          nodeSid = props.id,
-          concept = thisColl.get(nodeSid);
+          concept = thisColl.get(props.id);
       if (!concept){
         thisColl.create(props);
       } else{
@@ -49,10 +48,6 @@ define(["backbone", "underscore"], function(Backbone, _){
 
     return Backbone.Collection.extend({
       model: UserConcept,
-
-      initialize: function(args){
-        this.type = args.type;
-      },
 
       setStarredStatus: function(sid, status){
         return pvt.changeUserConceptState.call(this, {id: sid, starred: status});
@@ -84,7 +79,7 @@ define(["backbone", "underscore"], function(Backbone, _){
        */
       defaults: function() {
         return {
-          concepts: new ConceptsCollection({type: "learned"})
+          concepts: new ConceptsCollection()
         };
       },
 
@@ -115,19 +110,19 @@ define(["backbone", "underscore"], function(Backbone, _){
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateLearnedConcept: function(nodeTag, nodeSid, status){
-        var changed = this.get("concepts").setLearnedStatus(nodeSid, status);
+      updateLearnedConcept: function(id, status){
+        var changed = this.get("concepts").setLearnedStatus(id, status);
         var learnedTrigger = window.agfkGlobals.auxModel.getConsts().learnedTrigger;
         if (changed) {
-          this.trigger(learnedTrigger, nodeTag, nodeSid, status);
+          this.trigger(learnedTrigger, id, status);
         }
       },
 
-      updateStarredConcept: function(nodeTag, nodeSid, status){
-        var changed = this.get("concepts").setStarredStatus(nodeSid, status);
+      updateStarredConcept: function(id, status){
+        var changed = this.get("concepts").setStarredStatus(id, status);
         var starredTrigger = window.agfkGlobals.auxModel.getConsts().starredTrigger;
         if (changed) {
-          this.trigger(starredTrigger, nodeTag, nodeSid, status);
+          this.trigger(starredTrigger, id, status);
         }
       }
     });

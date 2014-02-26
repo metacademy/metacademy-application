@@ -50,14 +50,6 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         return _.extend({}, GraphModel.prototype.defaults(), enDef);
       },
 
-      // url: function(){
-      //   var leaf = this.get("leafs")[0] || this.fetchTag;
-      //   if (!leaf){
-      //     throw new Error("Must set graph leaf in graph-model to fetch graph data");
-      //   }
-      //   return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
-      // },
-
       parse: function(resp, xhr){
         if (xhr.parse == false) {
           return {};
@@ -116,43 +108,35 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
             aux = window.agfkGlobals && window.agfkGlobals.auxModel;
         // Implicit learned listeners
         if (aux) {
-          thisModel.listenTo(aux, aux.getConsts().learnedTrigger, thisModel.changeILNodesFromTag);
+          thisModel.listenTo(aux, aux.getConsts().learnedTrigger, thisModel.changeILNodes);
         }
-        thisModel.on("sync", function(){
-          thisModel.changeILNodesFromTag();
-        });
+        thisModel.changeILNodes();
       },
 
-      /**
-       * DFS to change the implicit learned status of the dependencies of leafTag
-       * TODO does not have test coverage
-       */
-      changeILNodesFromTag: function(){
-        // TODO cache learned/implicit learned nodes
+      changeILNodes: function () {
         var thisModel = this,
-            nodes = thisModel.getNodes(),
+            depLeafs = thisModel.get("leafs"),
             aux = window.agfkGlobals && window.agfkGlobals.auxModel,
-            depLeafs = thisModel.get("leafs");
+            reachableNodeIds = [];
 
         if (!aux) return;
 
         depLeafs.forEach(function(depLeaf){
-          var isShortcut = nodes.get(depLeaf).get("is_shortcut"),
-              unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depLeaf, isShortcut), function(tagO){return tagO.from_tag;});
-          nodes.each(function(node){
-            if (unlearnedDepTags.indexOf(node.id) > -1){
-              node.setImplicitLearnStatus(false);
-            } else if (node.id !== depLeaf){
-              node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
-            }
-          });
+          // perform dfs from leaf node
+          reachableNodeIds = _.union(reachableNodeIds, aux.dfsFromNode(thisModel.getNode(depLeaf), true));
+        });
+        thisModel.getNodes().each(function(node){
+          if (reachableNodeIds.indexOf(node.id) > -1){
+            node.setImplicitLearnStatus(false);
+          } else {
+            node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
+          }
         });
       },
 
       getNodeByTag: function (tag) {
         return this.get("nodes").findWhere({tag: tag});
       }
-
     });
   })();
 });

@@ -106,7 +106,7 @@ def register(request, redirect_addr="/user"):
 # increase the complexity of the project
 # or maybe just switching to class-based views would simplify this makeshift API
 @allow_lazy_user
-def handle_concepts(request, conceptId=""):
+def handle_concepts(request, cid=""):
     """
     A simple interface for handling a user's association with a concept
     """
@@ -114,7 +114,8 @@ def handle_concepts(request, conceptId=""):
     method = request.method
 
     if method == "PUT":
-        cid = rbody["id"]
+        if not cid:
+            cid = rbody["id"]
         learned = rbody["learned"]
         starred = rbody["starred"]
 

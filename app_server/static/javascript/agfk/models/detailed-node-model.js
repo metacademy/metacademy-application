@@ -85,7 +85,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       thisModel.setImplicitLearnStatus = function(status){
         if (nodePvt.implicitLearn !== status){
           nodePvt.implicitLearn = status;
-          thisModel.trigger("change:implicitLearnStatus", thisModel.get("id"), thisModel.get("sid"), status);
+          thisModel.trigger("change:implicitLearnStatus", thisModel.get("id"), status);
         }
       };
 
@@ -122,23 +122,6 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         title += " (under construction)";
       }
       return title;
-    },
-
-    /**
-     * Compute the list of outlinks to be displayed in the context section
-     */
-    computeNeededFor: function(){
-      var nodes = this.collection, thisModel = this;
-
-      var found = this.get("outlinks").filter(function(item){
-        var node = nodes.findWhere({"id": item.get("to_tag")});
-        if (!node) {
-          return false;
-        }
-        return node.get("dependencies").findWhere({"from_tag": thisModel.get("id")});
-      });
-
-      return new DetailedEdgeCollection(found);
     },
 
     /**

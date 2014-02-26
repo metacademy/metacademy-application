@@ -214,19 +214,19 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                thisRoute.viewMode = paramsObj[qViewMode];
                var viewMode = thisRoute.viewMode;
 
+               if (!thisRoute.userModel) {
+                 var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true});
+                 var aux = window.agfkGlobals.auxModel;
+                 // isCreating || aux.setDepLeaf(nodeId);
+                 aux.setUserModel(userModel);
+                 thisRoute.userModel = userModel;
+               }
+
                // init main app model
                if (!thisRoute.graphModel) {
                  thisRoute.graphModel = new thisRoute.GraphModel(_.extend(window.agfkGlobals.graphInitData, isCreating ? {} : {leafs: [nodeId]}), {parse: true});
                }
                var graphModel = thisRoute.graphModel;
-
-               if (!thisRoute.userModel) {
-                 var userModel = new UserData(window.agfkGlobals.userInitData, {parse: true});
-                 var aux = window.agfkGlobals.auxModel;
-                 isCreating || aux.setDepLeaf(nodeId);
-                 aux.setUserModel(userModel);
-                 thisRoute.userModel = userModel;
-               }
 
                // default rendering determined by edit mode
                try{

@@ -60,23 +60,6 @@
     color: #333;
 }
 
-#explore-learn-button-wrapper button, #hovertext-buttons button{
-    -webkit-box-shadow: 1px 1px 2px #463838;
-    -moz-box-shadow: 1px 1px 2px #463838;
-    box-shadow: 1px 1px 2px #463838;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    border: 2px #5C4A56 solid;
-    background-color: white;
-    padding: 1.5px;
-    cursor: pointer;
-}
-
-#explore-learn-button-wrapper button:hover{
-    border: 2px #D145CC solid;
-}
-
 #back-to-editing{
     display: none;
     padding: 1em;
@@ -91,6 +74,23 @@
 }
 
 /* Explore-Learn Navigation Button */
+#explore-learn-button-wrapper button, #hovertext-buttons button{
+    -webkit-box-shadow: 1px 1px 2px #463838;
+    -moz-box-shadow: 1px 1px 2px #463838;
+    box-shadow: 1px 1px 2px #463838;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 2px #5C4A56 solid;
+    background-color: white;
+    padding: 1.5px;
+    cursor: pointer;
+}
+
+#explore-learn-button-wrapper .el-nav-button:hover{
+    border: 2px #D145CC solid;
+}
+
 .e-to-l-summary-link{
     color: blueviolet;
     margin-right: 0.5em;
@@ -103,7 +103,7 @@
     height: 20px;
 }
 
-.el-nav-button.active{
+#explore-learn-button-wrapper .el-nav-button.active{
     opacity: 0.7;
     border: 2px #5C4A56 solid;
     cursor: default;
@@ -112,7 +112,7 @@
     box-shadow: none;
 }
 
-.el-nav-button.active:hover{
+#explore-learn-button-wrapper .el-nav-button.active:hover{
     cursor: default;
     border: 2px #5C4A56 solid;
 }

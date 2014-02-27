@@ -135,6 +135,9 @@ define(["jquery"], function($){
    * Parse simple markdown to html
    */
   utils.simpleMdToHtml = function (inMd) {
+  if (!inMd) {
+    return "";
+  }
     var inLines = inMd.split("\n"),
         depth,
         retStr = "",

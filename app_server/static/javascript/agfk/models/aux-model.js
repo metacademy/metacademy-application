@@ -101,49 +101,6 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
         return this.userModel.isStarred(id);
       },
 
-      /* Finds all (learned) dependendcies of input "tag" */
-      computeAllDependencies: function(tag, isShortcut, onlyUnlearned){
-        var nodes =  this.get("nodes"),
-            shortcuts = this.get("shortcuts"),
-            thisModel = this,
-            node,
-            dependenciesObj;
-
-        if (onlyUnlearned && thisModel.conceptIsLearned(tag)){
-          return [];
-        }
-
-        if (isShortcut && shortcuts.get(tag)) {
-          node = shortcuts.get(tag);
-          dependenciesObj = pvt.shortcutDependencies;
-        } else if (nodes.get(tag)) {
-          node = nodes.get(tag);
-          dependenciesObj = pvt.dependencies;
-        } else {
-          // shouldn't happen
-          return [];
-        }
-
-        if (dependenciesObj.hasOwnProperty(tag)) {
-          return dependenciesObj[tag];
-        }
-
-        var result = [];
-        dependenciesObj[tag] = result;     // so that we don't get into an infinite loop if there's a cycle
-
-        node.get("dependencies").each(function(dep) {
-          var fromTag = dep.get("from_tag"),
-              currDep = {'from_tag': fromTag, 'shortcut': dep.get("shortcut")};
-          if (!onlyUnlearned || !thisModel.conceptIsLearned(fromTag)) {
-            result = _.union(result, [currDep], thisModel.computeUnlearnedDependencies(fromTag, dep.get("shortcut")));
-            result = _.unique(result, false, function(dep) { return dep.from_tag + ':' + dep.shortcut; });
-          }
-        });
-
-        dependenciesObj[tag] = result;
-        return result;
-      },
-
       /**
        * returns an array of node ids traversed during a dfs from the input leaf
        * leaf - the beginning leaf node
@@ -172,14 +129,6 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
         return traversedIds;
       },
 
-
-      /**
-       * Finds the unlearned dependencies of a concept with tag 'tag'
-       */
-      computeUnlearnedDependencies: function(tag, isShortcut){
-        return this.computeAllDependencies(tag, isShortcut, true);
-      },
-
       /**
        * Computes the learning time estimate for concept with tag 'tag'
        * Uses a DFS to compute the learning time estimate
@@ -188,7 +137,7 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
       computeTimeEstimate: function(id){
       // TODO aux computeTimeEstimate should take place on the server
       // FIXME
-        return 1;
+        throw new Error("Not implemented yet");
       }
     });
   })();

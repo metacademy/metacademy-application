@@ -73,7 +73,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
             .attr("class", consts.elIconClass)
             .attr("height", consts.elIconHeight + "px")
             .attr("width", consts.elIconWidth + "px")
-            .attr(consts.dataConceptTagProp, d.id)
+            .attr(consts.dataConceptTagProp, d.get("tag"))
             .on("mouseup", function () {
               thisView.handleEToLConceptClick.call(thisView, this.getAttribute(consts.dataConceptTagProp), this);
             }

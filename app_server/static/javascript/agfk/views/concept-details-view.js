@@ -229,10 +229,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
         // update the hovertext when nodes are marked learned/unlearned
         var aux = window.agfkGlobals.auxModel;
-        thisView.listenTo(aux, "reset:estimates", thisView.addHoverText);
 
         thisView.assign(assignObj);
-        thisView.addHoverText();
         thisView.delegateEvents();
         thisView.$el.scrollTop(0);
 
@@ -278,28 +276,33 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.appRouter.changeUrlParams({focus: focus});
       },
 
-      getHoverText: function(conceptTag) {
-        var aux = window.agfkGlobals.auxModel;
-        if (aux.conceptIsLearned(conceptTag)) {
-          return "You have learned this concept.";
-        } else {
-          var timeEstimate = aux.computeTimeEstimate(conceptTag);
-          if (timeEstimate) {
-            return "Time estimate: " + Utils.formatTimeEstimate(timeEstimate);
-          } else {
-            return "";
-          }
-        }
-      },
+      // /**
+      //  * Returns the concept hover text
+      //  */
+      // getHoverText: function(conceptTag) {
+      //   var aux = window.agfkGlobals.auxModel;
+      //   if (aux.conceptIsLearned(conceptTag)) {
+      //     return "You have learned this concept.";
+      //   } else {
+      //     // TODO FIXME
+      //     return "You have not learned this concept";
+      //     // var timeEstimate = aux.computeTimeEstimate(conceptTag);
+      //     // if (timeEstimate) {
+      //     //   return "Time estimate: " + Utils.formatTimeEstimate(timeEstimate);
+      //     // } else {
+      //     //   return "";
+      //     // }
+      //   }
+      // },
 
-      addHoverText: function() {
-        var thisView = this;
-        this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
-          var temp = _.last(this.href.split("/")),
-              concept = _.last(temp.split("="));
-          return thisView.getHoverText(concept);
-        });
-      },
+      // addHoverText: function() {
+      //   var thisView = this;
+      //   this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
+      //     var temp = _.last(this.href.split("/")),
+      //         concept = _.last(temp.split("="));
+      //     return thisView.getHoverText(concept);
+      //   });
+      // },
 
       /**
        * Compute the list of notes to display.
@@ -318,13 +321,13 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         return notes;
       },
 
-      /**
-       * The note telling the user the node is a shortcut.
-       */
-      shortcutNote: function() {
-        var link = this.model.get("id");
-        return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>';
-      },
+      // /**
+      //  * The note telling the user the node is a shortcut.
+      //  */
+      // shortcutNote: function() {
+      //   var link = this.model.get("id");
+      //   return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>';
+      // },
 
       /**
        * Clean Up the view properly

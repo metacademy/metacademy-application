@@ -16,8 +16,7 @@ requirejs.config({
     "btouch": "lib/backbone.touch",
     "colorbox": "lib/jquery.colorbox-min",
     "sidr": "lib/jquery.sidr.min",
-    "filesaver": "lib/FileSaver",
-    "completely": "lib/complete.ly.1.0.1"
+    "filesaver": "lib/FileSaver"
   },
   shim: {
     completely: {

@@ -4,9 +4,14 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
 
   var DetailedNode = Node.extend({
     // FIXME these shouldn't be hardcoded
-    collFields: ["dependencies", "outlinks", "resources", "goals"],
+    collFields: function () {
+      return _.union(Node.prototype.collFields(), ["resources", "goals"]);
+    },
 
-    txtFields: ["id", "tag", "exercises", "sid", "title", "summary", "pointers", "is_shortcut", "learn_time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
+    txtFields: function () {
+        return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "sid", "summary", "pointers", "learn_time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
+    },
+
 
     defaults: function(){
       var dnDefaults = {
@@ -25,7 +30,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         hasContractedOLs: false,
         sid: "",
         summary: "",
-        time: "",
+        learn_time: -1,
         is_shortcut: 0
       };
       return _.extend({}, Node.prototype.defaults(), dnDefaults);
@@ -44,12 +49,14 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       if (resp === null || xhr.parse == false) {
         return {};
       }
-      var output = thisModel.defaults();
+      var output = thisModel.defaults(),
+          txtFields = thisModel.txtFields(),
+          collFields = thisModel.collFields();
 
       // ---- parse the text values ---- //
-      var i = thisModel.txtFields.length;
+      var i = txtFields.length;
       while (i--) {
-        var tv = thisModel.txtFields[i];
+        var tv = txtFields[i];
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
         } else if (output[tv] === undefined) {
@@ -58,9 +65,9 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       }
 
       // ---- parse the collection values ---- //
-      i = thisModel.collFields.length;
+      i = collFields.length;
       while (i--) {
-        var cv = thisModel.collFields[i];
+        var cv = collFields[i];
         output[cv].parent = thisModel;
         if (resp[cv] !== undefined) {
           output[cv].add(resp[cv], {parse: true});
@@ -102,11 +109,11 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       };
 
       thisModel.getCollFields = function(){
-        return thisModel.collFields;
+        return thisModel.collFields();
       };
 
       thisModel.getTxtFields = function(){
-        return thisModel.txtFields;
+        return thisModel.txtFields();
       };
     },
 
@@ -136,11 +143,12 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       var thisModel = this,
           attrs = thisModel.attributes,
           attrib,
-          retObj = {};
+          retObj = {},
+          collFields = thisModel.collFields();
 
       // handle flat attributes
       for (attrib in attrs) {
-        if (attrs.hasOwnProperty(attrib) && thisModel.collFields.indexOf(attrib) === -1) {
+        if (attrs.hasOwnProperty(attrib) && collFields.indexOf(attrib) === -1) {
           retObj[attrib] = thisModel.get(attrib);
         }
       }

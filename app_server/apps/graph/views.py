@@ -101,7 +101,6 @@ def edit_existing_graph(request, gid):
         concepts = get_user_data(request)
         full_graph_json = get_full_graph_json_str()
         graph_json = api_communicator.get_graph(request, gid)
-        pdb.set_trace()
         return render_to_response("graph-creator.html",
                                   {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
                                    "graph_id": gid, "graph_init_data": graph_json},

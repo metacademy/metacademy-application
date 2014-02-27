@@ -256,7 +256,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                if (paramsObj[qFocusConcept] === undefined){
                  topoSort = graphModel.getTopoSort();
-                 paramsObj[qFocusConcept] = graphModel.getNode(topoSort[topoSort.length - 1]).get("tag");
+                 paramsObj[qFocusConcept] = topoSort.length ? graphModel.getNode(topoSort[topoSort.length - 1]).get("tag") : "";
                }
 
                // always render if creating

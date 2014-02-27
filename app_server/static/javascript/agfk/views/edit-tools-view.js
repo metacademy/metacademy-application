@@ -1,5 +1,5 @@
 /*global define*/
-define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbone, ErrorHandler){
+define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandler){
   "use strict";
 
   /**
@@ -27,8 +27,7 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         "click #delete-graph": "clearGraph",
         "click #preview-graph": "previewGraph",
         "click #back-to-editing": "returnToEditor",
-        "click #save": "syncWithServer",
-        "keyup #add-concept-container input": "addConceptKeyUp"
+        "click #save": "syncWithServer"
         // Bad design note: #optimize listener is in graph-view
       },
 
@@ -50,23 +49,6 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
        */
       render: function(){
         pvt.viewRendered = true;
-        // setup autocomplete
-        // TODO handle styles in css -- perhaps use a different library
-        var auto = window.completely(document.getElementById('add-concept-container'), {
-    	     fontSize : '0.9em'
-         });
-         auto.options = window.agfkGlobals.auxModel.get("nodes").map(function (node) {
-           return node.get("title").toLowerCase();
-         });
-         auto.options.sort();
-         auto.input.placeholder = "Search for a concept to add";
-         var $auto = $(auto.input);
-         $auto.css("border", "1px solid rgb(56, 49, 49)");
-         $auto.css("padding", "0.2em");
-        var $hint = $(auto.hint);
-        $hint.css("padding", "0.3em");
-         //auto.repaint();
-        this.auto = auto;
         return this;
       },
 
@@ -144,7 +126,6 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
                          newPath = newPath.join("/") + "/" + thisView.model.id;
                          window.history.pushState({}, "", newPath);
                        }
-
                    },
                      error: function (resp) {
                        console.log(resp.responseText);
@@ -167,49 +148,6 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         if (!confirmDelete || confirm("Press OK to clear this graph")){
           this.model.clear().set(this.model.defaults());
           this.model.trigger("render"); // FIXME this is a hack
-        }
-      },
-
-      addConceptKeyUp: function (evt) {
-        var thisView = this,
-            keyCode = evt.keyCode;
-        var inpText = evt.target.value;
-        if (!inpText.length) {
-          thisView.auto.hideDropDown();
-          thisView.auto.hint.value = "";
-          return;
-        }
-        if (keyCode === 13) {
-          if (inpText) {
-            var aux = window.agfkGlobals.auxModel,
-            // try to find the tag and add to graph
-            res = aux.get("nodes").filter(function(d){
-              return d.get("title").toLowerCase() === inpText.toLowerCase() || d.id.toLowerCase() === inpText.toLowerCase();
-            });
-            if (res.length) {
-              var fetchNodeId = res[0].id;
-              thisView.model.set("leafs", [fetchNodeId]);
-              thisView.model.useOldUrl = true;
-              thisView.model.fetch({
-                success: function () {
-                  // need to contract
-                  var fetchNode = thisView.model.getNode(fetchNodeId);
-                  fetchNode.set("x", 200);
-                  fetchNode.set("y", 200); // FIXME figure out a better positioning system for the fetched node
-                  fetchNode.contractDeps();
-                  thisView.model.trigger("render");
-                  evt.target.value = "";
-
-                  // TODO write your own autocomplete
-                  thisView.auto.hideDropDown();
-                  thisView.auto.hint.value = "";
-                }
-              });
-            } else {
-              alert("sorry, no matching concept for: " + inpText);
-              // TODO let the user know that no matching concept was found
-            }
-          }
         }
       }
 

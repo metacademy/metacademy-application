@@ -112,7 +112,7 @@ define(["chai", "gc/models/editable-graph-model"], function(chai, EditGraphModel
         graphObj.getNodes().forEach(function(oldNode) {
           var node = graphObj.getNode(oldNode.id),
               attribs = oldNode.attributes,
-              collFields = oldNode.collFields;
+              collFields = oldNode.collFields();
           // compare txt fields
           for (var attr in attribs) {
             if (attribs.hasOwnProperty(attr) && collFields.indexOf(attr) === -1){

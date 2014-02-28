@@ -6,6 +6,22 @@
   <div class="global-resource-fields">
   </div>
 
+  <div class="resource-core-fields">
+    <label>Does this resource cover all of the learning goals?</label>
+    <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Yes
+    <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="supp" <%= (core == 0) ? "checked" : "" %>>No
+    <% var goals = this.model.get("concept").get("goals") %>
+    <% if (goals.length) { %>
+    <div class="resource-goals-covered" style="<%- core ? 'display: none' : '' %>">
+      <label>Which goals does it cover?</label>
+      <% goals.each(function(goal){ %>
+         <input type="checkbox" name="resource-goal-<%= goal.cid %>" value="<%= goal.id %>" <%- goals_covered.indexOf(goal.id) > -1 ? "checked" : "" %>> <%- goal.get("text") %> <br>
+         <% }); %>
+    </div>
+    <% } %>
+  </div>
+
+
   <div class="resource-location-wrapper">
   </div>
   <!-- <div class="expand-content"> -->
@@ -18,10 +34,6 @@
 
   <label>Notes</label>
   <textarea class="text-field" name="notes-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning"><%= notes %></textarea>
-
-  <label>Does this resource cover all of the learning goals?</label>
-  <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Yes
-  <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="supp" <%= (core == 0) ? "checked" : "" %>>No
 
   <label>Access</label>
   <select name="access-<%=this.cid%>" class="select-field">

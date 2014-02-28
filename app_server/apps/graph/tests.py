@@ -1,7 +1,6 @@
 import pdb
 import ast
 import json
-import unittest
 import copy
 
 from django.contrib.auth.models import User
@@ -12,18 +11,23 @@ from apps.user_management.models import Profile
 import test_data
 from test_data.data import three_node_graph
 
+# TODO are we checking the global resources?
 
 ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
                  ('post', 'list')]
 
+
 def concept_list_url():
     return '/graphs/api/v1/concept/'
+
 
 def concept_detail_url(cid):
     return concept_list_url() + cid + '/'
 
+
 def dependency_list_url():
     return '/graphs/api/v1/dependency/'
+
 
 def dependency_detail_url(dep_id):
     return dependency_list_url() + dep_id + '/'
@@ -38,14 +42,14 @@ class BaseResourceTest(ResourceTestCase):
         super(BaseResourceTest, self).setUp()
 
         # Create a normal user.
-        self.username = 'test' # use un as pw
+        self.username = 'test'  # use un as pw
         user = User.objects.create_user(self.username, 'test@example.com', self.username)
         prof = Profile(user=user)
         prof.save()
         user.save()
 
         # create a super user
-        self.super_username = 'super_test' # use un as pw
+        self.super_username = 'super_test'  # use un as pw
         suser = User.objects.create_superuser(self.super_username, self.super_username + "@test.com", self.super_username)
         suser.save()
         sprof = Profile(user=suser)
@@ -67,7 +71,7 @@ class BaseResourceTest(ResourceTestCase):
     def populate_initial_graph(self):
         # login as superuser
         self.api_client.client.login(username=self.super_username, password=self.super_username)
-        
+
         for concept in test_data.data.initial_concepts(self.init_tag_match()):
             self.api_client.post(concept_list_url(), format='json', data=concept)
         for dep in test_data.data.initial_dependencies():
@@ -136,12 +140,14 @@ class BaseResourceTest(ResourceTestCase):
         res_eval_attrs = ["location", "additional_dependencies", "authors"]
         res_int_attrs = ["year"]
         res_boolean_attrs = ["core", "free", "requires_signup"]
+        res_m2m_attrs = ["goals_covered"]
 
-        all_attribs = set().union(res_eval_attrs).union(res_int_attrs).union(res_boolean_attrs)
+        all_attribs = set().union(res_eval_attrs).union(res_int_attrs).union(res_boolean_attrs).union(res_m2m_attrs)
+
         for in_res in in_concept["resources"]:
             res = ConceptResource.objects.get(id=in_res["id"])
             for atrb in all_attribs:
-                if in_res.has_key(atrb):
+                if atrb in in_res:
                     if atrb in res_flat_attrs:
                         self.assertEqual(unicode(in_res[atrb]), getattr(res, atrb))
                     elif atrb in res_eval_attrs:
@@ -150,6 +156,16 @@ class BaseResourceTest(ResourceTestCase):
                         self.assertEqual(int(in_res[atrb]), getattr(res, atrb))
                     elif atrb in res_boolean_attrs:
                         self.assertEqual(bool(int(in_res[atrb])), getattr(res, atrb))
+                    elif atrb in res_m2m_attrs:
+                        if in_res[atrb] == []:
+                            self.assertEqual(getattr(res, atrb).all().count(), 0)
+                        else:
+                            api_keys = map(lambda akey: akey.split("/")[-2], in_res[atrb])
+                            db_keys = map(lambda g: g.id, res.goals_covered.all())
+                            for akey in api_keys:
+                                # if akey not in db_keys:
+                                #     pdb.set_trace()
+                                self.assertEqual(akey in db_keys, True)
 
     def check_result(self, resp, data):
         # check results of GET operations against database
@@ -170,21 +186,19 @@ class BaseResourceTest(ResourceTestCase):
                 full_data[k] = v
             self.verify_db_obj(full_data)
 
-
         # check that unsuccessful modifications don't do anything
         if self.verb in ['put', 'post', 'patch'] and not self.succeeds():
             self.assertEqual(len(self.objects_in_db()), self.initial_count())
 
 
-
 class ResourceAuthTest(BaseResourceTest):
     def __init__(self):
         BaseResourceTest.__init__(self, 'tst_auth')
-        
+
     def correct_response_code(self):
         if (self.verb, self.vtype) not in ALLOWED_PAIRS:
             return 'MethodNotAllowed'
-        
+
         if self.verb == 'get':
             if self.vtype == 'list' or self.resource_exists():
                 return 'OK'
@@ -214,15 +228,13 @@ class ResourceAuthTest(BaseResourceTest):
 
     def tst_auth(self):
         # name disguised so test discoverer doesn't pick it up
-        
+
         data = self.get_request_data()
         resp = self.do_request(self.resource_url(), verb=self.verb, vtype=self.vtype, data=data,
                                user_type=self.user_type)
         self.check_response_code(resp)
         self.check_result(resp, data)
 
-
-    
 
 class ConceptResourceAuthTest(ResourceAuthTest):
     def __init__(self, verb, vtype, user_type, tag_match, existing_concept):
@@ -248,10 +260,10 @@ class ConceptResourceAuthTest(ResourceAuthTest):
             return concept_detail_url(self.detail_data()['id'])
         else:
             return concept_list_url()
-    
+
     def user_can_edit(self):
         return self.user_type == 'super' or \
-               (self.user_type == 'auth' and self.tag_match and self.existing_concept != 'accepted')
+            (self.user_type == 'auth' and self.tag_match and self.existing_concept != 'accepted')
 
     def list_data(self):
         if self.existing_concept in ['provisional', 'accepted']:
@@ -276,10 +288,9 @@ class ConceptResourceAuthTest(ResourceAuthTest):
     def resource_exists(self):
         return self.existing_concept in ['provisional', 'accepted']
 
-    
-
 
 class DependencyResourceAuthTest(ResourceAuthTest):
+
     def __init__(self, verb, vtype, user_type, dependency_exists):
         ResourceAuthTest.__init__(self)
         self.verb = verb
@@ -311,7 +322,7 @@ class DependencyResourceAuthTest(ResourceAuthTest):
             return test_data.data.initial_dependencies()
         else:
             return test_data.data.new_dependencies()
-        
+
     def user_can_edit(self):
         return self.user_type == 'super'
 
@@ -320,7 +331,7 @@ class DependencyResourceAuthTest(ResourceAuthTest):
 
         def extract_id(uri):
             return uri.split('/')[-2]
-        
+
         self.assertEqual(dep.source.id, extract_id(in_dep['source']))
         self.assertEqual(dep.target.id, extract_id(in_dep['target']))
         self.assertEqual(dep.reason, in_dep['reason'])
@@ -334,7 +345,7 @@ class DependencyResourceAuthTest(ResourceAuthTest):
 
     def resource_exists(self):
         return self.dependency_exists
-        
+
 
 class GraphResourceTest(BaseResourceTest):
     """
@@ -484,8 +495,6 @@ class GraphResourceTest(BaseResourceTest):
 
     def test_get_list_auth(self):
         self.get_list_test(auth=True)
-
-
 
 
 def load_tests(loader, suite, pattern):

@@ -10,7 +10,9 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
       templateId: "resource-editor-template",
       ecClass: "expanded",
       globalResClass: "global-resource-fields",
-      resLocWrapperClass: "resource-location-wrapper"
+      resLocWrapperClass: "resource-location-wrapper",
+      rgcClass: "resource-goals-covered",
+      crfClass: "core-radio-field"
     };
 
     return BaseEditorView.extend({
@@ -19,9 +21,11 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
       className: "resource-form input-form",
 
       events: function(){
-        var oevts = BaseEditorView.prototype.events();
+        var oevts = BaseEditorView.prototype.events(),
+            consts = pvt.consts;
         oevts["blur .deps-field"] = "changeDepsField";
-        oevts["change .core-radio-field"] = "changeCoreRadioField";
+        oevts["change ." + consts.crfClass] = "changeCoreRadioField";
+        oevts["change ." + consts.rgcClass + " input"] = "changeCoveredGoal";
         return oevts;
       },
 
@@ -45,8 +49,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         assignObj["." + consts.globalResClass] = thisView.globalResourceView;
         assignObj["." + consts.resLocWrapperClass] = thisView.resourceLocationsView;
 
-        thisView.$el.html(thisView.template(thisView.model.toJSON()));
-
+        thisView.$el.html(thisView.template(thisView.model.attributes));
         // assign the subviews
         thisView.assign(assignObj);
 
@@ -92,13 +95,39 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
       },
 
       /**
+       * changeCoveredGoal: change which goals are covered by the resource
+       */
+      changeCoveredGoal: function (evt) {
+        var thisView = this,
+            checkbox = evt.currentTarget,
+            goalId = checkbox.value,
+            checked = checkbox.checked,
+            goalsCovered = this.model.get("goals_covered"),
+            gidIndex = goalsCovered.indexOf(goalId);
+
+        if (checked && gidIndex === -1) {
+          goalsCovered.push(goalId);
+        } else if (!checked && gidIndex !== -1) {
+          goalsCovered.splice(gidIndex, 1);
+        }
+        thisView.model.set("goals_covered", goalsCovered);
+      },
+
+      /**
        * changeCoreRadioField: change core/supplementary field in the resource model
        */
       changeCoreRadioField: function (evt) {
         var thisView = this,
             curTar = evt.currentTarget,
-            attrName = curTar.name.split("-")[0];
-        thisView.model.set(attrName, curTar.value === "core" ? 1 : 0);
+            attrName = curTar.name.split("-")[0],
+            coreVal = curTar.value === "core" ? 1 : 0,
+            $rgc = $(evt.currentTarget.parentElement).find("." + pvt.consts.rgcClass).hide();
+        thisView.model.set(attrName, coreVal);
+        if (coreVal) {
+          $rgc.hide();
+        } else {
+          $rgc.show();
+        }
       }
     });
   })();

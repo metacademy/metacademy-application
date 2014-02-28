@@ -9,7 +9,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
     },
 
     txtFields: function () {
-        return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "sid", "summary", "pointers", "learn_time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
+        return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "summary", "pointers", "learn_time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
     },
 
 

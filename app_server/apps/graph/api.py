@@ -248,6 +248,7 @@ class ConceptResourceResource(CustomSaveHookResource):
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
     locations = fields.ToManyField(ResourceLocationResource, 'locations', full=True, related_name="cresource")
     global_resource = fields.ForeignKey(GlobalResourceResource, "global_resource", full=True)
+    goals_covered = fields.ManyToManyField(GoalResource, "goals_covered")
 
     class Meta(CustomSaveHookResource.Meta):
         queryset = CResource.objects.all()
@@ -361,12 +362,10 @@ class ConceptResource(CustomSaveHookResource):
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)
-        csettings.save()
         # create targetgraph if necessary
         tgraph, tnew = TargetGraph.objects.get_or_create(leaf=bundle.obj)
         if tnew:
             tgraph.concepts.add(bundle.obj)
-            tgraph.save()
         return bundle
 
     class Meta(CustomSaveHookResource.Meta):
@@ -415,7 +414,13 @@ class DependencyResource(CustomSaveHookResource):
             otarget = bundle.obj.target
             osource = bundle.obj.source
             concepts_to_traverse = [ol.target for ol in otarget.dep_source.all()]
-            add_concepts = osource.tgraph_leaf.concepts.all()
+            os_tgraph, created = TargetGraph.objects.get_or_create(leaf=osource)
+            if created:
+                os_tgraph.concepts.add(osource)
+            add_concepts = os_tgraph.concepts.all()
+            ot_tgraph, created = TargetGraph.objects.get_or_create(leaf=otarget)
+            if created:
+                os_tgraph.concepts.add(otarget)
             otarget.tgraph_leaf.concepts.add(*add_concepts)
             otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())
             otarget.tgraph_leaf.dependencies.add(bundle.obj)

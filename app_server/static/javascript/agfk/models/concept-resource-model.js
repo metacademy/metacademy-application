@@ -6,7 +6,7 @@
 
 define(["backbone", "agfk/collections/resource-location-collection", "agfk/models/global-resource-model"], function(Backbone, LocationCollection, GlobalResource){
     return Backbone.Model.extend({
-    simpleFields: ["id", "access", "core", "edition", "additional_dependencies", "notes"],
+    simpleFields: ["id", "access", "core", "edition", "additional_dependencies", "notes", "goals_covered"],
     collFields: ["locations"],
     /**
      * default values -- attributes match possible data from server
@@ -17,7 +17,9 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
         locations: new LocationCollection(),
         global_resource: new GlobalResource(),
         access: "",
-        core: 0,
+        core: 1,
+        // TODO consider using a GoalCollection?
+        goals_covered: [],
         edition: "",
         additional_dependencies: [],
         notes: "",
@@ -85,6 +87,11 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       retObj["concept"] = {"id": thisModel.get("concept").get("id")};
       retObj["locations"] = thisModel.get("locations").toJSON();
       retObj["global_resource"] = thisModel.get("global_resource").toJSON();
+      var goals = thisModel.get("concept").get("goals");
+      retObj["goals_covered"] = thisModel.get("goals_covered")
+        .map(function (gid) {
+          return goals.get(gid).url();
+        });
       return retObj;
     }
   });

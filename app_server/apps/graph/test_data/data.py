@@ -23,6 +23,7 @@ def concept1(tag_match=True):
                            'concept': {'id': 'tvat4s6ja6bhuxr'},
                            'core': 0,
                            'edition': '',
+                           'goals_covered': map(goal_uri, ["wiemte29", "sr1cxzjjor"]),
                            'global_resource': {'access': '',
                                                'authors': [],
                                                'description': "it's edx",
@@ -96,6 +97,7 @@ def concept2(tag_match=True):
             'x': 613.6666666666667,
             'y': 154}
 
+
 def concept3(tag_match=True):
     if tag_match:
         tag = '9jgljchjobc5wmi'
@@ -117,8 +119,9 @@ def concept3(tag_match=True):
                            'additional_dependencies': [{'title': 'logistic regression'},
                                                        {'title': 'gradient descent'}],
                            'concept': {'id': '9jgljchjobc5wmi'},
-                           'core': 1,
+                           'core': 0,
                            'edition': '3',
+                           'goals_covered': [],
                            'global_resource': {'access': '',
                                                'authors': ['larry page', 'serge brin'],
                                                'description': "here's a resource",
@@ -150,7 +153,7 @@ def concept4(tag_match=True):
         tag = 'c95j43nx8dj4ne8'
     else:
         tag = 'nomatch4'
-        
+
     return {'editNote': '',
             'exercises': "here's some exercises (this will change)",
             'flags': [],
@@ -223,7 +226,7 @@ def dependency3():
             'source_goals': map(goal_uri, ['sr1cxzjjor', 'wiemte29']),
             'target': concept_uri('uqdaziy5h4cxr'),
             'target_goals': map(goal_uri, ['749ylul3di'])}
-            
+
 
 
 # directly copied from a post request ()

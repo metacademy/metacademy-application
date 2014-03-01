@@ -2,6 +2,7 @@ import pdb
 import string
 import random
 import ast
+from collections import OrderedDict
 
 # myapp/api.py
 from tastypie import fields
@@ -254,6 +255,13 @@ class ConceptResourceResource(CustomSaveHookResource):
         queryset = CResource.objects.all()
         resource_name = 'conceptresource'
 
+    def post_save_hook(self, bundle):
+        if bundle.obj.goals_covered.all().count() == 0 and len(bundle.data["goals_covered"]):
+            # FIXME hack because of weird saving schedule in tastypie
+            for gc in bundle.data["goals_covered"]:
+                bundle.obj.goals_covered.add(gc.obj)
+        return bundle
+
     def dehydrate(self, bundle):
         # TODO why is this called > 1 times? and why doesn't this flag stop it?
         if not hasattr(self, "was_dehydrated"):
@@ -347,6 +355,7 @@ class ConceptResourceResource(CustomSaveHookResource):
             else:
                 save_adep = {"title": dep["title"]}
             save_adeps.append(save_adep)
+
         return bundle
 
 
@@ -376,11 +385,11 @@ class ConceptResource(CustomSaveHookResource):
 
     def alter_deserialized_list_data(self, request, data):
         for concept in data["objects"]:
-            normalize_concept(concept)
+            data = normalize_concept(concept)
         return data
 
     def alter_deserialized_detail_data(self, request, data):
-        normalize_concept(data)
+        data = normalize_concept(data)
         return data
 
 
@@ -456,7 +465,7 @@ class GraphResource(BaseResource):
             for concept in data["concepts"]:
                 if type(concept) != dict:     # if it's a Bundle, this function has already been called
                     continue
-                normalize_concept(concept)
+                concept = normalize_concept(concept)
                 id_to_concept[concept["id"]] = concept
 
         return data
@@ -486,8 +495,12 @@ def normalize_concept(in_concept):
     """
     Temporary hack to normalize tag/id for new and old data and remove client-side fields
     """
-    if type(in_concept) != dict:
-        return
+    # ensure that goals comes before resources
+
+    # pdb.set_trace()
+
+    # if type(in_concept) != OrderedDict:
+    #     return
 
     if not in_concept["id"] or in_concept["id"][:4] == "-new":
         useid = ''
@@ -502,6 +515,8 @@ def normalize_concept(in_concept):
     for field in in_concept.keys():
         if field not in CONCEPT_SAVE_FIELDS:
             del in_concept[field]
+
+    return in_concept
 
 
 class TargetGraphResource(NamespacedModelResource):

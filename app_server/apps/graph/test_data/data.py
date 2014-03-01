@@ -172,6 +172,7 @@ def concept4(tag_match=True):
                            'concept': {'id': 'c95j43nx8dj4ne8'},
                            'core': 1,
                            'edition': '3',
+                           'goals_covered': [goal_uri("9c84hgiske")],
                            'global_resource': {'access': '',
                                                'authors': ['somebody', 'nobody'],
                                                'description': "yet another resource",

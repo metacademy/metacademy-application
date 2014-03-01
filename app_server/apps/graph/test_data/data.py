@@ -70,6 +70,7 @@ def concept2(tag_match=True):
                            'additional_dependencies': [],
                            'concept': {'id': 'uqdaziy5h4cxr'},
                            'core': 0,
+                           'goals_covered': [],
                            'edition': '',
                            'global_resource': {'access': '',
                                                'authors': [],

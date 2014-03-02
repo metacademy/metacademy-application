@@ -104,14 +104,14 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
             jsonEdgesOnly =  $.extend({}, jsonObj, {concepts: []});
         $.ajax({ type: "PUT",
                  // TODO move hardcoded url
-                 url: "/graphs/api/v1/graph/" + thisView.model.id + "/",
+                 url: thisView.model.url(),
                  contentType: "application/json; charset=utf-8",
                  data: JSON.stringify(jsonConceptOnly),
                  headers: {'X-CSRFToken': window.CSRF_TOKEN},
                  success: function (resp) {
                    $.ajax({ type: "PUT",
                      // TODO move hardcoded url
-                     url: "/graphs/api/v1/graph/" + thisView.model.id + "/",
+                     url: thisView.model.url(),
                      contentType: "application/json; charset=utf-8",
                      data: JSON.stringify(jsonObj),
                      headers: {'X-CSRFToken': window.CSRF_TOKEN},

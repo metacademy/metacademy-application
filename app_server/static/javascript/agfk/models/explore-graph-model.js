@@ -2,7 +2,7 @@
  This file contains the graph-data model
  */
 /*global define */
-define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors"], function(Backbone, _, GraphModel, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
+define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors"], function($, Backbone, _, GraphModel, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
@@ -36,7 +36,9 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
    * GraphData: model to store all graph related data
    */
   return (function(){
+
     var pvt = {};
+
     return GraphModel.extend({
       /**
        * default user states
@@ -99,6 +101,78 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         return thisModel.attributes;
       },
 
+      toJSON: function () {
+        var thisModel = this,
+            node_uris = [],
+            edge_uris = [];
+        this.get("nodes").each(function (node) {
+          node_uris.push(node.url());
+        });
+        this.get("edges").each(function (edge) {
+          edge_uris.push(edge.url());
+        });
+
+        return {
+          concepts: node_uris,
+          dependencies: edge_uris,
+          id: this.get("id"),
+          title: this.get("title")
+        };
+      },
+
+      /**
+       * @Override
+       */
+      postAddEdge: function (edge, isNewEdge) {
+        var thisModel = this;
+        // if it needs the server id it'll be saved after the node id returns
+        // so don't do it here
+        if (isNewEdge && !edge.get("needsServerId")) {
+          edge.save(null, {parse: false,
+                           success: function () {
+                             thisModel.save(null, {parse: false});
+                           }
+                          });
+        }
+      },
+
+      /**
+       * @Override
+       */
+      postAddNode: function (node, isNewNode) {
+        if (!isNewNode) {
+          node.hasServerId = true;
+          return;
+        }
+        var thisModel = this;
+        node.hasServerId = false;
+
+        // TODO HARDCODED URL
+        $.get(window.agfkGlobals.idcheckUrl, {id: node.id, type: "concept" })
+          .success(function (resp) {
+            node.set("id", resp.id);
+            node.set("tag", resp.id);
+            node.hasServerId = true;
+            // set edge ids that were waiting for the server
+            thisModel.getEdges().filter(function (edge) {
+              return edge.get("needsServerId");
+            }).forEach(thisModel.setEdgeId);
+
+            // save the node -- how will we save edges on creation? -- save them once they get the server id
+            node.save(null, {parse: false,
+                             success: function () {
+                               console.log("success");
+                               thisModel.save(null, {parse: false});
+                             }});
+            // then save the graph using only uris -- this is what "to json" should do
+          })
+          .fail(function (resp){
+            // failure
+            console.error("unable to verify new resource id -- TODO inform user -- msg: "
+                          + resp.responseText);
+          });
+      },
+
       /**
        * @Override
        */
@@ -136,6 +210,25 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
 
       getNodeByTag: function (tag) {
         return this.get("nodes").findWhere({tag: tag});
+      },
+
+      setEdgeId: function (edge) {
+        var src,
+            tar,
+            needsServerId;
+
+        if (edge.set) {
+          // edge is a backbone model
+          src = edge.get("source");
+          tar = edge.get("target");
+          edge.set("id", String(src.id) + String(tar.id));
+          edge.set("needsServerId", !src.hasServerId || !tar.hasServerId);
+        } else {
+          src = edge.source;
+          tar = edge.target;
+          edge.id = String(src.id) + String(tar.id);
+          edge.needsServerId = !src.hasServerId || !tar.hasServerId;
+        }
       }
     });
   })();

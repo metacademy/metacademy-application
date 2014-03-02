@@ -24,15 +24,11 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       }
       return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
     }
-      return "http://127.0.0.1:8080/graphs/api/v1/graph/" + this.id + "/";
+      return window.agfkGlobals.apiBase + "graph/" + this.id + "/";
     },
 
     isPopulated: function() {
       return true;
-    },
-
-    postAddEdge: function (edge) {
-    // TODO this may no longer be necessary
     }
   });
 });

@@ -113,7 +113,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         var thisView = this,
             gid = Math.random().toString(36).substr(8),
             newGoal = new GoalModel({id: gid, concept: thisView.model});
-        $.get("/graphs/idchecker/", {id: gid, type: "goal"})
+        $.get(window.agfkGlobals.idcheckUrl, {id: gid, type: "goal"})
         .success(function (resp) {
             newGoal.set("id", resp.id);
         })
@@ -159,13 +159,13 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         newRes.set("concept", thisView.model);
 
         // TODO fix hardcoded URLS!
-        $.get("/graphs/idchecker/", {id: rid, type: "resource" })
+        $.get(window.agfkGlobals.idcheckUrl, {id: rid, type: "resource" })
         .success(function (resp) {
             newRes.set("id", resp.id);
         })
         .fail(pvt.failFun);
 
-        $.get("/graphs/idchecker/", {id: grid, type: "global_resource" })
+        $.get(window.agfkGlobals.idcheckUrl, {id: grid, type: "global_resource" })
           .success(function (resp) {
             // change the id if it hasn't taken on a different global resource
             var gresource = newRes.get("global_resource");

@@ -382,6 +382,7 @@ class ConceptResource(CustomSaveHookResource):
         queryset = Concept.objects.all()
         resource_name = 'concept'
         authorization = ConceptAuthorization()
+        always_return_data = True
 
     def alter_deserialized_list_data(self, request, data):
         for concept in data["objects"]:

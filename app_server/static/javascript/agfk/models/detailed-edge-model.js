@@ -17,7 +17,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
 
     parse: function (resp, xhr) {
       // backwards compatability to parse entire server graph TODO remove
-      if (!(resp.hasOwnProperty("source") && resp.hasOwnProperty("target"))) {
+      if (!xhr.parse || !(resp.hasOwnProperty("source") && resp.hasOwnProperty("target"))) {
         return resp;
       }
 

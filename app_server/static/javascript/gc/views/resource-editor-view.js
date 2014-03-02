@@ -65,7 +65,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         thisView.resourceLocationsView.model.add(resLoc);
         // verify the rl id is okay
         // TODO fix hardcoded URLS!
-        $.get("http://127.0.0.1:8080/graphs/idchecker/",
+        $.get(window.agfkGlobals.idcheckUrl,
           {id: rlid, type: "resource_location" })
           .success(function (resp) {
             resLoc.set("id", resp.id);

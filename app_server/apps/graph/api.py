@@ -268,7 +268,7 @@ class ConceptResourceResource(CustomSaveHookResource):
             self.was_dehydrated = True
         elif self.was_dehydrated:
             return bundle
-
+        bundle.data["goals_covered"] = [goal.id for goal in bundle.obj.goals_covered.all()]
         # bundle.data['location'] = json.loads(bundle.data['location'])
         adeps = bundle.data["additional_dependencies"]
         notes = bundle.data["notes"]

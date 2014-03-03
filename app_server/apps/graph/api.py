@@ -2,7 +2,6 @@ import pdb
 import string
 import random
 import ast
-from collections import OrderedDict
 
 # myapp/api.py
 from tastypie import fields
@@ -200,10 +199,6 @@ class ResourceLocationResource(CustomSaveHookResource):
         queryset = ResourceLocation.objects.all()
         resource_name = 'resourcelocation'
 
-    def dehydrate(self, bundle, **kwargs):
-        del bundle.data["cresource"]
-        return bundle
-
 
 class GlobalResourceResource(CustomSaveHookResource):
     """
@@ -308,8 +303,8 @@ class ConceptResourceResource(CustomSaveHookResource):
         if type(resource) != dict:
             return bundle
 
-        if "concept" in resource:
-            del resource["concept"]
+        # if "concept" in resource:
+        #     del resource["concept"]
 
         # create new id if necessary
         if not resource["id"]:
@@ -318,13 +313,9 @@ class ConceptResourceResource(CustomSaveHookResource):
                 useid = ''.join([random.choice(string.lowercase + string.digits) for i in range(12)])
             resource["id"] = useid
 
-        # FIXME this shouldn't exist here, or at least, it should check
-        # that the id doesn't exist (for that 1 in 4.7x10^18 chance)
-        if not "id" in resource:
-            resource["id"] = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
-
         adeps_type = type(resource["additional_dependencies"])
-        if adeps_type == str:
+
+        if adeps_type == str or adeps_type == unicode:
             adeps = ast.literal_eval(resource["additional_dependencies"])
         elif adeps_type == list:
             adeps = resource["additional_dependencies"]
@@ -408,6 +399,7 @@ class DependencyResource(CustomSaveHookResource):
         queryset = Dependency.objects.all()
         resource_name = 'dependency'
         include_resource_uri = False
+        # allow patch so we can update many deps at once
         list_allowed_methods = ('get', 'post', 'patch')
 
     def pre_save_hook(self, bundle, **kwargs):

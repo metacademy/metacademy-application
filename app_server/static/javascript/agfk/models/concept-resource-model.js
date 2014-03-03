@@ -1,3 +1,4 @@
+
 /**
  * Concept-level learning resource model
  */
@@ -18,7 +19,7 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
         global_resource: new GlobalResource(),
         access: "",
         core: 1,
-        // TODO consider using a GoalCollection?
+        // TODO consider using a GoalCollection if goals become more complicated
         goals_covered: [],
         edition: "",
         additional_dependencies: [],
@@ -75,6 +76,10 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       return this.get("global_resource").get("year");
     },
 
+    url: function () {
+        return window.agfkGlobals.apiBase + "conceptresource/" + this.id + "/";
+    },
+
     toJSON: function () {
       var thisModel = this,
           retObj = {},
@@ -84,7 +89,8 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       thisModel.simpleFields.forEach(function(attrib){
           retObj[attrib] = thisModel.get(attrib);
       });
-      retObj["concept"] = {"id": thisModel.get("concept").get("id")};
+      retObj["concept"] = thisModel.get("concept").url();
+      // don't use URIs since the locs and global res must exist
       retObj["locations"] = thisModel.get("locations").toJSON();
       retObj["global_resource"] = thisModel.get("global_resource").toJSON();
       var goals = thisModel.get("concept").get("goals");

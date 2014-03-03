@@ -22,6 +22,10 @@ define(["backbone"], function(Backbone){
       };
     },
 
+    url: function () {
+        return window.agfkGlobals.apiBase + "globalresource/" + this.id + "/";
+    },
+
     getAuthorsString: function () {
       return this.get("authors").join(" and ");
     }

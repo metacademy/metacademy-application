@@ -168,10 +168,10 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         newRes.parent = thisView.model;
         newRes.set("concept", thisView.model);
 
-        // TODO fix hardcoded URLS!
         $.get(window.agfkGlobals.idcheckUrl, {id: rid, type: "resource" })
         .success(function (resp) {
             newRes.set("id", resp.id);
+            newRes.save(null, {parse: false});
         })
         .fail(pvt.failFun);
 

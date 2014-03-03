@@ -60,7 +60,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
       addResourceLocation: function () {
         var thisView = this,
             rlid = Math.random().toString(36).substr(8),
-            resLoc = new ResourceLocation({id: rlid, concept_resource: thisView.model});
+            resLoc = new ResourceLocation({id: rlid, cresource: thisView.model});
         thisView.resourceLocationsView = thisView.resourceLocationsView || new ResourceLocationsView({model: thisView.model.get("locations")});
         thisView.resourceLocationsView.model.add(resLoc);
         // verify the rl id is okay
@@ -114,8 +114,8 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         } else if (!checked && gidIndex !== -1) {
           goalsCovered.splice(gidIndex, 1);
         }
-        saveObj["goals_covered"] = goalsCovered;
-        thisView.model.save(saveObj, {parse: false, patch: true});
+        thisView.model.set("goals_covered", goalsCovered);
+        thisView.model.save(null, {parse: false});
       },
 
       /**

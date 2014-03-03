@@ -8,20 +8,37 @@ define(["backbone"], function(Backbone){
   return Backbone.Model.extend({
     defaults: function () {
       return {
-        concept_resource: null,
+        cresource: null,
         url: "",
         location_type: "",
         location_text: ""
       };
     },
+
+    initialize: function () {
+      // save instead of patch to avoid race conditions with concept resource
+      this.doSaveUpdate = true;
+    },
+
+    url: function () {
+        return window.agfkGlobals.apiBase + "resourcelocation/" + this.id + "/";
+    },
+
+    parse: function (resp, xhr) {
+      if (!xhr.parse) {
+        return {};
+      }
+      resp["cresource"] = this.collection.parent;
+      return resp;
+    },
+
     toJSON: function () {
       var thisModel = this,
-          cresource = thisModel.get("concept_resource"),
-          cres_id = cresource ? cresource.id : "",
-          attrbs = thisModel.attributes;
+          cresource = thisModel.get("cresource");
 
       return {
-        concept_resource: {id: cres_id},
+        id: thisModel.id,
+        cresource: cresource.url(),
         url: thisModel.get("url"),
         location_type: thisModel.get("location_type"),
         location_text: thisModel.get("location_text")

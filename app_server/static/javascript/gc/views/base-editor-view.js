@@ -63,8 +63,12 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
             curTar = evt.currentTarget,
             attrName = curTar.name.split("-")[0],
             saveObj = {};
+
         saveObj[attrName] = curTar.value;
-        thisView.model.save(saveObj, {parse: false, patch: true});
+        thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+
+        // so event is only fired on child views
+        evt.stopPropagation();
       },
 
 
@@ -76,8 +80,11 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
             curTar = evt.currentTarget,
             attrName = curTar.name.split("-")[0],
             saveObj = {};
+
         saveObj[attrName] =  curTar.checked ? 1 : 0;
-        thisView.model.save(saveObj, {parse: false, patch: true});
+          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+        // so event is only fired on child views
+        evt.stopPropagation();
       },
 
       /**
@@ -89,7 +96,9 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
             attrName = curTar.name.split("-")[0],
             saveObj = {};
         saveObj[attrName] = curTar.value;
-        thisView.model.save(saveObj, {parse: false, patch: true});
+        thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+        // so event is only fired on child views
+        evt.stopPropagation();
       }
     });
   })();

@@ -17,7 +17,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "agfk/m
       render: function(){
         var thisView = this;
         thisView.isRendered = false;
-        thisView.$el.html(thisView.template(thisView.model.toJSON()));
+        thisView.$el.html(thisView.template(thisView.model.attributes));
         thisView.isRendered = true;
         return thisView;
       }

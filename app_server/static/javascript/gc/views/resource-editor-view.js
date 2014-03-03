@@ -87,11 +87,14 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         var thisView = this,
             curTar = evt.currentTarget,
             attrName = curTar.name.split("-")[0],
-            inpText = curTar.value;
+            inpText = curTar.value,
+            saveObj = {};
+
         // parse tags server side since graph is being created
-        thisView.model.set(attrName, inpText.split(/\s*,\s*/).map(function (title) {
+        saveObj[attrName] = inpText.split(/\s*,\s*/).map(function (title) {
           return {title: title};
-        }));
+        });
+        thisView.model.save(saveObj, {parse: false, patch: true});
       },
 
       /**
@@ -103,14 +106,16 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
             goalId = checkbox.value,
             checked = checkbox.checked,
             goalsCovered = this.model.get("goals_covered"),
-            gidIndex = goalsCovered.indexOf(goalId);
+            gidIndex = goalsCovered.indexOf(goalId),
+            saveObj = {};
 
         if (checked && gidIndex === -1) {
           goalsCovered.push(goalId);
         } else if (!checked && gidIndex !== -1) {
           goalsCovered.splice(gidIndex, 1);
         }
-        thisView.model.set("goals_covered", goalsCovered);
+        saveObj["goals_covered"] = goalsCovered;
+        thisView.model.save(saveObj, {parse: false, patch: true});
       },
 
       /**
@@ -121,8 +126,10 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
             curTar = evt.currentTarget,
             attrName = curTar.name.split("-")[0],
             coreVal = curTar.value === "core" ? 1 : 0,
-            $rgc = $(evt.currentTarget.parentElement).find("." + pvt.consts.rgcClass).hide();
-        thisView.model.set(attrName, coreVal);
+            $rgc = $(evt.currentTarget.parentElement).find("." + pvt.consts.rgcClass).hide(),
+            saveObj = {};
+        saveObj[attrName] = coreVal;
+        thisView.model.save(saveObj, {parse: false, patch: true});
         if (coreVal) {
           $rgc.hide();
         } else {

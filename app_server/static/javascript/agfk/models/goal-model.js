@@ -14,11 +14,20 @@ define(["backbone", "utils/utils"], function(Backbone, Utils){
         return window.agfkGlobals.apiBase + "goal/" + this.id + "/";
     },
 
+    parse: function (resp, xhr) {
+      if (!xhr.parse) {
+        return {};
+      }
+      resp.concept = this.collection.parent;
+      return resp;
+    },
+
     toJSON: function () {
       var thisModel = this;
         return {
           id: thisModel.id,
-          text: thisModel.get("text")
+          text: thisModel.get("text"),
+          concept: thisModel.get("concept").url()
         };
     },
 

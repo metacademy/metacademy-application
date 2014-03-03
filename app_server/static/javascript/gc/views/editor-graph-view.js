@@ -89,18 +89,10 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
         thisView.model.save({title: title}, {
           parse: false,
           success: function (mdl, resp) {
-            console.log(resp && resp.responseText);
-            // TODO this needs to be more general
-            if (window.location.pathname.substr(-3) == "new") {
-              var newPath = window.location.pathname.split("/");
-              newPath.pop();
-              newPath = newPath.join("/") + "/" + thisView.model.id;
-              window.history.pushState({}, "", newPath);
-            }
+            Utils.urlFromNewToId(thisView.model.id);
           },
           error:function (mdl, resp) {
-            // TODO why is this called when receiving 204 ?
-            console.log(resp && resp.responseText);
+            console.log("error: " + resp && resp.responseText);
           }
         });
       };
@@ -438,7 +430,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
             })
             .on("blur", function(d){
               d3node.selectAll("text").style("display", "block");
-              d.set("title", this.textContent);
+              d.save({"title": this.textContent}, {patch: true, parse: false});
               d3.select(this.parentElement).remove();
             });
       return d3txt;

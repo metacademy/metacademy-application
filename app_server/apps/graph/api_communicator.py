@@ -56,6 +56,8 @@ def get_graph(request, gid, serialize=True):
     """
     get json graph object for the given graph id (gid) and django http request object
     """
+    request.GET = request.GET.copy()
+    request.GET["full"] = "true"
     return get_api_object(GraphResource, request, gid, serialize=serialize)
 
 

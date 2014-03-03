@@ -17,28 +17,42 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
 
     parse: function (resp, xhr) {
       // backwards compatability to parse entire server graph TODO remove
-      if (!xhr.parse || !(resp.hasOwnProperty("source") && resp.hasOwnProperty("target"))) {
+      if (!xhr.parse) {
+        return {};
+      }
+      if (!(resp.hasOwnProperty("source") && resp.hasOwnProperty("target"))) {
         return resp;
       }
 
       var thisModel = this;
 
+      // TODO DRY source_goals and target_goals
       if (resp.hasOwnProperty("source_goals")) {
         if (! (resp.source_goals instanceof GoalCollection)) {
-          // assume we're dealing with an array of goal ids
+          // assume we're dealing with an array of goal uris
+          var sgids = resp.source_goals.map(function (sguri) {
+            var sgarr = sguri.split("/");
+            return sgarr[sgarr.length-2];
+          });
           resp.source_goals = resp.source.get("goals").filter(function (sgoal) {
-            return resp.source_goals.indexOf(sgoal.id) != -1;
+            return sgids.indexOf(sgoal.id) != -1;
           });
         }
       } else {
         // add all goals from source unless the goals are specified
         resp.source_goals = resp.source.get("goals").models;
       }
+
       if (resp.hasOwnProperty("target_goals")) {
         if (!(resp.target_goals instanceof GoalCollection)) {
-          // assume we're dealing with an array of goal ids
+          // assume we're dealing with an array of goal uris
+          var tgids = resp.target_goals.map(function (tguri) {
+            var tgarr = tguri.split("/");
+            return tgarr[tgarr.length-2];
+          });
+
           resp.target_goals = resp.target.get("goals").filter(function (tgoal) {
-            return resp.target_goals.indexOf(tgoal.id) != -1;
+            return tgids.indexOf(tgoal.id) != -1;
           });
         }
       } else {

@@ -61,8 +61,10 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       blurTextField: function (evt) {
         var thisView = this,
             curTar = evt.currentTarget,
-            attrName = curTar.name.split("-")[0];
-        thisView.model.set(attrName, curTar.value);
+            attrName = curTar.name.split("-")[0],
+            saveObj = {};
+        saveObj[attrName] = curTar.value;
+        thisView.model.save(saveObj, {parse: false, patch: true});
       },
 
 
@@ -72,8 +74,10 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       changeBooleanField: function (evt) {
         var thisView = this,
             curTar = evt.currentTarget,
-            attrName = curTar.name.split("-")[0];
-        thisView.model.set(attrName, curTar.checked ? 1 : 0);
+            attrName = curTar.name.split("-")[0],
+            saveObj = {};
+        saveObj[attrName] =  curTar.checked ? 1 : 0;
+        thisView.model.save(saveObj, {parse: false, patch: true});
       },
 
       /**
@@ -82,8 +86,10 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
       changeSelectField: function (evt) {
         var thisView = this,
             curTar = evt.currentTarget,
-            attrName = curTar.name.split("-")[0];
-        thisView.model.set(attrName, curTar.value);
+            attrName = curTar.name.split("-")[0],
+            saveObj = {};
+        saveObj[attrName] = curTar.value;
+        thisView.model.save(saveObj, {parse: false, patch: true});
       }
     });
   })();

@@ -166,6 +166,18 @@ define(["jquery"], function($){
     return retStr;
   };
 
+  /**
+   * Change urls of the form /blah/blah/new to /blah/blah/id without redirecting
+   */
+  utils.urlFromNewToId = function (id) {
+    var pathArr = window.location.pathname.split("/"),
+        newLoc = pathArr.indexOf("new");
+    if (newLoc > -1) {
+      pathArr[newLoc] = id;
+      window.history.pushState({}, "", pathArr.join("/"));
+    }
+  };
+
   // return require.js object
   return utils;
 });

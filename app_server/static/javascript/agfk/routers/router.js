@@ -25,8 +25,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
              pExploreMode: "explore",
              pLearnMode: "learn",
              pEditMode: "edit",
-             colorboxWidth: "80%",
-             colorboxHeight: "95%",
              pCreateMode: "create",
              leftPanelId: "leftpanel,",
              rightPanelId: "rightpanel",
@@ -39,6 +37,14 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
              ajaxErrorKey: "ajax", // must also change in error-view.js
              unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
            };
+
+           pvt.colorboxOptions = {inline: true,
+                                  transition: "elastic",
+                                  width: "80%",
+                                  height: "95%",
+                                  closeButton: false,
+                                  opacity: 0.6
+                                  };
 
            // return public object
            return Backbone.Router.extend({
@@ -84,8 +90,17 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
               * Show the input view in the input selector and maintain a reference for correct clean up
               */
              showView: function (inView, doRender, selector, removeOldView, useColorBox) {
-               var thisRoute = this;
+               var thisRoute = this,
+                   prevPath = thisRoute.prevPath || "";
                removeOldView = removeOldView === undefined ? true : removeOldView;
+
+               if (useColorBox) {
+                 pvt.colorboxOptions.href = inView.$el;
+                 pvt.colorboxOptions.onClosed = function () {
+                   thisRoute.navigate(prevPath);
+                   thisRoute.prevPath = prevPath; // incase event is not fired
+                 };
+               }
 
                // helper function for async rendering views
                // TODO move to private
@@ -98,14 +113,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                  if (doRender){
                    if (typeof selector === "string"){
                      if (useColorBox){
-                       $.colorbox({inline: true,
-                                   href: inView.$el,
-                                   transition: "elastic",
-                                   width: pvt.consts.colorboxWidth,
-                                   height: pvt.consts.colorboxHeight,
-                                   onClosed: function(){
-                                     thisRoute.navigate(""); // TODO this may not always be true
-                                   }});
+                       $.colorbox(pvt.colorboxOptions);
                      } else {
                        $(selector).html(inView.$el).show();
                      }
@@ -114,7 +122,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                    }
                  } else{
                    if (useColorBox) {
-                     $.colorbox({inline: true, href: inView.$el, transition: "elastic", width: pvt.consts.colorboxWidth, height: pvt.consts.colorboxHeight});
+                     $.colorbox(pvt.colorboxOptions);
                    } else {
                      inView.$el.parent().show();
                    }
@@ -123,6 +131,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                  if (removeOldView){
                    thisRoute.currentView = inView;
                  }
+                 thisRoute.prevPath = window.location.hash.substr(1);
                }
 
                if (doRender){

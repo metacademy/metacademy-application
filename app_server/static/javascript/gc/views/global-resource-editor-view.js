@@ -15,7 +15,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
 
       events: function () {
         var oevts = BaseEditorView.prototype.events();
-        oevts["blur .author-field"] = "changeAuthorField";
+        oevts["blur .author-field"] = "blurAuthorField";
         oevts["keyUp .gresource-title"] = "keyUpGlobalResourceTitle";
         oevts["blur .gresource-title"] = "blurGlobalResourceTitle";
         return oevts;
@@ -49,16 +49,18 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
       },
 
       /**
-       * changeAuthorField: change author field in the resource model
+       * blurAuthorField: change author field in the resource model
        * -- array separated by "and"
        */
-      changeAuthorField: function (evt) {
+      blurAuthorField: function (evt) {
         var thisView = this,
             curTar = evt.currentTarget,
             attrName = curTar.name.split("-")[0],
             inpText = curTar.value,
-            authors = inpText.split(/\s+and\s+/i);
-        thisView.model.set(attrName, authors);
+            authors = inpText.split(/\s+and\s+/i),
+            saveObj = {};
+        saveObj[attrName] = authors;
+        thisView.model.save(saveObj, {parse: false, patch: true});
       }
     });
   })();

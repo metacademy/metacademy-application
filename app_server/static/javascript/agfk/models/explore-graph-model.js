@@ -2,7 +2,7 @@
  This file contains the graph-data model
  */
 /*global define */
-define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors"], function($, Backbone, _, GraphModel, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
+define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors", "utils/utils"], function($, Backbone, _, GraphModel, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler, Utils){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
@@ -126,13 +126,19 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
       postAddEdge: function (edge, isNewEdge) {
         var thisModel = this;
         // if it needs the server id it'll be saved after the node id returns
-        // so don't do it here
-        if (isNewEdge && !edge.get("needsServerId")) {
-          edge.save(null, {parse: false,
-                           success: function () {
-                             thisModel.save(null, {parse: false});
-                           }
-                          });
+        // so don't save the graph here
+        if (isNewEdge && !edge.needsServerId) {
+          edge.save(null,
+                    {parse: false,
+                     success: function () {
+                       thisModel.save(null,
+                                      {parse: false,
+                                       success:  function (){
+                                         Utils.urlFromNewToId(thisModel.id);
+                                       }
+                                      });
+                     }
+                    });
         }
       },
 
@@ -147,7 +153,6 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
         var thisModel = this;
         node.hasServerId = false;
 
-        // TODO HARDCODED URL
         $.get(window.agfkGlobals.idcheckUrl, {id: node.id, type: "concept" })
           .success(function (resp) {
             node.set("id", resp.id);
@@ -155,16 +160,19 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
             node.hasServerId = true;
             // set edge ids that were waiting for the server
             thisModel.getEdges().filter(function (edge) {
-              return edge.get("needsServerId");
+              return edge.needsServerId;
             }).forEach(thisModel.setEdgeId);
 
             // save the node -- how will we save edges on creation? -- save them once they get the server id
             node.save(null, {parse: false,
                              success: function () {
                                console.log("success");
-                               thisModel.save(null, {parse: false});
+                               thisModel.save(null,
+                                              {parse: false,
+                                               success: function () {
+                                                 Utils.urlFromNewToId(thisModel.id);
+                                               }});
                              }});
-            // then save the graph using only uris -- this is what "to json" should do
           })
           .fail(function (resp){
             // failure
@@ -222,7 +230,7 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
           src = edge.get("source");
           tar = edge.get("target");
           edge.set("id", String(src.id) + String(tar.id));
-          edge.set("needsServerId", !src.hasServerId || !tar.hasServerId);
+          edge.needsServerId = !src.hasServerId || !tar.hasServerId;
         } else {
           src = edge.source;
           tar = edge.target;

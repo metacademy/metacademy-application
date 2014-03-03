@@ -24,9 +24,9 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
 
       events: {
-        "blur .title-input": "changeTitleInput",
-        "blur .ec-display-wrap > textarea": "changeTextField",
-        "blur input.dep-reason": "changeDepReason",
+        "blur .title-input": "blurTitleField",
+        "blur .ec-display-wrap > textarea": "blurTextField",
+        "blur input.dep-reason": "blurDepReason",
         "click .ec-tabs button": "changeDisplayedSection",
         "click #add-resource-button": "addResource",
         "click #add-goal-button": "addGoal",
@@ -112,20 +112,25 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       addGoal: function () {
         var thisView = this,
             gid = Math.random().toString(36).substr(8),
-            newGoal = new GoalModel({id: gid, concept: thisView.model});
-        $.get(window.agfkGlobals.idcheckUrl, {id: gid, type: "goal"})
-        .success(function (resp) {
-            newGoal.set("id", resp.id);
-        })
-        .fail(pvt.failFun);
-
+            newGoal = new GoalModel({id: gid, concept: thisView.model}),
+            deps = thisView.model.get("dependencies"),
+            ols = thisView.model.get("outlinks");
         // add goal to goal list
         thisView.model.get("goals").add(newGoal, {at: 0});
+
+        newGoal.save(null, {parse: false, success: function () {
+          // FIXME this is an awkward way to update the deps and ols
+          deps.save(null, {parse: false});
+          ols.save(null, {parse: false});
+        }});
+
+        // TODO we need to update all of the source/targets, hmmm
+        thisView.render();
         // add goal to all preq and postreq dep lists by default
-        thisView.model.get("dependencies").each(function (dep) {
+        deps.each(function (dep) {
             dep.get("target_goals").add(newGoal);
         });
-        thisView.model.get("outlinks").each(function (ol) {
+        ols.each(function (ol) {
           ol.get("source_goals").add(newGoal);
         });
 
@@ -134,19 +139,24 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
       changeDepGoal: function (evt) {
         var thisView = this,
+            thisModel = thisView.model,
             $domEl = $(evt.currentTarget),
             depId = $domEl.data("dep"),
             goalId = $domEl.prop("value"),
             goalType = $domEl.prop("name").split("-")[0],
             goal = goalType === "target_goals"
-            ? thisView.model.get("goals").get(goalId)
-            : thisView.model.get("dependencies").get(depId).get("source").get("goals").get(goalId);
+            ? thisModel.get("goals").get(goalId)
+            : thisModel.get("dependencies").get(depId).get("source").get("goals").get(goalId),
+            dep = thisModel.get("dependencies").get(depId);
 
         if ($domEl.prop("checked")) {
-          thisView.model.get("dependencies").get(depId).get(goalType).add(goal);
+          dep.get(goalType).add(goal);
         } else {
-          thisView.model.get("dependencies").get(depId).get(goalType).remove(goal);
+          dep.get(goalType).remove(goal);
         }
+        var saveObj = {};
+        saveObj[goalType] = dep.get(goalType);
+        dep.save(saveObj, {patch: true, parse: false});
       },
 
       addResource: function () {
@@ -184,23 +194,25 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         this.render();
       },
 
-      changeTitleInput: function(evt){
-        this.model.set("title", evt.currentTarget.value);
+      blurTitleField: function(evt){
+        this.model.save({"title": evt.currentTarget.value}, {parse: false, patch: true});
       },
 
       /**
        * Changes text field values for simple attributes of models
        * the id of the containing element must match the attribute name
        */
-      changeTextField: function(evt){
-        this.model.set(evt.currentTarget.parentElement.id, evt.currentTarget.value);
+      blurTextField: function(evt){
+        var saveObj = {};
+        saveObj[evt.currentTarget.parentElement.id] = evt.currentTarget.value;
+        this.model.save(saveObj, {parse: false, patch: true});
       },
 
-      changeDepReason: function(evt){
+      blurDepReason: function(evt){
         var curTarget = evt.currentTarget,
             cid = curTarget.id.split("-")[0], // cid-reason
             reason = curTarget.value;
-        this.model.get("dependencies").get(cid).set("reason", reason);
+        this.model.get("dependencies").get(cid).save({"reason": reason}, {patch: true, parse: false});
       },
 
       isViewRendered: function(){

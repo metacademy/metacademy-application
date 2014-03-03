@@ -55,9 +55,9 @@
       </div>
     </div>
     <% if (dependencies.length==0) { %>
-       <p class="no-content-info">
-         This concept has no prerequisites specified.
-       </p>
+    <p class="no-content-info">
+      This concept has no prerequisites specified.
+    </p>
     <%}%>
     <% dependencies.each(function(dep){ %>
     <div class="dep-entry input-form">
@@ -82,12 +82,10 @@
           <input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="source_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("source_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%>
         </div>
         <%});%>
-        <%} %>
-      </div>
+
+    <%} %>
     </div>
   </div>
-
-
   <% }) %>
 </div>
 

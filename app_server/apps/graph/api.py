@@ -114,6 +114,7 @@ class BaseResource(NamespacedModelResource):
         list_allowed_methods = ('get', 'post')
         detail_allowed_methods = ('get', 'put', 'patch')
         max_limit = 0
+        always_return_data = True
         authorization = ModAndUserObjectsOnlyAuthorization()
 
 
@@ -382,7 +383,6 @@ class ConceptResource(CustomSaveHookResource):
         queryset = Concept.objects.all()
         resource_name = 'concept'
         authorization = ConceptAuthorization()
-        always_return_data = True
 
     def alter_deserialized_list_data(self, request, data):
         for concept in data["objects"]:
@@ -408,6 +408,7 @@ class DependencyResource(CustomSaveHookResource):
         queryset = Dependency.objects.all()
         resource_name = 'dependency'
         include_resource_uri = False
+        list_allowed_methods = ('get', 'post', 'patch')
 
     def pre_save_hook(self, bundle, **kwargs):
         """
@@ -456,8 +457,26 @@ class GraphResource(BaseResource):
     """
     NOTE: can't commit dependencies if concepts are not already present in graph'
     """
-    concepts = fields.ManyToManyField(ConceptResource, 'concepts', full=True, null=True)
-    dependencies = fields.ManyToManyField(DependencyResource, 'dependencies', full=True, null=True)
+    concepts = fields.ManyToManyField(ConceptResource, 'concepts', null=True)
+    dependencies = fields.ManyToManyField(DependencyResource, 'dependencies', null=True)
+
+    def dehydrate(self, bundle):
+        """
+        Dehydrate with full=true specified in the url
+        """
+        show_full = bundle.request.GET.get('full', "false").lower() == "true"
+        # awkward hack to allow the full parameter to be specified in the url
+        if show_full:
+            c_old_full = self.concepts.full
+            self.concepts.full = True
+            bundle.data['concepts'] = self.concepts.dehydrate(bundle)
+            self.concepts.full = c_old_full
+            d_old_full = self.dependencies.full
+            self.dependencies.full = True
+            bundle.data['dependencies'] = self.dependencies.dehydrate(bundle)
+            self.dependencies.full = d_old_full
+
+        return bundle
 
     def alter_deserialized_detail_data(self, request, data):
         # create the graph if it does not exist and associate the user with the graph
@@ -483,7 +502,6 @@ class GraphResource(BaseResource):
 
     class Meta(BaseResource.Meta):
         """ GraphResource Meta """
-        include_resource_uri = False
         queryset = Graph.objects.all()
         resource_name = 'graph'
 

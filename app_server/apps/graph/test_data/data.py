@@ -11,16 +11,11 @@ def concept1(tag_match=True):
             'goals': [{'id': 'wiemte29', 'text': 'a third goal for mom'},
                       {'id': 'f5oln2ke29', 'text': 'another goal for mom'},
                       {'id': 'sr1cxzjjor', 'text': 'a goal for mom'}],
-            'hasContractedDeps': False,
-            'hasContractedOLs': False,
             'id': 'tvat4s6ja6bhuxr',
-            'isContracted': False,
-            'isNew': 1,
-            'is_shortcut': 0,
             'pointers': 'mum see also',
             'resources': [{'access': '',
                            'additional_dependencies': [],
-                           'concept': {'id': 'tvat4s6ja6bhuxr'},
+                           'concept': concept_uri('tvat4s6ja6bhuxr'),
                            'core': 0,
                            'edition': '',
                            'goals_covered': map(goal_uri, ["wiemte29", "sr1cxzjjor"]),
@@ -35,20 +30,17 @@ def concept1(tag_match=True):
                                                'url': 'http://www.edx.org',
                                                'year': ''},
                            'id': 'enixhzd7vi',
-                           'locations': [{'concept_resource': {'id': 'enixhzd7vi'},
+                           'locations': [{'cresource': concept_resource_uri('enixhzd7vi'),
                                           'location_text': '',
                                           'location_type': '',
                                           'url': ''}],
                            'notes': ''}],
-            'sid': '',
             'software': 'mum software',
             'summary': 'mum summary',
             'tag': tag,
             'time': '',
             'title': 'mom',
-            'useCsrf': True,
-            'x': 443.6666666666667,
-            'y': 154}
+            }
 
 def concept2(tag_match=True):
     if tag_match:
@@ -59,16 +51,11 @@ def concept2(tag_match=True):
     return {'editNote': '',
             'exercises': 'yaya',
             'goals': [{'id': '749ylul3di', 'text': 'dad goal'}],
-            'hasContractedDeps': False,
-            'hasContractedOLs': False,
             'id': 'uqdaziy5h4cxr',
-            'isContracted': False,
-            'isNew': 1,
-            'is_shortcut': 0,
             'pointers': '',
             'resources': [{'access': '',
                            'additional_dependencies': [],
-                           'concept': {'id': 'uqdaziy5h4cxr'},
+                           'concept': concept_uri('uqdaziy5h4cxr'),
                            'core': 0,
                            'goals_covered': [],
                            'edition': '',
@@ -83,20 +70,16 @@ def concept2(tag_match=True):
                                                'url': '',
                                                'year': ''},
                            'id': '9ha4gkqpvi',
-                           'locations': [{'concept_resource': {'id': '9ha4gkqpvi'},
+                           'locations': [{'cresource': concept_resource_uri('9ha4gkqpvi'),
                                           'location_text': '',
                                           'location_type': '',
                                           'url': ''}],
                            'notes': ''}],
-            'sid': '',
             'software': '',
             'summary': 'dad summary',
             'tag': tag,
             'time': '',
-            'title': 'dad',
-            'useCsrf': True,
-            'x': 613.6666666666667,
-            'y': 154}
+            'title': 'dad'}
 
 
 def concept3(tag_match=True):
@@ -109,17 +92,12 @@ def concept3(tag_match=True):
             'exercises': "here's some exercises (this will change)",
             'goals': [{'id': '32j5kfyldi', 'text': 'goal 2 for the child'},
                       {'id': 'kxktiysyvi', 'text': 'goal 1 for the child'}],
-            'hasContractedDeps': False,
-            'hasContractedOLs': False,
             'id': '9jgljchjobc5wmi',
-            'isContracted': False,
-            'isNew': 1,
-            'is_shortcut': 0,
             'pointers': 'see also (may change)',
             'resources': [{'access': 'reg',
                            'additional_dependencies': [{'title': 'logistic regression'},
                                                        {'title': 'gradient descent'}],
-                           'concept': {'id': '9jgljchjobc5wmi'},
+                           'concept': concept_uri('9jgljchjobc5wmi'),
                            'core': 0,
                            'edition': '3',
                            'goals_covered': [],
@@ -134,20 +112,17 @@ def concept3(tag_match=True):
                                                'url': 'http://www.google.com',
                                                'year': '1998'},
                            'id': 't8gk0dlsor',
-                           'locations': [{'concept_resource': {'id': 't8gk0dlsor'},
+                           'locations': [{'cresource': concept_resource_uri('t8gk0dlsor'),
                                           'location_text': 'the one and only location display text',
                                           'location_type': 'chp',
                                           'url': 'http://www.google.com'}],
                            'notes': 'this is a note'}],
-            'sid': '',
             'software': 'some software (will also change)',
             'summary': 'son summary',
             'tag': tag,
             'time': '',
-            'title': 'son',
-            'useCsrf': True,
-            'x': 528.6666666666667,
-            'y': 284}
+            'title': 'son'}
+
 
 def concept4(tag_match=True):
     if tag_match:
@@ -159,17 +134,12 @@ def concept4(tag_match=True):
             'exercises': "here's some exercises (this will change)",
             'flags': [],
             'goals': [{'id': '9c84hgiske', 'text': 'yet another goal'}],
-            'hasContractedDeps': False,
-            'hasContractedOLs': False,
             'id': 'c95j43nx8dj4ne8',
-            'isContracted': False,
-            'isNew': 1,
-            'is_shortcut': 0,
             'pointers': 'see also (may change)',
             'resources': [{'access': 'reg',
                            'additional_dependencies': [{'title': 'something'},
                                                        {'title': 'something else'}],
-                           'concept': {'id': 'c95j43nx8dj4ne8'},
+                           'concept': concept_uri('c95j43nx8dj4ne8'),
                            'core': 1,
                            'edition': '3',
                            'goals_covered': [goal_uri("9c84hgiske")],
@@ -184,26 +154,29 @@ def concept4(tag_match=True):
                                                'url': 'http://www.somethingsomething.com',
                                                'year': '1994'},
                            'id': 'd8cu3bdd',
-                           'locations': [{'concept_resource': {'id': 'd8cu3bdd'},
+                           'locations': [{'cresource': concept_resource_uri('d8cu3bdd'),
                                           'location_text': 'some sort of text',
                                           'location_type': 'chp',
                                           'url': 'http://www.somethingelse.com'}],
                            'notes': 'this is another note'}],
-            'sid': '',
             'software': 'some software (will also change)',
             'summary': 'yet another summary',
             'tag': tag,
             'time': '',
-            'title': 'yet another concept',
-            'useCsrf': True,
-            'x': 528.6666666666667,
-            'y': 284}
+            'title': 'yet another concept'}
+
 
 def concept_uri(id):
     return '/graphs/api/v1/concept/%s/' % id
 
+
+def concept_resource_uri(id):
+    return '/graphs/api/v1/conceptresource/%s/' % id
+
+
 def goal_uri(id):
     return '/graphs/api/v1/goal/%s/' % id
+
 
 def dependency1():
     return {'id': 'tvat4s6ja6bhuxr9jgljchjobc5wmi',
@@ -213,6 +186,7 @@ def dependency1():
             'target': concept_uri('9jgljchjobc5wmi'),
             'target_goals': map(goal_uri, ['kxktiysyvi', '32j5kfyldi'])}
 
+
 def dependency2():
     return {'id': 'uqdaziy5h4cxr9jgljchjobc5wmi',
             'reason': "he's my dad",
@@ -220,6 +194,7 @@ def dependency2():
             'source_goals': map(goal_uri, ['749ylul3di']),
             'target': concept_uri('9jgljchjobc5wmi'),
             'target_goals': map(goal_uri, ['kxktiysyvi'])}
+
 
 def dependency3():
     return {'id': 'c9erhj3n4oi8dhfwjen43',

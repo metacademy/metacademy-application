@@ -114,7 +114,7 @@ class BaseResourceTest(ResourceTestCase):
         elif verb == "patch":
             resp = self.api_client.patch(url, format='json', data=data)
         elif verb == "get":
-            resp = self.api_client.get(url)
+            resp = self.api_client.get(url, data={"full": "true"})
         else:
             raise RuntimeError("Unknown verb: %s" % verb)
 
@@ -130,6 +130,7 @@ class BaseResourceTest(ResourceTestCase):
         """
 
         concept = Concept.objects.get(id=in_concept["id"])
+
         # verify flat attributes
         flat_attrs = ["id", "tag", "title", "pointers", "software", "exercises", "summary"]
         for attr in flat_attrs:
@@ -160,7 +161,7 @@ class BaseResourceTest(ResourceTestCase):
                         if in_res[atrb] == []:
                             self.assertEqual(getattr(res, atrb).all().count(), 0)
                         else:
-                            api_keys = map(lambda akey: akey.split("/")[-2], in_res[atrb])
+                            api_keys = in_res[atrb]
                             db_keys = map(lambda g: g.id, res.goals_covered.all())
                             for akey in api_keys:
                                 # if akey not in db_keys:
@@ -379,7 +380,7 @@ class GraphResourceTest(BaseResourceTest):
             return resp1, resp2
         # TODO should we test PUT separately?
         elif verb == "get":
-            resp = self.api_client.get(self.graph_detail_api_url)
+            resp = self.api_client.get(self.graph_detail_api_url, data={"full": "true"})
         return resp
 
     def verify_db_graph(self, in_graph):
@@ -467,7 +468,8 @@ class GraphResourceTest(BaseResourceTest):
         self.auth_create_graph()
         if auth:
             self.api_client.client.login(username=self.username, password=self.username)
-        resp = self.api_client.get(self.graph_detail_api_url)
+
+        resp = self.api_client.get(self.graph_detail_api_url, data={"full": "true"})
         self.assertValidJSONResponse(resp)
         jgraph = json.loads(resp.content)
         self.verify_db_graph(jgraph)
@@ -482,7 +484,7 @@ class GraphResourceTest(BaseResourceTest):
         self.auth_create_graph()
         if auth:
             self.api_client.client.login(username=self.username, password=self.username)
-        resp = self.api_client.get(self.graph_list_api_url)
+        resp = self.api_client.get(self.graph_list_api_url, data={"full": "true"})
         self.assertValidJSONResponse(resp)
         jgraph_list = json.loads(resp.content)
         self.assertEqual(jgraph_list["meta"]["total_count"], 1)

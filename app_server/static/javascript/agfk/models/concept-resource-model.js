@@ -35,8 +35,16 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       var thisModel = this,
           output = thisModel.defaults();
 
+      // get goal id from goal uri
+      var gc = resp['goals_covered'],
+          i = gc.length;
+      while (i--) {
+        var splitGc = gc[i].split("/");
+        gc[i] = splitGc[splitGc.length - 2];
+      }
+
       // ---- parse the simple attributes ---- //
-      var i = thisModel.simpleFields.length;
+      i = thisModel.simpleFields.length;
       while( i -- ){
         var sf = thisModel.simpleFields[i];
         if (resp[sf] !== undefined) {

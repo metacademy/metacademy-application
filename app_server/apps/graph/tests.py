@@ -161,11 +161,14 @@ class BaseResourceTest(ResourceTestCase):
                         if in_res[atrb] == []:
                             self.assertEqual(getattr(res, atrb).all().count(), 0)
                         else:
-                            api_keys = in_res[atrb]
+                            try:
+                                api_keys = [api_uri.split("/")[-2] for api_uri in in_res[atrb]]
+                            except:
+                                pdb.set_trace()
                             db_keys = map(lambda g: g.id, res.goals_covered.all())
                             for akey in api_keys:
-                                # if akey not in db_keys:
-                                #     pdb.set_trace()
+                                if akey not in db_keys:
+                                    pdb.set_trace()
                                 self.assertEqual(akey in db_keys, True)
 
     def check_result(self, resp, data):
@@ -420,8 +423,6 @@ class GraphResourceTest(BaseResourceTest):
 
     # TODO figure out authentication key
     def test_create_list_session_auth(self):
-        # temporary
-        import config; config.TCLSA = True
 
         # Check how many graphs exist
         self.assertEqual(Graph.objects.count(), 0)
@@ -429,7 +430,7 @@ class GraphResourceTest(BaseResourceTest):
         #pdb.set_trace()
         resp1, resp2 = self.auth_create_graph()
         self.assertHttpCreated(resp1)
-        self.assertEqual(resp2.status_code, 204)  # 204 = no content
+        self.assertEqual(resp2.status_code, 200)
         # Verify a new one has been added to the db.
         self.assertEqual(Graph.objects.count(), 1)
         self.verify_db_graph(self.post_data)

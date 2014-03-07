@@ -1,5 +1,6 @@
 import pdb
 
+import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
 
@@ -38,11 +39,17 @@ class Concept(Model):
                                      and (self.is_provisional() or (hasattr(self, "conceptsettings")
                                                                     and self.conceptsettings.is_editor(user))))
 
+# maintain version control for the concept
+reversion.register(Concept, follow=["goals", "dep_target", "concept_resource"])
+
 
 class Goal(Model, LoggedInEditable):
     id = CharField(max_length=16, primary_key=True)
     concept = ForeignKey(Concept, related_name="goals")
     text = CharField(max_length=500)
+
+# maintain version control for the goal but only access thru the concept
+reversion.register(Goal)
 
 
 class Dependency(Model, LoggedInEditable):
@@ -58,6 +65,9 @@ class Dependency(Model, LoggedInEditable):
 
     def editable_by(self, user):
         return user.is_superuser or self.target.is_provisional()
+
+# maintain version control for the goal but only access thru the target concept
+reversion.register(Dependency)
 
 
 class ConceptSettings(Model, LoggedInEditable):
@@ -96,6 +106,7 @@ class GlobalResource(Model, LoggedInEditable):
 
     # fields that can be overwritten/used by the ResourceLocation
     url = CharField(max_length=200)
+reversion.register(GlobalResource)
 
 
 class ConceptResource(Model, LoggedInEditable):
@@ -119,6 +130,9 @@ class ConceptResource(Model, LoggedInEditable):
     # concats GlobalResource field ?
     notes = CharField(max_length=500, null=True, blank=True)
 
+# maintain version control for the concept
+reversion.register(ConceptResource, follow=["locations"])
+
 
 class ResourceLocation(Model, LoggedInEditable):
     """
@@ -130,6 +144,8 @@ class ResourceLocation(Model, LoggedInEditable):
     location_type = CharField(max_length=30)
     location_text = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
+# maintain vc for resource location
+reversion.register(ResourceLocation)
 
 
 class Graph(Model, LoggedInEditable):

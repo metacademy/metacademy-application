@@ -13,6 +13,8 @@ from test_data.data import three_node_graph
 
 # TODO are we checking the global resources?
 
+# TODO  patch to lists is now allowed -- test
+
 ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
                  ('post', 'list')]
 

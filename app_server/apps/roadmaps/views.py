@@ -121,6 +121,7 @@ def format_diff_line(line):
     else:
         return line
 
+
 def show_changes(request, in_username, tag, vnum=-1):
     try:
         rm_dict = get_roadmap_objs(in_username, tag)
@@ -161,8 +162,8 @@ def show_changes(request, in_username, tag, vnum=-1):
         'diff': diff,
         }, **common_rm_dict))
 
-    
-    
+
+
 
 def show_history(request, in_username, tag):
     try:
@@ -212,13 +213,14 @@ def update_to_revision(request, in_username, tag, vnum):
 
     if 0 > vnum or vnum >= num_versions:
         return HttpResponse(status=404)
-
-    versions[vnum].revert()
+    versions[vnum].revision.revert()
 
     return HttpResponse(status=200)
 
+
 def get_versions_obj(obj):
     return reversion.get_for_object(obj).order_by("id")
+
 
 @transaction.atomic
 def edit(request, in_username, tag):
@@ -367,7 +369,7 @@ def preview(request):
         'title': request.POST['title'] if 'title' in request.POST else '',
         'author': request.POST['author'] if 'author' in request.POST else '',
         'audience': request.POST['audience'] if 'audience' in request.POST else '',
-        }
+    }
     body = request.POST['body'] if 'body' in request.POST else ''
 
     body_html = markdown_to_html(body)
@@ -376,19 +378,20 @@ def preview(request):
         'roadmap': roadmap,
         'body_html': safestring.mark_safe(body_html),
         'show_edit_link': False
-        })
+    })
 
 
 def list(request):
     roadmaps = models.Roadmap.objects.all()
-    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and r.roadmapsettings.is_published() , roadmaps)
+    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and r.roadmapsettings.is_published(), roadmaps)
     roadmaps = sorted(roadmaps, key=lambda x: x.title.lower())
 
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
         'include_create': True,
         'empty_message': 'Nobody has made any roadmaps yet.'
-        })
+    })
+
 
 def list_by_user(request, in_username):
     try:
@@ -406,10 +409,11 @@ def list_by_user(request, in_username):
         'roadmaps': roadmaps,
         'include_create': include_create,
         'empty_message': 'This user has not made any public roadmaps.'
-        })
+    })
+
 
 def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
-    base_url = '/roadmaps/%s/%s' % (rm_username, tag) # TODO remove hardcoding
+    base_url = '/roadmaps/%s/%s' % (rm_username, tag)  # TODO remove hardcoding
     return {
         'roadmap': roadmap,
         'roadmap_settings': roadmap_settings,
@@ -423,6 +427,7 @@ def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
         'can_change_settings': roadmap_settings.can_change_settings(user),
         'can_edit': roadmap_settings.editable_by(user)
     }
+
 
 def get_roadmap_objs(username, tag):
     roadmap_settings = models.load_roadmap_settings(username, tag)

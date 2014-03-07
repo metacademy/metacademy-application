@@ -1,10 +1,9 @@
 import pdb
 
+import reversion
 from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugField, TextField, IntegerField, OneToOneField, ManyToManyField
 
 from apps.user_management.models import Profile
-
-import reversion
 
 MAX_USERNAME_LENGTH = 30   # max length in Django's User class
 
@@ -33,6 +32,7 @@ class Roadmap(Model):
 
 # maintain version control for the roadmap
 reversion.register(Roadmap)
+
 
 class RoadmapSettings(Model):
     """

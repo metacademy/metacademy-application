@@ -3,7 +3,7 @@ import string
 import random
 import ast
 
-# myapp/api.py
+import reversion
 from tastypie import fields
 from tastypie.resources import NamespacedModelResource
 from tastypie.authorization import DjangoAuthorization
@@ -191,6 +191,14 @@ class GoalResource(CustomSaveHookResource):
         queryset = Goal.objects.all()
         resource_name = 'goal'
 
+    def post_save_hook(self, bundle):
+        # TODO decide when to make a new version
+        if True:
+            with reversion.create_revision():
+                # TODO increment version number
+                bundle.obj.concept.save()
+        return bundle
+
 
 class ResourceLocationResource(CustomSaveHookResource):
     cresource = fields.ForeignKey("apps.graph.api.ConceptResourceResource", "cresource")
@@ -198,6 +206,13 @@ class ResourceLocationResource(CustomSaveHookResource):
     class Meta(CustomSaveHookResource.Meta):
         queryset = ResourceLocation.objects.all()
         resource_name = 'resourcelocation'
+
+    def post_save_hook(self, bundle):
+        # TODO decide when to make a new version
+        if True:
+            with reversion.create_revision():
+                # TODO increment version number
+                bundle.obj.cresource.concept.save()
 
 
 class GlobalResourceResource(CustomSaveHookResource):
@@ -240,6 +255,13 @@ class GlobalResourceResource(CustomSaveHookResource):
         queryset = GlobalResource.objects.all()
         resource_name = 'globalresource'
 
+    def post_save_hook(self, bundle):
+        # TODO decide when to make a new version
+        if True:
+            with reversion.create_revision():
+                # TODO increment version number
+                bundle.obj.save()
+
 
 class ConceptResourceResource(CustomSaveHookResource):
     concept = fields.ToOneField("apps.graph.api.ConceptResource", "concept")
@@ -256,6 +278,12 @@ class ConceptResourceResource(CustomSaveHookResource):
             # FIXME hack because of weird saving schedule in tastypie
             for gc in bundle.data["goals_covered"]:
                 bundle.obj.goals_covered.add(gc.obj)
+
+        # TODO decide when to make a new version
+        if True:
+            with reversion.create_revision():
+                # TODO increment version number
+                bundle.obj.concept.save()
         return bundle
 
     def dehydrate(self, bundle):
@@ -363,10 +391,18 @@ class ConceptResource(CustomSaveHookResource):
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
         csettings.editors.add(uprof)
+
         # create targetgraph if necessary
         tgraph, tnew = TargetGraph.objects.get_or_create(leaf=bundle.obj)
         if tnew:
             tgraph.concepts.add(bundle.obj)
+
+        # create new reversion if reversion creating criteria is met (TODO implement on model)
+        if True:
+            with reversion.create_revision():
+                # TODO increment version number
+                bundle.obj.save()
+
         return bundle
 
     class Meta(CustomSaveHookResource.Meta):
@@ -413,6 +449,13 @@ class DependencyResource(CustomSaveHookResource):
         """
         updates target graphs when creating new dependencies
         """
+
+        # TODO decide when to make a new version
+        if True:
+            with reversion.create_revision():
+                # TODO increment version number
+                bundle.obj.target.save()
+
         if self.isnew:
             otarget = bundle.obj.target
             osource = bundle.obj.source

@@ -10,9 +10,9 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
     toolboxId: "toolbox",
     selectedClass: "selected",
     connectClass: "connect-node",
-    toEditCircleClass: "to-edit-circle",
+    toEditCircleGClass: "to-edit-circle-g",
     activeEditId: "active-editing",
-    toEditCircleRadius: 10,
+    toEditCircleRadius: 14,
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
     ENTER_KEY: 13
@@ -276,23 +276,28 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       newGs.each(function(d){
         var d3el = d3.select(this);
         thisView.listenTo(d, "change:title", function() {
-          d3el.selectAll("text").remove();
+          d3el.selectAll("text." + consts.titleTextClass).remove();
           thisView.insertTitleLinebreaks(d3el, d.get("title"));
         });
       });
 
       // add small circle link for editing
-      newGs.append("circle")
+      var newGG = newGs.append("g")
+        .attr("transform", "translate(" + consts.nodeRadius*Math.SQRT1_2 + (-consts.nodeRadius*Math.SQRT1_2) + ")")
+        .classed(consts.toEditCircleGClass, true);
+
+        newGG.append("circle")
         .attr("r", consts.toEditCircleRadius)
-        .attr("cx", consts.nodeRadius*0.707)
-        .attr("cy", -consts.nodeRadius*0.707)
-        .classed(consts.toEditCircleClass, true)
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
             thisView.state.toNodeEdit = true;
             thisView.appRouter.changeUrlParams({mode: "edit", focus: d.id});
           }
         });
+        newGG.append("text")
+        .attr("dy", 3)
+        .attr("text-anchor", "middle")
+        .text("edit");
     },
 
     pathMouseDown: function(d, thisView){
@@ -401,7 +406,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
           consts = pvt.consts,
           nodeRadius = consts.nodeRadius;
 
-      d3node.selectAll("text").style("display", "none");
+      d3node.selectAll("text." + consts.titleTextClass).style("display", "none");
       var curTrans = thisView.dzoom.translate(),
           curScale = thisView.dzoom.scale(),//nodeBCR.width/consts.nodeRadius,
           placePad  =  10*curScale,
@@ -429,7 +434,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
               }
             })
             .on("blur", function(d){
-              d3node.selectAll("text").style("display", "block");
+              d3node.selectAll("text." + consts.titleTextClass).style("display", "block");
               d.save({"title": this.textContent}, {patch: true, parse: false});
               d3.select(this.parentElement).remove();
             });

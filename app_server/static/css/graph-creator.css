@@ -84,8 +84,6 @@ Instructions
     display: block;
 }
 
-/** **/
-
 #gc-wrap svg{
     height: 100%;
     width: 100%;
@@ -97,13 +95,26 @@ Instructions
 }
 
 /* Graph editor specific styles */
-g.concept-g circle.to-edit-circle{
-    fill: #C2DBFC;
+g.concept-g .to-edit-circle-g{
     display: none;
 }
 
-g.concept-g.hovered circle.to-edit-circle{
+g.concept-g .to-edit-circle-g circle{
+    fill: #f8f4ff;
+    stroke-width: 1px;
+}
+
+g.concept-g .to-edit-circle-g text{
+    font-style: italic;
+    font-weight: normal;
+}
+
+g.concept-g.hovered .to-edit-circle-g{
     display: block;
+}
+
+g.concept-g.hovered .to-edit-circle-g{
+    fill: #333333;
 }
 
 g.connect-node circle{

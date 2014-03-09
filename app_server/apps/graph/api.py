@@ -1,3 +1,4 @@
+# TODO concept reversions don't undo the creation of related objects (they will undo their properties)
 import pdb
 import string
 import random

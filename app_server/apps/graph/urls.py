@@ -4,7 +4,7 @@ from tastypie.api import NamespacedApi
 
 from apps.graph.api import ConceptResource, GraphResource, ConceptResourceResource, DependencyResource, GoalResource,\
     TargetGraphResource, GlobalResourceResource, ResourceLocationResource
-from views import new_graph, check_id, get_concept_dep_graph, edit_existing_graph
+from views import new_graph, check_id, get_concept_dep_graph, edit_existing_graph, get_concept_history
 
 # api v1
 v1_api = NamespacedApi(api_name='v1', urlconf_namespace='graphs')
@@ -19,8 +19,10 @@ v1_api.register(GoalResource())
 
 #import pdb; pdb.set_trace()
 
+# TODO refactor concepgts
 urlpatterns = patterns('',
-                       url(r'^(?i)concepts/([^/]+)?/?', get_concept_dep_graph, name="concepts"),
+                       url(r'^(?i)concepts/([^/]+)/history$', get_concept_history, name="concepts_history"),
+                       url(r'^(?i)concepts/([^/]+)?/?$', get_concept_dep_graph, name="concepts"),
                        url(r'^new/?', new_graph, name="graph-creator"),
                        url(r'^idchecker/?', check_id, name="idchecker"),
                        # /mapi/graph (should handle get/post/put requests

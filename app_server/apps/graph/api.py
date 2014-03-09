@@ -198,6 +198,8 @@ class GoalResource(CustomSaveHookResource):
             with reversion.create_revision():
                 # TODO increment version number
                 bundle.obj.concept.save()
+                reversion.set_user(bundle.request.user)
+                reversion.set_comment("changed goal")
         return bundle
 
 
@@ -213,7 +215,10 @@ class ResourceLocationResource(CustomSaveHookResource):
         if True:
             with reversion.create_revision():
                 # TODO increment version number
+                reversion.set_user(bundle.request.user)
+                reversion.set_comment("changed resource location")
                 bundle.obj.cresource.concept.save()
+        return bundle
 
 
 class GlobalResourceResource(CustomSaveHookResource):
@@ -253,6 +258,9 @@ class GlobalResourceResource(CustomSaveHookResource):
         return bundle
 
     class Meta(CustomSaveHookResource.Meta):
+        """
+        Meta for global resource
+        """
         queryset = GlobalResource.objects.all()
         resource_name = 'globalresource'
 
@@ -261,7 +269,10 @@ class GlobalResourceResource(CustomSaveHookResource):
         if True:
             with reversion.create_revision():
                 # TODO increment version number
+                reversion.set_user(bundle.request.user)
+                reversion.set_comment("changed: TODO figure out different fields")
                 bundle.obj.save()
+        return bundle
 
 
 class ConceptResourceResource(CustomSaveHookResource):
@@ -271,6 +282,9 @@ class ConceptResourceResource(CustomSaveHookResource):
     goals_covered = fields.ManyToManyField(GoalResource, "goals_covered")
 
     class Meta(CustomSaveHookResource.Meta):
+        """
+        ConceptResource meta
+        """
         queryset = CResource.objects.all()
         resource_name = 'conceptresource'
 
@@ -284,6 +298,8 @@ class ConceptResourceResource(CustomSaveHookResource):
         if True:
             with reversion.create_revision():
                 # TODO increment version number
+                reversion.set_user(bundle.request.user)
+                reversion.set_comment("changed resource")
                 bundle.obj.concept.save()
         return bundle
 
@@ -402,6 +418,8 @@ class ConceptResource(CustomSaveHookResource):
         if True:
             with reversion.create_revision():
                 # TODO increment version number
+                reversion.set_user(bundle.request.user)
+                reversion.set_comment("changed the concept")
                 bundle.obj.save()
 
         return bundle
@@ -433,6 +451,9 @@ class DependencyResource(CustomSaveHookResource):
     target_goals = fields.ManyToManyField(GoalResource, "target_goals")
 
     class Meta(BaseResource.Meta):
+        """
+        DependencyResource Meta
+        """
         queryset = Dependency.objects.all()
         resource_name = 'dependency'
         include_resource_uri = False
@@ -455,6 +476,8 @@ class DependencyResource(CustomSaveHookResource):
         if True:
             with reversion.create_revision():
                 # TODO increment version number
+                reversion.set_user(bundle.request.user)
+                reversion.set_comment('change "' + bundle.obj.source.title + '" dependency')
                 bundle.obj.target.save()
 
         if self.isnew:

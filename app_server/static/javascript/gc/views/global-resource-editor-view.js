@@ -59,8 +59,10 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
             inpText = curTar.value,
             authors = inpText.split(/\s+and\s+/i),
             saveObj = {};
-        saveObj[attrName] = authors;
-        thisView.model.save(saveObj, {parse: false, patch: true});
+        if (thisView.model.get(attrName) !== authors) {
+          saveObj[attrName] = authors;
+          thisView.model.save(saveObj, {parse: false, patch: true});
+        }
       }
     });
   })();

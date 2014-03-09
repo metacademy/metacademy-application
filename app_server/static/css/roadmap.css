@@ -165,12 +165,6 @@ a.external-link{
     margin: 1.3em 0 0 0;
 }
 
-.history-header{
-    font-size: 1.3em;
-    font-weight: bold;
-    text-align: center;
-}
-
 .content h1 {
     font-weight: bold;
     font-size: 2em;
@@ -332,66 +326,6 @@ a.external-link{
     clear: both;
 }
 
-ol.history-list{
-    width: 70%;
-    margin: auto;
-}
-
-.history-list li {
-    border: 1px solid #B6ADAD;
-    margin: 1em auto;
-    border-radius: 5px;
-    padding: 0.5em;
-    max-width: 40em;
-}
-
-.history-list li.current{
-    background-color: #FFF7FD;
-}
-
-.revision-history-comment{
-    color: #818288;
-    font-size: 0.8em;
-    margin-top: 0.4em;
-}
-
-.revision-history-preview, .revision-history-revert, .revision-history-changes{
-    float: right;
-}
-
-.revision-history-preview a, .revision-history-revert a, .revision-history-changes a{
-    min-width: 3.5em;
-    text-align: center;
-    color: white;
-    padding: 0.7em;
-    display: inline-block;
-    text-decoration: none;
-    background: #474949;
-    cursor: pointer;
-    padding: 0.7em;
-    font-size: 0.9em;
-    border-radius: 5px;
-    border: none;
-}
-
-.revision-history-preview a{
-    margin-left: 0.8em;
-}
-
-.revision-history-revert a{
-    margin-left: 0.8em;
-    background: #681030;
-}
-
-.current .revision-history-revert a{
-    background: #D8C6CD;
-    cursor: default;
-}
-
-#preview-display-box{
-    display: none;
-}
-
 .roadmap-alert {
     font-size: 1.3em;
     text-align: center;
@@ -400,18 +334,6 @@ ol.history-list{
     border: 2px solid #333;
     background: aliceblue;
     border-radius: 5px;
-}
-
-@media only screen and (max-width: 769px){
-    div.container{
-        width: 95%;
-    }
-    ol.history-list{
-        width: 90%;
-    }
-    .history-header{
-        margin-left: 5%;
-    }
 }
 
 .roadmap-diff {
@@ -426,4 +348,16 @@ ol.history-list{
 .roadmap-diff del {
     background: #FFAAAA;
     text-decoration: none;
+}
+
+@media only screen and (max-width: 769px){
+    div.container{
+        width: 95%;
+    }
+    ol.history-list{
+        width: 90%;
+    }
+    .history-header{
+        margin-left: 5%;
+    }
 }

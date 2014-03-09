@@ -3,16 +3,18 @@ import random
 import string
 import pdb
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponse
-from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
+import reversion
 
 from apps.cserver_comm.cserver_communicator import get_full_graph_json_str
 from apps.user_management.models import Profile
 from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation, Goal
 from apps.graph.models import ConceptResource as CResource
 from apps.graph import api_communicator
+
+# TODO refactor into two class based views: graphs and concepts
 
 
 def _gen_random_id(rlen):
@@ -55,11 +57,19 @@ def check_id(request):
         return HttpResponse(status=405)
 
 
+def get_concept_history(request, concept_tag=""):
+    """
+    obtain the edit history for the given concept
+    """
+    concept = Concept.objects.get(tag=concept_tag)
+    revs = _get_versions_obj(concept)[::-1]
+    return render(request, 'concept_history.html', {'concept': concept, "revs": revs})
+
+
 def get_concept_dep_graph(request, concept_tag=""):
     """
     obtain the dependency graph for the given concept
     """
-
     leaf = None
     try:
         try:
@@ -71,11 +81,11 @@ def get_concept_dep_graph(request, concept_tag=""):
     graph_data = api_communicator.get_targetgraph(request, leaf.id)
     uconcepts = get_user_data(request)
 
-    return render_to_response("agfk-app.html",
+    return render(request, "agfk-app.html",
                               {"full_graph_skeleton": get_full_graph_json_str(),
                                "user_data": json.dumps(uconcepts),
                                "graph_init_data": graph_data,
-                               "target_id": leaf.id}, context_instance=RequestContext(request))
+                               "target_id": leaf.id})
 
 
 def new_graph(request):
@@ -87,10 +97,10 @@ def new_graph(request):
             gid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             used = len(Graph.objects.filter(id=gid)) > 0
 
-        return render_to_response("graph-creator.html",
-                                  {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
-                                   "graph_id": gid, "graph_init_data": {"id": gid}},
-                                  context_instance=RequestContext(request))
+        return render(request, "graph-creator.html",
+                      {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
+                       "graph_id": gid, "graph_init_data": {"id": gid}})
+
     else:
         return HttpResponse(status=405)
 
@@ -101,10 +111,9 @@ def edit_existing_graph(request, gid):
         concepts = get_user_data(request)
         full_graph_json = get_full_graph_json_str()
         graph_json = api_communicator.get_graph(request, gid)
-        return render_to_response("graph-creator.html",
-                                  {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
-                                   "graph_id": gid, "graph_init_data": graph_json},
-                                  context_instance=RequestContext(request))
+        return render(request, "graph-creator.html",
+                      {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
+                       "graph_id": gid, "graph_init_data": graph_json})
     else:
         return HttpResponse(status=405)
 
@@ -121,3 +130,7 @@ def get_user_data(request):
         concepts = {"concepts": []}
 
     return concepts
+
+
+def _get_versions_obj(obj):
+    return reversion.get_for_object(obj).order_by("id")

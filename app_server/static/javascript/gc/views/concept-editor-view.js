@@ -11,7 +11,9 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       templateId: "full-screen-content-editor",
       contentItemClass: "ec-display-wrap",
       resourcesTidbitWrapId: "resources-tidbit-wrap",
-      goalsTidbitWrapId: "goals-tidbit-wrap"
+      goalsTidbitWrapId: "goals-tidbit-wrap",
+      historyId: "history",
+      reversionsClass: "reversions"
     };
 
     pvt.failFun = function failFun (resp){
@@ -27,6 +29,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         "blur .title-input": "blurTitleField",
         "blur .ec-display-wrap > textarea": "blurTextField",
         "blur input.dep-reason": "blurDepReason",
+        "click #btn-history": "loadConceptHistory",
         "click .ec-tabs button": "changeDisplayedSection",
         "click #add-resource-button": "addResource",
         "click #add-goal-button": "addGoal",
@@ -195,7 +198,10 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       },
 
       blurTitleField: function(evt){
-        this.model.save({"title": evt.currentTarget.value}, {parse: false, patch: true});
+        var thisView = this;
+        if (thisView.model.get("title") !== evt.currentTarget.value) {
+          thisView.model.save({"title": evt.currentTarget.value}, {parse: false, patch: true});
+        }
       },
 
       /**
@@ -203,16 +209,47 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
        * the id of the containing element must match the attribute name
        */
       blurTextField: function(evt){
-        var saveObj = {};
-        saveObj[evt.currentTarget.parentElement.id] = evt.currentTarget.value;
-        this.model.save(saveObj, {parse: false, patch: true});
+        var thisView = this,
+            saveObj = {},
+            attr = evt.currentTarget.parentElement.id;
+        saveObj[attr] = evt.currentTarget.value;
+        if (thisView.model.get(attr) !== saveObj[attr]) {
+          thisView.model.save(saveObj, {parse: false, patch: true});
+        }
       },
 
+      /**
+       * Blur the dependency reason: save changes to server
+       */
       blurDepReason: function(evt){
-        var curTarget = evt.currentTarget,
+        var thisView = this,
+            curTarget = evt.currentTarget,
             cid = curTarget.id.split("-")[0], // cid-reason
-            reason = curTarget.value;
-        this.model.get("dependencies").get(cid).save({"reason": reason}, {patch: true, parse: false});
+            reason = curTarget.value,
+            dep = thisView.model.get("dependencies").get(cid);
+        if (reason !== dep.get("reason")) {
+          dep.save({"reason": reason}, {patch: true, parse: false});
+        }
+      },
+
+      /**
+       * Load the reversion history for the given concept
+       */
+      loadConceptHistory: function (evt) {
+        var thisView = this,
+            conceptTag = thisView.model.get("tag"),
+            consts = pvt.consts;
+
+        // TODO remove hardcoding
+        $.get("/concepts/" + conceptTag + "/history")
+        .success(function (resp, xhr) {
+          console.log("success getting history");
+          $("#" + consts.historyId).append($(resp).find("." + consts.reversionsClass));
+        })
+        .fail(function () {
+            console.log("unable to load concept reversion history TODO inform user");
+        });
+
       },
 
       isViewRendered: function(){

@@ -33,22 +33,34 @@ body{
 }
 
 /************
+Overrides
+************/
+#cboxLoadedContent {
+    position: relative;
+}
+
+/************
 Instructions
 ************/
 #create-instructions{
     position: absolute;
     bottom: 0;
+    top: auto;
     right: 0;
 }
 
 .instructions{
     font-size: 0.8em;
-    background-color: #F0F0F0;
-    color: rgb(143, 126, 139);
-    border-radius: 5px;
+    background: #fffef1;
+    border: 1px solid #e5e2c8;
+    border-radius: 4px 0 0 4px;
+    color: #6b694f;
     padding: 0.5em;
     display: inline-block;
-    margin-top: 0.4em;
+    position: absolute;
+    top: 8em;
+    right: 0;
+    z-index: 10;
 }
 
 .instructions-icon{
@@ -63,6 +75,9 @@ Instructions
     display: none;
     font-size: 1.1em;
     padding: 1em;
+    width: 100%;
+    max-width: 800px;
+    min-width: 600px;
     line-height: 1.5em;
 }
 
@@ -97,16 +112,18 @@ Instructions
 /* Graph editor specific styles */
 g.concept-g .to-edit-circle-g{
     display: none;
+    cursor: pointer;
 }
 
 g.concept-g .to-edit-circle-g circle{
-    fill: #f8f4ff;
+    fill: #f5fffa;
     stroke-width: 1px;
 }
 
 g.concept-g .to-edit-circle-g text{
     font-style: italic;
     font-weight: normal;
+    font-size: 0.6em;
 }
 
 g.concept-g.hovered .to-edit-circle-g{
@@ -161,7 +178,6 @@ g.connect-node circle{
    margin:0 0 0 1px;
    padding:3px 10px;
    background:#ddd;
-   color:##ECECEC;
    text-decoration:none;
    line-height:1.3em;
    border: 0;
@@ -174,7 +190,7 @@ g.connect-node circle{
 .ec-tabs button.active,
 .ec-tabs button.active:hover {
    color:#fff;
-   background:#4D4747;
+   background:#706d68;
    font-weight:bold;
 }
 
@@ -192,7 +208,7 @@ g.connect-node circle{
 .ec-tabs {
    width:100%;
    background:#fff;
-   border-bottom: 2px solid #4D4747;
+   border-bottom: 2px solid #54514e;
    overflow:hidden;
    position:relative;
 }
@@ -223,9 +239,8 @@ g.connect-node circle{
 }
 
 .ec-display-wrap{
-    position: relative;
     margin: 1em auto;
-    display:none;
+    display: none;
     margin: auto;
     width: 70%;
     text-align: center;
@@ -250,7 +265,7 @@ g.connect-node circle{
     margin-top: 1em;
     margin-bottom: 2em;
     border: 2px solid #C9B8C7;
-    background-color: rgb(244, 240, 245);
+    background-color: rgb(247, 248, 255);
     border-radius: 5px;
     padding: 1em;
 }
@@ -372,6 +387,7 @@ g.connect-node circle{
 }
 
 .no-content-info {
+    margin-top: 1em;
     font-size: 0.9em;
     font-style: italic;
 }

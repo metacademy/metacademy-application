@@ -1,4 +1,3 @@
-
 // FIXME TODO - must return errors to the user in an elegant way, both client side (here) and from the server
 
 /*global define*/

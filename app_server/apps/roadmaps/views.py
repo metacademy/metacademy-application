@@ -1,6 +1,3 @@
-import pdb
-
-import collections
 import difflib
 import os
 from operator import attrgetter
@@ -36,15 +33,18 @@ BLEACH_ATTR_WHITELIST = {
     'a': ['href', 'rel']
 }
 
+
 # TODO what is this used for - Colorado
 def metacademy_domains():
     return ['']
+
 
 def is_internal_link(url):
     p = urlparse.urlparse(url)
     if p.netloc not in metacademy_domains():
         return False
     return p.path.find('/concepts/') != -1
+
 
 re_tag = re.compile(r'/concepts/(\w+)')
 def parse_tag(url):
@@ -53,6 +53,7 @@ def parse_tag(url):
         return m.group(1)
     else:
         return None
+
 
 def process_link(attrs, new=False):
     if is_internal_link(attrs['href']):
@@ -65,15 +66,17 @@ def process_link(attrs, new=False):
     attrs['target'] = '_blank'
     return attrs
 
+
 def wiki_link_url_builder(label, base, end):
     """
     TODO allow tags and titles (how to distinguish?)
     """
     ttt_dict = cscomm.get_title_to_tag_dict()
-    if ttt_dict.has_key(label):
+    if label in ttt_dict:
         return base + ttt_dict[label]
     else:
         return base + label
+
 
 def markdown_to_html(markdown_text):
     """
@@ -84,6 +87,7 @@ def markdown_to_html(markdown_text):
     body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, mathjax_ext, 'toc', 'sane_lists', 'extra', 'wikilinks(base_url=/concepts/)'], extension_configs={'wikilinks(base_url=/concepts/)' : [('build_url', wiki_link_url_builder)]})
     html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
     return bleach.linkify(html, callbacks=[process_link])
+
 
 def show(request, in_username, tag, vnum=-1):
     try:
@@ -98,10 +102,10 @@ def show(request, in_username, tag, vnum=-1):
         return HttpResponse(status=404)
 
     vnum = int(vnum)
-    versions = get_versions_obj(roadmap)
+    versions = _get_versions_obj(roadmap)
     num_versions = len(versions)
 
-    if num_versions > vnum >= 0 :
+    if num_versions > vnum >= 0:
         roadmap = versions[vnum].object_version.object
 
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
@@ -110,7 +114,8 @@ def show(request, in_username, tag, vnum=-1):
         'body_html': markdown_to_html(roadmap.body),
         'num_versions': num_versions,
         'page_class': "view"
-        }, **common_rm_dict))
+    }, **common_rm_dict))
+
 
 def format_diff_line(line):
     line = escape(line)
@@ -135,7 +140,7 @@ def show_changes(request, in_username, tag, vnum=-1):
         return HttpResponse(status=404)
 
     vnum = int(vnum)
-    versions = get_versions_obj(roadmap)
+    versions = _get_versions_obj(roadmap)
     num_versions = len(versions)
 
     if num_versions > vnum >= 0 :
@@ -160,9 +165,7 @@ def show_changes(request, in_username, tag, vnum=-1):
 
     return render(request, 'roadmap-diff.html', dict({
         'diff': diff,
-        }, **common_rm_dict))
-
-
+    }, **common_rm_dict))
 
 
 def show_history(request, in_username, tag):
@@ -178,20 +181,20 @@ def show_history(request, in_username, tag):
 
     cur_version_num = roadmap.version_num
 
-    revs = get_versions_obj(roadmap)[::-1]
+    revs = _get_versions_obj(roadmap)[::-1]
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
     return render(request, 'roadmap-history.html',
                   dict({"revs": revs,
                         'page_class': "history",
-                        'cur_version_num':cur_version_num,
+                        'cur_version_num': cur_version_num,
                     }, **common_rm_dict))
+
 
 @csrf_exempt
 def update_to_revision(request, in_username, tag, vnum):
     """
     update the given roadmap to the specified reversion number (simply copies over the previous entry)
     """
-
     if not request.method == "PUT":
         return HttpResponse(status=403)
 
@@ -208,7 +211,7 @@ def update_to_revision(request, in_username, tag, vnum):
         return HttpResponse(status=401)
 
     vnum = int(vnum)
-    versions = get_versions_obj(roadmap)
+    versions = _get_versions_obj(roadmap)
     num_versions = len(versions)
 
     if 0 > vnum or vnum >= num_versions:
@@ -218,7 +221,7 @@ def update_to_revision(request, in_username, tag, vnum):
     return HttpResponse(status=200)
 
 
-def get_versions_obj(obj):
+def _get_versions_obj(obj):
     return reversion.get_for_object(obj).order_by("id")
 
 
@@ -247,7 +250,7 @@ def edit(request, in_username, tag):
         form = RoadmapForm(request.POST, instance=roadmap)
 
         if form.is_valid():
-            versions = get_versions_obj(roadmap)
+            versions = _get_versions_obj(roadmap)
             cur_vn = len(versions) + 1
             smodel = form.save(commit=False)
             smodel.version_num = cur_vn
@@ -425,7 +428,8 @@ def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
         'history_url': base_url + "/history",
         'settings_url': base_url + '/settings',
         'can_change_settings': roadmap_settings.can_change_settings(user),
-        'can_edit': roadmap_settings.editable_by(user)
+        'can_edit': roadmap_settings.editable_by(user),
+        'base_rev_url': base_url + '/version/'
     }
 
 

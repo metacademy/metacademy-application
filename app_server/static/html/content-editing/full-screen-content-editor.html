@@ -1,5 +1,4 @@
 <script type="text/template" id="full-screen-content-editor">
-
   <div class="ec-title">
     <input type="text" class="title-input" placeholder="title of concept" value="<%- title %>">
   </div>
@@ -10,9 +9,10 @@
       <li><button id="btn-goals">Learning Goals</button></li>
       <li><button id="btn-dependencies">Prerequisites</button></li>
       <li><button id="btn-resources">Resources</button></li>
-      <li><button id="btn-exercises">Exercises</button></li>
-      <li><button id="btn-software">Software</button></li>
+      <!-- <li><button id="btn-exercises">Exercises</button></li> -->
+      <!-- <li><button id="btn-software">Software</button></li> -->
       <li><button id="btn-pointers">See Also</button></li>
+      <li><button id="btn-history">History</button></li>
     </ul>
   </div>
 
@@ -83,60 +83,63 @@
         </div>
         <%});%>
 
-    <%} %>
+        <%} %>
+      </div>
     </div>
+    <% }) %>
   </div>
-  <% }) %>
-</div>
 
-<div class="ec-display-wrap" id="pointers">
-  <div class="instructions">
-    <div class="instructions-icon">
-      instructions
+  <div class="ec-display-wrap" id="pointers">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify relationships to other concepts using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+      </div>
     </div>
-    <div class="instructions-text">
-      Specify relationships to other concepts using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
-    </div>
+    <textarea><%=pointers%></textarea>
   </div>
-  <textarea><%=pointers%></textarea>
-</div>
 
-<div class="ec-display-wrap" id="goals">
-  <div class="instructions">
-    <div class="instructions-icon">
-      instructions
+  <div class="ec-display-wrap" id="goals">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify the goals for the user using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+      </div>
     </div>
-    <div class="instructions-text">
-      Specify the goals for the user using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+    <div id="goals-tidbit-wrap" class="tidbit-wrap">
+      <button class="add-item-button" id="add-goal-button">+ Add Goal</button>
     </div>
   </div>
-  <div id="goals-tidbit-wrap" class="tidbit-wrap">
-    <button class="add-item-button" id="add-goal-button">+ Add Goal</button>
-  </div>
-</div>
 
-<div class="ec-display-wrap" id="exercises">
-  <div class="instructions">
-    <div class="instructions-icon">
-      instructions
+  <div class="ec-display-wrap" id="exercises">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify and explain links to exercises the user can practice in order to understand this concept further using simplified markdown syntax (TODO this should be more structured and allow users to write their own exercises).
+      </div>
     </div>
-    <div class="instructions-text">
-      Specify and explain links to exercises the user can practice in order to understand this concept further using simplified markdown syntax (TODO this should be more structured and allow users to write their own exercises).
-    </div>
+    <textarea><%=exercises%></textarea>
   </div>
-  <textarea><%=exercises%></textarea>
-</div>
 
-<div class="ec-display-wrap" id="software">
-  <div class="instructions">
-    <div class="instructions-icon">
-      instructions
+  <div class="ec-display-wrap" id="software">
+    <div class="instructions">
+      <div class="instructions-icon">
+        instructions
+      </div>
+      <div class="instructions-text">
+        Specify and explain links to software implementations of the specified concept (TODO these should include more structure, e.g. language fields).
+      </div>
     </div>
-    <div class="instructions-text">
-      Specify and explain links to software implementations of the specified concept (TODO these should include more structure, e.g. language fields).
-    </div>
+    <textarea><%=software%></textarea>
   </div>
-  <textarea><%=software%></textarea>
-</div>
+
+  <div class="ec-display-wrap" id="history">
+  </div>
 
 </script>

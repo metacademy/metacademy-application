@@ -64,13 +64,13 @@
       <% var src = dep.get("source"); %>
       <h3> <%- src.get("title") %> </h3>
       <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">
+  <button class="expand-content ec-button"> + show goal relationships</button>
+  <button class="contract-content ec-button"> - hide goal relationships</button>
       <div class="detailed-info">
         <% if (goals.length) { %>
         <label>What goals depend on "<%-src.get("title")%>"?</label>
         <% goals.each(function(goal){ %>
-        <div class="goal-check-input">
-          <input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="target_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("target_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%>
-        </div>
+          <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="target_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("target_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
         <%});%>
         <%}%>
 
@@ -78,9 +78,7 @@
         <label>What goals from "<%-src.get("title")%>" are relevant to "<%-title%>"?</label>
 
         <% src.get("goals").each(function(goal){ %>
-        <div class="goal-check-input">
-          <input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="source_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("source_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%>
-        </div>
+          <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="source_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("source_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
         <%});%>
 
         <%} %>

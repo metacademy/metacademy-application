@@ -486,10 +486,12 @@ class DependencyResource(CustomSaveHookResource):
             concepts_to_traverse = [ol.target for ol in otarget.dep_source.all()]
             os_tgraph, created = TargetGraph.objects.get_or_create(leaf=osource)
             if created:
+                pdb.set_trace()
                 os_tgraph.concepts.add(osource)
             add_concepts = os_tgraph.concepts.all()
             ot_tgraph, created = TargetGraph.objects.get_or_create(leaf=otarget)
             if created:
+                pdb.set_trace()
                 os_tgraph.concepts.add(otarget)
             otarget.tgraph_leaf.concepts.add(*add_concepts)
             otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())

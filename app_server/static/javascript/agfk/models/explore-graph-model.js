@@ -166,7 +166,6 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
             // save the node -- how will we save edges on creation? -- save them once they get the server id
             node.save(null, {parse: false,
                              success: function () {
-                               console.log("success");
                                thisModel.save(null,
                                               {parse: false,
                                                success: function () {

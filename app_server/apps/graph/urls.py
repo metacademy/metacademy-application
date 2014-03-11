@@ -21,11 +21,11 @@ v1_api.register(GoalResource())
 
 # TODO refactor concepgts
 urlpatterns = patterns('',
-                       url(r'^(?i)concepts/([^/]+)/history$', get_concept_history, name="concepts_history"),
+                       url(r'^(?i)concepts/([^/]+)/history/?$', get_concept_history, name="concept-history"),
                        url(r'^(?i)concepts/([^/]+)?/?$', get_concept_dep_graph, name="concepts"),
+                       #                  url(r'^(?i)concepts/([^/]+)?/version/(\d+)/?$', get_concept_version, name="concept-version"),
                        url(r'^new/?', new_graph, name="graph-creator"),
                        url(r'^idchecker/?', check_id, name="idchecker"),
-                       # /mapi/graph (should handle get/post/put requests
                        url('^api/', include(v1_api.urls), name="api"),
                        url('^([^/]+)/?$', edit_existing_graph),
 )

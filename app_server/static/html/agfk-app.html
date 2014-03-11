@@ -24,7 +24,7 @@
 {% block main %}
 
 <div id="nojs-content">
-  {% include "concept-presentation.html" %}
+TODO get working for js-less browsing
 </div>
 
 {% include "agfk-structure-loader.html" %}
@@ -39,7 +39,7 @@
     <script>
       window.agfkGlobals = {};
       agfkGlobals.userInitData = {{ user_data|safe }};
-      agfkGlobals.targetId = "{{ target_id | safe}}";
+      agfkGlobals.targetId = "{{ leaf.id | safe}}";
       agfkGlobals.auxModel = null; // init in main js app
       agfkGlobals.apiBase = "/graphs/api/v1/"; // TODO remove hardcoding if possible
       agfkGlobals.globalResources = {};

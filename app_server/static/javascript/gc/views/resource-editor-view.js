@@ -23,6 +23,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
       events: function(){
         var oevts = BaseEditorView.prototype.events(),
             consts = pvt.consts;
+        oevts["click .res-tabs button"] = "changeDispResSec";
         oevts["blur .deps-field"] = "changeDepsField";
         oevts["change ." + consts.crfClass] = "changeCoreRadioField";
         oevts["change ." + consts.rgcClass + " input"] = "changeCoveredGoal";
@@ -50,8 +51,14 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         assignObj["." + consts.resLocWrapperClass] = thisView.resourceLocationsView;
 
         thisView.$el.html(thisView.template(thisView.model.attributes));
+
         // assign the subviews
         thisView.assign(assignObj);
+
+        // set the active global/local button
+        thisView.curResDisp = thisView.curResDisp || consts.globalResClass;
+        thisView.$el.find("." + thisView.curResDisp).addClass("active");
+        thisView.$el.find(".btn-" + thisView.curResDisp).addClass("active");
 
         thisView.isRendered = true;
         return thisView;
@@ -77,6 +84,19 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
           });
 
         // TODO fixme should add a new location element to the dom and rerender
+      },
+
+      /**
+       * Changed the displayed resource section
+       */
+      changeDispResSec: function (evt) {
+        var thisView = this,
+            classesStr = evt.currentTarget.className,
+            val = classesStr.split(" ")[0].substr(4);
+        if (thisView.curResDisp !== val ) {
+          thisView.curResDisp = val;
+          thisView.render();
+        }
       },
 
       /**

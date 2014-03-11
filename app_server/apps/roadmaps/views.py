@@ -84,7 +84,9 @@ def markdown_to_html(markdown_text):
     """
     roadmap_ext = RoadmapExtension()
     mathjax_ext = MathJaxExtension()
-    body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, mathjax_ext, 'toc', 'sane_lists', 'extra', 'wikilinks(base_url=/concepts/)'], extension_configs={'wikilinks(base_url=/concepts/)' : [('build_url', wiki_link_url_builder)]})
+    body_html = markdown.markdown(markdown_text,
+                                  extensions=[roadmap_ext, mathjax_ext, 'toc', 'sane_lists', 'extra', 'wikilinks(base_url=/concepts/)'],
+                                  extension_configs={'wikilinks(base_url=/concepts/)': [('build_url', wiki_link_url_builder)]})
     html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
     return bleach.linkify(html, callbacks=[process_link])
 
@@ -143,14 +145,14 @@ def show_changes(request, in_username, tag, vnum=-1):
     versions = _get_versions_obj(roadmap)
     num_versions = len(versions)
 
-    if num_versions > vnum >= 0 :
+    if num_versions > vnum >= 0:
         roadmap = versions[vnum].object_version.object
 
     curr_body = roadmap.body
     curr_lines = curr_body.splitlines()
 
     if vnum > 0:
-        prev_roadmap = versions[vnum-1].object_version.object
+        prev_roadmap = versions[vnum - 1].object_version.object
         prev_body = prev_roadmap.body
     else:
         prev_body = ''
@@ -187,7 +189,9 @@ def show_history(request, in_username, tag):
                   dict({"revs": revs,
                         'page_class': "history",
                         'cur_version_num': cur_version_num,
-                    }, **common_rm_dict))
+                        'show_change_button': True,
+                        'show_preview_button': True
+                        }, **common_rm_dict))
 
 
 @csrf_exempt
@@ -272,7 +276,8 @@ def edit(request, in_username, tag):
     return render(request, 'roadmap-edit.html', dict({
         'form': form,
         'page_class': "edit",
-        }, **common_rm_dict))
+    }, **common_rm_dict))
+
 
 def settings(request, in_username, tag):
     # check that the user is logged in

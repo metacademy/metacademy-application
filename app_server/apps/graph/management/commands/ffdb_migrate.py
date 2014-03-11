@@ -16,6 +16,14 @@ from app_server.apps.cserver_comm.cserver_communicator import get_full_graph_dat
 from apps.graph.models import Concept
 
 
+def get_goal_uri(id):
+    return "/graphs/api/v1/goal/" + id + "/"
+
+
+def get_concept_uri(id):
+    return "/graphs/api/v1/concept/" + id + "/"
+
+
 def markdown_obj_to_markdown(mdobj):
     mdarr = []
     for mobj in mdobj:
@@ -52,13 +60,7 @@ class Command(BaseCommand):
         global_res_dicts = {}
         # parse the dependencies after the concepts
         all_deps = []
-        conct = 0
         for concept_skeleton in graph_data["nodes"]:
-            # break
-            # conct += 1
-            # if conct > 100:
-            #     break
-
             concept = get_concept_data(concept_skeleton["tag"])
             api_con = {}
 
@@ -75,6 +77,7 @@ class Command(BaseCommand):
                         goal_arr = [goal]
                     else:
                         goal_arr.append(goal)
+
                 # TODO fix DRY
                 if goal_arr:
                     mtxt = markdown_obj_to_markdown(goal_arr)
@@ -95,8 +98,6 @@ class Command(BaseCommand):
                 api_con[dcf] = concept.get(dcf)
             api_con["learn_time"] = concept.get("time")
 
-            # TODO FIXME need to figure out "goals covered"
-
             ### RESOURCES ###
             api_resources = []
             for res in concept["resources"]:
@@ -111,6 +112,11 @@ class Command(BaseCommand):
                     res_obj["core"] = res.get("core")
                 else:
                     res_obj["core"] = 0
+
+                if api_goal_list and res_obj["core"]:
+                    res_obj["goals_covered"] = [get_goal_uri(g["id"]) for g in api_goal_list]
+                else:
+                    res_obj["goals_covered"] = []
 
                 # determine access
                 if res.get("free"):
@@ -161,11 +167,9 @@ class Command(BaseCommand):
             src = tag_to_concept_dict[dep["from_tag"]]
             target = tag_to_concept_dict[dep["to_tag"]]
             api_dep["id"] = src["id"] + target["id"]
-            api_dep["source"] = "/graphs/api/v1/concept/" + src["id"] + "/"
-            api_dep["target"] = "/graphs/api/v1/concept/" + target["id"] + "/"
+            api_dep["source"] = get_concept_uri(src["id"])
+            api_dep["target"] = get_concept_uri(target["id"])
             api_dep["reason"] = dep["reason"]
-            api_dep["source_goals"] = ["/graphs/api/v1/goal/" + sgoal.id + "/"
-                                       for sgoal in Concept.objects.get(id=src["id"]).goals.all()]
-            api_dep["target_goals"] = ["/graphs/api/v1/goal/" + tgoal.id + "/"
-                                       for tgoal in Concept.objects.get(id=target["id"]).goals.all()]
+            api_dep["source_goals"] = [get_goal_uri(sgoal.id) for sgoal in Concept.objects.get(id=src["id"]).goals.all()]
+            api_dep["target_goals"] = [get_goal_uri(tgoal.id) for tgoal in Concept.objects.get(id=target["id"]).goals.all()]
             post_dependency(api_dep)

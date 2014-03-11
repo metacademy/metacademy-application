@@ -14,13 +14,17 @@
       </div>
       {% endif %}
 
+      {% if show_preview_button %}
       <div class="revision-history-preview">
         <a class="cbox-preview" href="{{base_rev_url}}{{forloop.revcounter0}}">Preview</a>
       </div>
+      {% endif %}
 
+      {% if show_change_button %}
       <div class="revision-history-changes">
         <a class="cbox-changes" href="{{base_rev_url}}{{forloop.revcounter0}}/changes">Changes</a>
       </div>
+      {% endif %}
 
       <div class="revision-history-comment">
         {% if rev.revision.comment %}

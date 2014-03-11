@@ -4,16 +4,20 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
   return (function(){
     var pvt = {};
+
+    // TODO state should exist on the object itself
     pvt.state = {
       visId: ""
     };
+
     pvt.consts = {
       templateId: "full-screen-content-editor",
       contentItemClass: "ec-display-wrap",
       resourcesTidbitWrapId: "resources-tidbit-wrap",
       goalsTidbitWrapId: "goals-tidbit-wrap",
       historyId: "history",
-      reversionsClass: "reversions"
+      reversionsClass: "reversions",
+      expClass: "expanded"
     };
 
     pvt.failFun = function failFun (resp){
@@ -30,10 +34,11 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         "blur .ec-display-wrap > textarea": "blurTextField",
         "blur input.dep-reason": "blurDepReason",
         "click #btn-history": "loadConceptHistory",
-        "click .ec-tabs button": "changeDisplayedSection",
+        "click .ec-title + .ec-tabs button": "changeDisplayedSection",
         "click #add-resource-button": "addResource",
         "click #add-goal-button": "addGoal",
-        "change .goal-check-input .check-field": "changeDepGoal"
+        "change .goal-check-input .check-field": "changeDepGoal",
+        "click .ec-button": "togglePreqDetails"
       },
 
       render: function(){
@@ -193,8 +198,13 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       },
 
       changeDisplayedSection: function(evt){
-        pvt.state.visId = evt.currentTarget.id.substr(4);
-        this.render();
+        var thisView = this,
+            curVal = pvt.state.visId,
+            val = evt.currentTarget.id.substr(4);
+        if (curVal !== val) {
+          pvt.state.visId = val;
+          thisView.render();
+        }
       },
 
       blurTitleField: function(evt){
@@ -250,6 +260,12 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
             console.log("unable to load concept reversion history TODO inform user");
         });
 
+      },
+
+      // TODO create standalone views for the preqs
+      togglePreqDetails: function (evt) {
+        var parEl = evt.currentTarget.parentElement;
+        $(parEl).toggleClass(pvt.consts.expClass);
       },
 
       isViewRendered: function(){

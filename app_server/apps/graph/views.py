@@ -82,10 +82,10 @@ def get_concept_dep_graph(request, concept_tag=""):
     uconcepts = get_user_data(request)
 
     return render(request, "agfk-app.html",
-                              {"full_graph_skeleton": get_full_graph_json_str(),
-                               "user_data": json.dumps(uconcepts),
-                               "graph_init_data": graph_data,
-                               "target_id": leaf.id})
+                  {"full_graph_skeleton": get_full_graph_json_str(),
+                   "user_data": json.dumps(uconcepts),
+                   "graph_init_data": graph_data,
+                   "leaf": leaf})
 
 
 def new_graph(request):

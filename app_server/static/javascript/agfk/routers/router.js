@@ -256,7 +256,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                  document.title = "Graph Creation - Metacademy";
                }
 
-               // add the concept list view if it is not already present
+               // add the concept list view if it is not already present and if not disallowed by a global var
                if (thisRoute.viewMode !== pCreateMode && !thisRoute.conceptListView && thisRoute.viewMode !== pEditMode) {
                  thisRoute.conceptListView = new ConceptListView({model: graphModel, appRouter: thisRoute});
                  $("#main").prepend(thisRoute.conceptListView.render().$el);

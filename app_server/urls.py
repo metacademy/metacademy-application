@@ -9,7 +9,7 @@ from haystack.views import search_view_factory
 from haystack.query import SearchQuerySet
 
 from apps.roadmaps.models import Roadmap
-from views import MultiSearchView, ContactView
+from views import MultiSearchView, ContactView, get_list_view
 
 admin.autodiscover()
 
@@ -22,7 +22,7 @@ Django urls handler
 urlpatterns = patterns('',
                        url(r'^$', TemplateView.as_view(template_name="landing.html")),
                        url(r'^(?i)search$', search_inst, name="haystack_search"),
-                       url(r'^(?i)list$', TemplateView.as_view(template_name="concept-list.html")),
+                       url(r'^(?i)list$', get_list_view),
                        url(r'^(?i)concepts/((?P<anything>.*))', RedirectView.as_view(url="/graphs/concepts/%(anything)s", query_string=True), name='concepts'),
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),
                        url(r'^user/', include('apps.user_management.urls', namespace='user') ),

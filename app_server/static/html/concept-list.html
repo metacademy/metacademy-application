@@ -14,13 +14,20 @@ Concepts - Metacademy
 
 {% block jscript-extend %}
 <script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
-<script type="text/javascript" src="{% static "javascript/show-concepts-list.js" %}"></script>
 {% endblock %}
 
 {% block main%}
 
 <div class="list-concepts-wrapper">
-
+<ul>
+{% for concept in concepts %}
+  {% if not concept.is_provisional %}
+  <li class="list-concepts-li">
+    <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a>
+  </li>
+  {% endif %}
+{% endfor %}
+</ul>
 </div>
 
 {% include "concept-list-item.html" %}

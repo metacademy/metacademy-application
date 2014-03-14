@@ -25,6 +25,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
             consts = pvt.consts;
         oevts["click .res-tabs button"] = "changeDispResSec";
         oevts["blur .deps-field"] = "changeDepsField";
+        oevts["blur .array-text-field"] = "changeArrayTextField";
         oevts["change ." + consts.crfClass] = "changeCoreRadioField";
         oevts["change ." + consts.rgcClass + " input"] = "changeCoveredGoal";
         return oevts;
@@ -136,6 +137,22 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         }
         thisView.model.set("goals_covered", goalsCovered);
         thisView.model.save(null, {parse: false});
+      },
+
+      /**
+       * Change to array text field -- separate entries with newline
+       */
+      changeArrayTextField: function (evt) {
+        var thisView = this,
+            curTar = evt.currentTarget,
+            saveVals = curTar.value.split("\n"),
+            saveObj = {},
+            attrName = curTar.name.split("-")[0];
+
+        if (thisView.model.get(attrName) !== saveVals) {
+          saveObj[attrName] = saveVals;
+          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+        }
       },
 
       /**

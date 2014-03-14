@@ -43,7 +43,7 @@
     <input type="text" class="deps-field" name="additional_dependencies-<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= additional_dependencies.map(function(d){return d.title;}).join(', ') %>">
 
     <label>Notes</label>
-    <textarea class="text-field" name="notes-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning"><%= notes %></textarea>
+    <textarea class="array-text-field" name="notes-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning; notation is found on pg. 7"><%= notes %></textarea>
   </div>
 
 </script>

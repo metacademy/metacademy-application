@@ -3,7 +3,7 @@
     <% gres = this.model.get("global_resource") %>
     <% var titleDisp = gres.get("title") %>
     <% var yearDisp = yearString ? "(" + yearString + ")" : "" %>
-    <span class="res-arrow">→ </span><%= titleDisp %> <%- yearDisp %>
+    <span class="res-arrow">→ </span><%= titleDisp || "-no title-" %> <%- yearDisp %>
   </div>
 
   <div class="resource-content-wrap">
@@ -15,17 +15,18 @@
 
     <% if (locations && locations.length){ %>
     <div class="resource-location-display">
-      <span class="resource-location"> Location: </span>
 
     <% if (locations.length === 1){ %>
     <% loc = locations.models[0] %>
     <% loc_url = loc.get("url") %>
     <% loc_text = loc.get("location_text") %>
       <% if (loc_url) { %>
+      <span class="resource-location"> Location: </span>
       <span class="resource-location-item">
-	<a class="external-link" href="<%- loc_url %>"> <%- loc_text %> </a>
+	<a class="external-link" href="<%- loc_url %>"> <%- loc_text || loc_url %> </a>
       </span>
-      <% } else { %>
+      <% } else if (loc_text) { %>
+      <span class="resource-location"> Location: </span>
       <span class="resource-location-item"> <%- loc_text %> </span></li>
 <% } %>
 <% } else { %>

@@ -18,7 +18,7 @@ define(["backbone"], function(Backbone){
         edition_years: [],
         description: "",
         notes: "",
-        access: ""
+        access: "free"
       };
     },
 

@@ -17,7 +17,7 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
         id: "",
         locations: new LocationCollection(),
         global_resource: new GlobalResource(),
-        access: "",
+        access: "free",
         core: 1,
         // TODO consider using a GoalCollection if goals become more complicated
         goals_covered: [],

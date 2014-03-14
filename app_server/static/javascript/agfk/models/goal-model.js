@@ -32,7 +32,11 @@ define(["backbone", "utils/utils"], function(Backbone, Utils){
     },
 
     getParsedText: function () {
-        return Utils.simpleMdToHtml(this.get("text"));
+      var txt = this.get("text");
+      if (txt[0] != "*") {
+        txt = "*" + txt;
+      }
+        return Utils.simpleMdToHtml(txt);
     }
   });
 });

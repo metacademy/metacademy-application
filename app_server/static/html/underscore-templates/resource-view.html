@@ -79,7 +79,11 @@
   <ul>
     <% for (var i = 0; i < additional_dependencies.length; i++) { %>
        <li><span class="resource-dependencies-item">
-	   <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + additional_dependencies[i].link + '#focus=' + additional_dependencies[i].link %>"> <%- additional_dependencies[i].title %> </a>
+           <% if (additional_dependencies[i].link) { %>
+	         <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + additional_dependencies[i].link + '#focus=' + additional_dependencies[i].link %>"> <%- additional_dependencies[i].title %> </a>
+           <% } else { %>
+           <%- additional_dependencies[i].title %>
+           <% } %>
        </span></li>
        <% } %>
   </ul>

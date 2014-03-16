@@ -440,6 +440,22 @@ class ConceptResource(CustomSaveHookResource):
         return data
 
 
+class ConceptSegmentResource(CustomSaveHookResource):
+    """
+    API for concepts, aka nodes
+    """
+
+    def dehydrate(self, bundle):
+        bundle.data["is_partial"] = True
+        return bundle
+
+    class Meta:
+        """ ConceptSegmentResource Meta"""
+        queryset = Concept.objects.all()
+        authorization = ConceptAuthorization()
+        fields = ["title", "summary", "id", "tag"]
+
+
 class DependencyResource(CustomSaveHookResource):
     """
     API for Dependencies
@@ -459,6 +475,11 @@ class DependencyResource(CustomSaveHookResource):
         include_resource_uri = False
         # allow patch so we can update many deps at once
         list_allowed_methods = ('get', 'post', 'patch')
+
+    # def dehydrate(self, bundle):
+    #     bundle.data["source_title"] = bundle.obj.source.title
+    #     bundle.data["target_title"] = bundle.obj.target.title
+    #     return bundle
 
     def pre_save_hook(self, bundle, **kwargs):
         """
@@ -575,7 +596,6 @@ def normalize_concept(in_concept):
     """
     # ensure that goals comes before resources
 
-    # pdb.set_trace()
 
     # if type(in_concept) != OrderedDict:
     #     return
@@ -602,7 +622,7 @@ class TargetGraphResource(NamespacedModelResource):
     GET-only resource for target graphs (graphs with a single "target" concept and all dependenies)
     NB: this is _not_ a model resource
     """
-    concepts = fields.ToManyField(ConceptResource, "concepts", full=True)
+    concepts = fields.ToManyField(ConceptSegmentResource, "concepts", full=True)
     dependencies = fields.ToManyField(DependencyResource, "dependencies", full=True)
 
     class Meta:

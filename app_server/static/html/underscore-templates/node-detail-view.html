@@ -6,6 +6,12 @@
     </div>
   </h1>
 
+  <% if (is_partial) { %>
+  <div class="fetching-detail-waitbar">
+    Fetching content
+  </div>
+  <% } %>
+
   <div class="detail-time-est">
     <% if (time) { %>
         <span class="info-text">(<%- time %> to learn)</span>

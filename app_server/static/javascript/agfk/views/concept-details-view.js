@@ -211,6 +211,13 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
             assignObj = {},
             resourcesLocClass = "." + viewConsts.resourcesLocClass;
 
+        if (thisView.model.get("is_partial")) {
+          thisView.model.fetch({update: true, success: function (resp) {
+            thisView.model.set("is_partial", false);
+            thisView.render();
+          }});
+        }
+
         thisView.isRendered = false;
         var templateVars = _.extend(thisView.model.attributes, {
                              "notes": thisView.notesList(),
@@ -308,14 +315,15 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
        * Compute the list of notes to display.
        */
       notesList: function() {
-        var notes = [];
-        if (this.model.get("is_shortcut")) {
-          notes.push(this.shortcutNote());
+        var thisView = this,
+            notes = [];
+        if (thisView.model.get("is_shortcut")) {
+          notes.push(thisView.shortcutNote());
         }
-        if (this.model.get("flags")) {
-          notes = notes.concat(this.model.get("flags"));
+        if (thisView.model.get("flags")) {
+          notes = notes.concat(thisView.model.get("flags"));
         }
-        if (!this.model.isFinished()) {
+        if (!thisView.model.get("is_partial") && !thisView.model.isFinished()) {
           notes.push("This concept is still under construction.");
         }
         return notes;

@@ -3,13 +3,6 @@
 /* ---------->>> Learn View Styles <<<----------------*/
 /* ---------------------------------------------------*/
 
-/* #learn-view-wrapper{ */
-/*     display: none; */
-/*     width: 100%; */
-/*     background: white; */
-/*     height: inherit; */
-/* } */
-
 #learn-view{
     height: inherit;
 }
@@ -33,6 +26,18 @@
     font-size: 1.2em;
     text-align: center;
     font-weight: bold;
+}
+
+/* waitbar */
+.fetching-detail-waitbar {
+    top: 0em;
+    bottom: 0em;
+    position: absolute;
+    background: white;
+    width: 100%;
+    background-image: url('/static/images/ajax-loader-bar.gif');
+    background-repeat: no-repeat;
+    background-position: 30% 20%;
 }
 
 h1 .learn-view-check, h1 .learn-view-star{

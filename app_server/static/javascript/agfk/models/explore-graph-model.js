@@ -123,66 +123,6 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
       /**
        * @Override
        */
-      postAddEdge: function (edge, isNewEdge) {
-        var thisModel = this;
-        // if it needs the server id it'll be saved after the node id returns
-        // so don't save the graph here
-        if (isNewEdge && !edge.needsServerId) {
-          edge.save(null,
-                    {parse: false,
-                     success: function () {
-                       thisModel.save(null,
-                                      {parse: false,
-                                       success:  function (){
-                                         Utils.urlFromNewToId(thisModel.id);
-                                       }
-                                      });
-                     }
-                    });
-        }
-      },
-
-      /**
-       * @Override
-       */
-      postAddNode: function (node, isNewNode) {
-        if (!isNewNode) {
-          node.hasServerId = true;
-          return;
-        }
-        var thisModel = this;
-        node.hasServerId = false;
-
-        $.get(window.agfkGlobals.idcheckUrl, {id: node.id, type: "concept" })
-          .success(function (resp) {
-            node.set("id", resp.id);
-            node.set("tag", resp.id);
-            node.hasServerId = true;
-            // set edge ids that were waiting for the server
-            thisModel.getEdges().filter(function (edge) {
-              return edge.needsServerId;
-            }).forEach(thisModel.setEdgeId);
-
-            // save the node -- how will we save edges on creation? -- save them once they get the server id
-            node.save(null, {parse: false,
-                             success: function () {
-                               thisModel.save(null,
-                                              {parse: false,
-                                               success: function () {
-                                                 Utils.urlFromNewToId(thisModel.id);
-                                               }});
-                             }});
-          })
-          .fail(function (resp){
-            // failure
-            console.error("unable to verify new resource id -- TODO inform user -- msg: "
-                          + resp.responseText);
-          });
-      },
-
-      /**
-       * @Override
-       */
       postinitialize: function () {
         // setup listeners
         var thisModel = this,

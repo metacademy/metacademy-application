@@ -99,12 +99,12 @@ define(["backbone", "underscore"], function(Backbone, _){
 
       isLearned: function(sid){
         var concept = this.get("concepts").get(sid);
-        return concept && concept.get("learned");
+        return !!(concept && concept.get("learned"));
       },
 
       isStarred: function(sid){
         var concept = this.get("concepts").get(sid);
-        return concept && concept.get("starred");
+        return !!(concept && concept.get("starred"));
       },
 
       /**

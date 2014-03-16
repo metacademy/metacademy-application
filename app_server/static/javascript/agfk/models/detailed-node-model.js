@@ -9,7 +9,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
     },
 
     txtFields: function () {
-        return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "summary", "pointers", "learn_time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
+        return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "summary", "pointers", "learn_time", "is_partial", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
     },
 
 
@@ -49,7 +49,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       if (resp === null || xhr.parse == false) {
         return {};
       }
-      var output = thisModel.defaults(),
+      var output = xhr.update ? thisModel.attributes : thisModel.defaults(),
           txtFields = thisModel.txtFields(),
           collFields = thisModel.collFields();
 
@@ -57,6 +57,9 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       var i = txtFields.length;
       while (i--) {
         var tv = txtFields[i];
+        if (xhr.update && output[tv]) {
+          continue;
+        }
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
         } else if (output[tv] === undefined) {
@@ -68,6 +71,9 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       i = collFields.length;
       while (i--) {
         var cv = collFields[i];
+        if (xhr.update && output[cv].length > 0) {
+          continue;
+        }
         output[cv].parent = thisModel;
         if (resp[cv] !== undefined) {
           output[cv].add(resp[cv], {parse: true});
@@ -121,11 +127,12 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
      * Returns the title to be displayed in the learning view
      */
     getLearnViewTitle: function(){
-      var title = this.get("title") || this.id.replace(/_/g, " ");
-      if (this.get("is_shortcut")) {
+      var thisModel = this,
+          title = thisModel.get("title") || thisModel.id.replace(/_/g, " ");
+      if (thisModel.get("is_shortcut")) {
         title += " (shortcut)";
       }
-      if (!this.isFinished()) {
+      if (!thisModel.get("is_partial") && !thisModel.isFinished() ) {
         title += " (under construction)";
       }
       return title;

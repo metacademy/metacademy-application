@@ -24,10 +24,10 @@ def user_main(request):
     uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
 
     # list graphs they've edited
-    graphs = [gs.graph for gs in uprof.graph_editors.all()]
+    graphs = [gs.graph for gs in uprof.edited_graph.all()]
 
     # list concepts they've edited
-    concepts = [cs.concept for cs in uprof.concept_editors.all()]
+    concepts = [cs.concept for cs in uprof.edited_concept.all()]
 
     # list roadmaps where the user is listed as an owner
     roadmaps = [rs.roadmap for rs in uprof.roadmap_owners.all()]

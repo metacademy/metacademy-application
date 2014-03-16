@@ -77,10 +77,10 @@ class ConceptSettings(Model, LoggedInEditable):
     concept = OneToOneField(Concept, primary_key=True)
     # TODO {public, provisional, private}, maybe?
     status = CharField(max_length=100)
-    editors = ManyToManyField(Profile, related_name="concept_editors")
+    edited_by = ManyToManyField(Profile, related_name="edited_concept")
 
     def is_editor(self, user):
-        return self.editors.filter(user=user).exists()
+        return self.edited_by.filter(user=user).exists()
 
     def get_absolute_url(self):
         return "http://www.example.com"
@@ -165,7 +165,7 @@ class GraphSettings(Model, LoggedInEditable):
     Effectively, a graph is a set of nodes, and for now, it's mostly used in the context of users creating graphs
     """
     graph = OneToOneField(Graph)
-    editors = ManyToManyField(Profile, related_name="graph_editors")
+    edited_by = ManyToManyField(Profile, related_name="edited_graph")
 
     def get_absolute_url(self):
         return "/graphs/%s" % self.graph.id

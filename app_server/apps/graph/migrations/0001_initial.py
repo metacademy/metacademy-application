@@ -65,8 +65,8 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'graph', ['ConceptSettings'])
 
-        # Adding M2M table for field editors on 'ConceptSettings'
-        m2m_table_name = db.shorten_name(u'graph_conceptsettings_editors')
+        # Adding M2M table for field edited_by on 'ConceptSettings'
+        m2m_table_name = db.shorten_name(u'graph_conceptsettings_edited_by')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('conceptsettings', models.ForeignKey(orm[u'graph.conceptsettings'], null=False)),
@@ -156,8 +156,8 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'graph', ['GraphSettings'])
 
-        # Adding M2M table for field editors on 'GraphSettings'
-        m2m_table_name = db.shorten_name(u'graph_graphsettings_editors')
+        # Adding M2M table for field edited_by on 'GraphSettings'
+        m2m_table_name = db.shorten_name(u'graph_graphsettings_edited_by')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('graphsettings', models.ForeignKey(orm[u'graph.graphsettings'], null=False)),
@@ -209,8 +209,8 @@ class Migration(SchemaMigration):
         # Deleting model 'ConceptSettings'
         db.delete_table(u'graph_conceptsettings')
 
-        # Removing M2M table for field editors on 'ConceptSettings'
-        db.delete_table(db.shorten_name(u'graph_conceptsettings_editors'))
+        # Removing M2M table for field edited_by on 'ConceptSettings'
+        db.delete_table(db.shorten_name(u'graph_conceptsettings_edited_by'))
 
         # Deleting model 'GlobalResource'
         db.delete_table(u'graph_globalresource')
@@ -236,8 +236,8 @@ class Migration(SchemaMigration):
         # Deleting model 'GraphSettings'
         db.delete_table(u'graph_graphsettings')
 
-        # Removing M2M table for field editors on 'GraphSettings'
-        db.delete_table(db.shorten_name(u'graph_graphsettings_editors'))
+        # Removing M2M table for field edited_by on 'GraphSettings'
+        db.delete_table(db.shorten_name(u'graph_graphsettings_edited_by'))
 
         # Deleting model 'TargetGraph'
         db.delete_table(u'graph_targetgraph')
@@ -315,7 +315,7 @@ class Migration(SchemaMigration):
         u'graph.conceptsettings': {
             'Meta': {'object_name': 'ConceptSettings'},
             'concept': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['graph.Concept']", 'unique': 'True', 'primary_key': 'True'}),
-            'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'concept_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
+            'edited_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'edited_concept'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'graph.dependency': {
@@ -356,7 +356,7 @@ class Migration(SchemaMigration):
         },
         u'graph.graphsettings': {
             'Meta': {'object_name': 'GraphSettings'},
-            'editors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_editors'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
+            'edited_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'edited_graph'", 'symmetrical': 'False', 'to': u"orm['user_management.Profile']"}),
             'graph': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['graph.Graph']", 'unique': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },

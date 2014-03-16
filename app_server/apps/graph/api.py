@@ -407,7 +407,7 @@ class ConceptResource(CustomSaveHookResource):
         # create profile if necessary
         csettings, csnew = ConceptSettings.objects.get_or_create(concept=bundle.obj)
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
-        csettings.editors.add(uprof)
+        csettings.edited_by.add(uprof)
 
         # create targetgraph if necessary
         tgraph, tnew = TargetGraph.objects.get_or_create(leaf=bundle.obj)
@@ -576,7 +576,7 @@ class GraphResource(CustomSaveHookResource):
         uprof, created = Profile.objects.get_or_create(pk=bundle.request.user.pk)
 
         # TODO add check that the edit actally made a difference
-        gsettings.editors.add(uprof)
+        gsettings.edited_by.add(uprof)
         return bundle
 
     class Meta(BaseResource.Meta):

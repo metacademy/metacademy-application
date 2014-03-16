@@ -103,7 +103,6 @@ Instructions
     border: 1px solid #e5e2c8;
     border-radius: 4px 0 0 4px;
     color: #6b694f;
-    padding: 0.5em;
     display: inline-block;
     position: absolute;
     top: 8em;
@@ -113,9 +112,11 @@ Instructions
 
 .instructions-icon{
     text-align: center;
+    cursor: pointer;
+    padding: 0.5em;
 }
 
-.instructions:hover .instructions-icon{
+.instructions.expanded .instructions-icon{
     display: none;
 }
 
@@ -123,9 +124,7 @@ Instructions
     display: none;
     font-size: 1.1em;
     padding: 1em;
-    width: 100%;
-    max-width: 800px;
-    min-width: 600px;
+    width: 330px;
     line-height: 1.5em;
 }
 
@@ -143,8 +142,30 @@ Instructions
     display: block;
 }
 
-.instructions:hover .instructions-text{
+.instructions.expanded .instructions-text{
     display: block;
+}
+
+.instructions-minimize {
+    display: none;
+    background-color: #FFF2F2;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    right: 14px;
+    font-size: 20pt;
+    cursor: pointer;
+}
+.expanded .instructions-minimize {
+    display: block;
+}
+
+.instructions-minimize:hover {
+    font-weight: bold;
+    color: #333;
 }
 
 #gc-wrap svg{

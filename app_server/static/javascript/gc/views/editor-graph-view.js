@@ -1,17 +1,21 @@
 
 /*global define*/
-define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
+define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/utils", "filesaver"], function($, Backbone, d3, _, GraphView, Utils){
   var pvt = {};
 
   pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
     svgId: "gc-svg",
     titleId: "graph-title",
+    expClass: "expanded",
     instructionsDivId: "create-instructions",
+    instMinimizeClass: "instructions-minimize",
+    instIconClass: "instructions-icon",
     toolboxId: "toolbox",
     selectedClass: "selected",
     connectClass: "connect-node",
     toEditCircleGClass: "to-edit-circle-g",
     activeEditId: "active-editing",
+    localStoreShowInstsKey: "show-gc-inst",
     toEditCircleRadius: 14,
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
@@ -75,11 +79,29 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
   var GraphEditor = GraphView.extend({
     events: function () {
       var thisView = this,
+          consts = pvt.consts,
           levts = {};
-      levts["keydown #" + pvt.consts.titleId] = function (evt) {
+
+      levts["keydown #" + consts.titleId] = function (evt) {
         var keyCode = evt.keyCode;
-        if (keyCode === pvt.consts.ENTER_KEY) {
-         evt.currentTarget.blur();
+        if (keyCode === consts.ENTER_KEY) {
+          evt.currentTarget.blur();
+        }
+      };
+
+      levts["click ." + consts.instMinimizeClass] = function (evt) {
+        $(evt.currentTarget.parentNode).removeClass(consts.expClass);
+        if(typeof(window.Storage)!=="undefined")
+        {
+          window.localStorage.setItem(consts.localStoreShowInstsKey, 0);
+        }
+      };
+
+      levts["click ." + consts.instIconClass] = function (evt) {
+        $(evt.currentTarget.parentNode).addClass(consts.expClass);
+        if(typeof(window.Storage)!=="undefined")
+        {
+          window.localStorage.setItem(consts.localStoreShowInstsKey, 1);
         }
       };
 
@@ -158,9 +180,17 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       titleDiv.setAttribute("contentEditable", "true");
       thisView.$el.append(titleDiv);
 
-      // add the instructions tab TODO refactor into an html template
-       thisView.$el.append(document.getElementById(consts.instructionsDivId));
-       thisView.$el.find("#" + consts.instructionsDivId).show();
+      // add the instructions tab
+      thisView.$el.append(document.getElementById(consts.instructionsDivId));
+
+      // hide/show the ls depending on ls props
+      var showInstr = true,
+          instrDiv = thisView.$el.find("#" + consts.instructionsDivId);
+      if(typeof(window.Storage)!=="undefined") {
+        showInstr = Boolean(Number(window.localStorage[consts.localStoreShowInstsKey]));
+        showInstr = showInstr === undefined ? true : showInstr;
+      }
+      showInstr ? instrDiv.addClass(consts.expClass) : instrDiv.removeClass(consts.expClass);
 
       // displayed when dragging between nodes
       thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")
@@ -283,10 +313,10 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
 
       // add small circle link for editing
       var newGG = newGs.append("g")
-        .attr("transform", "translate(" + consts.nodeRadius*Math.SQRT1_2 + "," + (-consts.nodeRadius*Math.SQRT1_2) + ")")
-        .classed(consts.toEditCircleGClass, true);
+            .attr("transform", "translate(" + consts.nodeRadius*Math.SQRT1_2 + "," + (-consts.nodeRadius*Math.SQRT1_2) + ")")
+            .classed(consts.toEditCircleGClass, true);
 
-        newGG.append("circle")
+      newGG.append("circle")
         .attr("r", consts.toEditCircleRadius)
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
@@ -294,7 +324,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
             thisView.appRouter.changeUrlParams({mode: "edit", focus: d.id});
           }
         });
-        newGG.append("text")
+      newGG.append("text")
         .attr("dy", 3)
         .attr("text-anchor", "middle")
         .text("edit");

@@ -83,7 +83,8 @@ class ConceptSettings(Model, LoggedInEditable):
         return self.edited_by.filter(user=user).exists()
 
     def get_absolute_url(self):
-        return "http://www.example.com"
+        # TODO remove hardcoding
+        return "/concepts/%s" % self.concept.tag
 
 
 class GlobalResource(Model, LoggedInEditable):

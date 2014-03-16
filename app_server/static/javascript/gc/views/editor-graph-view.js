@@ -283,7 +283,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
 
       // add small circle link for editing
       var newGG = newGs.append("g")
-        .attr("transform", "translate(" + consts.nodeRadius*Math.SQRT1_2 + (-consts.nodeRadius*Math.SQRT1_2) + ")")
+        .attr("transform", "translate(" + consts.nodeRadius*Math.SQRT1_2 + "," + (-consts.nodeRadius*Math.SQRT1_2) + ")")
         .classed(consts.toEditCircleGClass, true);
 
         newGG.append("circle")

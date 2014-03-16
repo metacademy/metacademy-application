@@ -533,7 +533,7 @@ class DependencyResource(CustomSaveHookResource):
         return bundle
 
 
-class GraphResource(BaseResource):
+class GraphResource(CustomSaveHookResource):
     """
     NOTE: can't commit dependencies if concepts are not already present in graph'
     """
@@ -577,7 +577,6 @@ class GraphResource(BaseResource):
 
         # TODO add check that the edit actally made a difference
         gsettings.editors.add(uprof)
-        gsettings.save()
         return bundle
 
     class Meta(BaseResource.Meta):
@@ -594,11 +593,6 @@ def normalize_concept(in_concept):
     """
     Temporary hack to normalize tag/id for new and old data and remove client-side fields
     """
-    # ensure that goals comes before resources
-
-
-    # if type(in_concept) != OrderedDict:
-    #     return
 
     if not in_concept["id"] or in_concept["id"][:4] == "-new":
         useid = ''

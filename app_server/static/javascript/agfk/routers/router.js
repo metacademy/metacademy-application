@@ -241,20 +241,22 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                var graphModel = thisRoute.graphModel;
 
-               // determine focus id or tag
-               if (!paramsObj[qFocusConcept]) {
-                 var tsort = thisRoute.graphModel.getTopoSort();
-                 paramsObj[qFocusConcept] = tsort[tsort.length - 1];
-                 targetNodeId = paramsObj[qFocusConcept];
-               }
-               // get ids/tags labeled correctly since user can pass in either
-               fNodeTag = paramsObj[qFocusConcept];
-               fnode = graphModel.getNode(fNodeTag);
-               if (fnode) {
-                 fNodeTag = fnode.get("tag");
-               } else {
-                 fnode = graphModel.getNodeByTag(fNodeTag);
-                 paramsObj[qFocusConcept] = fnode.id;
+               if (graphModel.getNodes().length) {
+                 // determine focus id or tag
+                 if (!paramsObj[qFocusConcept]) {
+                   var tsort = thisRoute.graphModel.getTopoSort();
+                   paramsObj[qFocusConcept] = tsort[tsort.length - 1];
+                   targetNodeId = paramsObj[qFocusConcept];
+                 }
+                 // get ids/tags labeled correctly since user can pass in either
+                 fNodeTag = paramsObj[qFocusConcept];
+                 fnode = graphModel.getNode(fNodeTag);
+                 if (fnode) {
+                   fNodeTag = fnode.get("tag");
+                 } else {
+                   fnode = graphModel.getNodeByTag(fNodeTag);
+                   paramsObj[qFocusConcept] = fnode.id;
+                 }
                }
 
                // shorthand

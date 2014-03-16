@@ -453,7 +453,7 @@ class ConceptSegmentResource(CustomSaveHookResource):
         """ ConceptSegmentResource Meta"""
         queryset = Concept.objects.all()
         authorization = ConceptAuthorization()
-        fields = ["title", "summary", "id", "tag"]
+        fields = ["title", "summary", "id", "tag", "learn_time"]
 
 
 class DependencyResource(CustomSaveHookResource):

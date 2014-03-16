@@ -30,7 +30,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         hasContractedOLs: false,
         sid: "",
         summary: "",
-        learn_time: -1,
+        learn_time: 1,
         is_shortcut: 0
       };
       return _.extend({}, Node.prototype.defaults(), dnDefaults);

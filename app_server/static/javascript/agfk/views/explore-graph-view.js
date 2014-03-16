@@ -235,7 +235,9 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
           thisView.$infoTextBox = $infoTextBox;
         }
         if (thisView.focusNode) {
-          thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
+          if (thisView.numHiddenNodes) {
+            thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
+          }
         }
       },
 

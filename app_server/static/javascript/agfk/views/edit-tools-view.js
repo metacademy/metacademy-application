@@ -86,9 +86,11 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
       },
 
       previewGraph: function () {
-        var thisView = this;
-        $("#" + pvt.consts.backToEditingButtonId).show();
-        thisView.appRouter.changeUrlParams({mode: "explore"});
+        var thisView = this,
+            topoSort = thisView.model.getTopoSort(),
+            // TODO fix hardcoding!
+            newWin = window.open("/graphs/concepts/" + topoSort[topoSort.length - 1], "_blank");
+        newWin.focus();
       },
 
       returnToEditor: function () {
@@ -97,6 +99,7 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
         thisView.appRouter.navigate("", {trigger: true});
       },
 
+      // TODO use this function if the connection is lost
       syncWithServer: function () {
         var thisView = this,
             jsonObj = this.model.toJSON(),

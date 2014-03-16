@@ -2,12 +2,9 @@
 
 .apptools{
     display: none;
-    background: white;
     position: absolute;
-    top: 1.5em;
-    right: 4em;
-    border: 2px solid #CE94BC;
-    border-radius: 10px;
+    top: 1em;
+    left: 0;
     text-align: center;
     padding: 1em;
 }
@@ -37,6 +34,7 @@
 #content-editing-tools button{
     border: none;
     background: inherit;
+    outline: none;
 }
 
 #content-editing-tools .icon{

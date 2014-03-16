@@ -3,6 +3,7 @@ import pdb
 import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
+from django.core.urlresolvers import reverse
 
 from apps.user_management.models import Profile
 
@@ -75,7 +76,6 @@ class ConceptSettings(Model, LoggedInEditable):
     Model that contains the concept data not under version control
     """
     concept = OneToOneField(Concept, primary_key=True)
-    # TODO {public, provisional, private}, maybe?
     status = CharField(max_length=100)
     edited_by = ManyToManyField(Profile, related_name="edited_concept")
 
@@ -83,8 +83,7 @@ class ConceptSettings(Model, LoggedInEditable):
         return self.edited_by.filter(user=user).exists()
 
     def get_absolute_url(self):
-        # TODO remove hardcoding
-        return "/concepts/%s" % self.concept.tag
+        return reverse("graphs:concepts", args=(self.concept.tag,))
 
 
 class GlobalResource(Model, LoggedInEditable):
@@ -169,7 +168,7 @@ class GraphSettings(Model, LoggedInEditable):
     edited_by = ManyToManyField(Profile, related_name="edited_graph")
 
     def get_absolute_url(self):
-        return "/graphs/%s" % self.graph.id
+        return reverse("graphs:existing-edit", args=(self.graph.id,))
 
 
 class TargetGraph(Model, LoggedInEditable):

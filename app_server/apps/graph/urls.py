@@ -27,5 +27,5 @@ urlpatterns = patterns('',
                        url(r'^new/?', new_graph, name="graph-creator"),
                        url(r'^idchecker/?', check_id, name="idchecker"),
                        url('^api/', include(v1_api.urls), name="api"),
-                       url('^([^/]+)/?$', edit_existing_graph),
+                       url('^([^/]+)/?$', edit_existing_graph, name="existing-edit"),
 )

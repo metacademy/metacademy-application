@@ -19,10 +19,12 @@ v1_api.register(GoalResource())
 
 #import pdb; pdb.set_trace()
 
-# TODO refactor concepgts
+# TODO refactor concepts
 urlpatterns = patterns('',
+                       url(r'^$', "django.views.defaults.page_not_found"),
                        url(r'^(?i)concepts/([^/]+)/history/?$', get_concept_history, name="concept-history"),
-                       url(r'^(?i)concepts/([^/]+)?/?$', get_concept_dep_graph, name="concepts"),
+                       url(r'^(?i)concepts/([^/]+)/?$', get_concept_dep_graph, name="concepts"),
+                       url(r'^(?i)concepts/$', "django.views.defaults.page_not_found", name="concepts-base"),
                        #                  url(r'^(?i)concepts/([^/]+)?/version/(\d+)/?$', get_concept_version, name="concept-version"),
                        url(r'^new/?', new_graph, name="graph-creator"),
                        url(r'^idchecker/?', check_id, name="idchecker"),

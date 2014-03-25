@@ -186,6 +186,7 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
       // hide/show the ls depending on ls props
       var showInstr = true,
           instrDiv = thisView.$el.find("#" + consts.instructionsDivId);
+      instrDiv.show();
       if(typeof(window.Storage)!=="undefined") {
         showInstr = Boolean(Number(window.localStorage[consts.localStoreShowInstsKey]));
         showInstr = showInstr === undefined ? true : showInstr;

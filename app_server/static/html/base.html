@@ -63,35 +63,12 @@
     </script>
     {% endblock %}
 
-    {% block iedetect %}
-
-    <script type="text/javascript">
-      if(!document.createElement('canvas').getContext){
-      alert("Sorry, Metacademy does not work for your browser" +
-      " (IE < 10 or early mobile browsers). Have you considered Firefox/Chrome/Opera instead?");
-                                                                                              }
-                                                                                              </script>
-    {% endblock %}
-
     <title> {% block title %}Metacademy{% endblock %}</title>
 
     {% endblock %}
   </head>
 
   <body>
-    {% block noscript %}
-    <noscript>
-      <div class="noscript-alert">
-        <p>
-          It looks like you have javascript disabled.
-        </p>
-        <p>
-          You must have javascript enabled on a modern browser in order to use metacademy.org
-        </p>
-      </div>
-    </noscript>
-    {% endblock %}
-
     {% block body %}
 
     <div class="header-pull-right header-menu" id="header">

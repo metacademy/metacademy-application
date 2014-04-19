@@ -18,6 +18,7 @@
    color: #23240D;
    padding: 0.3em 0 1em 1.5em;
    width: 90%;
+   max-width: 1100px;
    margin: auto;
    line-height: 1.2em;
 }

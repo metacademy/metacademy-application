@@ -2,6 +2,7 @@ import json
 import random
 import string
 import pdb
+import os
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -13,6 +14,7 @@ from apps.user_management.models import Profile
 from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation, Goal
 from apps.graph.models import ConceptResource as CResource
 from apps.graph import api_communicator
+from config import NOJS_CONCEPT_CACHE_PATH
 
 # TODO refactor into two class based views: graphs and concepts
 
@@ -80,10 +82,15 @@ def get_concept_dep_graph(request, concept_tag=""):
         raise Exception("could not find concept with id or tag: " + str(concept_tag))
     graph_data = api_communicator.get_targetgraph(request, leaf.id)
     uconcepts = get_user_data(request)
+    try:
+        nojs_content = open(os.path.join(NOJS_CONCEPT_CACHE_PATH, "graphs/concepts/" + concept_tag)).read()
+    except IOError:
+        nojs_content = "== Under Construction (not yet indexed) =="
 
     return render(request, "agfk-app.html",
                   {"full_graph_skeleton": get_full_graph_json_str(),
                    "user_data": json.dumps(uconcepts),
+                   "nojs_content": nojs_content ,
                    "graph_init_data": graph_data,
                    "leaf": leaf})
 

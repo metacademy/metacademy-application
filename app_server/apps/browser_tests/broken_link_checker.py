@@ -46,7 +46,7 @@ def get_broken_links_concepts():
     # get all concepts
     graph_data = get_full_graph_data()
     blinks = []
-    base_concept_url = APP_SERVER + reverse("graphs:concepts")
+    base_concept_url = APP_SERVER + "/graphs/concepts/"
 
     # TODO also check shortcut references
     for concept_obj in graph_data["nodes"]:

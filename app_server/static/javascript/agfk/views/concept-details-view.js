@@ -248,7 +248,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       /**
        * Assign subviews: method groked from http://ianstormtaylor.com/assigning-backbone-subviews-made-even-cleaner/
        */
-      assign : function (selector, view) {
+      assign: function (selector, view) {
         var selectors;
         if (_.isObject(selector)) {
           selectors = selector;

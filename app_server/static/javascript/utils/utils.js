@@ -128,7 +128,7 @@ define(["jquery"], function($){
       linkRe = /\[([^\]]*)\]\(([^\)]*)\)/,
       httpRe = /http:\/\//;
   var mdMatchToHtmlLink = function(match, $1, $2, offset, original) {
-    return '<a class="' + (httpRe.test($2) ? "external-link" : "internal-link") + '" href="' + $2 + '">' + $1 + '</a>';
+    return '<a class="' + (httpRe.test($2) ? "external-link" : "internal-link") + '" href="' + $2 + '" data-tag="' + $2 + '">' + $1 + '</a>';
   };
 
   /**

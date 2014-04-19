@@ -58,6 +58,19 @@ def check_id(request):
     else:
         return HttpResponse(status=405)
 
+def check_tags(request):
+    """
+    check if the given concept tag is available
+    """
+    if request.method == "GET":
+        qtags = json.loads(request.GET.get("tags"))
+        retobj = {}
+        for tag in qtags:
+            retobj[tag] = Concept.objects.filter(tag=tag).exists()
+        return HttpResponse(json.dumps(retobj), "application/json")
+    else:
+        return HttpResponse(status=405)
+
 
 def get_concept_history(request, concept_tag=""):
     """
@@ -85,7 +98,7 @@ def get_concept_dep_graph(request, concept_tag=""):
     try:
         nojs_content = open(os.path.join(NOJS_CONCEPT_CACHE_PATH, "graphs/concepts/" + concept_tag)).read()
     except IOError:
-        nojs_content = "== Under Construction (not yet indexed) =="
+        nojs_content = "== Under Construction (not yet cached) =="
 
     return render(request, "agfk-app.html",
                   {"full_graph_skeleton": get_full_graph_json_str(),

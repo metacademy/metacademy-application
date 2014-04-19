@@ -15,7 +15,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     // define private variables and methods
     var pvt = {};
 
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "resource-view-template",
       viewClass: "resource-view",
       viewIdPrefix: "resource-details-"
@@ -23,9 +23,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
     // return public object
     return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
+      template: _.template(document.getElementById( pvt.consts.templateId).innerHTML),
+      id: function(){ return pvt.consts.viewIdPrefix +  this.model.cid;},
+      className: pvt.consts.viewClass,
 
       /**
        * Render the learning view given the supplied model
@@ -47,7 +47,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     // define private variables and methods
     var pvt = {};
 
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "resources-section-view-template",
       viewClass: "resources-wrapper",
       viewIdPrefix: "resources-wrapper-"
@@ -55,9 +55,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
     // return public object
     return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.options.conceptId;},
-      className: pvt.viewConsts.viewClass,
+      template: _.template(document.getElementById( pvt.consts.templateId).innerHTML),
+      id: function(){ return pvt.consts.viewIdPrefix +  this.options.conceptId;},
+      className: pvt.consts.viewClass,
 
       /**
        * Render the learning view given the supplied model
@@ -129,7 +129,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     // define private variables and methods
     var pvt = {};
 
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "node-detail-view-template", // name of view template (warning: hardcoded in html)
       viewTag: "section",
       viewIdPrefix: "node-detail-view-",
@@ -139,13 +139,16 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       learnViewStarClass: 'learn-view-star',
       learnedClass: "learned-concept",
       starredClass: "starred-concept", // TODO this needs to be refactored with learn view title
-      implicitLearnedClass: "implicit-learned-concept"
+      implicitLearnedClass: "implicit-learned-concept",
+      internalLinkClass: "internal-link",
+      missingLinkClass: "missing-link"
+
     };
 
     // return public object for detailed node view
     return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix + this.model.get("id");},
+      template: _.template(document.getElementById( pvt.consts.templateId).innerHTML),
+      id: function(){ return pvt.consts.viewIdPrefix + this.model.get("id");},
 
       events: {
         "click .learn-view-check": function(evt){
@@ -159,23 +162,23 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         "mousedown .focus-link": "changeFocusNode"
       },
 
-      tagName: pvt.viewConsts.viewTag,
+      tagName: pvt.consts.viewTag,
 
       className: function(){
-        var viewConsts = pvt.viewConsts,
+        var consts = pvt.consts,
             thisView = this,
             thisModel = thisView.model,
             id = thisModel.id,
             aux = window.agfkGlobals.auxModel;
 
-        return pvt.viewConsts.viewClass
-          + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
-          + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
-          + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
+        return pvt.consts.viewClass
+          + (aux.conceptIsStarred(id) ? " " + consts.starredClass : "")
+          + (aux.conceptIsLearned(id) ? " " + consts.learnedClass : "")
+          + (thisModel.getImplicitLearnStatus() ? " " + consts.implicitLearnedClass : "");
       },
 
       initialize: function(inp){
-        var viewConsts = pvt.viewConsts,
+        var consts = pvt.consts,
             thisView = this,
             aux = window.agfkGlobals.auxModel,
             nodeTag = thisView.model.id,
@@ -193,10 +196,10 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
         // TODO refactor this code if we keep the star and check in current location
         this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, status){
-          changeClass("." + viewConsts.learnViewCheckClass, viewConsts.learnedClass, status);
+          changeClass("." + consts.learnViewCheckClass, consts.learnedClass, status);
         });
         this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, status){
-          changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
+          changeClass("." + consts.starViewStarClass, consts.starredClass, status);
         });
 
       },
@@ -207,9 +210,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
        */
       render: function(){
         var thisView = this,
-            viewConsts = pvt.viewConsts,
+            consts = pvt.consts,
             assignObj = {},
-            resourcesLocClass = "." + viewConsts.resourcesLocClass;
+            resourcesLocClass = "." + consts.resourcesLocClass;
 
         if (thisView.model.get("is_partial")) {
           thisView.model.fetch({update: true, success: function (resp) {
@@ -224,7 +227,30 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
                              "time": Utils.formatTimeEstimate(thisView.model.get("learn_time")),
                              "displayTitle": thisView.model.getLearnViewTitle()});
 
-        thisView.parsedPointers = thisView.parsedPointers || Utils.simpleMdToHtml(thisView.model.get("pointers"));
+        if (!thisView.parsedPointers) {
+          thisView.parsedPointers = Utils.simpleMdToHtml(thisView.model.get("pointers"));
+          var checkTags = [];
+          $(thisView.parsedPointers).find("." + pvt.consts.internalLinkClass).each(function (i, ael) {
+            checkTags.push(ael.getAttribute("data-tag"));
+          });
+          if (checkTags.length) {
+            // TODO remove hardcoded url
+            $.ajax({
+              dataType: "json",
+              url: "/graphs/tagschecker/",
+              data: {"tags": window.JSON.stringify(checkTags)},
+              success: function (resp) {
+                for (var tag in resp) {
+                  if (!resp[tag]) {
+                    thisView.$el.find("[data-tag=" + tag + "]").addClass(pvt.consts.missingLinkClass);
+                  }
+                };
+              }
+            });
+          }
+
+          // check that all pointer tags exist
+        }
 
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources

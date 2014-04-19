@@ -92,7 +92,7 @@ def get_concept_dep_graph(request, concept_tag=""):
         except ObjectDoesNotExist:
             leaf = Concept.objects.get(tag=concept_tag)
     except ObjectDoesNotExist:
-        raise Exception("could not find concept with id or tag: " + str(concept_tag))
+        return render(request, "concept-does-not-exist.html", {"cref": concept_tag})
     graph_data = api_communicator.get_targetgraph(request, leaf.id)
     uconcepts = get_user_data(request)
     try:

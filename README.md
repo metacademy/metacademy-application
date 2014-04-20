@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/metacademy/metacademy-application.png)](https://travis-ci.org/metacademy/metacademy-application)
 
 Metacademy's Source
 ==============

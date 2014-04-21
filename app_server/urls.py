@@ -14,6 +14,7 @@ from views import MultiSearchView, ContactView, get_list_view
 admin.autodiscover()
 
 sqs = SearchQuerySet().filter(is_listed_in_main_str="True")
+sqs.order_by('score')
 search_inst = search_view_factory(view_class=MultiSearchView, searchqueryset=sqs, template='search-results.html')
 
 """

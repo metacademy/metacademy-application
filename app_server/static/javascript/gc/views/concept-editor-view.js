@@ -253,7 +253,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // TODO remove hardcoding
         $.get("/concepts/" + conceptTag + "/history")
         .success(function (resp, xhr) {
-          console.log("success getting history");
           $("#" + consts.historyId).append($(resp).find("." + consts.reversionsClass));
         })
         .fail(function () {

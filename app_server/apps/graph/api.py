@@ -1,4 +1,3 @@
-# TODO concept reversions don't undo the creation of related objects (they will undo their properties)
 import pdb
 import string
 import random
@@ -270,7 +269,8 @@ class GlobalResourceResource(CustomSaveHookResource):
             with reversion.create_revision():
                 # TODO increment version number
                 reversion.set_user(bundle.request.user)
-                reversion.set_comment("changed: TODO figure out different fields")
+                # TODO figure out these changes
+                reversion.set_comment("changed global resource fields")
                 bundle.obj.save()
         return bundle
 

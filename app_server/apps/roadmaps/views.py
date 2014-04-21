@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 
-from apps.cserver_comm import cserver_communicator as cscomm
+from apps.graph.models import Concept
 from utils.roadmap_extension import RoadmapExtension
 from utils.mathjax_extension import MathJaxExtension
 from forms import RoadmapForm, RoadmapSettingsForm
@@ -57,7 +57,7 @@ def parse_tag(url):
 
 def process_link(attrs, new=False):
     if is_internal_link(attrs['href']):
-        if cscomm.is_node_present(parse_tag(attrs['href'])):
+        if Concept.objects.filter(tag=parse_tag(attrs['href'])).exists():
             attrs['class'] = 'internal-link'
         else:
             attrs['class'] = 'internal-link missing-link'
@@ -71,9 +71,9 @@ def wiki_link_url_builder(label, base, end):
     """
     TODO allow tags and titles (how to distinguish?)
     """
-    ttt_dict = cscomm.get_title_to_tag_dict()
-    if label in ttt_dict:
-        return base + ttt_dict[label]
+    res = Concept.objects.filter(title=label)
+    if len(res):
+        return base + res[0].tag
     else:
         return base + label
 

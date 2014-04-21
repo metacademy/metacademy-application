@@ -25,14 +25,15 @@
     </div>
   </div>
 
-  {% if page.object_list|length %}
+  {% if roadmap_count %}
   <div class="roadmap-search-res">
     <div class="search-info {% if concepts_search_data|length > 0 %}search-section-indicator{% endif %}">
-      We found {{ page.object_list|length }} relevant roadmap{% if page.object_list|length > 1 %}s{% endif %}
+      We found {{ roadmap_count }} relevant roadmap{% if roadmap_count > 1 %}s{% endif %}
     </div>
     <div class="search-res">
       <ol class="search-res-list">
         {% for sobj in page.object_list %}
+        {% ifequal sobj.model_name 'roadmap' %}
         <li class="search-res-li">
           <h3 class="search-res-title">
             <a class="search-res-link internal-link" href="{{ sobj.object.roadmapsettings.get_absolute_url }}"> {{sobj.object.title}} </a>
@@ -46,20 +47,21 @@
             </p>
           </div>
         </li>
+        {% endifequal %}
         {% endfor %}
       </ol>
     </div>
   </div>
   {% endif %}
 
-  {% if concepts_search_data %}
-  <div class="search-info {% if page.object_list|length > 0 %}search-section-indicator{% endif %}">
-    We found {{ concepts_search_data|length }} relevant concept{% if concepts_search_data|length > 1 %}s{% endif %}
+    {% if concept_count %}
+  <div class="search-info {% if roadmap_count %}search-section-indicator{% endif %}">
+    We found {{ concept_count }} relevant concept{% if concept_count > 1 %}s{% endif %}
   </div>
   {% endif %}
   <div class="search-res">
     <ol class="search-res-list">
-      {% if not concepts_search_data|length and page.object_list|length == 0 %}
+      {% if page.object_list|length == 0 %}
 
       <div class="nosearch-message">
         <p>
@@ -74,15 +76,17 @@
       </div>
       {% endif %}
 
-      {% for sobj in concepts_search_data %}
+      {% for sobj in page.object_list %}
+        {% ifequal sobj.model_name 'concept' %}
       <li class="search-res-li">
         <h3 class="search-res-title">
-          <a class="search-res-link internal-link" href="{% url 'graphs:concepts'%}{{sobj.tag }}"> {{sobj.title}} </a>
+          <a class="search-res-link internal-link" href="{% url 'graphs:concepts' sobj.tag %}"> {{sobj.title}} </a>
         </h3>
         <div class="search-res-description">
           {{sobj.summary}}
         </div>
       </li>
+      {% endifequal %}
       {% endfor %}
     </ol>
   </div>

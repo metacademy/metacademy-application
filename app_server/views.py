@@ -42,21 +42,20 @@ def get_list_view(request):
 
 class MultiSearchView(SearchView):
     """
-    Class that searches both content-based and application-based data
+    Class that searches multiple models and includes their counts in the output
     """
     def extra_context(self):
         """
-        Adds the concept search (list) results for a given query
-        TODO we may want to move this funcitonality to the client (have their browser query the content server)
+        Adds the model counts
         """
-        qstring = self.get_query()
-        if len(qstring) == 0:
-            search_data = None
-            print 'WARNING: empty query parameter in get_search_view'
-        else:
-            search_data = get_search_json(qstring)
-
-        return {"concepts_search_data": search_data, 'search_query': qstring}
+        cct = 0
+        rmct = 0
+        for res in self.results:
+            if res.model_name == "concept":
+                cct += 1
+            else:
+                rmct += 1
+        return {"concept_count": cct, "roadmap_count": rmct, "search_query": self.query}
 
 
 class ContactView(FormView):

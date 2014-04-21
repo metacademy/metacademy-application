@@ -1,9 +1,11 @@
 import pdb
 
 import reversion
+import django.db.models as dbmodels
 from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugField, TextField, IntegerField, OneToOneField, ManyToManyField
 
 from apps.user_management.models import Profile
+
 
 MAX_USERNAME_LENGTH = 30   # max length in Django's User class
 
@@ -70,6 +72,12 @@ class RoadmapSettings(Model):
 
     def viewable_by(self, user):
         return self.is_published() or self.editable_by(user)
+
+def reindex_roadmap(sender, **kwargs):
+    # placed here to avoid circular imports
+    from search_indexes import RoadmapIndex
+    RoadmapIndex().update_object(kwargs['instance'].roadmap)
+dbmodels.signals.post_save.connect(reindex_roadmap, sender=RoadmapSettings)
 
 def load_roadmap_settings(username, tag):
     try:

@@ -1,5 +1,6 @@
 import pdb
 
+import django.db.models as dbmodels
 import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
@@ -30,6 +31,12 @@ class Concept(Model):
     version_num = IntegerField(default=0, null=True, blank=True)
     is_shortcut = BooleanField(default=False)
     learn_time = FloatField(null=True, blank=True)
+
+    def is_listed_in_main_str(self):
+        ret_str = "False"
+        if not self.is_provisional():
+            ret_str = "True"
+        return ret_str
 
     def is_provisional(self):
         # "approved" concepts get their very own tag
@@ -84,6 +91,13 @@ class ConceptSettings(Model, LoggedInEditable):
 
     def get_absolute_url(self):
         return reverse("graphs:concepts", args=(self.concept.tag,))
+
+
+def reindex_concept(sender, **kwargs):
+    # placed here to avoid circular imports
+    from search_indexes import ConceptIndex
+    ConceptIndex().update_object(kwargs['instance'].concept)
+dbmodels.signals.post_save.connect(reindex_concept, sender=ConceptSettings)
 
 
 class GlobalResource(Model, LoggedInEditable):

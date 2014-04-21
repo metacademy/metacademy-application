@@ -25,7 +25,7 @@
   agfkGlobals.globalResources = {};
   agfkGlobals.apiBase = "/graphs/api/v1/"; // TODO remove hardcoding if possible
   agfkGlobals.idcheckUrl = "{% url 'graphs:idchecker' %}";
-  agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+  agfkGlobals.auxData = {};
 </script>
 {% if debug %}
 <script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>

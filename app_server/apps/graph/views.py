@@ -9,7 +9,6 @@ from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 import reversion
 
-from apps.cserver_comm.cserver_communicator import get_full_graph_json_str
 from apps.user_management.models import Profile
 from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation, Goal
 from apps.graph.models import ConceptResource as CResource
@@ -101,8 +100,7 @@ def get_concept_dep_graph(request, concept_tag=""):
         nojs_content = "== Under Construction (not yet cached) =="
 
     return render(request, "agfk-app.html",
-                  {"full_graph_skeleton": get_full_graph_json_str(),
-                   "user_data": json.dumps(uconcepts),
+                  {"user_data": json.dumps(uconcepts),
                    "nojs_content": nojs_content ,
                    "graph_init_data": graph_data,
                    "leaf": leaf})
@@ -111,14 +109,13 @@ def get_concept_dep_graph(request, concept_tag=""):
 def new_graph(request):
     if request.method == "GET":
         concepts = get_user_data(request)
-        full_graph_json = get_full_graph_json_str()
         used = True
         while used:
             gid = ''.join([random.choice(string.lowercase + string.digits) for i in range(8)])
             used = len(Graph.objects.filter(id=gid)) > 0
 
         return render(request, "graph-creator.html",
-                      {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
+                      {"user_data": json.dumps(concepts),
                        "graph_id": gid, "graph_init_data": {"id": gid}})
 
     else:
@@ -129,10 +126,9 @@ def edit_existing_graph(request, gid):
     if request.method == "GET":
         # get the graph data so we can bootstrap it
         concepts = get_user_data(request)
-        full_graph_json = get_full_graph_json_str()
         graph_json = api_communicator.get_graph(request, gid)
         return render(request, "graph-creator.html",
-                      {"full_graph_skeleton": full_graph_json, "user_data": json.dumps(concepts),
+                      {"user_data": json.dumps(concepts),
                        "graph_id": gid, "graph_init_data": graph_json})
     else:
         return HttpResponse(status=405)

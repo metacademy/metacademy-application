@@ -3,7 +3,7 @@
 Metacademy's Source
 ==============
 
-This source is licensed under GPLv3, see LICENSE.txt (note: metacademy's content is CC BY SA 3.0).
+This source is licensed under GPLv3, see [LICENSE.txt](LICENSE.txt) (note: metacademy's content is CC BY SA 3.0).
 
 ## Demo
 
@@ -17,11 +17,11 @@ For Windows installation/requirements, please see the readme located in [/window
 
 
 ### Preliminary requirements
-* `python 2.7X`: NB: install `python-devel` if you're using a package manager such as apt-get. The following command should print a path (if this command raises an exception, make sure that you have the `python-devel` version installed):
-*
-            python -c 'from distutils.sysconfig import get_makefile_filename as m; print m()'
+* `python 2.7.X` NB: install `python-devel` if you're using a package manager such as apt-get. The following command should print a path (if this command raises an exception, make sure that you have `python-devel` for your installed  version of python installed):
 
-* `gcc`: Install [gcc](http://gcc.gnu.org) (OSX users: installing the [OSX developer tools](https://developer.apple.com/technologies/tools/) is probably the easiest way to do this). The following command should not throw an error:
+        python -c 'from distutils.sysconfig import get_makefile_filename as m; print m()'
+
+* `gcc` Install [gcc](http://gcc.gnu.org) (OSX users: installing the [OSX developer tools](https://developer.apple.com/technologies/tools/) is probably the easiest way to do this). The following command should not throw an error:
 
         gcc -v
 

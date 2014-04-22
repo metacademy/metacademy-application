@@ -23,10 +23,9 @@
   <tr> <th> Concept</th> <th> Broken Link </th><tr>
   {% for bl in blinks %}
   <tr>
-    <td> <a href="{% url "graphs:concepts" %}{{bl.0}}">{{bl.0}}</a></td>
+    <td> <a href="{% url "graphs:concepts" bl.0 %}">{{bl.0}}</a></td>
     <td><a href="{{bl.1}}"> {{bl.1}} </a> </td>
   </tr>
   {% endfor %}
 </table>
 {% endblock %}
-

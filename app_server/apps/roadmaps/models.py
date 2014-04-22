@@ -3,6 +3,7 @@ import pdb
 import reversion
 import django.db.models as dbmodels
 from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugField, TextField, IntegerField, OneToOneField, ManyToManyField
+from haystack.exceptions import SearchBackendError
 
 from apps.user_management.models import Profile
 
@@ -76,7 +77,11 @@ class RoadmapSettings(Model):
 def reindex_roadmap(sender, **kwargs):
     # placed here to avoid circular imports
     from search_indexes import RoadmapIndex
-    RoadmapIndex().update_object(kwargs['instance'].roadmap)
+    try:
+        RoadmapIndex().update_object(kwargs['instance'].roadmap)
+    except SearchBackendError:
+        pass
+
 dbmodels.signals.post_save.connect(reindex_roadmap, sender=RoadmapSettings)
 
 def load_roadmap_settings(username, tag):

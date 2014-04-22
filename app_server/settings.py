@@ -156,6 +156,7 @@ HAYSTACK_CONNECTIONS = {
 # TODO we may want to eventually switch to queued processing
 # https://github.com/toastdriven/queued_search
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
 
 # context processors
 TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",

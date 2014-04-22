@@ -13,7 +13,7 @@ from lazysignup.decorators import allow_lazy_user
 from lazysignup.templatetags.lazysignup_tags import is_lazy_user
 from lazysignup.models import LazyUser
 
-from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
+from apps.graph.models import Concept
 from aux_text import HTML_ACCT_EMAIL, TXT_ACCT_EMAIL
 
 
@@ -35,16 +35,15 @@ def user_main(request):
     # obtain an array of learned concept ids for the user
     lids = [l.id for l in uprof.learned.all()]
     sids = [s.id for s in uprof.starred.all()]
-    # TODO refactor
+
+    # FIXME TODO refactor and use the new database
     if len(lids) > 0:
-        concepts_dict = get_id_to_concept_dict()
-        lconcepts  = [concepts_dict[idval] for idval in lids if concepts_dict.has_key(idval)]
+        lconcepts  = [Concept.objects.get(id=idval) for idval in lids if Concept.objects.filter(id=idval).exists()]
     else:
         lconcepts = []
 
     if len(sids) > 0:
-        concepts_dict = get_id_to_concept_dict()
-        sconcepts  = [concepts_dict[idval] for idval in sids if concepts_dict.has_key(idval)]
+        sconcepts  =  [Concept.objects.get(id=idval) for idval in sids if Concept.objects.filter(id=idval).exists()]
     else:
         sconcepts = []
 

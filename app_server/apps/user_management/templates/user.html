@@ -91,7 +91,7 @@
         {% for entry in sconcepts %}
         <li class="list-concepts-li">
           <h3 class="list-concepts-title">
-            <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' %}{{entry.tag}}"> {{ entry.title }} </a>
+            <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' entry.tag %}"> {{ entry.title }} </a>
           </h3>
         </li>
         {% endfor %}
@@ -112,7 +112,7 @@
         {% for entry in lconcepts %}
         <li class="list-concepts-li">
           <h3 class="list-concepts-title">
-            <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' %}{{entry.tag}}"> {{ entry.title }} </a>
+            <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' entry.tag %}"> {{ entry.title }} </a>
           </h3>
         </li>
         {% endfor %}

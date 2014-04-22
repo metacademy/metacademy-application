@@ -5,6 +5,7 @@ import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
 from django.core.urlresolvers import reverse
+from haystack.exceptions import SearchBackendError
 
 from apps.user_management.models import Profile
 
@@ -96,7 +97,10 @@ class ConceptSettings(Model, LoggedInEditable):
 def reindex_concept(sender, **kwargs):
     # placed here to avoid circular imports
     from search_indexes import ConceptIndex
-    ConceptIndex().update_object(kwargs['instance'].concept)
+    try:
+        ConceptIndex().update_object(kwargs['instance'].concept)
+    except SearchBackendError:
+        pass
 dbmodels.signals.post_save.connect(reindex_concept, sender=ConceptSettings)
 
 

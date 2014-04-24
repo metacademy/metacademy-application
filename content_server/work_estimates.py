@@ -301,11 +301,11 @@ def fit_model(db, model_name='poisson'):
     obs = []
     for tag, node in db.nodes.items():
         for resource in node.resources:
-            if 'mark' in resource and 'star' in resource['mark']:
+            if 'core' in resource and resource['core']:
                 obs.append(Observation.from_resource((tag, False), resource, names))
     for tag, shortcut in db.shortcuts.items():
         for resource in shortcut.resources:
-            if 'mark' in resource and 'star' in resource['mark']:
+            if 'core' in resource and resource['core']:
                 obs.append(Observation.from_resource((tag, True), resource, names))
 
     if model_name == 'least_squares':

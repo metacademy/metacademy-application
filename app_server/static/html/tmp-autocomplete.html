@@ -1,0 +1,258 @@
+<html><head>
+
+  <meta charset="UTF-8">
+
+  <title>Working Prototype for Autocomplete</title>
+
+  <style>
+.search-container {
+  position: relative;
+  width: 30em;
+  height: 2em;
+  color: #333;
+}
+
+.search-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2em;
+  width: 2em;
+  z-index: 11;
+  cursor: pointer;
+}
+
+.search-button:hover #glass {
+  stroke: #501644;
+}
+
+.search-button:hover #handle {
+  stroke: #501644;
+}
+
+.search-input {
+  position: absolute;
+  z-index: 10;
+  border-radius: 0px;
+  background-color: #ffffff;
+  border: 1px solid #BABDC0;
+  width: 100%;
+  display: block;
+  font-size: 70%;
+  padding-left: .5em;
+  margin: 0;
+  height: 100%;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #501644;
+}
+
+.search-container, .search-input, .search-button, .ac-list, .ac-li, .ac-li-a {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ac-list {
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: inherit;
+  top: 29px;
+  border: 1px solid #BABDC0;
+  border-width: 0 1px 1px 1px;
+  background-color: #ffffff;
+  z-index: 9;
+}
+
+.ac-hidden {
+  display: none;
+}
+
+.ac-li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: #501644;
+  min-height: 2em;
+  vertical-align:middle;
+  line-height:2em;
+  text-decoration: none;
+  text-align: left;
+  width: 100%;
+}
+
+.ac-list {
+  border-bottom: 1px solid #BABDC0;
+}
+
+.ac-li-a {
+  color: #501644;
+  text-decoration: none;
+  margin: 0;
+  display: block;
+  width: 100%;
+  text-indent: -1.5em;
+  padding-left: 2em;
+}
+
+.ac-li-a:hover {
+  background-color: #F5E8F2;
+  color: #690259;
+}
+
+.ac-li-a:focus {
+  background-color: #F5E8F2;
+  color: #690259;
+  outline: none;
+}</style>
+</head>
+
+<body>
+
+<div class="search-container">
+  <input class="search-input">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" class="search-button">
+    <rect x="0" y="0"></rect>
+    <circle id="glass" stroke="#777" stroke-width="10" fill="none" cx="43" cy="43" r="25"></circle>
+    <path id="handle" stroke="#777" stroke-width="12" d="M63 63 L 81 81"></path>
+  </svg>
+  <ul class="ac-list"><li class="ac-hidden" value="1"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="2"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="3"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="4"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="5"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="6"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="7"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="8"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="9"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="10"><a class="ac-li-a" href="#">a</a></li></ul>
+</div>
+
+<script>
+  var options = {
+    numResults: 10,
+    containerEl: document.querySelector('.search-container'),
+    searchButtonEl: document.querySelector('.search-button'),
+    paths: {
+      dataPath: 'http://metacademy.org/api/list',
+      searchPath: 'http://metacademy.org/search?q=',
+      directPath: 'http://metacademy.org/graphs/concepts/',
+    }, 
+    classes: {
+      liClass: 'ac-li',
+      aClass: 'ac-li-a',
+      hiddenClass: 'ac-hidden'
+    }
+};
+
+var autocomplete = function(options, data) {
+  var doc = document,
+    resultNodes = options.containerEl.getElementsByTagName('LI'),
+    cache = {},
+    handlers = {
+      'enter': function(e) {
+        if (e.target.tagName === 'INPUT' && e.target.value) {
+          window.location = options.paths.searchPath + encodeURIComponent(e.target.value);
+        }
+      },
+      'up': function(e) {
+          e.preventDefault();
+        if (+e.target.parentNode.value === 1) {
+          options.containerEl.querySelector('INPUT').focus();
+        } else if (+e.target.parentNode.value > 1) {
+          e.target.parentNode.previousElementSibling.firstElementChild.focus();
+        }
+      },
+      'down': function(e) {  
+        e.preventDefault();
+        if (e.target.tagName === 'INPUT') {
+          options.containerEl.querySelector('A').focus();
+        } else if (+e.target.parentNode.value < options.numResults) {
+          e.target.parentNode.nextElementSibling.firstElementChild.focus();
+        }
+      },
+      'input': function(e) {
+        var val = e.target.value.trim().replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        return val ? insert(cacheFn(val, check)) : insert();
+      },
+      'button': function(e) {
+        var val = options.containerEl.querySelector('INPUT').value;
+        return val ? window.location = options.paths.searchPath + encodeURIComponent(val) : null;
+      }
+    };
+
+  function setEls() {
+    var wrapEl = options.containerEl.querySelector('UL');
+    var i = options.numResults;
+    while (i--) {
+      var liEl = doc.createElement('LI');
+      liEl.innerHTML = '<a class="'+ options.classes.aClass + '" href="#">a</a>';
+      liEl.className = options.classes.hiddenClass;
+      liEl.value = +options.numResults-i;
+      wrapEl.appendChild(liEl);
+    }
+  }
+
+  function cacheFn(q, fn) {
+    return cache[q] ? cache[q] : cache[q] = fn(q), cache[q];
+  }
+
+  function check(q) {
+    var rxFn = function(s) {
+      return '\\b(' + s + ')(.*)';
+    },
+      rx = new RegExp(q.replace(/(\S+)/g, rxFn).replace(/\s+/g, ''), 'gi'),
+      arr = [],
+      i = data.length;
+
+    while (i--) {
+      if (rx.test(data[i].title)) {
+        arr.push({
+          'title': data[i].title,
+          'tag': data[i].tag
+        });
+      }
+    }
+    return arr;
+  }
+
+  function insert(d) {
+    var i = options.numResults;
+    while (i--) {
+      if (d && d[i]) {
+        resultNodes[i].className = options.classes.liClass;
+        resultNodes[i].firstChild.firstChild.nodeValue = d[i].title;
+        resultNodes[i].firstChild.href = options.paths.directPath + encodeURIComponent(d[i].tag);
+      } else if (!d || !d[i]) {
+        resultNodes[i].className = options.classes.hiddenClass;
+      }
+    }
+  }
+
+  function eventScreener(e) {
+    var k = e.keyCode,
+      meth = k === 13 ? 'enter' : k === 38 ? 'up' : k === 40 ? 'down' : e.type === 'input' ? 'input' : null;
+    return meth ? handlers[meth](e) : null;
+  }
+
+  function blurHandler(e) {
+    window.setTimeout(function() {
+      return doc.activeElement.tagName === 'INPUT' || doc.activeElement.tagName === 'A' ? null : insert();
+    }, 100);
+  }
+  setEls();
+  options.containerEl.addEventListener('input', eventScreener);
+  options.containerEl.addEventListener('keydown', eventScreener);
+  options.searchButtonEl.addEventListener('click', handlers.button);
+  options.containerEl.addEventListener('blur', blurHandler, true);
+};
+
+(function setup(opts){
+  var xhr = new XMLHttpRequest(),
+    xhrFn = function() {
+      autocomplete(opts, JSON.parse(this.response));
+      xhr.removeEventListener('load', xhrFn);
+    };
+  xhr.open('GET', opts.paths.dataPath, true);
+  xhr.addEventListener('load', xhrFn);
+  xhr.send();
+})(options);
+</script>
+  
+</body>
+</html>

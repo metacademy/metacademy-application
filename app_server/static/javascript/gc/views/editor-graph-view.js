@@ -91,7 +91,7 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
 
       levts["click ." + consts.instMinimizeClass] = function (evt) {
         $(evt.currentTarget.parentNode).removeClass(consts.expClass);
-        if(typeof(window.Storage)!=="undefined")
+        if(typeof(window.localStorage)!=="undefined")
         {
           window.localStorage.setItem(consts.localStoreShowInstsKey, 0);
         }
@@ -99,7 +99,7 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
 
       levts["click ." + consts.instIconClass] = function (evt) {
         $(evt.currentTarget.parentNode).addClass(consts.expClass);
-        if(typeof(window.Storage)!=="undefined")
+        if(typeof(window.localStorage)!=="undefined")
         {
           window.localStorage.setItem(consts.localStoreShowInstsKey, 1);
         }
@@ -187,9 +187,8 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
       var showInstr = true,
           instrDiv = thisView.$el.find("#" + consts.instructionsDivId);
       instrDiv.show();
-      if(typeof(window.Storage)!=="undefined") {
+      if (typeof(window.localStorage) !== "undefined" && window.localStorage.hasOwnProperty(consts.localStoreShowInstsKey)) {
         showInstr = Boolean(Number(window.localStorage[consts.localStoreShowInstsKey]));
-        showInstr = showInstr === undefined ? true : showInstr;
       }
       showInstr ? instrDiv.addClass(consts.expClass) : instrDiv.removeClass(consts.expClass);
 

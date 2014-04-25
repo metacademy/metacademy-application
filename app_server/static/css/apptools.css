@@ -35,6 +35,7 @@
     border: none;
     background: inherit;
     outline: none;
+    cursor: pointer;
 }
 
 #content-editing-tools .icon{

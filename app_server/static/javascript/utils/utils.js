@@ -146,7 +146,7 @@ define(["jquery"], function($){
       // strip depth specification
       depth = depthRe.exec(line);
       depth = depth ? depth[0].length : 0;
-      if (prevDepth == depth) {
+      if (depth && prevDepth == depth) {
         retStr += "</li><li>";
       }
       while (prevDepth > depth) {

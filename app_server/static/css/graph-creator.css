@@ -116,6 +116,14 @@ Instructions
     padding: 0.5em;
 }
 
+.instructions:hover .instructions-icon{
+    display: none;
+}
+
+.instructions:hover .instructions-text{
+    display: block;
+}
+
 .instructions.expanded .instructions-icon{
     display: none;
 }

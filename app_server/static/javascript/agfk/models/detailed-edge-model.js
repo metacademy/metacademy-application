@@ -78,7 +78,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
     },
 
     url: function () {
-        return window.agfkGlobals.apiBase + "dependency/" + this.id + "/";
+        return window.APIBASE + "dependency/" + this.id + "/";
     },
 
     toJSON: function () {

@@ -23,7 +23,7 @@ define(["backbone"], function(Backbone){
     },
 
     url: function () {
-        return window.agfkGlobals.apiBase + "globalresource/" + this.id + "/";
+        return window.APIBASE + "globalresource/" + this.id + "/";
     },
 
     getAuthorsString: function () {

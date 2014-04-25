@@ -37,7 +37,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
     },
 
     url: function () {
-        return window.agfkGlobals.apiBase + "concept/" + this.id + "/";
+        return window.APIBASE + "concept/" + this.id + "/";
     },
 
     /**

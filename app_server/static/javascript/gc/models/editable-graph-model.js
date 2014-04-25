@@ -24,7 +24,7 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       }
       return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
     }
-      return window.agfkGlobals.apiBase + "graph/" + this.id + "/";
+      return window.APIBASE + "graph/" + this.id + "/";
     },
 
     isPopulated: function() {

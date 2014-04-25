@@ -2,7 +2,7 @@
 define(["jquery", "backbone", "lib/kmapjs/collections/edge-collection", "agfk/models/detailed-edge-model"], function($, Backbone, EdgeCollection, DetailedEdgeModel){
   return  EdgeCollection.extend({
     model: DetailedEdgeModel,
-    url: window.agfkGlobals.apiBase + "dependency/",
+    url: window.APIBASE + "dependency/",
     save: function () {
       // TODO make this save function more general purpose
       // collection save makes a patch request to the list url

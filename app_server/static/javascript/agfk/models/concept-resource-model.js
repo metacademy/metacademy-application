@@ -85,7 +85,7 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
     },
 
     url: function () {
-        return window.agfkGlobals.apiBase + "conceptresource/" + this.id + "/";
+        return window.APIBASE + "conceptresource/" + this.id + "/";
     },
 
     toJSON: function () {

@@ -21,7 +21,7 @@ define(["backbone"], function(Backbone){
     },
 
     url: function () {
-        return window.agfkGlobals.apiBase + "resourcelocation/" + this.id + "/";
+        return window.APIBASE + "resourcelocation/" + this.id + "/";
     },
 
     parse: function (resp, xhr) {

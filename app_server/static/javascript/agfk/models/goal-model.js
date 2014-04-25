@@ -11,7 +11,7 @@ define(["backbone", "utils/utils"], function(Backbone, Utils){
     },
 
     url: function () {
-        return window.agfkGlobals.apiBase + "goal/" + this.id + "/";
+        return window.APIBASE + "goal/" + this.id + "/";
     },
 
     parse: function (resp, xhr) {

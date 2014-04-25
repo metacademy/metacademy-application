@@ -67,7 +67,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
 
       addResourceLocation: function () {
         var thisView = this,
-            rlid = Math.random().toString(36).substr(8),
+            rlid = Math.random().toString(36).substr(3, 11),
             resLoc = new ResourceLocation({id: rlid, cresource: thisView.model});
         thisView.resourceLocationsView = thisView.resourceLocationsView || new ResourceLocationsView({model: thisView.model.get("locations")});
         thisView.resourceLocationsView.model.add(resLoc);

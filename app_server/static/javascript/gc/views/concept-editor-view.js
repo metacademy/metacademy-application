@@ -119,10 +119,11 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
       addGoal: function () {
         var thisView = this,
-            gid = Math.random().toString(36).substr(8),
+            gid = Math.random().toString(36).substr(3, 11),
             newGoal = new GoalModel({id: gid, concept: thisView.model}),
             deps = thisView.model.get("dependencies"),
             ols = thisView.model.get("outlinks");
+
         // add goal to goal list
         thisView.model.get("goals").add(newGoal, {at: 0});
 
@@ -169,8 +170,8 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
       addResource: function () {
         var thisView = this,
-            rid = Math.random().toString(36).substr(8),
-            grid = Math.random().toString(36).substr(8),
+            rid = Math.random().toString(36).substr(3, 11),
+            grid = Math.random().toString(36).substr(3, 11),
             newRes = new ConceptResource({id: rid});
         newRes.get("global_resource").set("id", grid);
         newRes.parent = thisView.model;

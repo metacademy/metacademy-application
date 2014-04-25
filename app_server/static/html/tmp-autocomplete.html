@@ -143,21 +143,21 @@ h2 {
   <ul class="ac-list"><li class="ac-hidden" value="1"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="2"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="3"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="4"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="5"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="6"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="7"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="8"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="9"><a class="ac-li-a" href="#">a</a></li><li class="ac-hidden" value="10"><a class="ac-li-a" href="#">a</a></li></ul>
 </div>
 
-  <script>
-    var options = {
-    numResults: 10,
-    containerEl: document.querySelector('.search-container'),
-    searchButtonEl: document.querySelector('.search-button'),
-    paths: {
-      dataPath: 'http://metacademy.org/api/list',
-      searchPath: 'http://metacademy.org/search?q=',
-      directPath: 'http://metacademy.org/graphs/concepts/',
-    }, 
-    classes: {
-      liClass: 'ac-li',
-      aClass: 'ac-li-a',
-      hiddenClass: 'ac-hidden'
-    }
+<script>
+var options = {
+  numResults: 10,
+  containerEl: document.querySelector('.search-container'),
+  searchButtonEl: document.querySelector('.search-button'),
+  paths: {
+    dataPath: 'http://metacademy.org/api/list',
+    searchPath: 'http://metacademy.org/search?q=',
+    directPath: 'http://metacademy.org/graphs/concepts/',
+  },
+  classes: {
+    liClass: 'ac-li',
+    aClass: 'ac-li-a',
+    hiddenClass: 'ac-hidden'
+  }
 };
 
 var autocomplete = function(options, data) {
@@ -171,14 +171,14 @@ var autocomplete = function(options, data) {
         }
       },
       'up': function(e) {
-          e.preventDefault();
+        e.preventDefault();
         if (+e.target.parentNode.value === 1) {
           options.containerEl.querySelector('INPUT').focus();
         } else if (+e.target.parentNode.value > 1) {
           e.target.parentNode.previousElementSibling.firstElementChild.focus();
         }
       },
-      'down': function(e) {  
+      'down': function(e) {
         e.preventDefault();
         if (e.target.tagName === 'INPUT') {
           options.containerEl.querySelector('A').focus();
@@ -193,6 +193,11 @@ var autocomplete = function(options, data) {
       'button': function(e) {
         var val = options.containerEl.querySelector('INPUT').value;
         return val ? window.location = options.paths.searchPath + encodeURIComponent(val) : null;
+      },
+      'loseFocus': function(e) {
+        window.setTimeout(function() {
+          return doc.activeElement.tagName === 'INPUT' || doc.activeElement.tagName === 'A' ? null : insert();
+        }, 100);
       }
     };
 
@@ -201,9 +206,9 @@ var autocomplete = function(options, data) {
     var i = options.numResults;
     while (i--) {
       var liEl = doc.createElement('LI');
-      liEl.innerHTML = '<a class="'+ options.classes.aClass + '" href="#">a</a>';
+      liEl.innerHTML = '<a class="' + options.classes.aClass + '" href="#">a</a>';
       liEl.className = options.classes.hiddenClass;
-      liEl.value = +options.numResults-i;
+      liEl.value = +options.numResults - i;
       wrapEl.appendChild(liEl);
     }
   }
@@ -219,7 +224,6 @@ var autocomplete = function(options, data) {
       rx = new RegExp(q.replace(/(\S+)/g, rxFn).replace(/\s+/g, ''), 'gi'),
       arr = [],
       i = data.length;
-
     while (i--) {
       if (rx.test(data[i].title)) {
         arr.push({
@@ -250,19 +254,14 @@ var autocomplete = function(options, data) {
     return meth ? handlers[meth](e) : null;
   }
 
-  function blurHandler(e) {
-    window.setTimeout(function() {
-      return doc.activeElement.tagName === 'INPUT' || doc.activeElement.tagName === 'A' ? null : insert();
-    }, 100);
-  }
   setEls();
   options.containerEl.addEventListener('input', eventScreener);
   options.containerEl.addEventListener('keydown', eventScreener);
   options.searchButtonEl.addEventListener('click', handlers.button);
-  options.containerEl.addEventListener('blur', blurHandler, true);
+  options.containerEl.addEventListener('blur', handlers.loseFocus, true);
 };
 
-(function setup(opts){
+(function setup(opts) {
   var xhr = new XMLHttpRequest(),
     xhrFn = function() {
       autocomplete(opts, JSON.parse(this.response));
@@ -273,6 +272,6 @@ var autocomplete = function(options, data) {
   xhr.send();
 })(options);
 
-  </script>
+</script>
 </body>
 </html>

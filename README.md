@@ -1,7 +1,8 @@
 [![Build Status](https://travis-ci.org/metacademy/metacademy-application.png)](https://travis-ci.org/metacademy/metacademy-application)
 
-Metacademy's Source
-==============
+<p align="center">
+<img src="http://obphio.us/media/images/meta-logo.png" alt="Metacademy Logo" height="150px"/>
+</p>
 
 This source is licensed under GPLv3, see [LICENSE.txt](LICENSE.txt) (note: metacademy's content is CC BY SA 3.0).
 

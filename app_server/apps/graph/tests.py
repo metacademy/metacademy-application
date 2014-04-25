@@ -18,6 +18,8 @@ from test_data.data import three_node_graph
 ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
                  ('post', 'list')]
 
+ALLOWED_DEP_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'), ('post', 'list'), ('patch', 'list')]
+
 
 def concept_list_url():
     return '/graphs/api/v1/concept/'
@@ -88,6 +90,8 @@ class BaseResourceTest(ResourceTestCase):
     def get_request_data(self):
         if self.vtype == 'detail' and self.verb == 'patch':
             return self.patch_data()
+        elif self.vtype == 'list' and self.verb == 'patch':
+            return {"objects": [self.detail_data()]}
         elif self.data_type() == 'list':
             return self.list_data()
         elif self.data_type() == 'detail':
@@ -202,7 +206,11 @@ class ResourceAuthTest(BaseResourceTest):
         BaseResourceTest.__init__(self, 'tst_auth')
 
     def correct_response_code(self):
-        if (self.verb, self.vtype) not in ALLOWED_PAIRS:
+        allowed_pairs = ALLOWED_PAIRS
+        if self.rtype == "dependency":
+            allowed_pairs = ALLOWED_DEP_PAIRS
+
+        if (self.verb, self.vtype) not in allowed_pairs:
             return 'MethodNotAllowed'
 
         if self.verb == 'get':
@@ -229,12 +237,10 @@ class ResourceAuthTest(BaseResourceTest):
         # treat successful response codes as interchangeable
         if rc == 'OK' and resp.status_code in [200, 201, 202, 204]:
             return
-
         getattr(self, 'assertHttp' + rc)(resp)
 
     def tst_auth(self):
         # name disguised so test discoverer doesn't pick it up
-
         data = self.get_request_data()
         resp = self.do_request(self.resource_url(), verb=self.verb, vtype=self.vtype, data=data,
                                user_type=self.user_type)
@@ -250,6 +256,7 @@ class ConceptResourceAuthTest(ResourceAuthTest):
         self.user_type = user_type
         self.tag_match = tag_match
         self.existing_concept = existing_concept
+        self.rtype = "concept"
 
     def initial_count(self):
         return len(test_data.data.initial_concepts(True))
@@ -303,6 +310,7 @@ class DependencyResourceAuthTest(ResourceAuthTest):
         self.vtype = vtype
         self.user_type = user_type
         self.dependency_exists = dependency_exists
+        self.rtype = "dependency"
 
     def init_tag_match(self):
         return False
@@ -510,17 +518,22 @@ def load_tests(loader, suite, pattern):
                     for tag_match in [False, True]:
                         for existing_concept in ['none', 'provisional', 'accepted']:
                             suite.addTest(ConceptResourceAuthTest(verb, vtype, user_type,
-                                                              tag_match, existing_concept))
+                                                                  tag_match, existing_concept))
             else:
                 suite.addTest(ConceptResourceAuthTest(verb, vtype, 'super', True, 'none'))
 
     for verb in ['get', 'post', 'put', 'patch']:
         for vtype in ['detail', 'list']:
-            if (verb, vtype) in ALLOWED_PAIRS:
+            if (verb, vtype) in ALLOWED_DEP_PAIRS:
                 for user_type in ['unauth', 'auth', 'super']:
                     for dependency_exists in [False, True]:
-                        suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
+                        if verb == "patch" and vtype == "list":
+                            suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, user_type != 'unauth'))
+                        else:
+                            suite.addTest(DependencyResourceAuthTest(verb, vtype, user_type, dependency_exists))
             else:
                 suite.addTest(DependencyResourceAuthTest(verb, vtype, 'super', False))
 
     return suite
+
+# FAIL: DependencyResourceAuthTest(verb=patch, vtype=list, user_type=super, dependency_exists=False)

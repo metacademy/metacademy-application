@@ -109,6 +109,7 @@ def handle_concepts(request, cid=""):
     """
     A simple interface for handling a user's association with a concept
     """
+    pdb.set_trace()
     rbody = json.loads(request.body) # communication payload
     method = request.method
 

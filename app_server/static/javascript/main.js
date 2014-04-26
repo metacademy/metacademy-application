@@ -10,7 +10,7 @@ requirejs.config({
   paths: {
     jquery:"lib/jquery-1.10.2",
     underscore: "lib/underscore",
-    backbone: "lib/backbone-min",
+    backbone: "lib/backbone",
     d3: "lib/d3",
     "dagre": "lib/dagre",
     "btouch": "lib/backbone.touch",

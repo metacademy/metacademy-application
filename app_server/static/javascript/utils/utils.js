@@ -1,7 +1,7 @@
 
 /*global define
-This file contains general purpose utility functions
-*/
+ This file contains general purpose utility functions
+ */
 
 define(["jquery"], function($){
   "use strict";
@@ -135,9 +135,9 @@ define(["jquery"], function($){
    * Parse simple markdown to html
    */
   utils.simpleMdToHtml = function (inMd) {
-  if (!inMd) {
-    return "";
-  }
+    if (!inMd) {
+      return "";
+    }
     var inLines = inMd.split("\n"),
         depth,
         retStr = "",
@@ -177,6 +177,18 @@ define(["jquery"], function($){
       window.history.pushState({}, "", pathArr.join("/"));
     }
   };
+
+  utils.readCookie = function (name) {
+    var nameEQ = escape(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+  };
+
 
   // return require.js object
   return utils;

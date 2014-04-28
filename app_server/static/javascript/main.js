@@ -84,7 +84,8 @@ requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router"
   Backbone.sync = function(method, model, options){
     options.beforeSend = function(xhr){
       if (model.get("useCsrf")){
-        xhr.setRequestHeader('X-CSRFToken', window.CSRF_TOKEN);
+        var csrf = Utils.readCookie("csrftoken") || window.CSRF_TOKEN;
+        xhr.setRequestHeader('X-CSRFToken', csrf);
       }
     };
     return oldSync(method, model, options);

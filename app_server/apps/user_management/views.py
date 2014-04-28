@@ -109,7 +109,6 @@ def handle_concepts(request, cid=""):
     """
     A simple interface for handling a user's association with a concept
     """
-    pdb.set_trace()
     rbody = json.loads(request.body) # communication payload
     method = request.method
 
@@ -132,8 +131,9 @@ def handle_concepts(request, cid=""):
             dbConceptObj.starred_uprofs.remove(uprof)
 
         dbConceptObj.save()
-
-        return HttpResponse()
+        hresp = HttpResponse(status=200)
+        hresp.set_cookie("csrftoken", "hiay")
+        return hresp
 
     else:
         return HttpResponse(status=405)

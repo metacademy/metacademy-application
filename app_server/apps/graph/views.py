@@ -81,6 +81,34 @@ def get_concept_history(request, concept_tag=""):
     return render(request, 'concept_history.html', {'concept': concept, "revs": revs})
 
 
+def get_concept_triplet(request):
+    """
+    Takes a get request with either a "title", "tag", or "title" field and
+    returns a json triplet with these three fields if the object exists in the db
+    """
+    retobj = {}
+    try:
+        if "tag" in request.GET:
+            retobj["tag"] = request.GET["tag"]
+            cobj = Concept.objects.get(tag=retobj["tag"])
+            retobj["id"] = cobj.id
+            retobj["title"] = cobj.title
+        elif "title" in request.GET:
+            retobj["title"] = request.GET["title"]
+            cobj = Concept.objects.get(title=retobj["title"])
+            retobj["id"] = cobj.id
+            retobj["tag"] = cobj.tag
+        elif "id" in request.GET:
+            retobj["title"] = request.GET["title"]
+            cobj = Concept.objects.get(title=retobj["title"])
+            retobj["id"] = cobj.id
+            retobj["tag"] = cobj.tag
+    except ObjectDoesNotExist:
+        retobj = {}
+
+    return HttpResponse(json.dumps(retobj), "application/json")
+
+
 def get_concept_dep_graph(request, concept_tag=""):
     """
     obtain the dependency graph for the given concept

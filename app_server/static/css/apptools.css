@@ -1,12 +1,15 @@
 /* App tools */
 
 .apptools{
-    display: none;
+    background: white;
     position: absolute;
-    top: 1em;
-    left: 0;
+    top: 1.5em;
+    right: 4em;
+    border: 2px solid #CE94BC;
+    border-radius: 10px;
     text-align: center;
     padding: 1em;
+    display: none;
 }
 
 .create #content-editing-tools{

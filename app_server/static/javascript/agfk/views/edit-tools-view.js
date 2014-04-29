@@ -24,18 +24,18 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
         "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
         "change #hidden-file-upload": "uploadGraph",
         "click #download-input": "downloadGraph",
-        "click #delete-graph": "clearGraph",
         "click #preview-graph": "previewGraph",
         "click #back-to-editing": "returnToEditor",
-        "click #save": "syncWithServer"
+        "click #save": "syncWithServer",
+        "keyup #add-concept-input": "addConceptKeyUp"
         // Bad design note: #optimize listener is in graph-view
       },
 
-       initialize: function(inp){
-         var thisView = this;
-         thisView.setElement("#" + pvt.consts.viewId);
-         thisView.appRouter = inp.appRouter;
-       },
+      initialize: function(inp){
+        var thisView = this;
+        thisView.setElement("#" + pvt.consts.viewId);
+        thisView.appRouter = inp.appRouter;
+      },
 
       /**
        * Return true if the view has been rendered
@@ -73,7 +73,6 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
           var txtRes = filereader.result;
           try{
             var jsonObj = JSON.parse(txtRes);
-            // thisView.deleteGraph(true);
             thisView.model.addJsonNodesToGraph(jsonObj);
             thisView.model.trigger("render");
           }catch(err){
@@ -113,27 +112,27 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
                  headers: {'X-CSRFToken': window.CSRF_TOKEN},
                  success: function (resp) {
                    $.ajax({ type: "PUT",
-                     // TODO move hardcoded url
-                     url: thisView.model.url(),
-                     contentType: "application/json; charset=utf-8",
-                     data: JSON.stringify(jsonObj),
-                     headers: {'X-CSRFToken': window.CSRF_TOKEN},
-                     success: function (resp) {
-                     console.log("success!");
-                       if (resp){
-                         console.log(resp.responseText);
-                       }
-                       if (window.location.pathname.substr(-3) == "new") {
-                         var newPath = window.location.pathname.split("/");
-                         newPath.pop();
-                         newPath = newPath.join("/") + "/" + thisView.model.id;
-                         window.history.pushState({}, "", newPath);
-                       }
-                   },
-                     error: function (resp) {
-                       console.log(resp.responseText);
-                     }
-                   });
+                            // TODO move hardcoded url
+                            url: thisView.model.url(),
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(jsonObj),
+                            headers: {'X-CSRFToken': window.CSRF_TOKEN},
+                            success: function (resp) {
+                              console.log("success!");
+                              if (resp){
+                                console.log(resp.responseText);
+                              }
+                              if (window.location.pathname.substr(-3) == "new") {
+                                var newPath = window.location.pathname.split("/");
+                                newPath.pop();
+                                newPath = newPath.join("/") + "/" + thisView.model.id;
+                                window.history.pushState({}, "", newPath);
+                              }
+                            },
+                            error: function (resp) {
+                              console.log(resp.responseText);
+                            }
+                          });
                  },
                  error: function (resp) {
                    console.log(resp.responseText);
@@ -147,13 +146,44 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
         window.saveAs(blob, "mygraph.json"); // TODO replace with title once available
       },
 
-      clearGraph: function(confirmDelete){
-        if (!confirmDelete || confirm("Press OK to clear this graph")){
-          this.model.clear().set(this.model.defaults());
-          this.model.trigger("render"); // FIXME this is a hack
+      addConceptKeyUp: function (evt) {
+        var thisView = this,
+            thisModel = thisView.model,
+            keyCode = evt.keyCode;
+        var inpText = evt.target.value;
+        if (keyCode === 13) {
+          // return key code
+          if (inpText) {
+
+            $.getJSON("/graphs/concept-triplet", {title: inpText})
+              .done(function (robj) {
+                if (robj && robj.id) {
+                  console.log( "fetched id for: " + inpText );
+                  var fetchNodeId = robj.id;
+                  thisModel.fetchTag = fetchNodeId;
+                  thisModel.fetch({
+                    success: function () {
+                      // need to contract
+                      console.log( "fetched: " + inpText );
+                      var fetchNode = thisModel.getNode(fetchNodeId);
+                      fetchNode.set("x", 200);
+                      fetchNode.set("y", 200); // TODO figure out a better positioning system for the fetched node
+                      fetchNode.contractDeps();
+                      thisView.model.trigger("render");
+                      evt.target.value = "";
+                    } // end success
+                  });
+                } else {
+                  evt.target.blur();
+                  alert("unable to fetch: " + inpText);
+                }
+              })
+              .fail(function () {
+                console.log("unable to fetch: " + inpText);
+              });
+          }
         }
       }
-
     });
   })();
 });

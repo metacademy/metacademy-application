@@ -19,112 +19,6 @@ h2 {
   font: 400 1.5em/1 'Lato', sans-serif;
 }
 
-.search-container {
-  position: relative;
-  width: 30em;
-  height: 2em;
-  color: #333;
-}
-
-.search-button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 2em;
-  width: 2em;
-  z-index: 11;
-  cursor: pointer;
-}
-
-.search-input:focus ~ .search-button .bg {
-  fill: #501644;
-}
-
-.search-button:hover .bg {
-  fill: #501644;
-}
-
-.search-input {
-  position: absolute;
-  z-index: 10;
-  border-radius: 0px;
-  background-color: #ffffff;
-  border: 1px solid #BABDC0;
-  width: 28rem;
-  display: block;
-  font-size: 70%;
-  padding-left: .5em;
-  margin: 0;
-  height: 100%;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #501644;
-}
-
-.search-container, .search-input, .search-button, .ac-list, .ac-li, .ac-li-a {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ac-list {
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  width: inherit;
-  top: 29px;
-  border: 1px solid #BABDC0;
-  border-width: 0 1px 1px 1px;
-  background-color: #ffffff;
-  z-index: 9;
-}
-
-.ac-hidden {
-  display: none;
-}
-
-.ac-li {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  color: #501644;
-  min-height: 2em;
-  vertical-align:middle;
-  line-height:2em;
-  text-decoration: none;
-  text-align: left;
-  width: 100%;
-}
-
-.ac-list {
-  border-bottom: 1px solid #BABDC0;
-}
-
-.ac-li-a {
-  color: #A01F70;
-  text-decoration: none;
-  margin: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-indent: -1.5em;
-  padding-left: 2em;
-}
-
-.ac-li-a:hover {
-  background-color: #F5E8F2;
-  color: #690259;
-}
-
-.ac-li-a:focus {
-  background-color: #F5E8F2;
-  color: #690259;
-  outline: none;
-}
-
 </style>
 </head>
 
@@ -152,7 +46,7 @@ h2 {
       dataPath: 'http://metacademy.org/api/list',
       searchPath: 'http://metacademy.org/search?q=',
       directPath: 'http://metacademy.org/graphs/concepts/',
-    }, 
+    },
     classes: {
       liClass: 'ac-li',
       aClass: 'ac-li-a',
@@ -178,7 +72,7 @@ var autocomplete = function(options, data) {
           e.target.parentNode.previousElementSibling.firstElementChild.focus();
         }
       },
-      'down': function(e) {  
+      'down': function(e) {
         e.preventDefault();
         if (e.target.tagName === 'INPUT') {
           options.containerEl.querySelector('A').focus();

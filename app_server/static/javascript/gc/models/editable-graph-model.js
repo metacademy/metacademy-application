@@ -15,16 +15,9 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     },
 
     url: function () {
-    // TODO fix urls hack - make API consistent once it's migrated
-    if (this.useOldUrl) {
-      this.useOldUrl = false;
-      var leaf = this.get("leafs")[0] || this.fetchTag;
-      if (!leaf){
-        throw new Error("Must set graph leaf in graph-model to fetch graph data");
-      }
-      return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
-    }
-      return window.APIBASE + "graph/" + this.id + "/";
+        var leaf =  this.fetchTag;
+        this.fetchTag = null;
+        return window.APIBASE + (leaf ? ("targetgraph/" + leaf) : ("graph/" + this.id + "/"));
     },
 
     isPopulated: function() {
@@ -75,22 +68,22 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
           }).forEach(thisModel.setEdgeId);
 
           // save the node -- how will we save edges on creation? -- save them once they get the server id
-          node.save(null, {parse: false,
-                           success: function () {
-                             thisModel.save(null,
-                                            {parse: false,
-                                             success: function () {
-                                               Utils.urlFromNewToId(thisModel.id);
-                                             }});
-                           }});
+          node.save(null,
+                    {parse: false,
+                     success: function () {
+                       thisModel.save(null,
+                                      {
+                                        parse: false,
+                                        success: function () {
+                                          Utils.urlFromNewToId(thisModel.id);
+                                        }});
+                     }});
         })
         .fail(function (resp){
           // failure
           console.error("unable to verify new resource id -- TODO inform user -- msg: "
                         + resp.responseText);
         });
-    },
-
-
+    }
   });
 });

@@ -52,16 +52,19 @@ class Concept(Model):
 reversion.register(Concept, follow=["goals", "dep_target", "concept_resource"])
 
 
-class Goal(Model, LoggedInEditable):
+class Goal(Model):
     id = CharField(max_length=16, primary_key=True)
     concept = ForeignKey(Concept, related_name="goals")
     text = CharField(max_length=500)
+
+    def editable_by(self, user):
+        return self.concept.editable_by(user)
 
 # maintain version control for the goal but only access thru the concept
 reversion.register(Goal)
 
 
-class Dependency(Model, LoggedInEditable):
+class Dependency(Model):
     """
     Concept edge
     """
@@ -127,7 +130,7 @@ class GlobalResource(Model, LoggedInEditable):
 reversion.register(GlobalResource)
 
 
-class ConceptResource(Model, LoggedInEditable):
+class ConceptResource(Model):
     """
     Model to maintain concept specific resources
     NOTE: should use functions to obtain fields
@@ -148,11 +151,15 @@ class ConceptResource(Model, LoggedInEditable):
     # concats GlobalResource field ?
     notes = CharField(max_length=500, null=True, blank=True)
 
+    def editable_by(self, user):
+        return self.concept.editable_by(user)
+
+
 # maintain version control for the concept
 reversion.register(ConceptResource, follow=["locations"])
 
 
-class ResourceLocation(Model, LoggedInEditable):
+class ResourceLocation(Model):
     """
     Specifies the location of the resources
     """
@@ -162,6 +169,10 @@ class ResourceLocation(Model, LoggedInEditable):
     location_type = CharField(max_length=30)
     location_text = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
+
+    def editable_by(self, user):
+        return self.cresource.editable_by(user)
+
 # maintain vc for resource location
 reversion.register(ResourceLocation)
 

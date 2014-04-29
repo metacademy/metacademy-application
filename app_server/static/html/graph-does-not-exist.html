@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load std_extras %}
+{% block meta-description %}
+    <meta name="description" content="This graph does not exist.">
+{% endblock %}
+
+{% block main %}
+    <div class="dev-note">
+      <p>
+      We're sorry, but we couldn't find a graph with this id: "{{cref}}".
+      </p>
+      <p>
+        If you think this is incorrect:  <a href="/feedback">send us a message</a>.
+      </p>
+    </div>
+{% endblock %}

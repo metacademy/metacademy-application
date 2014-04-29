@@ -57,6 +57,7 @@ def check_id(request):
     else:
         return HttpResponse(status=405)
 
+
 def check_tags(request):
     """
     check if the given concept tag is available
@@ -126,7 +127,10 @@ def edit_existing_graph(request, gid):
     if request.method == "GET":
         # get the graph data so we can bootstrap it
         concepts = get_user_data(request)
-        graph_json = api_communicator.get_graph(request, gid)
+        try:
+            graph_json = api_communicator.get_graph(request, gid)
+        except ObjectDoesNotExist:
+            return render(request, "graph-does-not-exist.html", {"cref": gid})
         return render(request, "graph-creator.html",
                       {"user_data": json.dumps(concepts),
                        "graph_id": gid, "graph_init_data": graph_json})

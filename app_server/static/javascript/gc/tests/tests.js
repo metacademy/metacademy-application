@@ -80,16 +80,16 @@ define(["chai", "gc/models/editable-graph-model"], function(chai, EditGraphModel
       newJsonObj,
       newGraph = new EditGraphModel();
 
-  describe('GC: Graph IO', function(){
-    describe('export graph', function(){
-      it('should obtain a valid json representation of the graph', function(){
-        jsonObj = graphObj.toJSON();
-      });
+  // describe('GC: Graph IO', function(){
+  //   describe('export graph', function(){
+  //     it('should obtain a valid json representation of the graph', function(){
+  //       jsonObj = graphObj.toJSON();
+  //     });
 
-      it('should be able to obtain a string representation of the graph', function(){
-        jsonStr = JSON.stringify(jsonObj);
-      });
-    });
+  //     it('should be able to obtain a string representation of the graph', function(){
+  //       jsonStr = JSON.stringify(jsonObj);
+  //     });
+  //   });
 
     // describe('import graph', function(){
     //   it('should be able to parse string to json', function(){
@@ -112,7 +112,7 @@ define(["chai", "gc/models/editable-graph-model"], function(chai, EditGraphModel
     //     graphObj.getNodes().forEach(function(oldNode) {
     //       var node = graphObj.getNode(oldNode.id),
     //           attribs = oldNode.attributes,
-    //           collFields = oldNode.collFields();
+    //           collFields = oldNode.collFields;
     //       // compare txt fields
     //       for (var attr in attribs) {
     //         if (attribs.hasOwnProperty(attr) && collFields.indexOf(attr) === -1){
@@ -174,8 +174,7 @@ define(["chai", "gc/models/editable-graph-model"], function(chai, EditGraphModel
 
     //   // TODO add server grabbing test! -- how to tell when it's finished parsing? -- use trigger events
 
-    // }
-    //); // end describe("import graph...
-  }); // end describe ("graph IO..
+    // }); // end describe("import graph...
+//  }); // end describe ("graph IO..
 
 }); // end define

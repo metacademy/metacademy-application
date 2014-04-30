@@ -251,7 +251,6 @@ a.home-nav{
 /* -----------------------------------*/
 .search-container {
   position: relative;
-  width: 30em;
   height: 2em;
   color: #333;
 }
@@ -275,12 +274,11 @@ a.home-nav{
 }
 
 .search-input {
-  position: absolute;
   z-index: 10;
+  position: absolute;
   border-radius: 0px;
   background-color: #ffffff;
   border: 1px solid #BABDC0;
-  width: 28rem;
   display: block;
   font-size: 70%;
   padding-left: .5em;
@@ -305,9 +303,10 @@ a.home-nav{
   margin: 0;
   position: absolute;
   width: inherit;
-  top: 29px;
+  top: 2em; /* must match the container height */
   border: 1px solid #BABDC0;
   border-width: 0 1px 1px 1px;
+  border-bottom: 1px solid #BABDC0;
   background-color: #ffffff;
   z-index: 9;
 }
@@ -321,22 +320,17 @@ a.home-nav{
   margin: 0;
   padding: 0;
   color: #501644;
-  min-height: 2em;
   vertical-align:middle;
-  line-height:2em;
   text-decoration: none;
   text-align: left;
   width: 100%;
-}
-
-.ac-list {
-  border-bottom: 1px solid #BABDC0;
 }
 
 .ac-li-a {
   color: #A01F70;
   text-decoration: none;
   margin: 0;
+  padding-top: 2em;
   display: block;
   width: 100%;
   height: 100%;

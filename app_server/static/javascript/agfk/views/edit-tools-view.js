@@ -1,5 +1,5 @@
 /*global define*/
-define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandler){
+define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone, ErrorHandler, GenUtils){
   "use strict";
 
   /**
@@ -13,7 +13,9 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
       apptoolsButtonId: "apptools-button",
       expandButtonClass: "expanded",
       disabledClass: "disabled",
-      viewId: "content-editing-tools"
+      viewId: "content-editing-tools",
+      addConceptInputId: "add-concept-input",
+      addConceptWrapId: "add-concept-container"
     };
     pvt.isRendered = true; // view is prerendered
 
@@ -48,8 +50,47 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
        * Render the apptools view
        */
       render: function(){
+        var thisView = this,
+            thisModel = thisView.model,
+            acOpts = {
+              containerEl: thisView.$el.find("." + pvt.consts.addConceptWrapId)[0]
+            };
+
+        // load a concept by its title from an ajax request
+        // TODO find a better place for this function
+        thisView.loadTitle = function(inpText, evt) {
+          $.getJSON("/graphs/concept-triplet", {title: inpText})
+            .done(function (robj) {
+              if (robj && robj.id) {
+                console.log( "fetched id for: " + inpText );
+                var fetchNodeId = robj.id;
+                thisModel.fetchTag = fetchNodeId;
+                thisModel.fetch({
+                  success: function () {
+                    // need to contract
+                    var fetchNode = thisModel.getNode(fetchNodeId);
+                    fetchNode.set("x", 200 + Math.random()*100);
+                    fetchNode.set("y", 200 + Math.random()*100); // TODO figure out a better positioning system for the fetched node
+                    fetchNode.contractDeps();
+                    thisView.model.trigger("render");
+                    thisView.model.save();
+                    evt.target.value = "";
+                  } // end success
+                });
+              } else {
+                evt.target.blur();
+                alert("unable to fetch: " + inpText);
+              }
+            })
+            .fail(function () {
+              console.log("unable to fetch: " + inpText);
+            });
+        };
+
+        // set up the autocomplete
+        thisView.autoComplete = new GenUtils.Autocomplete(acOpts, thisView.loadTitle);
         pvt.viewRendered = true;
-        return this;
+        return thisView;
       },
 
       /**
@@ -118,7 +159,6 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
                             data: JSON.stringify(jsonObj),
                             headers: {'X-CSRFToken': window.CSRF_TOKEN},
                             success: function (resp) {
-                              console.log("success!");
                               if (resp){
                                 console.log(resp.responseText);
                               }
@@ -149,38 +189,35 @@ define(["jquery", "backbone", "utils/errors"], function($, Backbone, ErrorHandle
       addConceptKeyUp: function (evt) {
         var thisView = this,
             thisModel = thisView.model,
-            keyCode = evt.keyCode;
-        var inpText = evt.target.value;
+            keyCode = evt.keyCode,
+            inpText = evt.target.value;
+
         if (keyCode === 13) {
           // return key code
-          if (inpText) {
-
-            $.getJSON("/graphs/concept-triplet", {title: inpText})
-              .done(function (robj) {
-                if (robj && robj.id) {
-                  console.log( "fetched id for: " + inpText );
-                  var fetchNodeId = robj.id;
-                  thisModel.fetchTag = fetchNodeId;
-                  thisModel.fetch({
-                    success: function () {
-                      // need to contract
-                      console.log( "fetched: " + inpText );
-                      var fetchNode = thisModel.getNode(fetchNodeId);
-                      fetchNode.set("x", 200);
-                      fetchNode.set("y", 200); // TODO figure out a better positioning system for the fetched node
-                      fetchNode.contractDeps();
-                      thisView.model.trigger("render");
-                      evt.target.value = "";
-                    } // end success
-                  });
+          thisView.loadTitle(inpText, evt);
+        }  else {
+          // only send one autocomplete ajax request at a time
+          // TODO move this to utils
+          var acAjax = function (intext) {
+            // TODO remove hardcoded URL
+            $.getJSON("/autocomplete", {ac: intext, onlyConcepts: true}, function (robj) {
+              thisView.autoComplete.setData(robj);
+            })
+              .always(function (res) {
+                if (thisView.nextACText) {
+                  var nextText = thisView.nextACText;
+                  thisView.nextACText = null;
+                  acAjax(nextText);
                 } else {
-                  evt.target.blur();
-                  alert("unable to fetch: " + inpText);
+                  thisView.acWait = false;
                 }
-              })
-              .fail(function () {
-                console.log("unable to fetch: " + inpText);
               });
+          };
+          if (!thisView.acWait) {
+            thisView.acWait = true;
+            acAjax(inpText);
+          } else {
+            thisView.nextACText = inpText;
           }
         }
       }

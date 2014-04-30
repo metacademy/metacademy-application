@@ -1,15 +1,14 @@
 import pdb
+import json
 
 from django.shortcuts import render
-from django.template import RequestContext
-from django.http import HttpResponse
 from django.views.generic.edit import FormView
+from django.http import HttpResponse
 
 from haystack.views import SearchView
-from os import system
+from haystack.query import SearchQuerySet
 
 from apps.graph.models import Concept
-from apps.cserver_comm.cserver_communicator import get_search_json
 from forms import ContactForm
 
 
@@ -23,7 +22,7 @@ def get_list_view(request):
     """
     Return the list of concepts
 
-		TODO this should be cached
+    TODO this should be cached
     """
     citms = []
     # previous starting letter
@@ -38,6 +37,23 @@ def get_list_view(request):
         citms.append(concept)
 
     return render(request, "concept-list.html", {"citms": citms})
+
+
+def autocomplete(request):
+    """
+    """
+    # only autocomplete on concepts?
+
+    acinp = request.GET.get("ac")
+    if not acinp:
+        return HttpResponse(status=501)
+    sqs = SearchQuerySet().autocomplete(title=acinp)
+    if (request.GET.get("onlyConcepts")):
+        sqs = sqs.models(Concept)
+    sqs = sqs[:7]
+    resp = [{"tag": acres.tag, "title": acres.title, "id": sqs[:7][0].id.split(".")[-1]} for acres in sqs]
+
+    return HttpResponse(json.dumps(resp), "application/json")
 
 
 class MultiSearchView(SearchView):

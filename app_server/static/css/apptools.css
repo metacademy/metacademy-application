@@ -47,9 +47,14 @@
     cursor: pointer;
 }
 
-#content-editing-tools input{
+#add-concept-container {
     width: 15em;
+    height: 1.5em;
+}
+
+#content-editing-tools input{
     padding: 0.3em;
+    width: inherit;
     margin-bottom: 0.2em;
 }
 
@@ -60,6 +65,17 @@
 
 #content-editing-tools .icon:hover{
     color: #333;
+}
+
+/** autocomplete **/
+#content-editing-tools .ac-li-a {
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+    font-size: 0.8em;
+}
+
+.ac-list {
+    top: 1.5em;
 }
 
 #back-to-editing{

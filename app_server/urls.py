@@ -8,8 +8,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from haystack.views import search_view_factory
 from haystack.query import SearchQuerySet
 
-from apps.roadmaps.models import Roadmap
-from views import MultiSearchView, ContactView, get_list_view
+from views import MultiSearchView, ContactView, get_list_view, autocomplete
 
 admin.autodiscover()
 
@@ -22,6 +21,7 @@ Django urls handler
 """
 urlpatterns = patterns('',
                        url(r'^$', TemplateView.as_view(template_name="landing.html")),
+                       url(r'^(?i)autocomplete/?$', autocomplete, name="autocomplete"),
                        url(r'^(?i)search$', search_inst, name="haystack_search"),
                        url(r'^(?i)list$', get_list_view),
                        url(r'^(?i)concepts/((?P<anything>.*))',

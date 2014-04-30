@@ -107,7 +107,7 @@ def reindex_concept(sender, **kwargs):
 dbmodels.signals.post_save.connect(reindex_concept, sender=ConceptSettings)
 
 
-class GlobalResource(Model, LoggedInEditable):
+class GlobalResource(Model):
     """
     Model to maintain resources used across concepts
     """
@@ -127,6 +127,13 @@ class GlobalResource(Model, LoggedInEditable):
 
     # fields that can be overwritten/used by the ResourceLocation
     url = CharField(max_length=200)
+
+    def editable_by(self, user):
+        """
+        global resource is editable if all of its concept resources are editable
+        """
+        return all([cr.editable_by(user) for cr in self.cresources.all()])
+
 reversion.register(GlobalResource)
 
 

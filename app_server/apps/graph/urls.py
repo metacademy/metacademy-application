@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url, include
 from tastypie.api import NamespacedApi
 
 from apps.graph.api import ConceptResource, GraphResource, ConceptResourceResource, DependencyResource, GoalResource,\
-    TargetGraphResource, GlobalResourceResource, ResourceLocationResource
+    TargetGraphResource, FullTargetGraphResource, GlobalResourceResource, ResourceLocationResource
 from views import new_graph, check_id, check_tags, get_concept_dep_graph, edit_existing_graph, get_concept_history, get_concept_triplet
 
 # api v1
@@ -14,6 +14,7 @@ v1_api.register(GlobalResourceResource())
 v1_api.register(ResourceLocationResource())
 v1_api.register(GraphResource())
 v1_api.register(TargetGraphResource())
+v1_api.register(FullTargetGraphResource())
 v1_api.register(DependencyResource())
 v1_api.register(GoalResource())
 

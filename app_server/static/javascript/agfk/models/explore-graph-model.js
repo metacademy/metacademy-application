@@ -53,19 +53,20 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
       },
 
       parse: function(resp, xhr){
+        var thisModel = this;
+        if (resp.id) {
+          thisModel.set("id", resp.id);
+        }
+
         if (xhr.parse == false) {
           return {};
         }
 
-        var thisModel = this,
-            deps = [],
+        var deps = [],
             nodes = resp.concepts,
             edges = resp.dependencies,
             nodeTag;
 
-        if (resp.id) {
-          thisModel.set("id", resp.id);
-        }
         if (resp.title) {
           thisModel.set("title", resp.title);
         }

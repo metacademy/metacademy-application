@@ -626,3 +626,20 @@ class TargetGraphResource(NamespacedModelResource):
         include_resource_uri = False
         queryset = TargetGraph.objects.all()
         resource_name = 'targetgraph'
+
+
+class FullTargetGraphResource(NamespacedModelResource):
+    """
+    GET-only full resource for target graphs (graphs with a single "target" concept and all dependenies)
+    NB: this is _not_ a model resource
+    """
+    concepts = fields.ToManyField(ConceptResource, "concepts", full=True)
+    dependencies = fields.ToManyField(DependencyResource, "dependencies", full=True)
+
+    class Meta:
+        """ TargetGraphResource Meta """
+        allowed_methods = ["get"]
+        list_allowed_methods = []
+        include_resource_uri = False
+        queryset = TargetGraph.objects.all()
+        resource_name = 'fulltargetgraph'

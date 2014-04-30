@@ -92,7 +92,6 @@ function genFun($){
           handlers = {
             // TODO need to generalize these handlers
             'enter': function(e) {
-              console.log( e.target.tagName );
               if (e.target.tagName === 'A') {
                 var val = e.target.firstChild.nodeValue;
                 inputEl.value = "";
@@ -117,6 +116,7 @@ function genFun($){
               }
             },
             'input': function(e) {
+              // FIXME
               // var val = e.target.value.trim().replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
               // return val ? insert(cacheFn(val, check)) : insert();
             },
@@ -126,7 +126,6 @@ function genFun($){
             containerClick: function (e) {
                 // TODO DRY with enter press
                 if (e.target.tagName === 'A') {
-                  console.log( "a click" );
                   e.preventDefault();
                   var val = e.target.firstChild.nodeValue;
                   inputEl.value = "";
@@ -190,7 +189,6 @@ function genFun($){
             rx = new RegExp(q.replace(/(\S+)/g, rxFn).replace(/\s+/g, ''), 'gi'),
             arr = [],
             i = data.length;
-        console.log( i );
 
         while (i--) {
           if (rx.test(data[i].title)) {
@@ -255,7 +253,6 @@ function genFun($){
       // ******************
       this.setData = function (inData) {
         data = inData;
-        console.log("inserting" + data);
         insert(inData);
       };
       return this;

@@ -64,19 +64,18 @@ define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone
               if (robj && robj.id) {
                 console.log( "fetched id for: " + inpText );
                 var fetchNodeId = robj.id;
-                thisModel.fetchTag = fetchNodeId;
-                thisModel.fetch({
-                  success: function () {
+                // TODO hardcoded URL
+                $.getJSON(window.APIBASE + "fulltargetgraph/" + fetchNodeId + "/", {"full": "true"}, function (res, rtype, jqxhr) {
                     // need to contract
+                    thisModel.set(thisModel.parse(res, jqxhr));
                     var fetchNode = thisModel.getNode(fetchNodeId);
                     fetchNode.set("x", 200 + Math.random()*100);
                     fetchNode.set("y", 200 + Math.random()*100); // TODO figure out a better positioning system for the fetched node
                     fetchNode.contractDeps();
                     thisView.model.trigger("render");
-                    thisView.model.save();
+                    thisView.model.save(null, {parse: false});
                     evt.target.value = "";
-                  } // end success
-                });
+                  }); // end success
               } else {
                 evt.target.blur();
                 alert("unable to fetch: " + inpText);

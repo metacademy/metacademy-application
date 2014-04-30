@@ -9,7 +9,7 @@ python app_server/manage.py runserver 8080 &
 
 # run the django tests
 echo "Django Tests"
-# python app_server/manage.py test
+python app_server/manage.py test
 
 # run the browser tests
 echo "Browser Tests"

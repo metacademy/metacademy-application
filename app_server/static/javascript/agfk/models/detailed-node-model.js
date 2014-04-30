@@ -49,7 +49,8 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       if (resp === null || xhr.parse == false) {
         return {};
       }
-      var output = xhr.update ? thisModel.attributes : thisModel.defaults(),
+
+      var output = _.extend(thisModel.defaults(), thisModel.attributes),
           txtFields = thisModel.txtFields(),
           collFields = thisModel.collFields();
 
@@ -57,9 +58,6 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       var i = txtFields.length;
       while (i--) {
         var tv = txtFields[i];
-        if (xhr.update && output[tv]) {
-          continue;
-        }
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
         } else if (output[tv] === undefined) {
@@ -71,12 +69,9 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
       i = collFields.length;
       while (i--) {
         var cv = collFields[i];
-        if (xhr.update && output[cv].length > 0) {
-          continue;
-        }
         output[cv].parent = thisModel;
         if (resp[cv] !== undefined) {
-          output[cv].add(resp[cv], {parse: true});
+          output[cv].add(resp[cv], {parse: true, merge: true});
         }
       }
       return output;

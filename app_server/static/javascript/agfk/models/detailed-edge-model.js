@@ -5,9 +5,9 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
       var enDef = {
         source: null,
         target: null,
-        // TODO FIXME consider moving these to non-saved attributes
         source_goals: new GoalCollection(),
         target_goals: new GoalCollection(),
+        // TODO FIXME consider moving these to non-saved attributes
         middlePts: [],
         isContracted: false,
         isTransitive: false
@@ -26,6 +26,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
 
       var thisModel = this;
 
+      // source goals
       // TODO DRY source_goals and target_goals
       if (resp.hasOwnProperty("source_goals")) {
         if (! (resp.source_goals instanceof GoalCollection)) {
@@ -34,15 +35,32 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
             var sgarr = sguri.split("/");
             return sgarr[sgarr.length-2];
           });
-          resp.source_goals = resp.source.get("goals").filter(function (sgoal) {
-            return sgids.indexOf(sgoal.id) != -1;
+
+          var sourceGoals = resp.source.get("goals"),
+              presentSGIds = {};
+          resp.source_goals = sourceGoals.filter(function (sgoal) {
+            if (sgids.indexOf(sgoal.id) != -1) {
+              presentSGIds[sgoal.id] = 1;
+              return true;
+            }
+            return false;
           });
+
+          // create new goals for goal ids that do not exists and add them to the source_goals
+          _.each(sgids, function (sid) {
+            if (!presentSGIds[sid]) {
+              sourceGoals.add({id: sid, concept: resp.source});
+              resp.source_goals.push(sourceGoals.get(sid));
+            }
+          });
+
         }
       } else {
         // add all goals from source unless the goals are specified
         resp.source_goals = resp.source.get("goals").models;
       }
 
+      // target goals
       if (resp.hasOwnProperty("target_goals")) {
         if (!(resp.target_goals instanceof GoalCollection)) {
           // assume we're dealing with an array of goal uris
@@ -51,12 +69,27 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
             return tgarr[tgarr.length-2];
           });
 
-          resp.target_goals = resp.target.get("goals").filter(function (tgoal) {
-            return tgids.indexOf(tgoal.id) != -1;
+          var targetGoals = resp.target.get("goals"),
+              presentTGIds = {};
+          resp.target_goals = targetGoals.filter(function (tgoal) {
+            if (tgids.indexOf(tgoal.id) > -1) {
+              presentTGIds[tgoal.id] = 1;
+              return true;
+            }
+            return false;
           });
+
+          // create new goals for goal ids that do not exists and add them to the target_goals
+          _.each(tgids, function (tid) {
+            if (!presentTGIds[tid]) {
+              targetGoals.add({id: tid, concept: resp.target});
+              resp.target_goals.push(targetGoals.get(tid));
+            }
+          });
+
         }
       } else {
-        // add all goals from target unless the goals are specified
+        // add all goals from target when the goals are not specified
         resp.target_goals = resp.target.get("goals").models;
       }
 
@@ -78,7 +111,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
     },
 
     url: function () {
-        return window.APIBASE + "dependency/" + this.id + "/";
+      return window.APIBASE + "dependency/" + this.id + "/";
     },
 
     toJSON: function () {

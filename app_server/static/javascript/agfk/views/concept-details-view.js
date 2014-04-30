@@ -215,7 +215,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
             resourcesLocClass = "." + consts.resourcesLocClass;
 
         if (thisView.model.get("is_partial")) {
-          thisView.model.fetch({update: true, success: function (resp) {
+          thisView.model.fetch({remove:false,  success: function (resp) {
             thisView.model.set("is_partial", false);
             thisView.render();
           }});

@@ -526,17 +526,18 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
       case consts.DELETE_KEY:
         d3.event.preventDefault();
         if (selectedNode){
-          if (confirm("delete node: " + selectedNode.get("title") + "?\nNote: all associated data will be removed")){
+          if (confirm("remove node: " + selectedNode.get("title") + " from the graph?\nNote: all associated data will be removed")){
             thisView.model.removeNode(selectedNode);
             state.selectedNode = null;
             thisView.render();
           }
         } else if (selectedEdge){
-          if (confirm("delete edge: " + selectedEdge.get("source").get("title") + " -> " + selectedEdge.get("target").get("title") + "?\nNote: all associated data will be removed")){
-            thisView.model.removeEdge(selectedEdge);
-            state.selectedEdge = null;
-            thisView.render();
-          }
+          alert("deleting edges is currently not possible -- this functionality will be added soon");
+          // if (confirm("delete edge: " + selectedEdge.get("source").get("title") + " -> " + selectedEdge.get("target").get("title") + "?\nNote: all associated data will be removed")){
+          //   thisView.model.removeEdge(selectedEdge);
+          //   state.selectedEdge = null;
+          //   thisView.render();
+          // }
         }
         break;
       }

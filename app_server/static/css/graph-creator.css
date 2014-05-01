@@ -90,14 +90,7 @@ Input form
 /************
 Instructions
 ************/
-#create-instructions{
-    position: absolute;
-    bottom: 0;
-    top: auto;
-    right: 0;
-}
-
-.instructions{
+.instructions, #create-instructions{
     font-size: 0.8em;
     background: #fffef1;
     border: 1px solid #e5e2c8;
@@ -108,6 +101,13 @@ Instructions
     top: 8em;
     right: 0;
     z-index: 10;
+}
+
+#create-instructions{
+    position: absolute;
+    bottom: 0;
+    top: auto;
+    right: 0;
 }
 
 .instructions-icon{
@@ -124,10 +124,9 @@ Instructions
     display: block;
 }
 
-.instructions.expanded .instructions-icon{
+#create-instructions.expanded .instructions-icon{
     display: none;
 }
-
 .instructions-text{
     display: none;
     font-size: 1.1em;
@@ -150,7 +149,7 @@ Instructions
     display: block;
 }
 
-.instructions.expanded .instructions-text{
+#create-instructions.expanded .instructions-text{
     display: block;
 }
 

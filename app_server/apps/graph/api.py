@@ -444,6 +444,7 @@ class ConceptSegmentResource(CustomSaveHookResource):
     """
     API for concepts, aka nodes
     """
+    goals = fields.ToManyField(GoalResource, 'goals', full=True, related_name="concept")
 
     def dehydrate(self, bundle):
         bundle.data["is_partial"] = True
@@ -453,7 +454,7 @@ class ConceptSegmentResource(CustomSaveHookResource):
         """ ConceptSegmentResource Meta"""
         queryset = Concept.objects.all()
         authorization = ConceptAuthorization()
-        fields = ["title", "summary", "id", "tag", "learn_time"]
+        fields = ["title", "summary", "id", "tag", "learn_time", "goals"]
 
 
 class DependencyResource(CustomSaveHookResource):

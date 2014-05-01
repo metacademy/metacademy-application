@@ -99,7 +99,65 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
             thisModel.addEdge(dep);
           });
         }
+
         return thisModel.attributes;
+      },
+
+      /**
+       * traverse the graph and determine the visibility of the nodes based on the goal relationships
+       */
+      setVisStatusFromGoals: function () {
+        var thisModel = this;
+
+        // get the leaves
+        var toTraverse = thisModel.getNodes().filter(function (mdl) {
+          return mdl.get("outlinks").length  == 0;
+        });
+
+        var visitedIds = {};
+        var relevantGoals = {};
+        _.each(toTraverse, function (mdl) {
+          visitedIds[mdl.id] = 1;
+          // all leaf goals are relevant by default  TODO allow for users to specify
+          mdl.get("goals").each(function (goal) {
+            relevantGoals[goal.id] = 1;
+          });
+        });
+
+        // BFS
+        while (toTraverse.length) {
+          var node = toTraverse.shift(),
+              hasGoals = node.get("goals").length > 0;
+          node.get("dependencies").each(function(dep) {
+            /* if any of the dep's target goals are in the relevantGoals
+            // add the source goals to the relgoals list and add the node
+             if it's not already present */
+            var isRelDep = !hasGoals || dep.get("target_goals").some(function (tg) {
+              return relevantGoals.hasOwnProperty(tg.id);
+            });
+
+            if (isRelDep) {
+              dep.get("source_goals").each(function (sg) {
+                relevantGoals[sg.id] = 1;
+              });
+              var src = dep.get("source");
+              if (!visitedIds.hasOwnProperty(src.id)) {
+                toTraverse.push(src);
+                visitedIds[src.id] = 1;
+              }
+            }
+          });
+        }
+
+        // set the vis status of all nodes not visited
+        thisModel.getNodes().each(function (node) {
+          if (!visitedIds.hasOwnProperty(node.id)) {
+            node.set("notGoalRelevant", true);
+          }
+        });
+
+        // TODO set a flag on all goals not in the goal list or store globally on aux?
+        window.agfkGlobals.auxModel.relevantGoals = relevantGoals;
       },
 
       toJSON: function () {
@@ -133,6 +191,7 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
           thisModel.listenTo(aux, aux.getConsts().learnedTrigger, thisModel.changeILNodes);
         }
         thisModel.changeILNodes();
+        thisModel.setVisStatusFromGoals();
       },
 
       changeILNodes: function () {

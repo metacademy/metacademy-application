@@ -7,7 +7,9 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
     pvt.consts = _.extend(ConceptListView.prototype.getConstsClone(),
       {
         elNameAppend: "-button",
-        elNavButtonClass: "el-nav-button"
+        elNavButtonClass: "el-nav-button",
+        timeEstClass: "time-estimate",
+        itemIdPrefix: "node-title-view-"
       });
 
     return ConceptListView.extend({
@@ -31,6 +33,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
         var thisView = this;
         thisView.$el.find("#" + pvt.consts.olId).append(thisView.$list);
         thisView.updateTimeEstimate();
+        thisView.hideNoDisplayItems();
       },
 
       /**
@@ -45,7 +48,6 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
         thisView.listenTo(window.agfkGlobals.auxModel,
                           gConsts.learnedTrigger, thisView.updateTimeEstimate);
         // initialization
-        // thisView.listenTo(thisView.model, "sync", thisView.updateTimeEstimate);
         if (inp !== undefined) {
           thisView.appRouter = inp.appRouter;
         }
@@ -91,10 +93,28 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
       },
 
       /**
+       * Removes the concept items that are hidden in the graph
+       * TODO refactor this function
+       */
+      hideNoDisplayItems: function () {
+        var aux = window.agfkGlobals.auxModel,
+            thisView = this,
+            itemIdPrefix = pvt.consts.itemIdPrefix;
+        // FIXME refactor this conditional with explore graph view
+        thisView.model.getNodes().each(function (node) {
+          if (node.get("isContracted")
+              || node.get("notGoalRelevant")
+              || ( node.isLearnedOrImplicitLearned()
+                   &&  !thisView.model.get("options").get("showLearnedConcepts"))) {
+            thisView.$el.find("#" + itemIdPrefix + node.id).hide();
+          }
+        });
+      },
+
+      /**
        * Update the learning time estimate display
        */
       updateTimeEstimate: function(){
-        // FIXME extract agfk out
         var thisView = this,
             nodes = thisView.model.getNodes(),
             timeEstimate,
@@ -109,7 +129,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/agfk-concept-list-item",
         } else {
           timeStr = "---";
         }
-        thisView.$el.find(".time-estimate").html(timeStr); // TODO move hardcoding
+        thisView.$el.find("." + pvt.consts.timeEstClass).html(timeStr); // TODO move hardcoding
       }
     });
   })();

@@ -279,7 +279,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                // set the document title as the key concept
                if (!isCreating){
-                 document.title = fnode.get("title") + "- Metacademy"; // graphModel.getNode(graphModel.get("leafs")[0]).get("title") + " - Metacademy";
+                 document.title = fnode.get("title") + " - Metacademy";
                } else {
                  document.title = "Graph Creation - Metacademy";
                }

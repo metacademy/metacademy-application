@@ -1,6 +1,7 @@
 
 /*global define*/
 define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], function(Backbone, _, NodeCollection){
+
   /**
    * AuxModel: model to store all auxiliary information used throughout metacademy
    * All data associated with the aux model should be read only
@@ -115,7 +116,7 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
         var toTraverse = [leaf],
             traversedIds = [leaf.id];
 
-        // DFS
+        // DFS FIXME -- this is BFS --CJR
         while (toTraverse.length) {
           var node = toTraverse.shift();
           node.get("dependencies").each(function(dep) {

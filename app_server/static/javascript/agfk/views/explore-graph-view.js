@@ -32,6 +32,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       summaryRightClass: "tright",
       dataConceptTagProp: "data-concept",
       infoBoxId: "explore-info-box",
+      textboxClass: "textbox",
       // message to display in explore view when no summary is present
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --",
       // ----- rendering options ----- //
@@ -226,7 +227,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         if (!thisView.$infoTextBox) {
           var $infoTextBoxEl = $(document.createElement("div"));
           $infoTextBoxEl.attr("id", consts.infoBoxId);
-          var $infoTextBox = $(document.createElement("div")).addClass("textbox");
+          var $infoTextBox = $(document.createElement("div")).addClass(consts.textboxClass);
           $infoTextBoxEl.append($infoTextBox);
           var $button = $(document.createElement("button"));
           $button.text("show all");
@@ -407,11 +408,10 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       isNodeVisible: function(node){
         var aux = window.agfkGlobals.auxModel,
              thisView = this;
-        // FIXME once db migration is complete
-
         return !node.get("isContracted")
+           && !node.get("notGoalRelevant")
            && ( !node.isLearnedOrImplicitLearned()
-           ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
+           ||  thisView.model.get("options").get("showLearnedConcepts"));
       }
     }); // end Backbone.View.extend({
   })();

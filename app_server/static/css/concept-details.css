@@ -261,6 +261,10 @@ h1 .learn-view-star{
     padding-right: 5px;
 }
 
+.notrel-goal {
+    color: rgb(197, 197, 197);
+}
+
 .key-resource-star{
     font-size: 0.8em;
     display: inline-block;

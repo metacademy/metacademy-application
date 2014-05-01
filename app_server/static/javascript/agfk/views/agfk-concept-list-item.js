@@ -89,6 +89,5 @@ define(["backbone", "underscore", "lib/kmapjs/views/concept-list-item"], functio
           nodeId = this.model.id;
       state === "learn" ? aux.toggleLearnedStatus(nodeId) : aux.toggleStarredStatus(nodeId);
     }
-
   });
 });

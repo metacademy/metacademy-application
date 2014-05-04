@@ -5,6 +5,7 @@ import ast
 
 import reversion
 from tastypie import fields
+from tastypie import http
 from tastypie.resources import NamespacedModelResource
 from tastypie.authorization import DjangoAuthorization
 from tastypie.exceptions import Unauthorized, ImmediateHttpResponse
@@ -18,6 +19,13 @@ from apps.user_management.models import Profile
 
 # global TODOs
 # hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
+
+
+class CreatesCycleException(Exception):
+    """
+    thrown when added edge creates a cycle
+    """
+    pass
 
 
 def get_api_object(ObjRes, request, oid, id_field="id", serialize=True):
@@ -132,8 +140,10 @@ class CustomSaveHookResource(BaseResource):
             self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
         else:
             self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
-
-        bundle = self.pre_save_hook(bundle)
+        try:
+            bundle = self.pre_save_hook(bundle)
+        except CreatesCycleException:
+            raise ImmediateHttpResponse(response=http.HttpForbidden())
 
         # Save FKs just in case.
         self.save_related(bundle)
@@ -477,16 +487,16 @@ class DependencyResource(CustomSaveHookResource):
         # allow patch so we can update many deps at once
         list_allowed_methods = ('get', 'post', 'patch')
 
-    # def dehydrate(self, bundle):
-    #     bundle.data["source_title"] = bundle.obj.source.title
-    #     bundle.data["target_title"] = bundle.obj.target.title
-    #     return bundle
-
     def pre_save_hook(self, bundle, **kwargs):
         """
         updates target graphs when creating new dependencies
         """
         self.isnew = not Dependency.objects.filter(id=bundle.obj.id).exists()
+        # check for cycles
+        tarid = bundle.obj.target.id
+        for tg in bundle.obj.source.target_graphs.all():
+            if tg.concepts.all().filter(id=tarid).exists():
+                raise CreatesCycleException("Edge creates a cycle")
         return bundle
 
     def post_save_hook(self, bundle, **kwargs):

@@ -12,6 +12,7 @@ import test_data
 from test_data.data import three_node_graph
 
 # TODO are we checking the global resources?
+# TODO add cycle checking auth test
 
 # TODO  patch to lists is now allowed -- test
 
@@ -535,5 +536,3 @@ def load_tests(loader, suite, pattern):
                 suite.addTest(DependencyResourceAuthTest(verb, vtype, 'super', False))
 
     return suite
-
-# FAIL: DependencyResourceAuthTest(verb=patch, vtype=list, user_type=super, dependency_exists=False)

@@ -61,7 +61,12 @@ class Command(BaseCommand):
         # parse the dependencies after the concepts
         all_deps = []
         for concept_skeleton in graph_data["nodes"]:
-            concept = get_concept_data(concept_skeleton["tag"])
+            tagval = concept_skeleton["tag"]
+            if Concept.objects.filter(tag=tagval).exists():
+                # don't add existing concepts
+                continue
+
+            concept = get_concept_data(tagval)
             api_con = {}
 
             # create goal objects

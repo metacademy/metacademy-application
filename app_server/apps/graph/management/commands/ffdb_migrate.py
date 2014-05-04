@@ -46,6 +46,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         graph_data = get_full_graph_data()
+
         tag_to_concept_dict = get_tag_to_concept_dict()
 
             # questions : transfer to goals

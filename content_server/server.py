@@ -6,7 +6,6 @@ from string import split
 
 import cStringIO
 import flask
-from flask.ext.cache import Cache
 
 import config
 import database
@@ -15,7 +14,6 @@ import graphs
 import search
 
 app = flask.Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': os.path.join(config.TOP_DB_PATH, "content_server_cache")}) # TODO move hard coded path
 
 """The API for this server responds to the following requests:
 
@@ -117,7 +115,6 @@ def make_response(text, fmt):
     resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,Content-Type'
     return resp
 
-@cache.memoize(timeout=36000)
 def get_dep_graph_text(tags):
     """
     a cacheable helper function for the building a dependency graph
@@ -189,7 +186,6 @@ def do_search():
     return _perform_search(args['q'])
 
 
-@cache.memoize(timeout=36000)
 def _perform_search(q):
     load_graph()
     tags = search.answer_query(q)
@@ -202,7 +198,6 @@ def _perform_search(q):
     # TODO: for security reasons, make the response an object rather than an array
     return make_response(text, 'json')
 
-@cache.cached(timeout=36000)
 @app.route('/full_graph')
 def do_full_graph():
     load_graph()

@@ -450,6 +450,28 @@ label.itm-label + label.itm-label {
     margin-top: 1em;
 }
 
+/**
+ * Resource location
+ */
+#add-location-button {
+    position: relative;
+    top: 0;
+}
+
+.resource-location {
+    border: 1px solid #666666;
+    border-radius: 3px;
+    padding-left: 1em;
+    padding-right: 1.5em;
+    padding-bottom: 1em;
+    margin-top: 1em;
+}
+
+.resource-location-wrapper input[type="text"],
+.resource-location-wrapper textarea {
+    width: 100%;
+}
+
 .ec-button{
     position: absolute;
     bottom: 0.2em;

@@ -28,6 +28,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         oevts["blur .array-text-field"] = "changeArrayTextField";
         oevts["change ." + consts.crfClass] = "changeCoreRadioField";
         oevts["change ." + consts.rgcClass + " input"] = "changeCoveredGoal";
+        oevts["click #add-location-button"] = "addResourceLocation";
         return oevts;
       },
 
@@ -83,8 +84,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
             console.error("unable to verify new resource location id -- TODO inform user -- msg: "
                           + resp.responseText);
           });
-
-        // TODO fixme should add a new location element to the dom and rerender
+          thisView.render();
       },
 
       /**

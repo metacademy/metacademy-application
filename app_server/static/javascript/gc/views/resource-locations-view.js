@@ -10,7 +10,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "agfk/m
 
     var ResourceLocationView = BaseEditorView.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
-
+      className: "resource-location",
       /**
        * render the view and return the view element
        */

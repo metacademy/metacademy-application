@@ -3,7 +3,7 @@
 
 /*global define*/
 if (typeof window.define === "undefined"){
-  var genutil = genFun($);
+  var genutil = genFun(window.$);
   genutil.prep();
 }
 else{
@@ -14,6 +14,7 @@ else{
 
 function genFun($){
   "use strict";
+
   return {
     prep: function(){
       /**
@@ -67,9 +68,10 @@ function genFun($){
       });
     },
 
-    Autocomplete: function (userOpts, selectCallback, clickCallBack) {
-
+    Autocomplete: function (userOpts, obtainGETData, inputCallback, selectCallback) {
+      // user can override with userOpts
       var defaultOptions = {
+        acUrl: "/autocomplete",
         numResults: 5,
         containerEl: document.querySelector('.search-container'),
         searchButtonEl: document.querySelector('.search-button'),
@@ -86,59 +88,96 @@ function genFun($){
 
       var doc = document,
           resultNodes = options.containerEl.getElementsByTagName('LI'),
-          //cache = {},
           data = [],
-          inputEl = options.containerEl.getElementsByTagName("input")[0],
-          handlers = {
-            // TODO need to generalize these handlers
-            'enter': function(e) {
-              if (e.target.tagName === 'A') {
-                var val = e.target.firstChild.nodeValue;
-                inputEl.value = "";
-                insert();
-                selectCallback(val, e);
-              }
-            },
-            'up': function(e) {
-              e.preventDefault();
-              if (+e.target.parentNode.value === 1) {
-                options.containerEl.querySelector('INPUT').focus();
-              } else if (+e.target.parentNode.value > 1) {
-                e.target.parentNode.previousElementSibling.firstElementChild.focus();
-              }
-            },
-            'down': function(e) {
-              e.preventDefault();
-              if (e.target.tagName === 'INPUT') {
-                options.containerEl.querySelector('A').focus();
-              } else if (+e.target.parentNode.value < options.numResults) {
-                e.target.parentNode.nextElementSibling.firstElementChild.focus();
-              }
-            },
-            'input': function(e) {
-              // FIXME
-              // var val = e.target.value.trim().replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-              // return val ? insert(cacheFn(val, check)) : insert();
-            },
-            'button': function(e) {
-              var val = options.containerEl.querySelector('INPUT').value;
-            },
-            containerClick: function (e) {
-                // TODO DRY with enter press
-                if (e.target.tagName === 'A') {
-                  e.preventDefault();
-                  var val = e.target.firstChild.nodeValue;
-                  inputEl.value = "";
-                  insert();
-                  selectCallback(val, e);
-                }
+          inputEl = options.containerEl.getElementsByTagName("input")[0];
+
+      // ajax helper
+      var nextACText,
+          acWait = false,
+          acCache = {};
+      var _acAjax = function (intext, acURL, acGETData, acCallback) {
+        if (acCache.hasOwnProperty(intext)) {
+          acWait = false;
+          nextACText = null;
+          acCallback(acCache[intext], intext);
+          return;
+        }
+        $.getJSON(acURL, acGETData, function (rdata) {
+          acCache[intext] = rdata;
+          acCallback(rdata, intext);
+        })
+          .always(function (res) {
+            if (nextACText) {
+              var nextText = nextACText;
+              nextACText = null;
+              _acAjax(nextText);
+            } else {
+              acWait = false;
             }
-          };
+          });
+      };
+
+      var setData = function (inData) {
+        data = inData;
+        insert(inData);
+      };
+
+      var handlers = {
+        'enter': function(e) {
+          if (e.target.tagName === 'A') {
+            var val = e.target.firstChild.nodeValue;
+            inputEl.value = "";
+            insert();
+            selectCallback(val, e);
+          }
+        },
+        'up': function(e) {
+          e.preventDefault();
+          if (+e.target.parentNode.value === 1) {
+            options.containerEl.querySelector('INPUT').focus();
+          } else if (+e.target.parentNode.value > 1) {
+            e.target.parentNode.previousElementSibling.firstElementChild.focus();
+          }
+        },
+        'down': function(e) {
+          e.preventDefault();
+          if (e.target.tagName === 'INPUT') {
+            options.containerEl.querySelector('A').focus();
+          } else if (+e.target.parentNode.value < options.numResults) {
+            e.target.parentNode.nextElementSibling.firstElementChild.focus();
+          }
+        },
+        'input': function(e) {
+          var val = e.target.value.trim().replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+          if (val) {
+            // only send one autocomplete ajax request at a time
+            if (!acWait) {
+              acWait = true;
+              _acAjax(val, options.acUrl, obtainGETData(val), setData);
+            } else {
+              nextACText = val;
+            }
+          }
+          return inputCallback ? inputCallback(val, e, this) : val;
+        },
+        'button': function(e) {
+          var val = options.containerEl.querySelector('INPUT').value;
+        },
+        containerClick: function (e) {
+          // TODO DRY with enter press
+          if (e.target.tagName === 'A') {
+            e.preventDefault();
+            var val = e.target.firstChild.nodeValue;
+            inputEl.value = "";
+            insert();
+            selectCallback(val, e);
+          }
+        }
+      };
 
       // ******************
       // Internal FUNCTIONS
       // ******************
-
       // from http://css-tricks.com/snippets/javascript/addclass-function/
       var addClass = function(_element, _classes) {
         var classList, item, _i, _len;
@@ -177,11 +216,6 @@ function genFun($){
         }
       };
 
-      var cacheFn = function (q, fn) {
-      // TODO rework the cache
-        return fn(q); // cache[q] ? cache[q] : cache[q] = fn(q), cache[q];
-      };
-
       var check = function (q) {
         var rxFn = function(s) {
           return '\\b(' + s + ')(.*)';
@@ -208,7 +242,6 @@ function genFun($){
           if (d && d.length > i) {
             resultNodes[i].className = options.classes.liClass;
             resultNodes[i].firstChild.firstChild.nodeValue = d[i].title;
-            // resultNodes[i].firstChild.href = "#" + encodeURIComponent(d[i].tag);
           } else {
             ict += 1;
             resultNodes[i].className = options.classes.hiddenClass;
@@ -251,10 +284,7 @@ function genFun($){
       // ******************
       // Public Functions
       // ******************
-      this.setData = function (inData) {
-        data = inData;
-        insert(inData);
-      };
+      this.setData = setData;
       return this;
     }
   };

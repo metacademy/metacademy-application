@@ -87,7 +87,10 @@ define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone
         };
 
         // set up the autocomplete
-        thisView.autoComplete = new GenUtils.Autocomplete(acOpts, thisView.loadTitle);
+        var obtainGETData = function (val) {
+            return {onlyConcepts: true,  ac: val};
+        };
+        thisView.autoComplete = new GenUtils.Autocomplete(acOpts, obtainGETData, null,  thisView.loadTitle);
         pvt.viewRendered = true;
         return thisView;
       },
@@ -194,30 +197,6 @@ define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone
         if (keyCode === 13) {
           // return key code
           thisView.loadTitle(inpText, evt);
-        }  else {
-          // only send one autocomplete ajax request at a time
-          // TODO move this to utils
-          var acAjax = function (intext) {
-            // TODO remove hardcoded URL
-            $.getJSON("/autocomplete", {ac: intext, onlyConcepts: true}, function (robj) {
-              thisView.autoComplete.setData(robj);
-            })
-              .always(function (res) {
-                if (thisView.nextACText) {
-                  var nextText = thisView.nextACText;
-                  thisView.nextACText = null;
-                  acAjax(nextText);
-                } else {
-                  thisView.acWait = false;
-                }
-              });
-          };
-          if (!thisView.acWait) {
-            thisView.acWait = true;
-            acAjax(inpText);
-          } else {
-            thisView.nextACText = inpText;
-          }
         }
       }
     });

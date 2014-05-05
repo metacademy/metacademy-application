@@ -21,7 +21,9 @@
   <div class="sres-search-wrapper">
     <a href="/"> <img id="sres-search-logo" class="mlogo" alt="Metacademy logo" src="{% static "images/banner2-meta.png" %}" /> </a>
     <div class="search-els">
+      <div class="db-search-wrap">
       <input type="text" class="searchbox" id="sres-search-input" placeholder="search" value="{{search_query}}" autocomplete="off" autocapitalize="off" tabindex="1" spellcheck="off">
+    </div>
     </div>
   </div>
 
@@ -68,11 +70,11 @@
           We did not find any relevant results (is your spelling correct?).
         </p>
         <p>
-          Perhaps check out our <a href="/list" class="internal-link">full list of concepts</a> to see if you can find what you're looking for.
+          Consider checking our <a href="/list" class="internal-link">full list of concepts</a> to see if you can find what you're looking for.
         </p>
-      </div>
-      <div class="sidenote">
-        (note: we're a young project and currently focus on machine learning and statistics)  <!-- TODO add "contribute content" link here -->
+        <p>
+          Try using a: <a class="external-link" href="https://www.google.com/#q=site:metacademy.org+{{url_search_query|safe}}">Google search for "{{search_query}}"</a> on Metacademy.
+        </p>
       </div>
       {% endif %}
 

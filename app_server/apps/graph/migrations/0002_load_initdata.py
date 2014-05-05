@@ -13,7 +13,22 @@ class Migration(DataMigration):
         from django.core.management import call_command
 
         if not TESTING:
-            call_command("loaddata", "graph_fixture.json")
+            load = True
+            while True:
+                ans = raw_input("Do you want to populate the db with metacademy data [y/n] (default=y)?\n")
+                if not ans:
+                    break
+                if ans not in ['y', 'Y', 'n', 'N']:
+                    print 'please enter y or n.'
+                    continue
+                if ans == 'y' or ans == 'Y':
+                    break
+                if ans == 'n' or ans == 'N':
+                    load = False
+                    break
+            if load:
+                print "loading graph data "
+                call_command("loaddata", "graph_fixture.json")
 
     def backwards(self, orm):
         "Write your backwards methods here."

@@ -37,7 +37,8 @@ class Command(BaseCommand):
                 c1 = parent.dep_target.all()[random.randint(0, ndep - 1)].source
                 c2 = parent.dep_target.all()[random.randint(0, ndep - 1)].source
                 tcat = c1.title + c2.title
-                do_write = not (added.get(tcat) or c1.tgraph_leaf.concepts.filter(id=c2.id).exists() or c2.tgraph_leaf.concepts.filter(id=c1.id).exists())
+                do_write = not (added.get(tcat) or c1.tgraph_leaf.concepts.filter(id=c2.id).exists()
+                                or c2.tgraph_leaf.concepts.filter(id=c1.id).exists())
                 if do_write:
                     added[tcat] = True
                     nout.write("(" + c1.title + ", " + c2.title + ")\n")

@@ -522,14 +522,15 @@ class DependencyResource(CustomSaveHookResource):
             add_concepts = os_tgraph.concepts.all()
             ot_tgraph, created = TargetGraph.objects.get_or_create(leaf=otarget)
             if created:
-                os_tgraph.concepts.add(otarget)
+                ot_tgraph.concepts.add(otarget)
+            ot_tgraph.depth = max(os_tgraph.depth + 1, ot_tgraph.depth)
             otarget.tgraph_leaf.concepts.add(*add_concepts)
             otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())
             otarget.tgraph_leaf.dependencies.add(bundle.obj)
             add_dependencies = otarget.tgraph_leaf.dependencies.all()
             concepts_traversed = {}
 
-            # DFS to add concept/deps to target graph
+            # DFS to add concept/deps to the tgraph of concepts that have the target concept as a preq
             while len(concepts_to_traverse):
                 cur_con = concepts_to_traverse.pop(0)
                 if cur_con.id in concepts_traversed:

@@ -212,5 +212,6 @@ class TargetGraph(Model, LoggedInEditable):
     Model that contains target graph concept and dependency references
     """
     leaf = OneToOneField(Concept, primary_key=True, related_name="tgraph_leaf")
+    depth = IntegerField(default=0)
     concepts = ManyToManyField(Concept, related_name="target_graphs")
     dependencies = ManyToManyField(Dependency, related_name="targetgraph_dependencies")

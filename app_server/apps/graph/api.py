@@ -522,7 +522,7 @@ class DependencyResource(CustomSaveHookResource):
             add_concepts = os_tgraph.concepts.all()
             ot_tgraph, created = TargetGraph.objects.get_or_create(leaf=otarget)
             if created:
-                os_tgraph.concepts.add(otarget)
+                ot_tgraph.concepts.add(otarget)
             otarget.tgraph_leaf.concepts.add(*add_concepts)
             otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())
             otarget.tgraph_leaf.dependencies.add(bundle.obj)

@@ -1,5 +1,5 @@
 /*global define*/
-define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone, ErrorHandler, GenUtils){
+define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], function(_, $, Backbone, ErrorHandler, GenUtils){
   "use strict";
 
   /**
@@ -37,6 +37,7 @@ define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone
         var thisView = this;
         thisView.setElement("#" + pvt.consts.viewId);
         thisView.appRouter = inp.appRouter;
+        _.bindAll(thisView, "loadTitle");
       },
 
       /**
@@ -58,33 +59,6 @@ define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone
 
         // load a concept by its title from an ajax request
         // TODO find a better place for this function
-        thisView.loadTitle = function(inpText, evt) {
-          $.getJSON("/graphs/concept-triplet", {title: inpText})
-            .done(function (robj) {
-              if (robj && robj.id) {
-                console.log( "fetched id for: " + inpText );
-                var fetchNodeId = robj.id;
-                // TODO hardcoded URL
-                $.getJSON(window.APIBASE + "fulltargetgraph/" + fetchNodeId + "/", {"full": "true"}, function (res, rtype, jqxhr) {
-                    // need to contract
-                    thisModel.set(thisModel.parse(res, jqxhr));
-                    var fetchNode = thisModel.getNode(fetchNodeId);
-                    fetchNode.set("x", 200 + Math.random()*100);
-                    fetchNode.set("y", 200 + Math.random()*100); // TODO figure out a better positioning system for the fetched node
-                    fetchNode.contractDeps();
-                    thisView.model.trigger("render");
-                    thisView.model.save(null, {parse: false});
-                    evt.target.value = "";
-                  }); // end success
-              } else {
-                evt.target.blur();
-                alert("unable to fetch: " + inpText);
-              }
-            })
-            .fail(function () {
-              console.log("unable to fetch: " + inpText);
-            });
-        };
 
         // set up the autocomplete
         var obtainGETData = function (val) {
@@ -101,6 +75,36 @@ define(["jquery", "backbone", "utils/errors", "gen-utils"], function($, Backbone
       close: function() {
         this.remove();
         this.unbind();
+      },
+
+      loadTitle: function(inpText, evt) {
+        var thisView = this,
+            thisModel = thisView.model;
+        $.getJSON("/graphs/concept-triplet", {title: inpText})
+          .done(function (robj) {
+            if (robj && robj.id) {
+              console.log( "fetched id for: " + inpText );
+              var fetchNodeId = robj.id;
+              // TODO hardcoded URL
+              $.getJSON(window.APIBASE + "fulltargetgraph/" + fetchNodeId + "/", {"full": "true"}, function (res, rtype, jqxhr) {
+                // need to contract
+                thisModel.set(thisModel.parse(res, jqxhr));
+                var fetchNode = thisModel.getNode(fetchNodeId);
+                fetchNode.set("x", 200 + Math.random()*100);
+                fetchNode.set("y", 200 + Math.random()*100); // TODO figure out a better positioning system for the fetched node
+                fetchNode.contractDeps();
+                thisView.model.trigger("render");
+                thisView.model.save(null, {parse: false});
+                evt.target.value = "";
+              }); // end success
+            } else {
+              evt.target.blur();
+              alert("unable to fetch: " + inpText);
+            }
+          })
+          .fail(function () {
+            console.log("unable to fetch: " + inpText);
+          });
       },
 
       uploadGraph: function(evt){

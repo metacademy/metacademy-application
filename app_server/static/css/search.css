@@ -128,6 +128,10 @@ h1{
     background: #A01F70;
 }
 
+.ac-list {
+    top: 41px;
+    margin-left: 11px;
+}
 
 @media only screen and (max-width: 769px){
     div.search-res-wrapper{
@@ -149,11 +153,19 @@ h1{
         margin:0;
         margin-left: -21px;
     }
+    .ac-list {
+        top: 23px;
+        margin-left: -21px;
+    }
 }
 
 @media only screen and (max-width: 400px){
     #sres-search-input{
         width: 280px;
+        margin-left: -11px;
+    }
+    .ac-list {
+        top: 23px;
         margin-left: -11px;
     }
 }

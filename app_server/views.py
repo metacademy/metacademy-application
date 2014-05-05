@@ -1,5 +1,6 @@
 import pdb
 import json
+import urllib
 
 from django.shortcuts import render
 from django.views.generic.edit import FormView
@@ -47,7 +48,8 @@ def autocomplete(request):
     acinp = request.GET.get("ac")
     if not acinp:
         return HttpResponse(status=501)
-    sqs = SearchQuerySet().autocomplete(title=acinp)
+    sqs = SearchQuerySet().autocomplete(title=acinp).filter(is_listed_in_main_str="True")
+    sqs.filter()
     if (request.GET.get("onlyConcepts")):
         sqs = sqs.models(Concept)
     sqs = sqs[:7]
@@ -71,7 +73,7 @@ class MultiSearchView(SearchView):
                 cct += 1
             else:
                 rmct += 1
-        return {"concept_count": cct, "roadmap_count": rmct, "search_query": self.query}
+        return {"concept_count": cct, "roadmap_count": rmct, "search_query": self.query, "url_search_query": urllib.quote(self.query)}
 
 
 class ContactView(FormView):

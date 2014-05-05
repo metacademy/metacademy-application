@@ -43,7 +43,7 @@ input{
     height: 1.8em;
 }
 
-.header-menu a{
+.header-menu a.header-a{
     color: #EFEFEF;
     font-size: 0.9em;
     text-decoration: none;
@@ -52,15 +52,15 @@ input{
     display: inline-block;
 }
 
-.header-menu a:hover{
+.header-menu a.header-a:hover{
     text-decoration: underline;
 }
 
-.header-menu  a.heleft{
+.header-menu  a.header-a.heleft{
     padding-right: 0.2em;
 }
 
-.header-menu  a.heright{
+.header-menu  a.header-a.heright{
     padding-left: 0.2em;
 }
 
@@ -189,7 +189,7 @@ a.expand-collapse-link:hover{
 
 .meta-home-link{
     margin-left: 0.2em;
-    padding: 0.5em 0 0.5em 110px;
+    padding: 0.3em 0 0.5em 110px;
     background-image: url('/static/images/metacademy-toolbar-icon1.png');
     background-repeat: no-repeat;
     background-position: left center;
@@ -201,6 +201,9 @@ a.home-nav{
     padding: 0;
 }
 
+#header-search-input {
+    height: 1.8em;
+}
 
 #header-search-input, user-form-field input{
     outline: none;
@@ -214,7 +217,7 @@ a.home-nav{
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
     box-sizing: border-box;
-    width: 15em;
+    width: 16em;
 }
 #header-search-input:focus, .user-form-field input:focus{
     border-color: #501644;
@@ -298,6 +301,12 @@ a.home-nav{
   box-sizing: border-box;
 }
 
+.db-search-wrap {
+    position: relative;
+    display: inline-block;
+    font-size: 0.9em;
+}
+
 .ac-list {
   padding: 0;
   margin: 0;
@@ -310,6 +319,10 @@ a.home-nav{
   background-color: #ffffff;
   z-index: 9;
 }
+
+.header-menu .ac-list {
+    top: 1.4em;
+}}
 
 .ac-hidden {
   display: none;
@@ -330,7 +343,7 @@ a.home-nav{
   color: #A01F70;
   text-decoration: none;
   margin: 0;
-  padding-top: 2em;
+  padding: 0.3em 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -350,14 +363,12 @@ a.home-nav{
 }
 
 
-
-
 /* -----------------------------------*/
 /* ---------->>> Media Rules  <<------*/
 /* -----------------------------------*/
 @media only screen and (max-width:999px){
     #header-search-input{
-        width: 10em;
+        width: 14em;
     }
     .header-title{
         min-width: 19em;

@@ -168,6 +168,7 @@ class Migration(SchemaMigration):
         # Adding model 'TargetGraph'
         db.create_table(u'graph_targetgraph', (
             ('leaf', self.gf('django.db.models.fields.related.OneToOneField')(related_name='tgraph_leaf', unique=True, primary_key=True, to=orm['graph.Concept'])),
+            ('depth', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal(u'graph', ['TargetGraph'])
 
@@ -373,6 +374,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'TargetGraph'},
             'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_graphs'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
             'dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'targetgraph_dependencies'", 'symmetrical': 'False', 'to': u"orm['graph.Dependency']"}),
+            'depth': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'leaf': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'tgraph_leaf'", 'unique': 'True', 'primary_key': 'True', 'to': u"orm['graph.Concept']"})
         },
         u'user_management.profile': {

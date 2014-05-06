@@ -494,9 +494,9 @@ class DependencyResource(CustomSaveHookResource):
         self.isnew = not Dependency.objects.filter(id=bundle.obj.id).exists()
         # check for cycles
         tarid = bundle.obj.target.id
-        for tg in bundle.obj.source.target_graphs.all():
-            if tg.concepts.all().filter(id=tarid).exists():
-                raise CreatesCycleException("Edge creates a cycle")
+        tg = bundle.obj.source.tgraph_leaf
+        if tg.concepts.all().filter(id=tarid).exists():
+            raise CreatesCycleException("Edge creates a cycle")
         return bundle
 
     def post_save_hook(self, bundle, **kwargs):

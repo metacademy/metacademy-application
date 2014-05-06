@@ -1,23 +1,15 @@
 import pdb
-import collections
-import numpy as np
 import re
-import random
 
 from django.core.management.base import BaseCommand
 
 try:
-    import scipy.optimize
-    import scipy.special
-except:
-    print "could not import optional scipy dependency -- updating time estimates may not work"
-try:
     import pandas as pd
 except:
     print "could not import optional pandas dependency -- updating time estimates may not work"
-    pass
 
 from apps.graph.models import Concept
+from aux.ctime import SimpleModel
 
 # obtained using Counter([rl.location_type for rl in ResourceLocation.objects.all()])
 # and then manually mapping
@@ -82,8 +74,8 @@ def parse_location(loc, retype):
             NUM_SEC_PGS = 3
             return NUM_SEC_PGS
     elif retype == "wpwords":
-        # TODO collect the number of words from the given website
-        return 500
+        # TODO collect the number of words from the given website and divide by some number
+        return 1
 
     #  TODO parse the time of online lectures
     return 1
@@ -94,9 +86,7 @@ def build_dataset():
     ldata = []
     for concept in Concept.objects.all():
         ctag = concept.tag
-        pdb.set_trace()
-
-        # dfs to get depth
+        cdepth = concept.tgraph_leaf.depth
 
         # TODO need to compute the depth!
         for cres in concept.concept_resource.all():
@@ -119,9 +109,9 @@ def build_dataset():
                     continue
                 cnts += parse_location(loc, loc_type)
             # TODO add depth
-            ldata.append([ctag, cres.id, random.randint(0, 5), prevloc_type, cnts])
+            ldata.append([ctag, cres.id, cdepth, prevloc_type, cnts])
     pdata = pd.DataFrame(ldata)
-    pdata.columns = ("ctag", "rid", "depth", "ltype", "count")
+    pdata.columns = ("ctag", "rid", "depth", "ltype", "cnt")
     return pdata
 
 
@@ -132,4 +122,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         pdata = build_dataset()
+        smodel = SimpleModel(pdata)
+        print smodel.llh()
+        smodel.gibbs_sampling(20)
+        import pprint
+        import operator
+        pprint.pprint(sorted(smodel.rel_complex.iteritems(), key=operator.itemgetter(1)))
+        pprint.pprint(smodel.lambdas0)
         pdb.set_trace()

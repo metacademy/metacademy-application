@@ -42,6 +42,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
 
         var assignObj = {};
         thisView.globalResourceView = thisView.globalResourceView || new GlobalResourceEditorView({model: thisView.model.get("global_resource")});
+        thisView.globalResourceView.conceptModel = thisView.model;
         thisView.resourceLocationsView = thisView.resourceLocationsView || new ResourceLocationsView({model: thisView.model.get("locations")});
 
         // make sure we have at least one resource location

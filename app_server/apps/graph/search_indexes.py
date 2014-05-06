@@ -1,7 +1,7 @@
 import os
 
 from haystack import indexes
-from models import Concept
+from models import Concept, GlobalResource
 
 
 class ConceptIndex(indexes.SearchIndex, indexes.Indexable):
@@ -13,6 +13,18 @@ class ConceptIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return Concept
+
+    def index_queryset(self, using=None):
+        """Used when the entire index for model is updated."""
+        return self.get_model().objects
+
+
+class GlobalResourceIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    title = indexes.EdgeNgramField(model_attr="title", boost=5.0)
+
+    def get_model(self):
+        return GlobalResource
 
     def index_queryset(self, using=None):
         """Used when the entire index for model is updated."""

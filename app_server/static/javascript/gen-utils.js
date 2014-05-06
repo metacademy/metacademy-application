@@ -20,7 +20,7 @@ function genFun($){
     // user can override with userOpts
     var defaultOptions = {
       acUrl: "/autocomplete",
-      numResults: 5,
+      numResults: 6,
       containerEl: document.querySelector('.search-container'),
       searchButtonEl: document.querySelector('.search-button'),
       classes: {
@@ -42,14 +42,30 @@ function genFun($){
     // ajax helper
     var nextACText,
         acWait = false,
+        nextACSetData = null,
+        nextACData = null,
+        nextACUrl = null,
         acCache = {};
-    var _acAjax = function (intext, acURL, acGETData, acCallback) {
+    var nullNextData = function () {
+      acWait = false;
+      nextACSetData = null;
+      nextACData = null;
+      nextACUrl = null;
+    };
+    var _acAjax = function _acAjax (intext, acURL, acGETData, acCallback) {
+      if (acWait) {
+        nextACText = intext;
+        nextACUrl = acURL;
+        nextACData = acGETData;
+        nextACSetData = acCallback;
+        return;
+      }
       if (acCache.hasOwnProperty(intext)) {
-        acWait = false;
-        nextACText = null;
+        nullNextData();
         acCallback(acCache[intext], intext);
         return;
       }
+      acWait = true;
       $.getJSON(acURL, acGETData, function (rdata) {
         acCache[intext] = rdata;
         acCallback(rdata, intext);
@@ -58,9 +74,10 @@ function genFun($){
           if (nextACText) {
             var nextText = nextACText;
             nextACText = null;
-            _acAjax(nextText);
-          } else {
             acWait = false;
+            _acAjax(nextText, nextACUrl, nextACData, nextACSetData);
+          } else {
+            nullNextData();
           }
         });
     };
@@ -100,12 +117,7 @@ function genFun($){
         var val = e.target.value.trim().replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
         if (val) {
           // only send one autocomplete ajax request at a time
-          if (!acWait) {
-            acWait = true;
             _acAjax(val, options.acUrl, obtainGETData(val), setData);
-          } else {
-            nextACText = val;
-          }
         } else {
           insert();
         }

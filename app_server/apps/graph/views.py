@@ -7,6 +7,7 @@ import os
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+from haystack.query import SearchQuerySet
 import reversion
 
 from apps.user_management.models import Profile
@@ -79,6 +80,19 @@ def get_concept_history(request, concept_tag=""):
     concept = Concept.objects.get(tag=concept_tag)
     revs = _get_versions_obj(concept)[::-1]
     return render(request, 'concept_history.html', {'concept': concept, "revs": revs})
+
+
+def get_autocomplete(request):
+    """
+    get autocomplete data (title + id) for data in the graph models
+    """
+    # TODO generalize to more models as needed
+    acinp = request.GET.get("ac")
+    if not acinp:
+        return HttpResponse(status=400)
+    sqs = SearchQuerySet().models(GlobalResource).autocomplete(title=acinp)[:10]
+    resp = [{"title": acres.title, "id": acres.id.split(".")[-1]} for acres in sqs if acres]
+    return HttpResponse(json.dumps(resp), "application/json")
 
 
 def get_concept_triplet(request):

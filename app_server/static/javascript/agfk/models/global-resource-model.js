@@ -27,7 +27,8 @@ define(["backbone"], function(Backbone){
     },
 
     getAuthorsString: function () {
-      return this.get("authors").join(" and ");
+      var auths = this.get("authors");
+      return auths ? auths.join(" and ") : "";
     }
   });
 });

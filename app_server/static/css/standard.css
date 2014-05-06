@@ -235,7 +235,7 @@ a.home-nav{
 }
 
 .dev-note{
-    margin-top: 2em;
+    margin-top: 1em;
     line-height: 1.2em;
     font-size: 0.9em;
     text-align: center;
@@ -322,7 +322,7 @@ a.home-nav{
 
 .header-menu .ac-list {
     top: 1.4em;
-}}
+}
 
 .ac-hidden {
   display: none;
@@ -404,7 +404,7 @@ a.home-nav{
     }
 
     div.dev-note{
-        margin-top: 3em;
+        margin-top: 1em;
     }
     .dev-note p{
         margin-top: 1em;

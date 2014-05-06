@@ -1,6 +1,8 @@
 <script type="text/template" id="global-resource-editor-template">
   <label>Title</label>
-  <input type="text"  class="gresource-title" name="title-<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
+  <div class="gresource-title-wrap">
+    <input type="text"  class="gresource-title" name="title-<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
+  </div>
 
   <label>Brief description</label>
   <textarea  class="text-field" name="description-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods"><%= description %></textarea>

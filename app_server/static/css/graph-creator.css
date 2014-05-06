@@ -10,7 +10,6 @@ p{
 }
 
 input{
-    border-radius: 5px;
     padding: 0.2em;
 }
 
@@ -403,6 +402,13 @@ g.connect-node circle{
     border-radius: 0 4px 4px 0;
 }
 
+.gresource-title-wrap {
+    position: relative;
+}
+
+.gresource-title-wrap .ac-list {
+    top: 25px;
+}
 
 .resource-form textarea {
     height: 5em;

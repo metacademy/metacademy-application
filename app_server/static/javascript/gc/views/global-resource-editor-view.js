@@ -1,13 +1,14 @@
 // FIXME TODO - must return errors to the user in an elegant way, both client side (here) and from the server
 
 /*global define*/
-define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], function(Backbone, _, $, BaseEditorView){
+define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-utils"], function(Backbone, _, $, BaseEditorView, GenUtils){
   return  (function(){
 
     var pvt = {};
     pvt.consts = {
       templateId: "global-resource-editor-template",
-      ecClass: "expanded"
+      ecClass: "expanded",
+      addGRTitleWrapClass: "gresource-title-wrap"
     };
 
     return BaseEditorView.extend({
@@ -21,6 +22,10 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
         return oevts;
       },
 
+      initialize: function () {
+          _.bindAll(this);
+      },
+
       /**
        * render the view and return the view element
        */
@@ -29,9 +34,34 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view"], functi
         thisView.isRendered = false;
 
         thisView.$el.html(thisView.template(thisView.model.attributes));
+        var acOpts = {
+          containerEl: thisView.$el.find("." + pvt.consts.addGRTitleWrapClass)[0],
+          acUrl: "/graphs/autocomplete"
+        };
+        var obtainGETData = function (val) {
+          return {ac: val, type: "globalresource"};
+        };
+
+        thisView.autocomplete = new GenUtils.Autocomplete(acOpts, obtainGETData, null, thisView.loadGResource);
 
         thisView.isRendered = true;
         return thisView;
+      },
+
+      /**
+       * Load a global resource into the model from an ajax request
+       */
+      loadGResource: function (inpText, evt) {
+        var thisView = this,
+            thisModel = thisView.model,
+            id = evt.target.getAttribute("data-id");
+        if (!id) {return;}
+        var prevId = thisModel.id;
+        thisModel.id = id;
+        thisModel.fetch({parse: true, success: function () {
+         thisView.conceptModel.save({"global_resource": thisModel.url()}, {parse: false, patch: true});
+         thisView.render();
+        }});
       },
 
       blurGlobalResourceTitle: function (evt) {

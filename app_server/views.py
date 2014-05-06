@@ -10,6 +10,7 @@ from haystack.views import SearchView
 from haystack.query import SearchQuerySet
 
 from apps.graph.models import Concept
+from apps.roadmaps.models import Roadmap
 from forms import ContactForm
 
 
@@ -44,16 +45,17 @@ def autocomplete(request):
     """
     """
     # only autocomplete on concepts?
-
     acinp = request.GET.get("ac")
     if not acinp:
         return HttpResponse(status=501)
-    sqs = SearchQuerySet().autocomplete(title=acinp).filter(is_listed_in_main_str="True")
-    sqs.filter()
+    sqs = SearchQuerySet()
     if (request.GET.get("onlyConcepts")):
         sqs = sqs.models(Concept)
-    sqs = sqs[:7]
-    resp = [{"tag": acres.tag, "title": acres.title, "id": sqs[:7][0].id.split(".")[-1]} for acres in sqs]
+    else:
+        sqs = sqs.models(Concept, Roadmap)
+        # concepts and roadmaps
+    sqs = sqs.autocomplete(title=acinp).filter(is_listed_in_main_str="True")[:7]
+    resp = [{"tag": acres.tag, "title": acres.title, "id": acres.id.split(".")[-1]} for acres in sqs]
 
     return HttpResponse(json.dumps(resp), "application/json")
 

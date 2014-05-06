@@ -4,7 +4,7 @@ from tastypie.api import NamespacedApi
 
 from apps.graph.api import ConceptResource, GraphResource, ConceptResourceResource, DependencyResource, GoalResource,\
     TargetGraphResource, FullTargetGraphResource, GlobalResourceResource, ResourceLocationResource
-from views import new_graph, check_id, check_tags, get_concept_dep_graph, edit_existing_graph, get_concept_history, get_concept_triplet
+from views import *
 
 # api v1
 v1_api = NamespacedApi(api_name='v1', urlconf_namespace='graphs')
@@ -24,6 +24,7 @@ v1_api.register(GoalResource())
 urlpatterns = patterns('',
                        url(r'^$', "django.views.defaults.page_not_found"),
                        url(r'^concept-triplet/?$', get_concept_triplet, name='concept_triplet'),
+                       url(r'^autocomplete/?$', get_autocomplete, name='autocomplete'),
                        url(r'^(?i)concepts/([^/]+)/history/?$', get_concept_history, name="concept-history"),
                        url(r'^(?i)concepts/([^/]+)/?$', get_concept_dep_graph, name="concepts"),
                        url(r'^(?i)concepts/$', "django.views.defaults.page_not_found", name="concepts-base"),

@@ -14,10 +14,14 @@ define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], functi
       expandButtonClass: "expanded",
       disabledClass: "disabled",
       viewId: "content-editing-tools",
-      addConceptInputId: "add-concept-input",
-      addConceptWrapId: "add-concept-container"
+      addConceptWrapClass: "add-concept-container"
     };
     pvt.isRendered = true; // view is prerendered
+
+    // set up the autocomplete
+    var obtainGETData = function (val) {
+      return {onlyConcepts: true,  ac: val};
+    };
 
     return Backbone.View.extend({
       appRouter: null,
@@ -54,16 +58,10 @@ define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], functi
         var thisView = this,
             thisModel = thisView.model,
             acOpts = {
-              containerEl: thisView.$el.find("." + pvt.consts.addConceptWrapId)[0]
+              containerEl: thisView.$el.find("." + pvt.consts.addConceptWrapClass)[0]
             };
 
         // load a concept by its title from an ajax request
-        // TODO find a better place for this function
-
-        // set up the autocomplete
-        var obtainGETData = function (val) {
-            return {onlyConcepts: true,  ac: val};
-        };
         thisView.autoComplete = new GenUtils.Autocomplete(acOpts, obtainGETData, null,  thisView.loadTitle);
         pvt.viewRendered = true;
         return thisView;
@@ -80,6 +78,7 @@ define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], functi
       loadTitle: function(inpText, evt) {
         var thisView = this,
             thisModel = thisView.model;
+        // TODO remove hard coded path if possible
         $.getJSON("/graphs/concept-triplet", {title: inpText})
           .done(function (robj) {
             if (robj && robj.id) {

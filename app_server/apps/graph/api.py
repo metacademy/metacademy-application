@@ -524,6 +524,7 @@ class DependencyResource(CustomSaveHookResource):
             if created:
                 ot_tgraph.concepts.add(otarget)
             ot_tgraph.depth = max(os_tgraph.depth + 1, ot_tgraph.depth)
+            ot_tgraph.save()
             otarget.tgraph_leaf.concepts.add(*add_concepts)
             otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())
             otarget.tgraph_leaf.dependencies.add(bundle.obj)

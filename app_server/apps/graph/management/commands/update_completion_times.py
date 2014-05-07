@@ -9,7 +9,6 @@ except:
     print "could not import optional pandas dependency -- updating time estimates may not work"
 
 from apps.graph.models import Concept
-from aux.ctime import SimpleModel
 
 # obtained using Counter([rl.location_type for rl in ResourceLocation.objects.all()])
 # and then manually mapping
@@ -122,11 +121,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         pdata = build_dataset()
-        smodel = SimpleModel(pdata)
-        print smodel.llh()
-        smodel.gibbs_sampling(20)
-        import pprint
-        import operator
-        pprint.pprint(sorted(smodel.rel_complex.iteritems(), key=operator.itemgetter(1)))
-        pprint.pprint(smodel.lambdas0)
-        pdb.set_trace()
+        pdata.to_csv("metacademy_data.csv")
+        print "wrote data"

@@ -523,8 +523,12 @@ class DependencyResource(CustomSaveHookResource):
             ot_tgraph, created = TargetGraph.objects.get_or_create(leaf=otarget)
             if created:
                 ot_tgraph.concepts.add(otarget)
-            ot_tgraph.depth = max(os_tgraph.depth + 1, ot_tgraph.depth)
-            ot_tgraph.save()
+            prev_depth = ot_tgraph.depth
+            ot_tgraph.depth = max(os_tgraph.depth + 1, prev_depth)
+            depth_inc = 0
+            if ot_tgraph.depth > prev_depth:
+                depth_inc = ot_tgraph.depth - prev_depth
+                ot_tgraph.save()
             otarget.tgraph_leaf.concepts.add(*add_concepts)
             otarget.tgraph_leaf.dependencies.add(*osource.tgraph_leaf.dependencies.all())
             otarget.tgraph_leaf.dependencies.add(bundle.obj)
@@ -539,6 +543,9 @@ class DependencyResource(CustomSaveHookResource):
                 concepts_traversed[cur_con.id] = True
                 # add all concepts
                 cur_con.tgraph_leaf.concepts.add(*add_concepts)
+                if depth_inc:
+                    cur_con.tgraph_leaf.depth
+                    cur_con.tgraph_leaf.save()
                 # add all deps
                 cur_con.tgraph_leaf.dependencies.add(*add_dependencies)
                 for ol in cur_con.dep_source.all():

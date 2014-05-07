@@ -138,7 +138,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
      # construction" message otherwise.
      */
     isFinished: function(){
-      return this.get("summary") && this.get("resources").length > 0;
+      return this.get("summary").length && this.get("resources").length > 0;
     },
 
     toJSON: function() {

@@ -114,6 +114,11 @@ class Command(BaseCommand):
                 # TODO FIXME we must unparse the note field
                 if "note" in res:
                     res_obj["notes"] = res.get("note")
+                if "extra" in res:
+                    if "notes" in res_obj:
+                        res_obj["notes"] += "\n" + "\n".join(res_obj["notes"])
+                    else:
+                        res_obj["notes"] = res.get("extra")
                 if "core" in res:
                     res_obj["core"] = res.get("core")
                 else:

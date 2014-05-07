@@ -15,7 +15,7 @@ class Migration(DataMigration):
         if not TESTING:
             load = True
             while True:
-                ans = raw_input("Do you want to populate the db with metacademy data [y/n] (default=y)?\n")
+                ans = raw_input("Populate the db with metacademy data [Y/n]? ")
                 if not ans:
                     break
                 if ans not in ['y', 'Y', 'n', 'N']:

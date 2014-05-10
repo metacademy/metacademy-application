@@ -1,6 +1,6 @@
 
 /*global define*/
-define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model", "gc/views/goal-editor-view"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel, GoalEditorView){
+define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model", "gc/views/goal-editor-view", "utils/utils"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel, GoalEditorView, Utils){
 
   return (function(){
     var pvt = {};
@@ -22,8 +22,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
     pvt.failFun = function failFun (resp){
           // failure
-          console.error("unable to verify new resource id -- TODO inform user -- msg: "
-                        + resp.responseText);
+      Utils.errorNotify("unable to verify sync learning resource with the server -- " + resp.responseText);
         };
 
     return Backbone.View.extend({
@@ -127,10 +126,13 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // add goal to goal list
         thisView.model.get("goals").add(newGoal, {at: 0});
 
-        newGoal.save(null, {parse: false, success: function () {
+        newGoal.save(null, {parse: false, error: thisView.attrErrorHandler, success: function () {
           // FIXME this is an awkward way to update the deps and ols
-          deps.save(null, {parse: false});
-          ols.save(null, {parse: false});
+          deps.save(null, {parse: false, error: thisView.attrErrorHandler});
+          ols.save(null, {parse: false, error: thisView.attrErrorHandler});
+        },
+        error: function () {
+         Utils.errorNotify("unable to save goal");
         }});
 
         // TODO we need to update all of the source/targets, hmmm
@@ -165,7 +167,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         }
         var saveObj = {};
         saveObj[goalType] = dep.get(goalType);
-        dep.save(saveObj, {patch: true, parse: false});
+        dep.save(saveObj, {patch: true, parse: false, error: thisView.attrErrorHandler});
       },
 
       addResource: function () {
@@ -180,7 +182,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         $.get(window.agfkGlobals.idcheckUrl, {id: rid, type: "resource" })
         .success(function (resp) {
             newRes.set("id", resp.id);
-            newRes.save(null, {parse: false});
+            newRes.save(null, {parse: false, error: thisView.attrErrorHandler});
         })
         .fail(pvt.failFun);
 
@@ -211,7 +213,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       blurTitleField: function(evt){
         var thisView = this;
         if (thisView.model.get("title") !== evt.currentTarget.value) {
-          thisView.model.save({"title": evt.currentTarget.value}, {parse: false, patch: true});
+          thisView.model.save({"title": evt.currentTarget.value}, {parse: false, error: thisView.attrErrorHandler, patch: true});
         }
       },
 
@@ -225,7 +227,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
             attr = evt.currentTarget.parentElement.id;
         saveObj[attr] = evt.currentTarget.value;
         if (thisView.model.get(attr) !== saveObj[attr]) {
-          thisView.model.save(saveObj, {parse: false, patch: true});
+          thisView.model.save(saveObj, {parse: false, error: thisView.attrErrorHandler, patch: true});
         }
       },
 
@@ -239,7 +241,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
             reason = curTarget.value,
             dep = thisView.model.get("dependencies").get(cid);
         if (reason !== dep.get("reason")) {
-          dep.save({"reason": reason}, {patch: true, parse: false});
+          dep.save({"reason": reason}, {patch: true, parse: false, error: thisView.attrErrorHandler});
         }
       },
 
@@ -257,9 +259,8 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
           $("#" + consts.historyId).append($(resp).find("." + consts.reversionsClass));
         })
         .fail(function () {
-            console.log("unable to load concept reversion history TODO inform user");
+            Utils.errorNotify("unable to load concept reversion history");
         });
-
       },
 
       // TODO create standalone views for the preqs

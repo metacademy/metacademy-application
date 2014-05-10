@@ -544,7 +544,7 @@ class DependencyResource(CustomSaveHookResource):
                 # add all concepts
                 cur_con.tgraph_leaf.concepts.add(*add_concepts)
                 if depth_inc:
-                    cur_con.tgraph_leaf.depth
+                    cur_con.tgraph_leaf.depth += depth_inc
                     cur_con.tgraph_leaf.save()
                 # add all deps
                 cur_con.tgraph_leaf.dependencies.add(*add_dependencies)

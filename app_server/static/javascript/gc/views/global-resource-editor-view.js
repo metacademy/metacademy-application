@@ -59,8 +59,17 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
         var prevId = thisModel.id;
         thisModel.id = id;
         thisModel.fetch({parse: true, success: function () {
-         thisView.conceptModel.save({"global_resource": thisModel.url()}, {parse: false, patch: true});
+         thisView.conceptModel.save({"global_resource": thisModel.url()}, {parse: false, patch: true, error: thisView.attrErrorHandler});
          thisView.render();
+        },
+        error: function () {
+          window.noty({
+              timeout: 5000,
+              type: 'error',
+              maxVisible: 1,
+              dismissQueue: false,
+              text: "Unable to get global resource from the server."
+          });
         }});
       },
 
@@ -91,7 +100,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
             saveObj = {};
         if (thisView.model.get(attrName) !== authors) {
           saveObj[attrName] = authors;
-          thisView.model.save(saveObj, {parse: false, patch: true});
+          thisView.model.save(saveObj, {parse: false, patch: true, error: thisView.attrErrorHandler});
         }
       }
     });

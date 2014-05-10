@@ -4,7 +4,6 @@
 define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-edge-collection", "gc/collections/editable-node-collection", "agfk/models/explore-graph-model", "utils/utils"], function($, Backbone, _, dagre, EditableEdgeCollection, EditableNodeCollection, ExploreGraphModel, Utils){
 
   return ExploreGraphModel.extend({
-
     defaults:function(){
       var exDef = {
         nodes: new EditableNodeCollection(),
@@ -15,9 +14,9 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     },
 
     url: function () {
-        var leaf =  this.fetchTag;
-        this.fetchTag = null;
-        return window.APIBASE + (leaf ? ("targetgraph/" + leaf) : ("graph/" + this.id + "/"));
+      var leaf =  this.fetchTag;
+      this.fetchTag = null;
+      return window.APIBASE + (leaf ? ("targetgraph/" + leaf) : ("graph/" + this.id + "/"));
     },
 
     isPopulated: function() {
@@ -39,6 +38,9 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
                                     {parse: false,
                                      success:  function (){
                                        Utils.urlFromNewToId(thisModel.id);
+                                     },
+                                     error: function () {
+                                       Utils.errorNotify("unable to save dependency to server");
                                      }
                                     });
                    }
@@ -66,7 +68,6 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
           thisModel.getEdges().filter(function (edge) {
             return edge.needsServerId;
           }).forEach(thisModel.setEdgeId);
-
           // save the node -- how will we save edges on creation? -- save them once they get the server id
           node.save(null,
                     {parse: false,
@@ -76,13 +77,24 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
                                         parse: false,
                                         success: function () {
                                           Utils.urlFromNewToId(thisModel.id);
-                                        }});
-                     }});
+                                        },
+                                        error: function () {
+                                          Utils.errorNotify("unable to sync with the server");
+                                        }
+                                      });
+                     },
+                    error: function (robj, resp) {
+                      var msg = "unable to communicate with server -- error -- " + resp.responseText;
+                      if (resp.status === 401){
+                        msg = "changes not saved: create an account in order to save these changes";
+                      }
+                      Utils.errorNotify(msg);
+                    }});
         })
-        .fail(function (resp){
+        .fail(function (robj, resp){
           // failure
-          console.error("unable to verify new resource id -- TODO inform user -- msg: "
-                        + resp.responseText);
+          Utils.errorNotify("unable to verify resource id with server -- error --  "
+                      + resp.responseText);
         });
     }
   });

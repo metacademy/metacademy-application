@@ -131,7 +131,7 @@ function genFun($){
         if (e.target.tagName === 'A') {
           e.preventDefault();
           var val = e.target.firstChild.nodeValue;
-          inputEl.value = "";
+          inputEl.value = val;
           insert();
           selectCallback(val, e);
         }

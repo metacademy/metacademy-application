@@ -1,5 +1,5 @@
 /*global define*/
-define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], function(_, $, Backbone, ErrorHandler, GenUtils){
+define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils", "utils/utils"], function(_, $, Backbone, ErrorHandler, GenUtils, Utils){
   "use strict";
 
   /**
@@ -93,16 +93,17 @@ define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], functi
                 fetchNode.set("y", 200 + Math.random()*100); // TODO figure out a better positioning system for the fetched node
                 fetchNode.contractDeps();
                 thisView.model.trigger("render");
-                thisView.model.save(null, {parse: false});
+                thisView.model.save(null, {parse: false, error: function () {
+                  Utils.errorNotify("unable to fetch: " + inpText);
+                }});
                 evt.target.value = "";
               }); // end success
             } else {
               evt.target.blur();
-              alert("unable to fetch: " + inpText);
             }
           })
           .fail(function () {
-            console.log("unable to fetch: " + inpText);
+            Utils.errorNotify("unable to fetch: " + inpText);
           });
       },
 
@@ -175,7 +176,7 @@ define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils"], functi
                               }
                             },
                             error: function (resp) {
-                              console.log(resp.responseText);
+                              Utils.errorNotify("unable to sync concept with the server: " + resp.responseText);
                             }
                           });
                  },

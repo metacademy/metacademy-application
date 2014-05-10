@@ -189,6 +189,15 @@ define(["jquery"], function($){
     return null;
   };
 
+  utils.errorNotify = function (msg) {
+    return window.noty({
+      type: "error",
+      timeout: 5000,
+      text: msg,
+      maxVisible: 1
+    });
+  };
+
 
   // return require.js object
   return utils;

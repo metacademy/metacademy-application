@@ -16,11 +16,16 @@ requirejs.config({
     "btouch": "lib/backbone.touch",
     "colorbox": "lib/jquery.colorbox-min",
     "sidr": "lib/jquery.sidr.min",
-    "filesaver": "lib/FileSaver"
+    "filesaver": "lib/FileSaver",
+    "noty": "lib/jquery.noty.packaged.min"
   },
   shim: {
     completely: {
       exports: "completely"
+    },
+    noty: {
+      exports: "noty",
+      deps: ["jquery"]
     },
     d3: {
       exports: "d3"
@@ -70,7 +75,7 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr", "colorbox"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr", "colorbox", "noty"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // handle noscript content

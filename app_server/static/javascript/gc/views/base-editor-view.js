@@ -2,7 +2,7 @@
 // FIXME TODO - must return errors to the user in an elegant way, both client side (here) and from the server
 
 /*global define*/
-define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
+define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _, $, Utils){
   return  (function(){
 
     var pvt = {};
@@ -55,6 +55,10 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
         $(evt.currentTarget.parentElement).toggleClass(pvt.consts.ecClass);
       },
 
+      attrErrorHandler: function (robj, resp) {
+        Utils.errorNotify("unable to sync attribute with the server: " + (resp.status === 401 ? "create an account to save your changes" : resp.responseText));
+      },
+
       /**
        * blurTextField: change text field in the resource model
        */
@@ -65,7 +69,7 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
             saveObj = {};
         if (thisView.model.get(attrName) !== curTar.value) {
           saveObj[attrName] = curTar.value;
-          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate, error: thisView.attrErrorHandler});
         }
 
         // so event is only fired on child views
@@ -84,7 +88,7 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
 
         saveObj[attrName] =  curTar.checked ? 1 : 0;
         if (thisView.model.get(attrName) !== saveObj[attrName]) {
-          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate, error: thisView.attrErrorHandler});
         }
         // so event is only fired on child views
         evt.stopPropagation();
@@ -100,7 +104,7 @@ define(["backbone", "underscore", "jquery"], function(Backbone, _, $){
             saveObj = {};
         if (thisView.model.get(attrName) !== curTar.value) {
           saveObj[attrName] = curTar.value;
-          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate});
+          thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate, error: thisView.attrErrorHandler});
         }
         // so event is only fired on child views
         evt.stopPropagation();

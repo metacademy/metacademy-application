@@ -2,7 +2,7 @@
 // FIXME TODO - must return errors to the user in an elegant way, both client side (here) and from the server
 
 /*global define*/
-define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/views/global-resource-editor-view", "gc/views/resource-locations-view", "agfk/models/resource-location-model"], function(Backbone, _, $, BaseEditorView, GlobalResourceEditorView, ResourceLocationsView, ResourceLocation){
+define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/views/global-resource-editor-view", "gc/views/resource-locations-view", "agfk/models/resource-location-model", "utils/utils"], function(Backbone, _, $, BaseEditorView, GlobalResourceEditorView, ResourceLocationsView, ResourceLocation, Utils){
   return  (function(){
 
     var pvt = {};
@@ -81,9 +81,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
             resLoc.set("id", resp.id);
         })
           .fail(function (resp){
-            // failure
-            console.error("unable to verify new resource location id -- TODO inform user -- msg: "
-                          + resp.responseText);
+            Utils.errorNotify("unable to sync resource id with the server: " + resp.responseText);
           });
           thisView.render();
       },

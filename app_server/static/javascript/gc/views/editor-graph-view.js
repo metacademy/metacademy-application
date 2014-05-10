@@ -114,7 +114,7 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
             Utils.urlFromNewToId(thisView.model.id);
           },
           error:function (mdl, resp) {
-            console.log("error: " + resp && resp.responseText);
+            Utils.errorNotify("unable to sync graph title - " + resp.responseText);
           }
         });
       };
@@ -465,7 +465,11 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
             })
             .on("blur", function(d){
               d3node.selectAll("text." + consts.titleTextClass).style("display", "block");
-              d.save({"title": this.textContent}, {patch: true, parse: false});
+              d.save({"title": this.textContent}, {patch: true, parse: false, error: function (robj, resp) {
+                Utils.errorNotify("unable to save title to the server: "
+                                  + (resp.status === 401 ? "you are not authorized to make these changes (are you logged in?)"
+                                     : resp.responseText));
+              }});
               d3.select(this.parentElement).remove();
             });
       return d3txt;

@@ -4,7 +4,7 @@
 source ../meta_venv/bin/activate
 
 # start the servers
-python app_server/manage.py runserver 8080 &
+# python app_server/manage.py runserver 8080 &
 # rserver_id=$!
 
 # run the django tests

@@ -1,5 +1,7 @@
+
 /*global define*/
 define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], function(Backbone, _, NodeCollection){
+
   /**
    * AuxModel: model to store all auxiliary information used throughout metacademy
    * All data associated with the aux model should be read only
@@ -8,22 +10,18 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
 
     // private data obj
     var pvt = {
-      dependencies: {},
       timeEstimates: {},
-      shortcutDependencies: {},
-      loadedGraph: false,
-      DEFAULT_LEARNING_TIME: 1
+      loadedGraph: false
     };
 
     /* change learned/starred concept state */
-    pvt.toggleUserConceptState = function(state, nodeTag, nodeId){
-      nodeId = nodeId || this.getSid(nodeTag);
+    pvt.toggleUserConceptState = function(state, nodeId) {
       var userModel = this.userModel;
       if (userModel){
         if (state === "learned"){
-          userModel.updateLearnedConcept(nodeTag, nodeId, !userModel.isLearned(nodeId));
+          userModel.updateLearnedConcept(nodeId, !userModel.isLearned(nodeId));
         } else{
-          userModel.updateStarredConcept(nodeTag, nodeId, !userModel.isStarred(nodeId));
+          userModel.updateStarredConcept(nodeId, !userModel.isStarred(nodeId));
         }
         return true;
       }
@@ -32,9 +30,8 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
 
     return Backbone.Model.extend({
       defaults: {
-        depLeaf: undefined,
-        nodes: new NodeCollection(),
-        shortcuts: new NodeCollection()
+        //nodes: new NodeCollection()
+        //shortcuts: new NodeCollection()
       },
 
       getConsts: function(){
@@ -42,34 +39,6 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
           starredTrigger: "change:starredConcepts",
           learnedTrigger: "change:learnedConcepts"
         };
-      },
-
-      /**
-       * parse aux data (data should be bootstrapped rather than ajaxed)
-       */
-      parse: function(resp, xhr){
-        if (resp === null){
-          return {};
-        }
-
-        var retObj = this.defaults;
-
-        // depending on how aux is initialized, these may already be defined
-        var nodes = retObj.nodes,
-            shortcuts = retObj.shortcuts;
-
-        if (resp.hasOwnProperty("nodes")) {
-          nodes.add(resp.nodes, {parse: true});
-        }
-        if (resp.hasOwnProperty("shortcuts")) {
-          shortcuts.add(resp.shortcuts, {parse: true});
-        }
-        pvt.loadedGraph = true;
-        return retObj;
-      },
-
-      setDepLeaf: function(depLeaf){
-        this.set("depLeaf", depLeaf);
       },
 
       /* this should be called after the user data is initialized */
@@ -81,14 +50,15 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
 
         thisModel.userModel = usm;
 
-        thisModel.listenTo(usm, learnedTrigger, function(nodeTag, nodeSid, status){
+        // trigger events from user model (Allows other models to act accordingly w/out depending on the user model itself)
+        thisModel.listenTo(usm, learnedTrigger, function(nodeTag, status){
           thisModel.resetEstimates();
-          thisModel.trigger(learnedTrigger, nodeTag, nodeSid, status);
-          thisModel.trigger(learnedTrigger + nodeTag, nodeTag, nodeSid, status);
+          thisModel.trigger(learnedTrigger, nodeTag, status);
+          thisModel.trigger(learnedTrigger + nodeTag, nodeTag, status);
         });
-        thisModel.listenTo(usm, starredTrigger, function(nodeTag, nodeSid, status){
-          thisModel.trigger(starredTrigger, nodeTag, nodeSid, status);
-          thisModel.trigger(starredTrigger + nodeTag, nodeTag, nodeSid, status);
+        thisModel.listenTo(usm, starredTrigger, function(nodeTag, status){
+          thisModel.trigger(starredTrigger, nodeTag, status);
+          thisModel.trigger(starredTrigger + nodeTag, nodeTag, status);
         });
       },
 
@@ -110,100 +80,54 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
         pvt.toggleUserConceptState.apply(this, args);
       },
 
-      /* get server id of concept tag */
-      getSid: function(conceptTag){
-        var nodes = this.get("nodes"),
-            concept;
-        if (nodes){
-          concept = nodes.get(conceptTag);
-        }
-        return concept && concept.get("sid");
-      },
-
       /**
        * Reset learning time estimates
        */
       resetEstimates: function(){
-        pvt.dependencies = {};
         pvt.timeEstimates = {};
-        pvt.shortcutDependencies = {};
         this.trigger("reset:estimates");
       },
 
       /**
        * Returns true if userData model has the input concept marked as "learned"
        */
-      conceptIsLearned: function(tag){
-        if (this.userModel){
-              var node = this.get("nodes").get(tag);
-          if (node){
-            return this.userModel.isLearned(node.get("sid"));
-          }
-        }
-        return false;
+      conceptIsLearned: function(id){
+        return this.userModel.isLearned(id);
       },
 
       /**
        * Returns true if userData model has the input concept marked as "starred"
        */
-      conceptIsStarred: function(tag){
-        if (this.userModel){
-              var node = this.get("nodes").get(tag);
-          if (node){
-            return this.userModel.isStarred(node.get("sid"));
-          }
-        }
-        return false;
-      },
-
-      /* Finds all (learned) dependendcies of input "tag" */
-      computeAllDependencies: function(tag, isShortcut, onlyUnlearned){
-        var nodes =  this.get("nodes"),
-            shortcuts = this.get("shortcuts"),
-            thisModel = this,
-            node,
-            dependenciesObj;
-
-        if (onlyUnlearned && thisModel.conceptIsLearned(tag)){
-          return [];
-        }
-
-        if (isShortcut && shortcuts.get(tag)) {
-          node = shortcuts.get(tag);
-          dependenciesObj = pvt.shortcutDependencies;
-        } else if (nodes.get(tag)) {
-          node = nodes.get(tag);
-          dependenciesObj = pvt.dependencies;
-        } else {
-          // shouldn't happen
-          return [];
-        }
-
-        if (dependenciesObj.hasOwnProperty(tag)) {
-          return dependenciesObj[tag];
-        }
-
-        var result = [];
-        dependenciesObj[tag] = result;     // so that we don't get into an infinite loop if there's a cycle
-
-        node.get("dependencies").each(function(dep) {
-          var fromTag = dep.get("from_tag"),
-              currDep = {'from_tag': fromTag, 'shortcut': dep.get("shortcut")};
-          if (!onlyUnlearned || !thisModel.conceptIsLearned(fromTag)) {
-            result = _.union(result, [currDep], thisModel.computeUnlearnedDependencies(fromTag, dep.get("shortcut")));
-            result = _.unique(result, false, function(dep) { return dep.from_tag + ':' + dep.shortcut; });
-          }
-        });
-
-        dependenciesObj[tag] = result;
-        return result;
+      conceptIsStarred: function(id){
+        return this.userModel.isStarred(id);
       },
 
       /**
-       * Finds the unlearned dependencies of a concept with tag 'tag'
+       * returns an array of node ids traversed during a dfs from the input leaf
+       * leaf - the beginning leaf node
+       * doesLearnedBlock - True if learned nodes are not traversed
        */
-      computeUnlearnedDependencies: function(tag, isShortcut){
-        return this.computeAllDependencies(tag, isShortcut, true);
+      dfsFromNode: function (leaf, doesLearnedBlock) {
+        var thisModel = this;
+        if (doesLearnedBlock && thisModel.conceptIsLearned(leaf.id)){
+          return [];
+        }
+
+        var toTraverse = [leaf],
+            traversedIds = [leaf.id];
+
+        // DFS FIXME -- this is BFS --CJR
+        while (toTraverse.length) {
+          var node = toTraverse.shift();
+          node.get("dependencies").each(function(dep) {
+            var src = dep.get("source");
+            if (traversedIds.indexOf(src.id) === -1 && (!doesLearnedBlock || !thisModel.conceptIsLearned(src.id))) {
+              toTraverse.push(src);
+              traversedIds.push(src.id);
+            }
+          });
+        }
+        return traversedIds;
       },
 
       /**
@@ -211,59 +135,10 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
        * Uses a DFS to compute the learning time estimate
        * Concepts without a learning time estimate are currently given a default value of 1 hour
        */
-      computeTimeEstimate: function(tag){
-        var nodes = this.get("nodes"),
-            shortcuts = this.get("shortcuts"),
-            node = nodes.get(tag),
-            DEFAULT_LEARNING_TIME = pvt.DEFAULT_LEARNING_TIME;
-
-        if (!node) {
-          return '';
-        }
-
-        if (!(tag in pvt.timeEstimates)) {
-          var deps = this.computeUnlearnedDependencies(tag, 0);
-
-          // eliminate redundant shortcuts
-          deps = _.filter(deps, function(dep) {
-            if (dep.shortcut) {
-              var found = _.where(deps, {"from_tag": dep.from_tag, "shortcut": 0});
-              return found.length == 0;
-            }
-            return true;
-          });
-
-          var total = 0;
-          _.each(deps, function(dep) {
-            var depShortcut = shortcuts.get(dep.from_tag),
-                depNode = nodes.get(dep.from_tag);
-            if (dep.shortcut && depShortcut && depShortcut.get("time")) {
-              total += depShortcut.get("time");
-            } else if (depNode && depNode.get("time")) {
-              total += depNode.get("time");
-            } else {
-              total += DEFAULT_LEARNING_TIME;
-            }
-          });
-
-          if (node.get("time")) {
-            total += node.get("time");
-          } else {
-            total += DEFAULT_LEARNING_TIME;
-          }
-
-          pvt.timeEstimates[tag] = total;
-        }
-
-        return pvt.timeEstimates[tag];
-      },
-
-      /**
-       * Get node display title from id
-       */
-      getTitleFromId: function(nid){
-        var tnode = this.get("nodes").get(nid);
-        return tnode && tnode.get("title");
+      computeTimeEstimate: function(id){
+      // TODO aux computeTimeEstimate should take place on the server
+      // FIXME
+        throw new Error("Not implemented yet");
       }
     });
   })();

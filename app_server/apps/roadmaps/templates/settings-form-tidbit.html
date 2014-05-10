@@ -18,6 +18,15 @@
     {% endif %}
   </div>
   <div class="form-field">
+    {{ settings_form.anyone_can_edit.label_tag }}
+    {{ settings_form.anyone_can_edit }}
+    {% if settings_form.anyone_can_edit.errors  %}
+    <div class="form-errors">
+      {{ settings_form.editors.errors }}
+    </div>
+    {% endif %}
+  </div>
+  <div class="form-field">
     {{ settings_form.editors.label_tag }}
     {{ settings_form.editors }}
     {% if settings_form.editors.errors  %}

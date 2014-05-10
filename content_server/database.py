@@ -112,7 +112,7 @@ class Database:
             if tag in self.shortcut_times:
                 item['time'] = self.shortcut_times[tag]
             shortcuts.append(item)
-        
+
         return {'nodes': nodes, 'shortcuts': shortcuts}
 
 
@@ -180,7 +180,7 @@ def read_node(content_path, tag):
     """Read a Concept object from a directory which optionally contains title.txt,
     dependencies.txt, key.txt, references.txt, summary.txt, and see-also.txt."""
     # TODO: normalize string cleaning (get rid of double quotes that mess up json)
-    
+
     ### process title
     if os.path.exists(title_file(content_path, tag)):
         title = formats.read_title(open(title_file(content_path, tag)))
@@ -221,14 +221,14 @@ def read_node(content_path, tag):
         questions = formats.read_questions(open(questions_file(content_path, tag)))
     else:
         questions = []
-            
+
 
     ### process dependencies
     if os.path.exists(dependencies_file(content_path, tag)):
         dependencies = formats.read_dependencies(open(dependencies_file(content_path, tag)))
     else:
         dependencies = []
-    
+
     ### process see-also
     pointers = []
     if os.path.exists(see_also_file(content_path, tag)):
@@ -273,9 +273,9 @@ def read_shortcut(content_path, tag, concept_node):
         questions = []
 
     return concepts.Shortcut(concept_node, goals, dependencies, shortcut_resources, questions)
-    
 
-    
+
+
 
 def check_required_files(content_path, node_tag):
     errors = []
@@ -291,16 +291,16 @@ def check_required_files(content_path, node_tag):
             errors.append('Missing dependencies for shortcut')
         if not os.path.exists(shortcut_resources_file(content_path, node_tag)):
             errors.append('Missing resources for shortcut')
-        
+
     return errors
 
 def check_node_format(content_path, tag):
     errors = check_required_files(content_path, tag)
-    
+
     fname = node_resources_file(content_path, tag)
     if os.path.exists(fname):
         errors.append({'resources.txt': formats.check_resources_format(open(fname))})
-        
+
     fname = dependencies_file(content_path, tag)
     if os.path.exists(fname):
         errors.append({'dependencies.txt': formats.check_dependencies_format(open(fname))})
@@ -327,7 +327,7 @@ def check_all_node_formats(content_path):
     for tag in tags:
         errors[tag] = check_node_format(content_path, tag)
     return errors
-    
+
 
 def read_nodes(content_path, onlytitle=False):
     """Read all the nodes in a directory and return a dict mapping tags to Concept objects."""
@@ -350,7 +350,7 @@ def read_shortcuts(content_path, concept_nodes):
         except DatabaseFormatError:
             pass
     return shortcuts
-    
+
 
 
 def _filter_non_nodes(tags):
@@ -425,7 +425,7 @@ def save_time_estimates(content_path):
     for tag, time in shortcut_times.items():
         print >> outstr, tag, time
     outstr.close()
-    
+
 def read_time_estimates(content_path):
     concept_times = {}
     fname = concept_time_estimates_file(content_path)
@@ -442,5 +442,3 @@ def read_time_estimates(content_path):
             shortcut_times[tag] = float(time_str)
 
     return concept_times, shortcut_times
-
-

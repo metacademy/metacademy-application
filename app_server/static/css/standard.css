@@ -43,7 +43,7 @@ input{
     height: 1.8em;
 }
 
-.header-menu a{
+.header-menu a.header-a{
     color: #EFEFEF;
     font-size: 0.9em;
     text-decoration: none;
@@ -52,15 +52,15 @@ input{
     display: inline-block;
 }
 
-.header-menu a:hover{
+.header-menu a.header-a:hover{
     text-decoration: underline;
 }
 
-.header-menu  a.heleft{
+.header-menu  a.header-a.heleft{
     padding-right: 0.2em;
 }
 
-.header-menu  a.heright{
+.header-menu  a.header-a.heright{
     padding-left: 0.2em;
 }
 
@@ -189,7 +189,7 @@ a.expand-collapse-link:hover{
 
 .meta-home-link{
     margin-left: 0.2em;
-    padding: 0.5em 0 0.5em 110px;
+    padding: 0.3em 0 0.5em 110px;
     background-image: url('/static/images/metacademy-toolbar-icon1.png');
     background-repeat: no-repeat;
     background-position: left center;
@@ -201,6 +201,9 @@ a.home-nav{
     padding: 0;
 }
 
+#header-search-input {
+    height: 1.8em;
+}
 
 #header-search-input, user-form-field input{
     outline: none;
@@ -214,7 +217,7 @@ a.home-nav{
     -webkit-box-sizing: border-box; /* Safari */
     -ms-box-sizing: border-box; /* IE */
     box-sizing: border-box;
-    width: 15em;
+    width: 16em;
 }
 #header-search-input:focus, .user-form-field input:focus{
     border-color: #501644;
@@ -232,7 +235,7 @@ a.home-nav{
 }
 
 .dev-note{
-    margin-top: 2em;
+    margin-top: 1em;
     line-height: 1.2em;
     font-size: 0.9em;
     text-align: center;
@@ -244,9 +247,128 @@ a.home-nav{
     padding: 0.1em 0.7em;
 }
 
+
+
+/* -----------------------------------*/
+/* --->>> Search/Autocomplete <<------*/
+/* -----------------------------------*/
+.search-container {
+  position: relative;
+  height: 2em;
+  color: #333;
+}
+
+.search-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2em;
+  width: 2em;
+  z-index: 11;
+  cursor: pointer;
+}
+
+.search-input:focus ~ .search-button .bg {
+  fill: #501644;
+}
+
+.search-button:hover .bg {
+  fill: #501644;
+}
+
+.search-input {
+  z-index: 10;
+  position: absolute;
+  border-radius: 0px;
+  background-color: #ffffff;
+  border: 1px solid #BABDC0;
+  display: block;
+  font-size: 70%;
+  padding-left: .5em;
+  margin: 0;
+  height: 100%;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #501644;
+}
+
+.search-container, .search-input, .search-button, .ac-list, .ac-li, .ac-li-a {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.db-search-wrap {
+    position: relative;
+    display: inline-block;
+    font-size: 0.9em;
+}
+
+.ac-list {
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: inherit;
+  top: 2em; /* must match the container height */
+  border: 1px solid #BABDC0;
+  border-width: 0 1px 1px 1px;
+  border-bottom: 1px solid #BABDC0;
+  background-color: #ffffff;
+  z-index: 9;
+}
+
+.header-menu .ac-list {
+    top: 1.4em;
+}
+
+.ac-hidden {
+  display: none;
+}
+
+.ac-li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: #501644;
+  vertical-align:middle;
+  text-decoration: none;
+  text-align: left;
+  width: 100%;
+}
+
+.ac-li-a {
+  color: #A01F70;
+  text-decoration: none;
+  margin: 0;
+  padding: 0.3em 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-indent: -1.5em;
+  padding-left: 2em;
+}
+
+.ac-li-a:hover {
+  background-color: #F5E8F2;
+  color: #690259;
+}
+
+.ac-li-a:focus {
+  background-color: #F5E8F2;
+  color: #690259;
+  outline: none;
+}
+
+
+/* -----------------------------------*/
+/* ---------->>> Media Rules  <<------*/
+/* -----------------------------------*/
 @media only screen and (max-width:999px){
     #header-search-input{
-        width: 10em;
+        width: 14em;
     }
     .header-title{
         min-width: 19em;
@@ -282,7 +404,7 @@ a.home-nav{
     }
 
     div.dev-note{
-        margin-top: 3em;
+        margin-top: 1em;
     }
     .dev-note p{
         margin-top: 1em;

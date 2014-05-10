@@ -1,18 +1,22 @@
 
 /*global define*/
-define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/utils", "filesaver"], function(Backbone, d3, _, GraphView, Utils){
+define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/utils", "filesaver"], function($, Backbone, d3, _, GraphView, Utils){
   var pvt = {};
 
   pvt.consts = _.extend(GraphView.prototype.getConstsClone(), {
     svgId: "gc-svg",
     titleId: "graph-title",
+    expClass: "expanded",
     instructionsDivId: "create-instructions",
+    instMinimizeClass: "instructions-minimize",
+    instIconClass: "instructions-icon",
     toolboxId: "toolbox",
     selectedClass: "selected",
     connectClass: "connect-node",
-    toEditCircleClass: "to-edit-circle",
+    toEditCircleGClass: "to-edit-circle-g",
     activeEditId: "active-editing",
-    toEditCircleRadius: 10,
+    localStoreShowInstsKey: "show-gc-inst",
+    toEditCircleRadius: 14,
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
     ENTER_KEY: 13
@@ -75,9 +79,44 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
   var GraphEditor = GraphView.extend({
     events: function () {
       var thisView = this,
+          consts = pvt.consts,
           levts = {};
+
+      levts["keydown #" + consts.titleId] = function (evt) {
+        var keyCode = evt.keyCode;
+        if (keyCode === consts.ENTER_KEY) {
+          evt.currentTarget.blur();
+        }
+      };
+
+      levts["click ." + consts.instMinimizeClass] = function (evt) {
+        $(evt.currentTarget.parentNode).removeClass(consts.expClass);
+        if(typeof(window.localStorage)!=="undefined")
+        {
+          window.localStorage.setItem(consts.localStoreShowInstsKey, 0);
+        }
+      };
+
+      levts["click ." + consts.instIconClass] = function (evt) {
+        $(evt.currentTarget.parentNode).addClass(consts.expClass);
+        if(typeof(window.localStorage)!=="undefined")
+        {
+          window.localStorage.setItem(consts.localStoreShowInstsKey, 1);
+        }
+      };
+
       levts["blur #" + pvt.consts.titleId] = function (evt) {
-        thisView.model.set("title", evt.currentTarget.innerHTML);
+        var title = evt.currentTarget.innerHTML;
+        thisView.model.set("title", title);
+        thisView.model.save({title: title}, {
+          parse: false,
+          success: function (mdl, resp) {
+            Utils.urlFromNewToId(thisView.model.id);
+          },
+          error:function (mdl, resp) {
+            Utils.errorNotify("unable to sync graph title - " + resp.responseText);
+          }
+        });
       };
       return _.extend(GraphView.prototype.events, levts);
     },
@@ -99,7 +138,6 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
         toNodeEdit: false
       });
 
-      thisView.idct = 0; // TODO this shouldn't be handled in the view
       // use expand/contract icons in editor graph
       thisView.addECIcon = true;
 
@@ -142,9 +180,17 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       titleDiv.setAttribute("contentEditable", "true");
       thisView.$el.append(titleDiv);
 
-      // add the instructions tab TODO refactor into an html template
-       thisView.$el.append(document.getElementById(consts.instructionsDivId));
-       thisView.$el.find("#" + consts.instructionsDivId).show();
+      // add the instructions tab
+      thisView.$el.append(document.getElementById(consts.instructionsDivId));
+
+      // hide/show the ls depending on ls props
+      var showInstr = true,
+          instrDiv = thisView.$el.find("#" + consts.instructionsDivId);
+      instrDiv.show();
+      if (typeof(window.localStorage) !== "undefined" && window.localStorage.hasOwnProperty(consts.localStoreShowInstsKey)) {
+        showInstr = Boolean(Number(window.localStorage[consts.localStoreShowInstsKey]));
+      }
+      showInstr ? instrDiv.addClass(consts.expClass) : instrDiv.removeClass(consts.expClass);
 
       // displayed when dragging between nodes
       thisView.dragLine = d3SvgG.insert('svg:path', ":first-child")
@@ -209,10 +255,12 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
 
     // @override
     postrender: function() {
-      var thisView = this;
+      var thisView = this,
+          consts = pvt.consts;
       thisView.gPaths.classed(pvt.consts.selectedClass, function(d){
         return d === thisView.state.selectedEdge;
       });
+      thisView.$el.find("#" + consts.titleId).html(thisView.model.get("title"));
     },
 
     // @override
@@ -258,23 +306,28 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       newGs.each(function(d){
         var d3el = d3.select(this);
         thisView.listenTo(d, "change:title", function() {
-          d3el.selectAll("text").remove();
+          d3el.selectAll("text." + consts.titleTextClass).remove();
           thisView.insertTitleLinebreaks(d3el, d.get("title"));
         });
       });
 
       // add small circle link for editing
-      newGs.append("circle")
+      var newGG = newGs.append("g")
+            .attr("transform", "translate(" + consts.nodeRadius*Math.SQRT1_2 + "," + (-consts.nodeRadius*Math.SQRT1_2) + ")")
+            .classed(consts.toEditCircleGClass, true);
+
+      newGG.append("circle")
         .attr("r", consts.toEditCircleRadius)
-        .attr("cx", consts.nodeRadius*0.707)
-        .attr("cy", -consts.nodeRadius*0.707)
-        .classed(consts.toEditCircleClass, true)
         .on("mouseup", function(d){
           if (!thisView.state.justDragged){
             thisView.state.toNodeEdit = true;
             thisView.appRouter.changeUrlParams({mode: "edit", focus: d.id});
           }
         });
+      newGG.append("text")
+        .attr("dy", 3)
+        .attr("text-anchor", "middle")
+        .text("edit");
     },
 
     pathMouseDown: function(d, thisView){
@@ -383,7 +436,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
           consts = pvt.consts,
           nodeRadius = consts.nodeRadius;
 
-      d3node.selectAll("text").style("display", "none");
+      d3node.selectAll("text." + consts.titleTextClass).style("display", "none");
       var curTrans = thisView.dzoom.translate(),
           curScale = thisView.dzoom.scale(),//nodeBCR.width/consts.nodeRadius,
           placePad  =  10*curScale,
@@ -411,8 +464,12 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
               }
             })
             .on("blur", function(d){
-              d3node.selectAll("text").style("display", "block");
-              d.set("title", this.textContent);
+              d3node.selectAll("text." + consts.titleTextClass).style("display", "block");
+              d.save({"title": this.textContent}, {patch: true, parse: false, error: function (robj, resp) {
+                Utils.errorNotify("unable to save title to the server: "
+                                  + (resp.status === 401 ? "you are not authorized to make these changes (are you logged in?)"
+                                     : resp.responseText));
+              }});
               d3.select(this.parentElement).remove();
             });
       return d3txt;
@@ -433,7 +490,7 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       } else if (state.graphMouseDown && d3.event.shiftKey){
         // clicked not dragged from svg
         var xycoords = d3.mouse(thisView.d3SvgG.node()),
-            d = {id: "c" + thisView.idct++, title: "concept title", x: xycoords[0], y: xycoords[1]},
+            d = {title: "concept title", x: xycoords[0], y: xycoords[1]},
             model = thisView.model;
 
         // add new node and make title immediently editable
@@ -473,17 +530,18 @@ define(["backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view", "utils/u
       case consts.DELETE_KEY:
         d3.event.preventDefault();
         if (selectedNode){
-          if (confirm("delete node: " + selectedNode.get("title") + "?\nNote: all associated data will be removed")){
+          if (confirm("remove node: " + selectedNode.get("title") + " from the graph?\nNote: all associated data will be removed")){
             thisView.model.removeNode(selectedNode);
             state.selectedNode = null;
             thisView.render();
           }
         } else if (selectedEdge){
-          if (confirm("delete edge: " + selectedEdge.get("source").get("title") + " -> " + selectedEdge.get("target").get("title") + "?\nNote: all associated data will be removed")){
-            thisView.model.removeEdge(selectedEdge);
-            state.selectedEdge = null;
-            thisView.render();
-          }
+          alert("deleting edges is currently not possible -- this functionality will be added soon");
+          // if (confirm("delete edge: " + selectedEdge.get("source").get("title") + " -> " + selectedEdge.get("target").get("title") + "?\nNote: all associated data will be removed")){
+          //   thisView.model.removeEdge(selectedEdge);
+          //   state.selectedEdge = null;
+          //   thisView.render();
+          // }
         }
         break;
       }

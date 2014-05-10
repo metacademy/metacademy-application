@@ -22,6 +22,11 @@
   <div class="user-form-field">
   {{ form.email.label_tag }}
   {{ form.email }}
+  {{ form.fname}}
+  <script>
+    var el = document.getElementById("id_fname");
+    el.parentNode.removeChild(el);
+  </script>
   {% if form.email.errors %}
   <div class="form-errors">
     {{form.email.errors}}

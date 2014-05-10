@@ -1,5 +1,5 @@
 /*global define*/
-define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbone, ErrorHandler){
+define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils", "utils/utils"], function(_, $, Backbone, ErrorHandler, GenUtils, Utils){
   "use strict";
 
   /**
@@ -13,9 +13,15 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       apptoolsButtonId: "apptools-button",
       expandButtonClass: "expanded",
       disabledClass: "disabled",
-      viewId: "content-editing-tools"
+      viewId: "content-editing-tools",
+      addConceptWrapClass: "add-concept-container"
     };
     pvt.isRendered = true; // view is prerendered
+
+    // set up the autocomplete
+    var obtainGETData = function (val) {
+      return {onlyConcepts: true,  ac: val};
+    };
 
     return Backbone.View.extend({
       appRouter: null,
@@ -24,18 +30,19 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         "click #upload-input": function(){ document.getElementById("hidden-file-upload").click();},
         "change #hidden-file-upload": "uploadGraph",
         "click #download-input": "downloadGraph",
-        "click #delete-graph": "clearGraph",
         "click #preview-graph": "previewGraph",
         "click #back-to-editing": "returnToEditor",
-        "keyup #add-concept-container input": "addConceptKeyUp"
+        "click #save": "syncWithServer",
+        "keyup #add-concept-input": "addConceptKeyUp"
+        // Bad design note: #optimize listener is in graph-view
       },
 
-       initialize: function(inp){
-         var thisView = this;
-        //     consts = pvt.consts;
-         thisView.setElement("#" + pvt.consts.viewId);
-         thisView.appRouter = inp.appRouter;
-       },
+      initialize: function(inp){
+        var thisView = this;
+        thisView.setElement("#" + pvt.consts.viewId);
+        thisView.appRouter = inp.appRouter;
+        _.bindAll(thisView, "loadTitle");
+      },
 
       /**
        * Return true if the view has been rendered
@@ -44,30 +51,20 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         return pvt.isRendered;
       },
 
-
       /**
        * Render the apptools view
        */
       render: function(){
+        var thisView = this,
+            thisModel = thisView.model,
+            acOpts = {
+              containerEl: thisView.$el.find("." + pvt.consts.addConceptWrapClass)[0]
+            };
+
+        // load a concept by its title from an ajax request
+        thisView.autoComplete = new GenUtils.Autocomplete(acOpts, obtainGETData, null,  thisView.loadTitle);
         pvt.viewRendered = true;
-        // setup autocomplete
-        // TODO handle styles in css -- perhaps use a different library
-        var auto = window.completely(document.getElementById('add-concept-container'), {
-    	     fontSize : '0.9em'
-         });
-         auto.options = window.agfkGlobals.auxModel.get("nodes").map(function (node) {
-           return node.get("title").toLowerCase();
-         });
-         auto.options.sort();
-         auto.input.placeholder = "Search for a concept to add";
-         var $auto = $(auto.input);
-         $auto.css("border", "1px solid rgb(56, 49, 49)");
-         $auto.css("padding", "0.2em");
-        var $hint = $(auto.hint);
-        $hint.css("padding", "0.3em");
-         //auto.repaint();
-        this.auto = auto;
-        return this;
+        return thisView;
       },
 
       /**
@@ -76,6 +73,38 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       close: function() {
         this.remove();
         this.unbind();
+      },
+
+      loadTitle: function(inpText, evt) {
+        var thisView = this,
+            thisModel = thisView.model;
+        // TODO remove hard coded path if possible
+        $.getJSON("/graphs/concept-triplet", {title: inpText})
+          .done(function (robj) {
+            if (robj && robj.id) {
+              console.log( "fetched id for: " + inpText );
+              var fetchNodeId = robj.id;
+              // TODO hardcoded URL
+              $.getJSON(window.APIBASE + "fulltargetgraph/" + fetchNodeId + "/", {"full": "true"}, function (res, rtype, jqxhr) {
+                // need to contract
+                thisModel.set(thisModel.parse(res, jqxhr));
+                var fetchNode = thisModel.getNode(fetchNodeId);
+                fetchNode.set("x", 200 + Math.random()*100);
+                fetchNode.set("y", 200 + Math.random()*100); // TODO figure out a better positioning system for the fetched node
+                fetchNode.contractDeps();
+                thisView.model.trigger("render");
+                thisView.model.save(null, {parse: false, error: function () {
+                  Utils.errorNotify("unable to fetch: " + inpText);
+                }});
+                evt.target.value = "";
+              }); // end success
+            } else {
+              evt.target.blur();
+            }
+          })
+          .fail(function () {
+            Utils.errorNotify("unable to fetch: " + inpText);
+          });
       },
 
       uploadGraph: function(evt){
@@ -91,7 +120,6 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
           var txtRes = filereader.result;
           try{
             var jsonObj = JSON.parse(txtRes);
-            // thisView.deleteGraph(true);
             thisView.model.addJsonNodesToGraph(jsonObj);
             thisView.model.trigger("render");
           }catch(err){
@@ -104,9 +132,11 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
       },
 
       previewGraph: function () {
-        var thisView = this;
-        $("#" + pvt.consts.backToEditingButtonId).show();
-        thisView.appRouter.changeUrlParams({mode: "explore"});
+        var thisView = this,
+            topoSort = thisView.model.getTopoSort(),
+            // TODO fix hardcoding!
+            newWin = window.open("/graphs/concepts/" + topoSort[topoSort.length - 1], "_blank");
+        newWin.focus();
       },
 
       returnToEditor: function () {
@@ -115,6 +145,46 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         thisView.appRouter.navigate("", {trigger: true});
       },
 
+      // TODO use this function if the connection is lost
+      syncWithServer: function () {
+        var thisView = this,
+            jsonObj = this.model.toJSON(),
+            jsonConceptOnly = $.extend({}, jsonObj, {dependencies: []}),
+            jsonEdgesOnly =  $.extend({}, jsonObj, {concepts: []});
+        $.ajax({ type: "PUT",
+                 // TODO move hardcoded url
+                 url: thisView.model.url(),
+                 contentType: "application/json; charset=utf-8",
+                 data: JSON.stringify(jsonConceptOnly),
+                 headers: {'X-CSRFToken': window.CSRF_TOKEN},
+                 success: function (resp) {
+                   $.ajax({ type: "PUT",
+                            // TODO move hardcoded url
+                            url: thisView.model.url(),
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(jsonObj),
+                            headers: {'X-CSRFToken': window.CSRF_TOKEN},
+                            success: function (resp) {
+                              if (resp){
+                                console.log(resp.responseText);
+                              }
+                              if (window.location.pathname.substr(-3) == "new") {
+                                var newPath = window.location.pathname.split("/");
+                                newPath.pop();
+                                newPath = newPath.join("/") + "/" + thisView.model.id;
+                                window.history.pushState({}, "", newPath);
+                              }
+                            },
+                            error: function (resp) {
+                              Utils.errorNotify("unable to sync concept with the server: " + resp.responseText);
+                            }
+                          });
+                 },
+                 error: function (resp) {
+                   console.log(resp.responseText);
+                 }
+               });
+      },
 
       downloadGraph: function(){
         var outStr = JSON.stringify(this.model.toJSON()),
@@ -122,54 +192,17 @@ define(["jquery", "backbone", "utils/errors", "completely"], function($, Backbon
         window.saveAs(blob, "mygraph.json"); // TODO replace with title once available
       },
 
-      clearGraph: function(confirmDelete){
-        if (!confirmDelete || confirm("Press OK to clear this graph")){
-          this.model.clear().set(this.model.defaults());
-          this.model.trigger("render"); // FIXME this is a hack
-        }
-      },
-
       addConceptKeyUp: function (evt) {
         var thisView = this,
-            keyCode = evt.keyCode;
-        var inpText = evt.target.value;
-        if (!inpText.length) {
-          thisView.auto.hideDropDown();
-          thisView.auto.hint.value = "";
-          return;
-        }
-        if (keyCode === 13) {
-          if (inpText) {
-            var aux = window.agfkGlobals.auxModel,
-            // try to find the tag and add to graph
-            res = aux.get("nodes").filter(function(d){
-              return d.get("title").toLowerCase() === inpText.toLowerCase() || d.id.toLowerCase() === inpText.toLowerCase();
-            });
-            if (res.length) {
-              var fetchNodeId = res[0].id;
-              thisView.model.set("leafs", [fetchNodeId]);
-              thisView.model.fetch({
-                success: function () {
-                  // need to contract
-                  var fetchNode = thisView.model.getNode(fetchNodeId);
-                  fetchNode.set("x", 200);
-                  fetchNode.set("y", 200); // FIXME figure out a better positioning system for the fetched node
-                  fetchNode.contractDeps();
-                  thisView.model.trigger("render");
-                  evt.target.value = "";
+            thisModel = thisView.model,
+            keyCode = evt.keyCode,
+            inpText = evt.target.value;
 
-                  // TODO write your own autocomplete
-                  thisView.auto.hideDropDown();
-                  thisView.auto.hint.value = "";
-                }
-              });
-            } else {
-              // TODO let the user know that no matching concept was found
-            }
-          }
+        if (keyCode === 13) {
+          // return key code
+          thisView.loadTitle(inpText, evt);
         }
       }
-
     });
   })();
 });

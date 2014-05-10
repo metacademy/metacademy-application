@@ -29,8 +29,8 @@ define(['lib/kmapjs/collections/node-collection', 'agfk/models/detailed-node-mod
 
       this.each(function(node) {
         if (!aux.conceptIsLearned(node.id) && !node.getImplicitLearnStatus()) {
-          if (node.get("time")) {
-            total += node.get("time");
+          if (node.get("learn_time")) {
+            total += node.get("learn_time");
           } else {
             total += 1;     // reasonable guess when the time is unknown
           }

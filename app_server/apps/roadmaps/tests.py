@@ -25,8 +25,6 @@ def common_setup(self):
         self.prof = Profile(user=self.user)
         self.prof.save()
 
-
-
 class TestRoadmapCreation(TestCase):
 
     def setUp(self):

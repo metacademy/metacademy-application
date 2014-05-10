@@ -1,7 +1,7 @@
 
 /*global define
-This file contains general purpose utility functions
-*/
+ This file contains general purpose utility functions
+ */
 
 define(["jquery"], function($){
   "use strict";
@@ -122,6 +122,82 @@ define(["jquery"], function($){
       return (Math.round(timeEstimate * 12) * 5) + " minutes";    // round to nearest 5 minutes
     }
   };
+
+
+  var depthRe = depthRe = /^\*+/,
+      linkRe = /\[([^\]]*)\]\(([^\)]*)\)/,
+      httpRe = /http:\/\//;
+  var mdMatchToHtmlLink = function(match, $1, $2, offset, original) {
+    return '<a class="' + (httpRe.test($2) ? "external-link" : "internal-link") + '" href="' + $2 + '" data-tag="' + $2 + '">' + $1 + '</a>';
+  };
+
+  /**
+   * Parse simple markdown to html
+   */
+  utils.simpleMdToHtml = function (inMd) {
+    if (!inMd) {
+      return "";
+    }
+    var inLines = inMd.split("\n"),
+        depth,
+        retStr = "",
+        prevDepth = 0;
+    inLines.forEach(function (line) {
+      // strip depth specification
+      depth = depthRe.exec(line);
+      depth = depth ? depth[0].length : 0;
+      if (depth && prevDepth == depth) {
+        retStr += "</li><li>";
+      }
+      while (prevDepth > depth) {
+        retStr += "</li></ul>";
+        prevDepth--;
+      }
+      while (prevDepth < depth) {
+        retStr += "<ul><li>";
+        prevDepth++;
+      }
+      retStr += line.substr(depth).replace(linkRe, mdMatchToHtmlLink);
+    });
+    while (prevDepth > 0) {
+      retStr += "</li></ul>";
+      prevDepth--;
+    }
+    return retStr;
+  };
+
+  /**
+   * Change urls of the form /blah/blah/new to /blah/blah/id without redirecting
+   */
+  utils.urlFromNewToId = function (id) {
+    var pathArr = window.location.pathname.split("/"),
+        newLoc = pathArr.indexOf("new");
+    if (newLoc > -1) {
+      pathArr[newLoc] = id;
+      window.history.pushState({}, "", pathArr.join("/"));
+    }
+  };
+
+  utils.readCookie = function (name) {
+    var nameEQ = escape(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+  };
+
+  utils.errorNotify = function (msg) {
+    return window.noty({
+      type: "error",
+      timeout: 5000,
+      text: msg,
+      maxVisible: 1
+    });
+  };
+
 
   // return require.js object
   return utils;

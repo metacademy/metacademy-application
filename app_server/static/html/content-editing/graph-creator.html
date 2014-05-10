@@ -12,14 +12,19 @@
 <link rel="stylesheet" href="{% static "css/concept-list.css" %}" />
 <link rel="stylesheet" href="{% static "css/concept-details.css" %}"/>
 <link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
+<link rel="stylesheet" href="{% static "css/reversions.css" %}" />
 {% endblock %}
 
 {% block jscript-extend %}
 <script>
   window.agfkGlobals = {};
   agfkGlobals.userInitData = {{ user_data|safe }};
-  agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+  agfkGlobals.graphInitData = {{ graph_init_data | safe }};
   agfkGlobals.auxModel = null; // init in main js app
+  agfkGlobals.isCreating = true; // init in main js app
+  agfkGlobals.globalResources = {};
+  agfkGlobals.idcheckUrl = "{% url 'graphs:idchecker' %}";
+  agfkGlobals.auxData = {};
 </script>
 {% if debug %}
 <script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>

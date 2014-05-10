@@ -73,9 +73,9 @@ Some of metacademy's ancillary functions currently depend on `scipy`. Scipy can 
 
         source ../meta_venv/bin/activate
 
-1. start the test servers
+1. start the development server
 
-        ./run_test_servers.sh
+        python app_server/manage.py runserver 8080
 
 1. Open [localhost:8080](http://localhost:8080) with a modern javascript-enabled browser
 

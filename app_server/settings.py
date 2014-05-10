@@ -3,11 +3,11 @@
 # Django settings for django_agfk project.
 import os
 import config
-
+import sys
 
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
 CLIENT_SERVER_PATH = SETTINGS_PATH
-AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH,'../'))
+AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH, '../'))
 
 
 ADMINS = (
@@ -18,7 +18,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': config.DJANGO_DB_FILE,                 # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
@@ -115,7 +115,7 @@ WSGI_APPLICATION = 'wsgi.application'
 TEMPLATE_DIRS = (
     os.path.join(CLIENT_SERVER_PATH,'static/html/'),
     os.path.join(CLIENT_SERVER_PATH,'static/html/underscore-templates/'),
-    os.path.join(CLIENT_SERVER_PATH,'static/html/content-editing/'),
+    os.path.join(CLIENT_SERVER_PATH,'static/html/content-editing/')
 )
 
 INSTALLED_APPS = (
@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'compressor',
     'lazysignup',
     'reversion',
+    'tastypie'
 )
 
 # apps settings
@@ -155,11 +156,13 @@ HAYSTACK_CONNECTIONS = {
 # TODO we may want to eventually switch to queued processing
 # https://github.com/toastdriven/queued_search
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
+SESSION_SAVE_EVERY_REQUEST = True
 
 # context processors
 TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
                                "django.core.context_processors.debug",
-                               "django.core.context_processors.i18n",
                                "django.core.context_processors.media",
                                "django.core.context_processors.static",
                                "django.core.context_processors.tz",
@@ -197,8 +200,8 @@ LOGGING = {
 
 
 AUTHENTICATION_BACKENDS = (
-  'django.contrib.auth.backends.ModelBackend',
-  'lazysignup.backends.LazySignupBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'lazysignup.backends.LazySignupBackend',
 )
 
 # default URL to redirect to after login
@@ -206,8 +209,10 @@ LOGIN_REDIRECT_URL = '/user'
 
 INTERNAL_IPS = ("127.0.0.1",)
 
-CONTENT_SERVER = 'http://'+ str(config.CONTENT_SERVER_IP) + ":" + str(config.CONTENT_SERVER_PORT)
+CONTENT_SERVER = 'http://' + str(config.CONTENT_SERVER_IP) + ":" + str(config.CONTENT_SERVER_PORT)
 
-APP_SERVER = 'http://'+ str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONTEND_SERVER_PORT)
+APP_SERVER = 'http://' + str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONTEND_SERVER_PORT)
+
+TESTING = sys.argv[1] == 'test'
 
 from settings_local import *

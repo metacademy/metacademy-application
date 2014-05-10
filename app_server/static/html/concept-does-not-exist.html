@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load std_extras %}
+{% block meta-description %}
+    <meta name="description" content="This concept does not exist yet.">
+{% endblock %}
+
+{% block main %}
+    <div class="dev-note">
+      <p>
+      We're sorry, but the concept with identifier "{{cref}}" has not been created yet.
+      </p>
+      <p>
+      Soon, you'll have the ability to create this concept yourself (if you want).
+      </p>
+      <p>
+        In the meantime, feel free to request this concept by <a href="/feedback">sending us a message</a>.
+      </p>
+    </div>
+{% endblock %}

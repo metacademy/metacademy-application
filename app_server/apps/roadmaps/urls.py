@@ -11,6 +11,7 @@ urlpatterns = patterns('',
                        url(r'^([^/]+)/([^/]+)/history$', views.show_history, name='history'),
                        url(r'^([^/]+)/([^/]+)/settings$', views.settings, name='settings'),
                        url(r'^([^/]+)/([^/]+)/version/(\d+)$', views.show, name='version'),
+                       url(r'^([^/]+)/([^/]+)/version/(\d+)/changes$', views.show_changes, name='changes'),
                        url(r'^([^/]+)/([^/]+)/update_to_revision/(\d+)$', views.update_to_revision, name='revert'),
                        url(r'^([^/]+)$', views.list_by_user, name='user-list'),
                        )

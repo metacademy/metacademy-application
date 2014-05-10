@@ -1,50 +1,51 @@
 <script type="text/template" id="resource-editor-template">
 
-  <button class="expand-resource ec-button"> + show all fields </button>
-  <button class="contract-resource ec-button"> - collapse fields</button>
-
-  <label>Title</label>
-  <input type="text"  class="text-field" name="title-<%=this.cid%>" placeholder="e.g. EdX Artificial Intelligence" value="<%= title %>">
-
-  <label>Location</label>
-  <textarea class="composite-field" name="location-<%=this.cid%>" placeholder="e.g. pg. 76-78 [http://example.com/place_urls_in_brackets]"><%= this.model.getLocationString() %></textarea>
-
-  <div class="expand-content">
-  <label>Brief description</label>
-  <textarea  class="text-field" name="description-<%=this.cid%>" placeholder="e.g. a textbook for a graduate machine learning course with a focus on Bayesian methods"><%= description %></textarea>
-
-  <label>Base resource url</label>
-  <input type="text" class="text-field" name="url-<%=this.cid%>" placeholder="e.g. https://www.coursera.org/course/ml" value="<%= url %>">
-
-  <label>Resource year</label>
-  <input type="text" class="text-field" name="year-<%=this.cid%>" placeholder="e.g. 2012" value="<%= year %>">
-
-  <label>Resource type</label>
-  <input type="text" class="text-field" name="resource_type-<%=this.cid%>" placeholder="e.g. textbook" value="<%= resource_type %>">
-
-  <label>Edition</label>
-  <input type="text" class="text-field" name="edition-<%=this.cid%>" placeholder="e.g. 2" value="<%= edition %>">
-
-  <label>Resource level</label>
-  <input type="text" class="text-field" name="level-<%=this.cid%>" placeholder="e.g. undergraduate" value="<%= level %>">
-
-  <label>Authors (separate with "and")</label>
-  <input type="text" class="author-field" name="authors-<%=this.cid%>" placeholder="e.g. Jim Henry and Mark Lollipop" value="<%= this.model.getAuthorsString() %>">
-
-  <label>Additional dependencies (enter concept title, separate with comma)</label>
-  <input type="text" class="deps-field" name="dependencies-<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= dependencies.map(function(d){return d.title;}).join(', ') %>">
-
-  <label>Extra information</label>
-  <textarea class="text-field" name="extra-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning"><%= extra %></textarea>
-
-  <label>Freely available?</label>
-  <input type="checkbox" class="boolean-field" name="free-<%=this.cid%>" value="free" <%= free ? "checked" : "" %>>
-
-  <label>Requires registration?</label>
-  <input type="checkbox" class="boolean-field" name="requires_signup-<%=this.cid%>" value="signup"  <%= requires_signup ? "checked" : "" %>>
-
-  <label>Resource type</label>
-  <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Core
-  <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="supplementary" <%= (core == 0) ? "checked" : "" %>>Supplementary
+  <div class="ec-tabs res-tabs">
+    <ul>
+      <li ><button class="btn-global-resource-fields">Resource Selection</button></li>
+      <li ><button class="btn-concept-specific-fields">Resource Info for the Concept</button></li>
+    </ul>
   </div>
+
+  <div class="global-resource-fields">
+  </div>
+
+  <div class="concept-specific-fields">
+    <div class="resource-core-fields">
+      <label>Does this resource cover all of the learning goals?</label>
+      <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Yes
+      <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="supp" <%= (core == 0) ? "checked" : "" %>>No
+      <% var goals = this.model.get("concept").get("goals") %>
+      <% if (goals.length) { %>
+      <div class="resource-goals-covered" style="<%- core ? 'display: none' : '' %>">
+        <label>Which goals does it cover?</label>
+        <% goals.each(function(goal){ %>
+        <label class="rgc-goal"><input type="checkbox" name="resource-goal-<%= goal.cid %>" value="<%= goal.id %>" <%- goals_covered.indexOf(goal.id) > -1 ? "checked" : "" %>> <%- goal.get("text") %> </label>
+        <% }); %>
+      </div>
+      <% } %>
+    </div>
+
+    <label>Access</label>
+    <select name="access-<%=this.cid%>" class="select-field">
+      <option value="free" <% if (access=="free"){ %> selected  <% } %>>free</option>
+      <option value="reg" <% if (access=="reg"){ %> selected  <% } %>>free but requires registration</option>
+      <option value="paid" <% if (access=="paid"){ %> selected  <% } %>>costs money</option>
+    </select>
+
+    <div class="resource-location-wrapper">
+    </div>
+    <button class="add-item-button" id="add-location-button">+ Add Resource Location</button>
+
+
+    <label>Edition</label>
+    <input type="text" class="text-field" name="edition-<%=this.cid%>" placeholder="e.g. 2" value="<%= edition %>">
+
+    <label>Additional dependencies (enter concept title, separate with comma)</label>
+    <input type="text" class="deps-field" name="additional_dependencies-<%=this.cid%>" placeholder="e.g. logistic regression,gradient descent" value="<%= additional_dependencies.map(function(d){return d.title;}).join(', ') %>">
+
+    <label>Notes</label>
+    <textarea class="array-text-field" name="notes-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning; notation is found on pg. 7"><%= notes %></textarea>
+  </div>
+
 </script>

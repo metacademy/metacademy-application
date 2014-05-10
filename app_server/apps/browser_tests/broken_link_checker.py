@@ -26,7 +26,7 @@ class HeadRequest(urllib2.Request):
 def is_valid_link(link):
     try:
 #        pdb.set_trace()
-        test_hr = HeadRequest(link)      
+        test_hr = HeadRequest(link)
         response = urllib2.urlopen(test_hr)
     except urllib2.HTTPError:
         try:
@@ -46,8 +46,8 @@ def get_broken_links_concepts():
     # get all concepts
     graph_data = get_full_graph_data()
     blinks = []
-    base_concept_url = APP_SERVER + reverse("graphs:concepts")
-    
+    base_concept_url = APP_SERVER + "/graphs/concepts/"
+
     # TODO also check shortcut references
     for concept_obj in graph_data["nodes"]:
         concept = concept_obj["tag"]

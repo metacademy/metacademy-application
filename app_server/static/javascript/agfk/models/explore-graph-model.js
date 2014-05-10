@@ -2,7 +2,7 @@
  This file contains the graph-data model
  */
 /*global define */
-define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors"], function(Backbone, _, GraphModel, NodePropertyCollections, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler){
+define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collections/detailed-node-collection",  "agfk/collections/detailed-edge-collection", "utils/errors", "utils/utils"], function($, Backbone, _, GraphModel, DetailedNodeCollection, DetailedEdgeCollection, ErrorHandler, Utils){
 
   /**
    * GraphOptionsModel: model to store graph display/interaction options
@@ -36,7 +36,9 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
    * GraphData: model to store all graph related data
    */
   return (function(){
+
     var pvt = {};
+
     return GraphModel.extend({
       /**
        * default user states
@@ -50,37 +52,131 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
         return _.extend({}, GraphModel.prototype.defaults(), enDef);
       },
 
-      url: function(){
-        var leaf = this.get("leafs")[0] || this.fetchTag;
-        if (!leaf){
-          throw new Error("Must set graph leaf in graph-model to fetch graph data");
-        }
-        return window.CONTENT_SERVER + "/dependencies?concepts=" + leaf;
-      },
-
       parse: function(resp, xhr){
-        var thisGraph = this,
-            deps = [],
-            nodes = resp.nodes,
+        var thisModel = this;
+        if (resp.id) {
+          thisModel.set("id", resp.id);
+        }
+
+        if (xhr.parse == false) {
+          return {};
+        }
+
+        var deps = [],
+            nodes = resp.concepts,
+            edges = resp.dependencies,
             nodeTag;
+
+        if (resp.title) {
+          thisModel.set("title", resp.title);
+        }
+
+        // parse is called before initialize - so these aren't guaranteed to be present
+        if (resp.hasOwnProperty("leafs")) {
+          thisModel.set("leafs", resp.leafs);
+        }
+        if (!thisModel.get("edges")){
+          thisModel.set("edges", thisModel.defaults().edges);
+          thisModel.edgeModel = thisModel.get("edges").model;
+        }
+        if (!thisModel.get("nodes")){
+          thisModel.set("nodes", thisModel.defaults().nodes);
+          thisModel.nodeModel = thisModel.get("nodes").model;
+        }
+
         for (nodeTag in nodes) {
           if (nodes.hasOwnProperty(nodeTag)) {
             var tmpNode = nodes[nodeTag];
             tmpNode.sid = tmpNode.id;
-            tmpNode.id = nodeTag;
-
-            // parse deps separately (outlinks will be readded)
-            tmpNode.dependencies.forEach(function(dep){
-              deps.push({source: dep.from_tag, target: dep.to_tag, reason: dep.reason, from_tag: dep.from_tag, to_tag: dep.to_tag});
-            });
-            delete tmpNode.dependencies;
-            delete tmpNode.outlinks;
-            thisGraph.addNode(tmpNode);
+            thisModel.addNode(tmpNode);
           }
         }
-        deps.forEach(function(dep){
-          thisGraph.addEdge(dep);
+        if (edges) {
+          edges.forEach(function(dep){
+            // convert source/target uri to id
+            dep.source = dep.source.split("concept/")[1].slice(0,-1);
+            dep.target = dep.target.split("concept/")[1].slice(0,-1);
+            thisModel.addEdge(dep);
+          });
+        }
+
+        return thisModel.attributes;
+      },
+
+      /**
+       * traverse the graph and determine the visibility of the nodes based on the goal relationships
+       */
+      setVisStatusFromGoals: function () {
+        var thisModel = this;
+
+        // get the leaves
+        var toTraverse = thisModel.getNodes().filter(function (mdl) {
+          return mdl.get("outlinks").length  == 0;
         });
+
+        var visitedIds = {};
+        var relevantGoals = {};
+        _.each(toTraverse, function (mdl) {
+          visitedIds[mdl.id] = 1;
+          // all leaf goals are relevant by default  TODO allow for users to specify
+          mdl.get("goals").each(function (goal) {
+            relevantGoals[goal.id] = 1;
+          });
+        });
+
+        // BFS
+        while (toTraverse.length) {
+          var node = toTraverse.shift(),
+              hasGoals = node.get("goals").length > 0;
+          node.get("dependencies").each(function(dep) {
+            /* if any of the dep's target goals are in the relevantGoals
+            // add the source goals to the relgoals list and add the node
+             if it's not already present */
+            var isRelDep = !hasGoals || dep.get("target_goals").some(function (tg) {
+              return relevantGoals.hasOwnProperty(tg.id);
+            });
+
+            if (isRelDep) {
+              dep.get("source_goals").each(function (sg) {
+                relevantGoals[sg.id] = 1;
+              });
+              var src = dep.get("source");
+              if (!visitedIds.hasOwnProperty(src.id)) {
+                toTraverse.push(src);
+                visitedIds[src.id] = 1;
+              }
+            }
+          });
+        }
+
+        // set the vis status of all nodes not visited
+        thisModel.getNodes().each(function (node) {
+          if (!visitedIds.hasOwnProperty(node.id)) {
+            node.set("notGoalRelevant", true);
+          }
+        });
+
+        // TODO set a flag on all goals not in the goal list or store globally on aux?
+        window.agfkGlobals.auxModel.relevantGoals = relevantGoals;
+      },
+
+      toJSON: function () {
+        var thisModel = this,
+            node_uris = [],
+            edge_uris = [];
+        this.get("nodes").each(function (node) {
+          node_uris.push(node.url());
+        });
+        this.get("edges").each(function (edge) {
+          edge_uris.push(edge.url());
+        });
+
+        return {
+          concepts: node_uris,
+          dependencies: edge_uris,
+          id: this.get("id"),
+          title: this.get("title")
+        };
       },
 
       /**
@@ -88,43 +184,59 @@ define(["backbone", "underscore", "lib/kmapjs/models/graph-model", "agfk/collect
        */
       postinitialize: function () {
         // setup listeners
-        var thisGraph = this,
+        var thisModel = this,
             aux = window.agfkGlobals && window.agfkGlobals.auxModel;
         // Implicit learned listeners
         if (aux) {
-          thisGraph.listenTo(aux, aux.getConsts().learnedTrigger, thisGraph.changeILNodesFromTag);
+          thisModel.listenTo(aux, aux.getConsts().learnedTrigger, thisModel.changeILNodes);
         }
-        thisGraph.on("sync", function(){
-          thisGraph.changeILNodesFromTag();
-        });
+        thisModel.changeILNodes();
+        thisModel.setVisStatusFromGoals();
       },
 
-      /**
-       * DFS to change the implicit learned status of the dependencies of leafTag
-       * TODO does not have test coverage
-       */
-      changeILNodesFromTag: function(){
-        // TODO cache learned/implicit learned nodes
-        var thisGraph = this,
-            nodes = thisGraph.getNodes(),
+      changeILNodes: function () {
+        var thisModel = this,
+            depLeafs = thisModel.get("leafs"),
             aux = window.agfkGlobals && window.agfkGlobals.auxModel,
-            depLeafs = thisGraph.get("leafs");
+            reachableNodeIds = [];
 
         if (!aux) return;
 
         depLeafs.forEach(function(depLeaf){
-          var isShortcut = nodes.get(depLeaf).get("is_shortcut"),
-              unlearnedDepTags = _.map(aux.computeUnlearnedDependencies(depLeaf, isShortcut), function(tagO){return tagO.from_tag;});
-          nodes.each(function(node){
-            if (unlearnedDepTags.indexOf(node.id) > -1){
-              node.setImplicitLearnStatus(false);
-            } else if (node.id !== depLeaf){
-              node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
-            }
-          });
+          // perform dfs from leaf node
+          reachableNodeIds = _.union(reachableNodeIds, aux.dfsFromNode(thisModel.getNode(depLeaf), true));
         });
-      }
+        thisModel.getNodes().each(function(node){
+          if (reachableNodeIds.indexOf(node.id) > -1){
+            node.setImplicitLearnStatus(false);
+          } else {
+            node.setImplicitLearnStatus(!aux.conceptIsLearned(node.id));
+          }
+        });
+      },
 
+      getNodeByTag: function (tag) {
+        return this.get("nodes").findWhere({tag: tag});
+      },
+
+      setEdgeId: function (edge) {
+        var src,
+            tar,
+            needsServerId;
+
+        if (edge.set) {
+          // edge is a backbone model
+          src = edge.get("source");
+          tar = edge.get("target");
+          edge.set("id", String(src.id) + String(tar.id));
+          edge.needsServerId = !src.hasServerId || !tar.hasServerId;
+        } else {
+          src = edge.source;
+          tar = edge.target;
+          edge.id = String(src.id) + String(tar.id);
+          edge.needsServerId = !src.hasServerId || !tar.hasServerId;
+        }
+      }
     });
   })();
 });

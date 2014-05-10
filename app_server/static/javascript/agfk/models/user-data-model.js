@@ -1,21 +1,24 @@
+
 /*
  This file contains the user data model, which contains the user-specific data that synces with the app server
  */
+
+/*global define*/
 define(["backbone", "underscore"], function(Backbone, _){
 
   var USER_CONSTS = {
     userPath: "/user/",
     conceptPath: "/user/concepts/"
   };
-  
+
   // wrapper model for learned concepts
   var sharedVars = {};
-  
+
   var UserConcept = Backbone.Model.extend({
     url: function(){
       return USER_CONSTS.conceptPath + this.id;
     },
-    
+
     defaults: { id: "",
                 useCsrf: true,
                 learned: false,
@@ -26,7 +29,7 @@ define(["backbone", "underscore"], function(Backbone, _){
   // wrapper collection for user concepts
   var ConceptsCollection = (function(){
     var pvt = {};
-    
+
     /*
      *  Create or change a users concept state
      * returns true if the concept was created or changed and changes were propagated to the server
@@ -34,22 +37,17 @@ define(["backbone", "underscore"], function(Backbone, _){
      */
     pvt.changeUserConceptState = function(props){
       var thisColl = this,
-          nodeSid = props.id,
-          concept = thisColl.get(nodeSid);
+          concept = thisColl.get(props.id);
       if (!concept){
         thisColl.create(props);
-      } else{        
+      } else{
         concept.save(props);
       }
       return true;
     };
-    
+
     return Backbone.Collection.extend({
       model: UserConcept,
-      
-      initialize: function(args){
-        this.type = args.type;
-      },
 
       setStarredStatus: function(sid, status){
         return pvt.changeUserConceptState.call(this, {id: sid, starred: status});
@@ -62,7 +60,7 @@ define(["backbone", "underscore"], function(Backbone, _){
   })();
 
 
-  /** 
+  /**
    * UserData: model to store user data -- will eventually communicate with server for registered users
    */
   var UserModel = (function(){
@@ -75,13 +73,13 @@ define(["backbone", "underscore"], function(Backbone, _){
     return Backbone.Model.extend({
 
       url: USER_CONSTS.userPath,
-      
+
       /**
        * default user states
        */
       defaults: function() {
         return {
-          concepts: new ConceptsCollection({type: "learned"})
+          concepts: new ConceptsCollection()
         };
       },
 
@@ -101,30 +99,30 @@ define(["backbone", "underscore"], function(Backbone, _){
 
       isLearned: function(sid){
         var concept = this.get("concepts").get(sid);
-        return concept && concept.get("learned");
+        return !!(concept && concept.get("learned"));
       },
 
       isStarred: function(sid){
         var concept = this.get("concepts").get(sid);
-        return concept && concept.get("starred");
+        return !!(concept && concept.get("starred"));
       },
 
       /**
        * Setter function that triggers an appropriate change event
        */
-      updateLearnedConcept: function(nodeTag, nodeSid, status){
-        var changed = this.get("concepts").setLearnedStatus(nodeSid, status);
+      updateLearnedConcept: function(id, status){
+        var changed = this.get("concepts").setLearnedStatus(id, status);
         var learnedTrigger = window.agfkGlobals.auxModel.getConsts().learnedTrigger;
         if (changed) {
-          this.trigger(learnedTrigger, nodeTag, nodeSid, status);
+          this.trigger(learnedTrigger, id, status);
         }
       },
 
-      updateStarredConcept: function(nodeTag, nodeSid, status){
-        var changed = this.get("concepts").setStarredStatus(nodeSid, status);
+      updateStarredConcept: function(id, status){
+        var changed = this.get("concepts").setStarredStatus(id, status);
         var starredTrigger = window.agfkGlobals.auxModel.getConsts().starredTrigger;
         if (changed) {
-          this.trigger(starredTrigger, nodeTag, nodeSid, status);
+          this.trigger(starredTrigger, id, status);
         }
       }
     });

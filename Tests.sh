@@ -4,8 +4,8 @@
 source ../meta_venv/bin/activate
 
 # start the servers
-./run_test_servers.sh &
-rserver_id=$!
+# python app_server/manage.py runserver 8080 &
+# rserver_id=$!
 
 # run the django tests
 echo "Django Tests"
@@ -19,5 +19,5 @@ echo "Browser Tests"
 python selenium_tests/simple_selenium_tests.py
 
 # clean up
-pkill -TERM -P $rserver_id
-kill `ps aux|grep manage.py|awk '{print ($2)}'`
+# pkill -TERM -P $rserver_id
+# kill `ps aux|grep manage.py|awk '{print ($2)}'`

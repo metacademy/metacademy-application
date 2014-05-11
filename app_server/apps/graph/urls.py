@@ -29,9 +29,11 @@ urlpatterns = patterns('',
                        url(r'^(?i)concepts/([^/]+)/?$', get_concept_dep_graph, name="concepts"),
                        url(r'^(?i)concepts/$', "django.views.defaults.page_not_found", name="concepts-base"),
                        #                  url(r'^(?i)concepts/([^/]+)?/version/(\d+)/?$', get_concept_version, name="concept-version"),
-                       url(r'^new/?', new_graph, name="graph-creator"),
+                       url(r'^edit/new/?', new_graph, name="graph-creator"),
+                       url('^edit/([^/]+)/?$', edit_existing_graph, name="existing-edit"),
+                       url('id/([^/]+)/?', show_graph, name="show-graph"),
                        url(r'^idchecker/?', check_id, name="idchecker"),
                        url(r'^tagschecker/?', check_tags, name="tagschecker"),
                        url('^api/', include(v1_api.urls), name="api"),
-                       url('^([^/]+)/?$', edit_existing_graph, name="existing-edit"),
+
 )

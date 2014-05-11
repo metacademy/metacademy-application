@@ -12,7 +12,10 @@
       <!-- <li><button id="btn-exercises">Exercises</button></li> -->
       <!-- <li><button id="btn-software">Software</button></li> -->
       <li><button id="btn-pointers">See Also</button></li>
-      <li><button id="btn-history">History</button></li>
+      <% if (window.IS_META_SUPERUSER) {%>
+      <li><button id="btn-settings">Settings</button></li>
+      <% } %>
+      <!-- <li><button id="btn-history">History</button></li> -->
     </ul>
   </div>
 
@@ -140,4 +143,11 @@
   <div class="ec-display-wrap" id="history">
   </div>
 
+  <div class="ec-display-wrap" id="settings">
+    <label>url tag</label>
+    <input type="text" class="tag-input" placeholder="url tag for concept" value="<%- tag %>">
+    <p>
+      note: these settings are only visible to moderators
+    </p>
+  </div>
 </script>

@@ -122,6 +122,9 @@ def get_concept_triplet(request):
 
     return HttpResponse(json.dumps(retobj), "application/json")
 
+def show_graph(request, concept_tag=""):
+    # TODO
+    pass
 
 def get_concept_dep_graph(request, concept_tag=""):
     """

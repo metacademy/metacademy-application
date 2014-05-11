@@ -30,6 +30,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
       events: {
         "blur .title-input": "blurTitleField",
+        "blur .tag-input": "blurTagField",
         "blur .ec-display-wrap > textarea": "blurTextField",
         "blur input.dep-reason": "blurDepReason",
         "click #btn-history": "loadConceptHistory",
@@ -214,6 +215,17 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         var thisView = this;
         if (thisView.model.get("title") !== evt.currentTarget.value) {
           thisView.model.save({"title": evt.currentTarget.value}, {parse: false, error: thisView.attrErrorHandler, patch: true});
+        }
+      },
+
+      blurTagField: function(evt){
+        var thisView = this;
+        if (thisView.model.get("tag") !== evt.currentTarget.value) {
+          if (confirm("are you sure you want to change the tag field?")) {
+            thisView.model.save({"tag": evt.currentTarget.value}, {parse: false, error: thisView.attrErrorHandler, patch: true});
+          } else {
+            evt.currentTarget.value = thisView.model.get("tag");
+          }
         }
       },
 

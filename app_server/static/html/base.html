@@ -61,6 +61,9 @@
       window.GRAPH_CONCEPT_PATH = "/graphs/concepts/";
       window.PRODUCTION = window.location.href.match('metacademy') !== null;
       window.CSRF_TOKEN = "{{ csrf_token }}";
+      {% if user.is_superuser %}
+      window.IS_META_SUPERUSER = true;
+      {% endif %}
     </script>
     {% endblock %}
 

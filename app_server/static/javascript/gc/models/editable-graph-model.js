@@ -14,9 +14,7 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     },
 
     url: function () {
-      var leaf =  this.fetchTag;
-      this.fetchTag = null;
-      return window.APIBASE + (leaf ? ("targetgraph/" + leaf) : ("graph/" + this.id + "/"));
+      return window.APIBASE + "graph/" + this.id + "/";
     },
 
     isPopulated: function() {

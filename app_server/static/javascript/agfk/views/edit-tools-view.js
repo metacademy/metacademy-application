@@ -135,7 +135,7 @@ define(["underscore", "jquery", "backbone", "utils/errors", "gen-utils", "utils/
         var thisView = this,
             topoSort = thisView.model.getTopoSort(),
             // TODO fix hardcoding!
-            newWin = window.open("/graphs/concepts/" + topoSort[topoSort.length - 1], "_blank");
+            newWin = window.open("/graphs/id/" + thisView.model.id, "_blank");
         newWin.focus();
       },
 

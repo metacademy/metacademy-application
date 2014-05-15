@@ -236,7 +236,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                // init main app model
                if (!thisRoute.graphModel) {
-                 thisRoute.graphModel = new thisRoute.GraphModel(_.extend(window.agfkGlobals.graphInitData, {leafs: isCreating ? null : [targetNodeId]}), {parse: true});
+                 thisRoute.graphModel = new thisRoute.GraphModel(window.agfkGlobals.graphInitData, {parse: true});
                }
 
                var graphModel = thisRoute.graphModel;
@@ -262,8 +262,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                // shorthand
                var fNodeId = paramsObj[qFocusConcept];
 
-               // set the leafs
-               graphModel.set("leafs", [targetNodeId]);
+               // // set the leafs
+               // graphModel.set("leafs", [targetNodeId]);
 
                // default rendering determined by edit mode
                try{

@@ -72,9 +72,9 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
         }
 
         // parse is called before initialize - so these aren't guaranteed to be present
-        if (resp.hasOwnProperty("leafs")) {
-          thisModel.set("leafs", resp.leafs);
-        }
+        // if (resp.hasOwnProperty("leafs")) {
+        //   thisModel.set("leafs", resp.leafs);
+        // }
         if (!thisModel.get("edges")){
           thisModel.set("edges", thisModel.defaults().edges);
           thisModel.edgeModel = thisModel.get("edges").model;
@@ -196,8 +196,8 @@ define(["jquery", "backbone", "underscore", "lib/kmapjs/models/graph-model", "ag
 
       changeILNodes: function () {
         var thisModel = this,
-            depLeafs = thisModel.get("leafs"),
             aux = window.agfkGlobals && window.agfkGlobals.auxModel,
+            depLeafs = aux.getLeafs(thisModel), // thisModel.get("leafs"),
             reachableNodeIds = [];
 
         if (!aux) return;

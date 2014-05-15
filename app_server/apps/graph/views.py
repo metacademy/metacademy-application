@@ -122,9 +122,29 @@ def get_concept_triplet(request):
 
     return HttpResponse(json.dumps(retobj), "application/json")
 
-def show_graph(request, concept_tag=""):
-    # TODO
-    pass
+
+def render_graph_view(request, gid, template_name):
+    if request.method == "GET":
+        # get the graph data so we can bootstrap it
+        concepts = get_user_data(request)
+        try:
+            graph_json = api_communicator.get_graph(request, gid)
+        except ObjectDoesNotExist:
+            return render(request, "graph-does-not-exist.html", {"cref": gid})
+        return render(request, template_name,
+                      {"user_data": json.dumps(concepts),
+                       "graph_id": gid, "graph_init_data": graph_json})
+    else:
+        return HttpResponse(status=405)
+
+
+def show_graph(request, gid):
+    return render_graph_view(request, gid, "agfk-app.html")
+
+
+def edit_existing_graph(request, gid):
+    return render_graph_view(request, gid, "graph-creator.html")
+
 
 def get_concept_dep_graph(request, concept_tag=""):
     """
@@ -147,7 +167,7 @@ def get_concept_dep_graph(request, concept_tag=""):
 
     return render(request, "agfk-app.html",
                   {"user_data": json.dumps(uconcepts),
-                   "nojs_content": nojs_content ,
+                   "nojs_content": nojs_content,
                    "graph_init_data": graph_data,
                    "leaf": leaf})
 
@@ -164,21 +184,6 @@ def new_graph(request):
                       {"user_data": json.dumps(concepts),
                        "graph_id": gid, "graph_init_data": {"id": gid}})
 
-    else:
-        return HttpResponse(status=405)
-
-
-def edit_existing_graph(request, gid):
-    if request.method == "GET":
-        # get the graph data so we can bootstrap it
-        concepts = get_user_data(request)
-        try:
-            graph_json = api_communicator.get_graph(request, gid)
-        except ObjectDoesNotExist:
-            return render(request, "graph-does-not-exist.html", {"cref": gid})
-        return render(request, "graph-creator.html",
-                      {"user_data": json.dumps(concepts),
-                       "graph_id": gid, "graph_init_data": graph_json})
     else:
         return HttpResponse(status=405)
 

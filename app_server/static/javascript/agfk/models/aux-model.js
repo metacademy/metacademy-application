@@ -131,6 +131,15 @@ define(["backbone", "underscore", "agfk/collections/detailed-node-collection"], 
       },
 
       /**
+       * Get the leafs in the graph model
+       */
+      getLeafs: function (graphModel) {
+        return graphModel.getNodes().filter(function (node) {
+          return node.get("outlinks").length == 0;
+        });
+      },
+
+      /**
        * Computes the learning time estimate for concept with tag 'tag'
        * Uses a DFS to compute the learning time estimate
        * Concepts without a learning time estimate are currently given a default value of 1 hour

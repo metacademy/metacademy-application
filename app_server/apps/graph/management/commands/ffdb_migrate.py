@@ -158,7 +158,7 @@ class Command(BaseCommand):
                         res_obj["additional_dependencies"].append({"title": adep["title"]})
 
                 # determine global resource
-                grkey = res["title"] + res["authors"]
+                grkey = res["title"] + str(res.get("authors"))
                 if grkey in global_res_dicts:
                     global_res = global_res_dicts[grkey]
                 else:

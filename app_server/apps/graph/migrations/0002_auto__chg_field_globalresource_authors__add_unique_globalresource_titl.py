@@ -1,37 +1,35 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
-from settings import TESTING
 
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        from django.core.management import call_command
 
-        if not TESTING:
-            load = True
-            while True:
-                ans = raw_input("Populate the db with metacademy data [Y/n]? ")
-                if not ans:
-                    break
-                if ans not in ['y', 'Y', 'n', 'N']:
-                    print 'please enter y or n.'
-                    continue
-                if ans == 'y' or ans == 'Y':
-                    break
-                if ans == 'n' or ans == 'N':
-                    load = False
-                    break
-            if load:
-                print "loading graph data "
-                call_command("loaddata", "graph_fixture.json")
+        # Changing field 'GlobalResource.authors'
+        db.alter_column(u'graph_globalresource', 'authors', self.gf('django.db.models.fields.CharField')(max_length=200))
+        # Adding unique constraint on 'GlobalResource', fields ['title', 'authors']
+        db.create_unique(u'graph_globalresource', ['title', 'authors'])
+
+        # Adding field 'TargetGraph.depth'
+        db.add_column(u'graph_targetgraph', 'depth',
+                      self.gf('django.db.models.fields.IntegerField')(default=0),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        # Removing unique constraint on 'GlobalResource', fields ['title', 'authors']
+        db.delete_unique(u'graph_globalresource', ['title', 'authors'])
+
+
+        # Changing field 'GlobalResource.authors'
+        db.alter_column(u'graph_globalresource', 'authors', self.gf('django.db.models.fields.CharField')(max_length=200, null=True))
+        # Deleting field 'TargetGraph.depth'
+        db.delete_column(u'graph_targetgraph', 'depth')
+
 
     models = {
         u'auth.group': {
@@ -112,9 +110,9 @@ class Migration(DataMigration):
             'target_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"})
         },
         u'graph.globalresource': {
-            'Meta': {'object_name': 'GlobalResource'},
+            'Meta': {'unique_together': "(('title', 'authors'),)", 'object_name': 'GlobalResource'},
             'access': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'authors': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'authors': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'edition_years': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
@@ -157,6 +155,7 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'TargetGraph'},
             'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'target_graphs'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
             'dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'targetgraph_dependencies'", 'symmetrical': 'False', 'to': u"orm['graph.Dependency']"}),
+            'depth': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'leaf': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'tgraph_leaf'", 'unique': 'True', 'primary_key': 'True', 'to': u"orm['graph.Concept']"})
         },
         u'user_management.profile': {
@@ -166,4 +165,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['graph']
-    symmetrical = True

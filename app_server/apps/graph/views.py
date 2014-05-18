@@ -91,7 +91,8 @@ def get_autocomplete(request):
     if not acinp:
         return HttpResponse(status=400)
     sqs = SearchQuerySet().models(GlobalResource).autocomplete(title=acinp)[:10]
-    resp = [{"title": acres.title, "id": acres.id.split(".")[-1]} for acres in sqs if acres]
+    pdb.set_trace()
+    resp = [{"title": acres.title + " (" + acres.authors + ")", "id": acres.id.split(".")[-1]} for acres in sqs if acres]
     return HttpResponse(json.dumps(resp), "application/json")
 
 

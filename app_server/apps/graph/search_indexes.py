@@ -22,7 +22,7 @@ class ConceptIndex(indexes.SearchIndex, indexes.Indexable):
 class GlobalResourceIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     title = indexes.EdgeNgramField(model_attr="title", boost=5.0)
-
+    authors = indexes.CharField(model_attr="authors")
     def get_model(self):
         return GlobalResource
 

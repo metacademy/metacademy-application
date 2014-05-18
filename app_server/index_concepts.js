@@ -9,7 +9,7 @@ pjs.config({
 
 pjs.addSuite({
   async: true,
-  url: 'http://127.0.0.1:8080/list',
+  url: 'http://metacademy.org/list',
   moreUrls: function() {
     return _pjs.getAnchorUrls('.list-concepts-link');
   },
@@ -17,16 +17,16 @@ pjs.addSuite({
   scraper: {
     async: true,
     scraper: function() {
-      console.log( "in scraper function " +  _pjs);
+      // console.log( "in scraper function " +  _pjs);
       if (document.title === "Concepts - Metacademy") {
         return;
       }
       _pjs.waitFor(function () {
         var retVal = document.getElementById("concept-list");
-        console.log("in waitFor eval: " + retVal);
+        // console.log("in waitFor eval: " + retVal);
         return retVal;
       }, function () {
-        console.log("in waitFor true");
+        // console.log("in waitFor true");
         var savetxt = $("#main-display-view").html();
         // replace focus hashbangs with urls
         savetxt = savetxt.replace(/#([^"']+)/g, function(mstr, mgrp){

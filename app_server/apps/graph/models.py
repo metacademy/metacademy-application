@@ -114,7 +114,7 @@ class GlobalResource(Model):
     id = CharField(max_length=16, primary_key=True)
     # fields specific to GlobalResource
     title = CharField(max_length=100)
-    authors = CharField(max_length=200, null=True, blank=True)
+    authors = CharField(max_length=200, default='')
     resource_type = CharField(max_length=100)
     year = IntegerField(null=True, blank=True)
     edition_years = CharField(max_length=100, null=True, blank=True)

@@ -56,7 +56,6 @@ class Command(BaseCommand):
         # TODO figure out shortcuts
         direct_copy_fields = ["title", "summary", "tag", "id", "flags"]
         # match global resources using this field
-        gres_match_field = "title"
         gres_direct_copy_fields = ["description", "authors", "year", "url", "resource_type", "title", "edition_years"]
         global_res_dicts = {}
         # parse the dependencies after the concepts
@@ -159,15 +158,16 @@ class Command(BaseCommand):
                         res_obj["additional_dependencies"].append({"title": adep["title"]})
 
                 # determine global resource
-                if res[gres_match_field] in global_res_dicts:
-                    global_res = global_res_dicts[res[gres_match_field]]
+                grkey = res["title"] + res["authors"]
+                if grkey in global_res_dicts:
+                    global_res = global_res_dicts[grkey]
                 else:
                     global_res = {}
                     for gres_dcf in gres_direct_copy_fields:
                         global_res[gres_dcf] = res.get(gres_dcf)
                     global_res["access"] = res_obj.get("access")
                     global_res["id"] = check_model_id("global_resource")
-                    global_res_dicts[res[gres_match_field]] = global_res
+                    global_res_dicts[grkey] = global_res
                 res_obj["global_resource"] = global_res
             api_con["resources"] = api_resources
             post_concept(api_con)

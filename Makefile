@@ -27,6 +27,9 @@ $(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | a
 app_server/static/lib/kmap/*:
 	git clone https://github.com/cjrd/kmap.git app_server/static/lib/kmap
 
+test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs app_server/settings_local.py config.py
+	./Tests.sh
+
 config.py:
 	cp config-template.py config.py
 
@@ -64,9 +67,6 @@ cleandist:
 
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf
-
-test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs
-	./Tests.sh
 
 build_production:
 	cd app_server/static/javascript; node lib/r.js -o build.js

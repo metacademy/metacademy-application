@@ -134,6 +134,9 @@ class GlobalResource(Model):
         """
         return all([cr.editable_by(user) for cr in self.cresources.all()])
 
+    class Meta:
+        unique_together = ("title", "authors")
+
 reversion.register(GlobalResource)
 
 

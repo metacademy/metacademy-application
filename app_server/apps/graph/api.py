@@ -314,6 +314,7 @@ class ConceptResourceResource(CustomSaveHookResource):
 
     def dehydrate(self, bundle):
         # TODO why is this called > 1 times? and why doesn't this flag stop it?
+
         if not hasattr(self, "was_dehydrated"):
             self.was_dehydrated = True
         elif self.was_dehydrated:

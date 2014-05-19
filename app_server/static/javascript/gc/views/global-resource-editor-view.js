@@ -17,7 +17,6 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
       events: function () {
         var oevts = BaseEditorView.prototype.events();
         oevts["blur .author-field"] = "blurAuthorField";
-        oevts["keyUp .gresource-title"] = "keyUpGlobalResourceTitle";
         oevts["blur .gresource-title"] = "blurGlobalResourceTitle";
         return oevts;
       },
@@ -56,35 +55,50 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
             thisModel = thisView.model,
             id = evt.target.getAttribute("data-id");
         if (!id) {return;}
-        var prevId = thisModel.id;
-        thisModel.id = id;
-        thisModel.fetch({parse: true, success: function () {
-         thisView.conceptModel.save({"global_resource": thisModel.url()}, {parse: false, patch: true, error: thisView.attrErrorHandler});
-         thisView.render();
-        },
-        error: function () {
-          window.noty({
-              timeout: 5000,
-              type: 'error',
-              maxVisible: 1,
-              dismissQueue: false,
-              text: "Unable to get global resource from the server."
-          });
-        }});
+
+        // check if it's in the global gresources
+        var grs = window.agfkGlobals.globalResources;
+        if (grs.hasOwnProperty(id)) {
+          thisView.conceptModel.set("global_resource", grs[id]);
+          thisView.model = grs[id];
+          thisModel = grs[id];
+          thisView.loadingFromAc = true;
+          thisView.render();
+          thisView.conceptModel.save(null, {parse: false, error: thisView.attrErrorHandler});
+          thisView.loadingFromAc = false;
+        } else {
+          var prevId = thisModel.id;
+          thisModel.id = id;
+          thisView.loadingFromAc = true;
+          thisModel.fetch({parse: true, success: function () {
+            thisView.conceptModel.save(null, {parse: false, error: thisView.attrErrorHandler});
+            thisView.render();
+            thisView.loadingFromAc = false;
+          },
+                           error: function () {
+                             window.noty({
+                               timeout: 5000,
+                               type: 'error',
+                               maxVisible: 1,
+                               dismissQueue: false,
+                               text: "Unable to get global resource from the server."
+                             });
+                           }});
+
+        }
       },
 
       blurGlobalResourceTitle: function (evt) {
         var thisView = this,
             globalGResources = window.agfkGlobals.globalResources,
             gid = thisView.model.id;
+        if (!evt.currentTarget.value || thisView.loadingFromAc || $(evt.relatedTarget).hasClass("ac-li-a")) {
+          return;
+        }
         if (!globalGResources.hasOwnProperty(gid)){
           globalGResources[gid] = thisView.model;
         }
         thisView.blurTextField(evt);
-      },
-
-      keyUpGlobalResourceTitle: function () {
-        // TODO FIXME this should match preexisting titles, i.e. check local gresources and also check server gresources
       },
 
       /**

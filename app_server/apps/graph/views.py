@@ -1,6 +1,7 @@
 import json
 import random
 import string
+import ast
 import pdb
 import os
 
@@ -81,6 +82,11 @@ def get_concept_history(request, concept_tag=""):
     revs = _get_versions_obj(concept)[::-1]
     return render(request, 'concept_history.html', {'concept': concept, "revs": revs})
 
+def _get_ac_string(res):
+    rstr = res.title
+    if len(res.authors) > 2:
+        rstr += " (" + ", ".join(ast.literal_eval(res.authors)) + ")"
+    return rstr
 
 def get_autocomplete(request):
     """
@@ -91,8 +97,8 @@ def get_autocomplete(request):
     if not acinp:
         return HttpResponse(status=400)
     sqs = SearchQuerySet().models(GlobalResource).autocomplete(title=acinp)[:10]
-    pdb.set_trace()
-    resp = [{"title": acres.title + " (" + acres.authors + ")", "id": acres.id.split(".")[-1]} for acres in sqs if acres]
+    resp = [{"title": _get_ac_string(acres), "id": acres.id.split(".")[-1]} for acres in sqs if acres]
+
     return HttpResponse(json.dumps(resp), "application/json")
 
 

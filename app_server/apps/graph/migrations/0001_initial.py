@@ -78,7 +78,7 @@ class Migration(SchemaMigration):
         db.create_table(u'graph_globalresource', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('authors', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
+            ('authors', self.gf('django.db.models.fields.CharField')(default='', max_length=200)),
             ('resource_type', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('year', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('edition_years', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
@@ -331,7 +331,7 @@ class Migration(SchemaMigration):
         u'graph.globalresource': {
             'Meta': {'object_name': 'GlobalResource'},
             'access': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'authors': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'authors': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'edition_years': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),

@@ -102,7 +102,6 @@ class Migration(SchemaMigration):
             ('edition', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
-            ('access', self.gf('django.db.models.fields.CharField')(max_length=4)),
             ('notes', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['ConceptResource'])
@@ -306,7 +305,6 @@ class Migration(SchemaMigration):
         },
         u'graph.conceptresource': {
             'Meta': {'object_name': 'ConceptResource'},
-            'access': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
             'additional_dependencies': ('django.db.models.fields.CharField', [], {'max_length': '300', 'null': 'True', 'blank': 'True'}),
             'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'concept_resource'", 'to': u"orm['graph.Concept']"}),
             'core': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),

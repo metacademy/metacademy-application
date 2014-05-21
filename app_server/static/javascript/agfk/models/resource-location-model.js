@@ -11,7 +11,8 @@ define(["backbone"], function(Backbone){
         cresource: null,
         url: "",
         location_type: "",
-        location_text: ""
+        location_text: "",
+        ordering: -1
       };
     },
 

@@ -28,6 +28,7 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
       var thisModel = this;
       // if it needs the server id it'll be saved after the node id returns
       // so don't save the graph here
+      edge.set("ordering", _.max(thisModel.getEdges().pluck("ordering")) + 1);
       if (isNewEdge && !edge.needsServerId) {
         edge.save(null,
                   {parse: false,

@@ -12,14 +12,14 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
       globalResClass: "global-resource-fields",
       resLocWrapperClass: "resource-location-wrapper",
       rgcClass: "resource-goals-covered",
-      crfClass: "core-radio-field"
+      crfClass: "core-radio-field",
+      sortableClass: "sortable"
     };
 
     return BaseEditorView.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
-
+      tagName: "li",
       className: "resource-form input-form",
-
       events: function(){
         var oevts = BaseEditorView.prototype.events(),
             consts = pvt.consts;
@@ -64,13 +64,34 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         thisView.$el.find(".btn-" + thisView.curResDisp).addClass("active");
 
         thisView.isRendered = true;
+        thisView.$el.find("." + consts.sortableClass).sortable().bind('sortupdate', function() {
+          thisView.updateLocationOrdering();
+        });
         return thisView;
+      },
+
+      /**
+       * Update the resource location ordering to match the ordering in the list
+       */
+      updateLocationOrdering: function () {
+        var thisView = this,
+            locs = thisView.model.get("locations");
+
+        thisView.$el.find("." + pvt.consts.resLocWrapperClass).find("li").each(function (i, liEl) {
+          var locCid = liEl.id.split("-")[0],
+              locObj = locs.get(locCid);
+          if (locObj.get("ordering") !== i) {
+            locObj.set("ordering", i);
+            locObj.save({ordering: i}, {patch: true, parse: false});
+          }
+        });
+        locs.sort();
       },
 
       addResourceLocation: function () {
         var thisView = this,
             rlid = Math.random().toString(36).substr(3, 11),
-            resLoc = new ResourceLocation({id: rlid, cresource: thisView.model});
+            resLoc = new ResourceLocation({id: rlid, cresource: thisView.model, ordering: _.max(thisView.model.get("locations").pluck("ordering")) + 1});
         thisView.resourceLocationsView = thisView.resourceLocationsView || new ResourceLocationsView({model: thisView.model.get("locations")});
         thisView.resourceLocationsView.model.add(resLoc);
         // verify the rl id is okay

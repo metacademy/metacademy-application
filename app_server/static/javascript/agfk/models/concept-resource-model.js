@@ -7,7 +7,7 @@
 
 define(["backbone", "agfk/collections/resource-location-collection", "agfk/models/global-resource-model"], function(Backbone, LocationCollection, GlobalResource){
     return Backbone.Model.extend({
-    simpleFields: ["id", "access", "core", "edition", "additional_dependencies", "notes", "goals_covered"],
+    simpleFields: ["id", "core", "edition", "additional_dependencies", "notes", "goals_covered"],
     collFields: ["locations"],
     /**
      * default values -- attributes match possible data from server
@@ -17,7 +17,6 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
         id: "",
         locations: new LocationCollection(),
         global_resource: new GlobalResource(),
-        access: "free",
         core: 1,
         // TODO consider using a GoalCollection if goals become more complicated
         goals_covered: [],

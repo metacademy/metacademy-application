@@ -28,6 +28,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='goals', to=orm['graph.Concept'])),
             ('text', self.gf('django.db.models.fields.CharField')(max_length=500)),
+            ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
         ))
         db.send_create_signal(u'graph', ['Goal'])
 
@@ -37,6 +38,7 @@ class Migration(SchemaMigration):
             ('source', self.gf('django.db.models.fields.related.ForeignKey')(related_name='dep_source', to=orm['graph.Concept'])),
             ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='dep_target', to=orm['graph.Concept'])),
             ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
+            ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
         ))
         db.send_create_signal(u'graph', ['Dependency'])
 
@@ -99,6 +101,7 @@ class Migration(SchemaMigration):
             ('additional_dependencies', self.gf('django.db.models.fields.CharField')(max_length=300, null=True, blank=True)),
             ('edition', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
             ('access', self.gf('django.db.models.fields.CharField')(max_length=4)),
             ('notes', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
         ))
@@ -121,6 +124,7 @@ class Migration(SchemaMigration):
             ('location_type', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('location_text', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
         ))
         db.send_create_signal(u'graph', ['ResourceLocation'])
 
@@ -311,6 +315,7 @@ class Migration(SchemaMigration):
             'goals_covered': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'goals_covered'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'notes': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
+            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         },
         u'graph.conceptsettings': {
@@ -322,6 +327,7 @@ class Migration(SchemaMigration):
         u'graph.dependency': {
             'Meta': {'object_name': 'Dependency'},
             'id': ('django.db.models.fields.CharField', [], {'max_length': '32', 'primary_key': 'True'}),
+            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dep_source'", 'to': u"orm['graph.Concept']"}),
             'source_goals': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'source_goals'", 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
@@ -346,6 +352,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Goal'},
             'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'goals'", 'to': u"orm['graph.Concept']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
+            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'text': ('django.db.models.fields.CharField', [], {'max_length': '500'})
         },
         u'graph.graph': {
@@ -367,6 +374,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'location_text': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location_type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         },

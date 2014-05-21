@@ -16,7 +16,9 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       resourcesTidbitWrapId: "resources-tidbit-wrap",
       goalsTidbitWrapId: "goals-tidbit-wrap",
       historyId: "history",
+      sortableClass: "sortable",
       reversionsClass: "reversions",
+      depUlId: "dependencies-list",
       expClass: "expanded"
     };
 
@@ -113,19 +115,52 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
         thisView.$el.find("#" + pvt.state.visId).addClass("active");
         thisView.$el.find("#btn-" + pvt.state.visId).addClass("active");
+
+        thisView.$el.find("#" + consts.goalsTidbitWrapId).sortable().bind('sortupdate', function () {
+          thisView.updateGoalOrdering();
+        });
+        thisView.$el.find("#" + consts.depUlId).sortable().bind('sortupdate', function () {
+          thisView.updateDepOrdering();
+        });
         thisView.isRendered = true;
         return thisView;
+      },
+
+      updateDepOrdering: function () {
+        var thisView = this,
+            deps = thisView.model.get("dependencies");
+        thisView.$el.find("#" + pvt.consts.depUlId).find("li").each(function (i, dep) {
+          var depModel = deps.get(dep.id.split("-")[0]);
+          if (depModel.get("ordering") !== i) {
+            depModel.set("ordering", i);
+            depModel.save({ordering: i}, {patch: true, parse: false});
+          }
+        });
+        deps.sort();
+      },
+
+      updateGoalOrdering: function () {
+        var thisView = this,
+            goals = thisView.model.get("goals");
+        thisView.$el.find("#" + pvt.consts.goalsTidbitWrapId).find("li").each(function (i, goalel) {
+          var goalModel = goals.get(goalel.id.split("-")[0]);
+          if (goalModel.get("ordering") !== i) {
+            goalModel.set("ordering", i);
+            goalModel.save({ordering: i}, {patch: true, parse: false});
+          }
+        });
+        goals.sort();
       },
 
       addGoal: function () {
         var thisView = this,
             gid = Math.random().toString(36).substr(3, 11),
-            newGoal = new GoalModel({id: gid, concept: thisView.model}),
+            newGoal = new GoalModel({id: gid, concept: thisView.model, ordering: _.max(thisView.model.get("goals").pluck("ordering")) + 1}),
             deps = thisView.model.get("dependencies"),
             ols = thisView.model.get("outlinks");
 
         // add goal to goal list
-        thisView.model.get("goals").add(newGoal, {at: 0});
+        thisView.model.get("goals").add(newGoal);
 
         newGoal.save(null, {parse: false, error: thisView.attrErrorHandler, success: function () {
           // FIXME this is an awkward way to update the deps and ols
@@ -136,8 +171,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
          Utils.errorNotify("unable to save goal");
         }});
 
-        // TODO we need to update all of the source/targets, hmmm
-        thisView.render();
         // add goal to all preq and postreq dep lists by default
         deps.each(function (dep) {
             dep.get("target_goals").add(newGoal);

@@ -26,15 +26,8 @@
       <% } %>
     </div>
 
-    <label>Access</label>
-    <select name="access-<%=this.cid%>" class="select-field">
-      <option value="free" <% if (access=="free"){ %> selected  <% } %>>free</option>
-      <option value="reg" <% if (access=="reg"){ %> selected  <% } %>>free but requires registration</option>
-      <option value="paid" <% if (access=="paid"){ %> selected  <% } %>>costs money</option>
-    </select>
-
-    <div class="resource-location-wrapper">
-    </div>
+    <ul class="resource-location-wrapper sortable">
+    </ul>
     <button class="add-item-button" id="add-location-button">+ Add Resource Location</button>
 
 

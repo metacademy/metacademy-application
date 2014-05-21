@@ -73,12 +73,13 @@ class Command(BaseCommand):
             api_goal_list = []
             goal_arr = []
             if concept.get("goals"):
+                gnum = 0
                 for goal in concept.get("goals"):
                     if int(goal.get("depth")) == 1:
                         if goal_arr:
                             mtxt = markdown_obj_to_markdown(goal_arr)
-                            # FIXME TODO goals are added multiple times if concept already exists in DB
-                            api_goal_list.append({"id": check_model_id("goal"), "text": mtxt})
+                            api_goal_list.append({"id": check_model_id("goal"), "text": mtxt, "ordering": gnum})
+                            gnum += 1
                         goal_arr = [goal]
                     else:
                         goal_arr.append(goal)
@@ -86,7 +87,8 @@ class Command(BaseCommand):
                 # TODO fix DRY
                 if goal_arr:
                     mtxt = markdown_obj_to_markdown(goal_arr)
-                    api_goal_list.append({"id": check_model_id("goal"), "text": mtxt})
+                    api_goal_list.append({"id": check_model_id("goal"), "text": mtxt, "ordering": gnum})
+                    gnum += 1
             api_con["goals"] = api_goal_list
 
             # create see-also object
@@ -105,18 +107,22 @@ class Command(BaseCommand):
 
             ### RESOURCES ###
             api_resources = []
+            rnum = 0
             for res in concept["resources"]:
                 res_obj = {}
                 api_resources.append(res_obj)
                 res_obj["id"] = check_model_id("resource")
-
+                res_obj["ordering"] = rnum
+                rnum += 1
                 # TODO FIXME we must unparse the note field
                 if "note" in res:
-                    res_obj["notes"] = res.get("note")
+                    res_obj["notes"] = filter(lambda x: len(x) > 2, res.get("note"))
                 if "extra" in res:
-                    if "notes" in res_obj:
-                        res_obj["notes"] += "\n" + "\n".join(res_obj["notes"])
-                    else:
+                    if "notes" not in res_obj:
+                    #     pass
+                    #     # pdb.set_trace()
+                    #     # res_obj["notes"] += res["extra"]
+                    # else:
                         res_obj["notes"] = res.get("extra")
                 if "core" in res:
                     res_obj["core"] = res.get("core")
@@ -128,21 +134,24 @@ class Command(BaseCommand):
                 else:
                     res_obj["goals_covered"] = []
 
-                # determine access
-                if res.get("free"):
-                    res_obj["access"] = "free"
-                elif res.get("requires_signup"):
-                    res_obj["access"] = "reg"
-                else:
-                    res_obj["access"] = "paid"
+                # # determine access
+                # if res.get("free"):
+                #     res_obj["access"] = "free"
+                # elif res.get("requires_signup"):
+                #     res_obj["access"] = "reg"
+                # else:
+                #     res_obj["access"] = "paid"
                 res_obj["edition"] = res.get("edition")
 
                 # build locations
                 rlocs = []
                 res_obj["locations"] = rlocs
+                lnum = 0
                 if "location" in res:
                     for loc in res.get("location"):
                         loc_obj = {}
+                        loc_obj["ordering"] = lnum
+                        lnum += 1
                         loc_obj["url"] = loc.get("link")
                         loc_obj["location_text"] = loc.get("text")
                         # TODO add location type to previous resources
@@ -168,11 +177,20 @@ class Command(BaseCommand):
                     global_res["access"] = res_obj.get("access")
                     global_res["id"] = check_model_id("global_resource")
                     global_res_dicts[grkey] = global_res
+                    # # determine access
+                    if res.get("free"):
+                        global_res["access"] = "free"
+                    elif res.get("requires_signup"):
+                        global_res["access"] = "reg"
+                    else:
+                        global_res["access"] = "paid"
+
                 res_obj["global_resource"] = global_res
             api_con["resources"] = api_resources
             post_concept(api_con)
 
         # now send the deps
+        dnum = 0
         for dep in all_deps:
             api_dep = {}
             src = tag_to_concept_dict[dep["from_tag"]]
@@ -181,6 +199,8 @@ class Command(BaseCommand):
             api_dep["source"] = get_concept_uri(src["id"])
             api_dep["target"] = get_concept_uri(target["id"])
             api_dep["reason"] = dep["reason"]
+            api_dep["ordering"] = dnum
+            dnum += 1
             api_dep["source_goals"] = [get_goal_uri(sgoal.id) for sgoal in Concept.objects.get(id=src["id"]).goals.all()]
             api_dep["target_goals"] = [get_goal_uri(tgoal.id) for tgoal in Concept.objects.get(id=target["id"]).goals.all()]
             post_dependency(api_dep)

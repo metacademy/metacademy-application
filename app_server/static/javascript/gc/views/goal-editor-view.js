@@ -11,8 +11,11 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
 
     return BaseEditorView.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
-
       className: "input-form goal-form",
+      tagName: "li",
+      id: function () {
+        return this.model.cid + "-goal";
+      },
 
       /**
        * render the view and return the view element

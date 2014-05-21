@@ -42,7 +42,7 @@ Overrides
 Input form
 ************/
 
-.input-form{
+.input-form, .sortable-placeholder{
     position: relative;
     border: 2px solid #B4ADAD;
     border-radius: 4px;
@@ -51,13 +51,18 @@ Input form
     text-align: left;
 }
 
+.sortable-placeholder{
+    border-style: dashed;
+    height: 77px;
+}
+
 .input-form label{
     margin-top: 1em;
     font-size: 0.9em;
     font-weight: bold;
     display: block;
 }
-.input-form + .input-form{
+.input-form + .input-form, .sortable-placeholder + .input-form, .input-form + .sortable-placeholder{
     margin-top: 2em;
 }
 
@@ -385,7 +390,7 @@ g.connect-node circle{
     color: white;
     position: absolute;
     left: 0;
-    top: -2em;
+    bottom: -2.5em;
     font-size: .7em;
 }
 

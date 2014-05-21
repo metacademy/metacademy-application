@@ -6,7 +6,8 @@ define(["backbone", "utils/utils"], function(Backbone, Utils){
       return {
         text: "",
         id: "",
-        concept: null
+        concept: null,
+        ordering: -1
       };
     },
 
@@ -27,7 +28,8 @@ define(["backbone", "utils/utils"], function(Backbone, Utils){
         return {
           id: thisModel.id,
           text: thisModel.get("text"),
-          concept: thisModel.get("concept").url()
+          concept: thisModel.get("concept").url(),
+          ordering: thisModel.get("ordering")
         };
     },
 

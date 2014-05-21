@@ -22,4 +22,12 @@
   <label>Edition years (separate with a comma)</label>
   <input type="text" class="text-field" name="edition_years-<%=this.cid%>" placeholder="e.g. 1996, 2004, 2012" value="<%= edition_years %>">
 
+    <label>Access</label>
+    <select name="access-<%=this.cid%>" class="select-field">
+      <option value="free" <% if (access=="free"){ %> selected  <% } %>>free</option>
+      <option value="reg" <% if (access=="reg"){ %> selected  <% } %>>free but requires registration</option>
+      <option value="paid" <% if (access=="paid"){ %> selected  <% } %>>costs money</option>
+    </select>
+
+
 </script>

@@ -56,6 +56,7 @@ class Goal(Model):
     id = CharField(max_length=16, primary_key=True)
     concept = ForeignKey(Concept, related_name="goals")
     text = CharField(max_length=500)
+    ordering = IntegerField(default=-1)
 
     def editable_by(self, user):
         return self.concept.editable_by(user)
@@ -74,6 +75,7 @@ class Dependency(Model):
     reason = CharField(max_length=500)
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")
+    ordering = IntegerField(default=-1)
 
     def editable_by(self, user):
         return user.is_superuser or self.target.is_provisional()
@@ -151,9 +153,7 @@ class ConceptResource(Model):
     additional_dependencies = CharField(max_length=300, null=True, blank=True)
     edition = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
-
-    # overrides GlobalResource field
-    access = CharField(max_length=4, choices=(("free", "free"), ("reg", "free but requires registration"), ("paid", "costs money")))
+    ordering = IntegerField(default=-1)
 
     # concats GlobalResource field ?
     notes = CharField(max_length=500, null=True, blank=True)
@@ -176,6 +176,7 @@ class ResourceLocation(Model):
     location_type = CharField(max_length=30)
     location_text = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
+    ordering = IntegerField(default=-1)
 
     def editable_by(self, user):
         return self.cresource.editable_by(user)

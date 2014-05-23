@@ -213,6 +213,10 @@ CONTENT_SERVER = 'http://' + str(config.CONTENT_SERVER_IP) + ":" + str(config.CO
 
 APP_SERVER = 'http://' + str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONTEND_SERVER_PORT)
 
-TESTING = sys.argv[1] == 'test'
-
 from settings_local import *
+
+if DEBUG:
+    TESTING = sys.argv[1] == 'test'
+else:
+    TESTING= False
+

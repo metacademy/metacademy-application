@@ -10,10 +10,16 @@ except ImportError:
 class ContactForm(forms.Form):
     email = forms.CharField(required=False, label="Your email (optional):")
     message = forms.CharField(widget=forms.Textarea, required=False)
+    # spam protection
+    fname = forms.CharField(required=False)
 
     def send_email(self):
         return_email = self.cleaned_data['email']
         msg = self.cleaned_data['message']
+        fname = self.cleaned_data['fname']
+        # spam protection
+        if fname:
+            return
         subject, to_email = 'Metacademy feedback from ' + return_email, 'feedback@metacademy.org'
         try:
             send_mail(subject, msg, EMAIL_HOST_USER, [to_email], fail_silently=False)

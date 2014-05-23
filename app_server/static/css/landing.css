@@ -36,6 +36,10 @@
     display: inline-block;
 }
 
+.dev-update {
+    font-weight: bold;
+}
+
 
 @media only screen and (max-width: 767px){
     #main-search-input{

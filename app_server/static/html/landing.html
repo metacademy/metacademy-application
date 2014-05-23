@@ -5,18 +5,21 @@
     <link rel="stylesheet" href="{% static "css/landing.css" %}"/>
 {% endblock %}
 
-{% block header-search %}    
+{% block header-search %}
 {% endblock %}
 
 {% block jscript-extend %}
 <script type="text/javascript" src="{% static "javascript/landing.js" %}"></script>
 {% endblock %}
-    
+
 {% block main %}
 
 <div class="main-search-wrap">
   <img id="main-search-logo" class="mlogo" src="{% static "images/banner2-meta.png" %}" alt="Metacademy Logo" />
-  <input type="text" class="searchbox" id="main-search-input" placeholder="Search for concept you want to learn, e.g. logistic regression" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
+  <div class="db-search-wrap">
+    <input type="text" class="searchbox" id="main-search-input" placeholder="Search for concept you want to learn, e.g. logistic regression" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
+  </div>
+</div>
 
   <div class="dev-note">
 <p>
@@ -29,7 +32,7 @@
   Check out the new roadmap: <a href="/roadmaps/rgrosse/deep_learning" class="internal-link">Deep Learning From the Bottom Up</a>
 </p>
   </div>
-  
+
 
 </div>
 

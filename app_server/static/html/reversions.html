@@ -1,0 +1,45 @@
+<div class="reversions">
+  <h1 class="history-header">
+    Revisions
+  </h1>
+
+  <ol class="history-list">
+    {% for rev in revs %}
+    <li {% if rev.object_version.object.version_num == cur_version_num%} class="current" {% endif %}>
+      <a class="internal-link" href="{{base_rev_url}}{{forloop.revcounter0}}"> (#{{forloop.revcounter0}}) by {{rev.revision.user.username}} [{{rev.revision.date_created}}] </a>
+
+      {% if can_edit %}
+      <div class="revision-history-revert">
+        <a href="update_to_revision/{{forloop.revcounter0}}">Revert</a>
+      </div>
+      {% endif %}
+
+      {% if show_preview_button %}
+      <div class="revision-history-preview">
+        <a class="cbox-preview" href="{{base_rev_url}}{{forloop.revcounter0}}">Preview</a>
+      </div>
+      {% endif %}
+
+      {% if show_change_button %}
+      <div class="revision-history-changes">
+        <a class="cbox-changes" href="{{base_rev_url}}{{forloop.revcounter0}}/changes">Changes</a>
+      </div>
+      {% endif %}
+
+      <div class="revision-history-comment">
+        {% if rev.revision.comment %}
+        {{rev.revision.comment}}
+        {% else %}
+        (no commit message)
+        {% endif %}
+      </div>
+
+      <div style="clear:both;">
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+
+  <div id="preview-display-box">
+  </div>
+</div>

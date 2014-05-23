@@ -1,20 +1,26 @@
+
 /*global define*/
-define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-property-collections", "agfk/collections/detailed-edge-collection"], function(_, Node, NodePropertyCollections, DetailedEdgeCollection){
+define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-resource-collection", "agfk/collections/detailed-edge-collection", "agfk/collections/goal-collection"], function(_, Node, ConceptResourceCollection, DetailedEdgeCollection, GoalCollection){
 
   var DetailedNode = Node.extend({
     // FIXME these shouldn't be hardcoded
-    collFields: ["exercises", "dependencies", "outlinks", "resources"],
+    collFields: function () {
+      return _.union(Node.prototype.collFields(), ["resources", "goals"]);
+    },
 
-    txtFields: ["id", "sid", "title", "summary", "goals", "pointers", "is_shortcut", "flags", "time", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"],
+    txtFields: function () {
+        return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "summary", "pointers", "learn_time", "is_partial", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
+    },
+
 
     defaults: function(){
       var dnDefaults = {
         dependencies: new DetailedEdgeCollection(),
         outlinks: new DetailedEdgeCollection(),
-        exercises: new NodePropertyCollections.ExerciseCollection(),
-        resources: new NodePropertyCollections.ResourceCollection(),
-        flags: [],
-        goals: "",
+        exercises: "",
+        resources: new ConceptResourceCollection(),
+        useCsrf: true,
+        goals: new GoalCollection(),
         pointers: "",
         software: "",
         x: 0,
@@ -24,38 +30,48 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
         hasContractedOLs: false,
         sid: "",
         summary: "",
-        time: "",
+        learn_time: 1,
         is_shortcut: 0
       };
       return _.extend({}, Node.prototype.defaults(), dnDefaults);
+    },
+
+    url: function () {
+        return window.APIBASE + "concept/" + this.id + "/";
     },
 
     /**
      *  parse the incoming server data
      */
     parse: function(resp, xhr) {
+      var thisModel = this;
       // check if we have a null response from the server
-      if (resp === null) {
+      if (resp === null || xhr.parse == false) {
         return {};
       }
-      var output = this.defaults();
+
+      var output = _.extend(thisModel.defaults(), thisModel.attributes),
+          txtFields = thisModel.txtFields(),
+          collFields = thisModel.collFields();
 
       // ---- parse the text values ---- //
-      var i = this.txtFields.length;
+      var i = txtFields.length;
       while (i--) {
-        var tv = this.txtFields[i];
+        var tv = txtFields[i];
         if (resp[tv] !== undefined) {
           output[tv] = resp[tv];
+        } else if (output[tv] === undefined) {
+          output[tv] = "";
         }
       }
 
       // ---- parse the collection values ---- //
-      i = this.collFields.length;
+      i = collFields.length;
       while (i--) {
-        var cv = this.collFields[i];
-        output[cv].parent = this;
+        var cv = collFields[i];
+        output[cv].parent = thisModel;
         if (resp[cv] !== undefined) {
-          output[cv].add(resp[cv]);
+          output[cv].add(resp[cv], {parse: true, merge: true});
         }
       }
       return output;
@@ -77,7 +93,7 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
       thisModel.setImplicitLearnStatus = function(status){
         if (nodePvt.implicitLearn !== status){
           nodePvt.implicitLearn = status;
-          thisModel.trigger("change:implicitLearnStatus", thisModel.get("id"), thisModel.get("sid"), status);
+          thisModel.trigger("change:implicitLearnStatus", thisModel.get("id"), status);
         }
       };
 
@@ -94,11 +110,11 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
       };
 
       thisModel.getCollFields = function(){
-        return thisModel.collFields;
+        return thisModel.collFields();
       };
 
       thisModel.getTxtFields = function(){
-        return thisModel.txtFields;
+        return thisModel.txtFields();
       };
     },
 
@@ -106,31 +122,15 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
      * Returns the title to be displayed in the learning view
      */
     getLearnViewTitle: function(){
-      var title = this.get("title") || this.id.replace(/_/g, " ");
-      if (this.get("is_shortcut")) {
+      var thisModel = this,
+          title = thisModel.get("title") || thisModel.id.replace(/_/g, " ");
+      if (thisModel.get("is_shortcut")) {
         title += " (shortcut)";
       }
-      if (!this.isFinished()) {
+      if (!thisModel.get("is_partial") && !thisModel.isFinished() ) {
         title += " (under construction)";
       }
       return title;
-    },
-
-    /**
-     * Compute the list of outlinks to be displayed in the context section
-     */
-    computeNeededFor: function(){
-      var nodes = this.collection, thisModel = this;
-
-      var found = this.get("outlinks").filter(function(item){
-        var node = nodes.findWhere({"id": item.get("to_tag")});
-        if (!node) {
-          return false;
-        }
-        return node.get("dependencies").findWhere({"from_tag": thisModel.get("id")});
-      });
-
-      return new DetailedEdgeCollection(found);
     },
 
     /**
@@ -138,7 +138,28 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/node-pro
      # construction" message otherwise.
      */
     isFinished: function(){
-      return this.get("summary") && this.get("resources").length > 0;
+      return this.get("summary").length && this.get("resources").length > 0;
+    },
+
+    toJSON: function() {
+      var thisModel = this,
+          attrs = thisModel.attributes,
+          attrib,
+          retObj = {},
+          collFields = thisModel.collFields();
+
+      // handle flat attributes
+      for (attrib in attrs) {
+        if (attrs.hasOwnProperty(attrib) && collFields.indexOf(attrib) === -1) {
+          retObj[attrib] = thisModel.get(attrib);
+        }
+      }
+
+      // jsonify some of the collection attributes (don't pass edges)
+      retObj.resources = thisModel.get("resources").toJSON();
+      retObj.goals = thisModel.get("goals").toJSON();
+
+      return retObj;
     }
   });
 

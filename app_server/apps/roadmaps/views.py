@@ -1,6 +1,4 @@
-import pdb
-
-import collections
+import difflib
 import os
 from operator import attrgetter
 
@@ -16,15 +14,15 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import safestring
+from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 
-from apps.cserver_comm import cserver_communicator as cscomm
+from apps.graph.models import Concept
 from utils.roadmap_extension import RoadmapExtension
 from utils.mathjax_extension import MathJaxExtension
 from forms import RoadmapForm, RoadmapSettingsForm
 import models
-import settings
 
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
@@ -36,15 +34,18 @@ BLEACH_ATTR_WHITELIST = {
     'img': ['src', 'alt', 'width', 'height']
 }
 
+
 # TODO what is this used for - Colorado
 def metacademy_domains():
     return ['']
+
 
 def is_internal_link(url):
     p = urlparse.urlparse(url)
     if p.netloc not in metacademy_domains():
         return False
     return p.path.find('/concepts/') != -1
+
 
 re_tag = re.compile(r'/concepts/(\w+)')
 def parse_tag(url):
@@ -54,9 +55,10 @@ def parse_tag(url):
     else:
         return None
 
+
 def process_link(attrs, new=False):
     if is_internal_link(attrs['href']):
-        if cscomm.is_node_present(parse_tag(attrs['href'])):
+        if Concept.objects.filter(tag=parse_tag(attrs['href'])).exists():
             attrs['class'] = 'internal-link'
         else:
             attrs['class'] = 'internal-link missing-link'
@@ -65,15 +67,17 @@ def process_link(attrs, new=False):
     attrs['target'] = '_blank'
     return attrs
 
+
 def wiki_link_url_builder(label, base, end):
     """
     TODO allow tags and titles (how to distinguish?)
     """
-    ttt_dict = cscomm.get_title_to_tag_dict()
-    if ttt_dict.has_key(label):
-        return base + ttt_dict[label]
+    res = Concept.objects.filter(title=label)
+    if len(res):
+        return base + res[0].tag
     else:
         return base + label
+
 
 def markdown_to_html(markdown_text):
     """
@@ -81,9 +85,12 @@ def markdown_to_html(markdown_text):
     """
     roadmap_ext = RoadmapExtension()
     mathjax_ext = MathJaxExtension()
-    body_html = markdown.markdown(markdown_text, extensions=[roadmap_ext, mathjax_ext, 'toc', 'sane_lists', 'extra', 'wikilinks(base_url=/concepts/)'], extension_configs={'wikilinks(base_url=/concepts/)' : [('build_url', wiki_link_url_builder)]})
+    body_html = markdown.markdown(markdown_text,
+                                  extensions=[roadmap_ext, mathjax_ext, 'toc', 'sane_lists', 'extra', 'wikilinks(base_url=/concepts/)'],
+                                  extension_configs={'wikilinks(base_url=/concepts/)': [('build_url', wiki_link_url_builder)]})
     html = bleach.clean(body_html, tags=BLEACH_TAG_WHITELIST, attributes=BLEACH_ATTR_WHITELIST)
     return bleach.linkify(html, callbacks=[process_link])
+
 
 def show(request, in_username, tag, vnum=-1):
     try:
@@ -94,14 +101,14 @@ def show(request, in_username, tag, vnum=-1):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     vnum = int(vnum)
-    versions = get_versions_obj(roadmap)
+    versions = _get_versions_obj(roadmap)
     num_versions = len(versions)
 
-    if num_versions > vnum >= 0 :
+    if num_versions > vnum >= 0:
         roadmap = versions[vnum].object_version.object
 
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
@@ -110,7 +117,59 @@ def show(request, in_username, tag, vnum=-1):
         'body_html': markdown_to_html(roadmap.body),
         'num_versions': num_versions,
         'page_class': "view"
-        }, **common_rm_dict))
+    }, **common_rm_dict))
+
+
+def format_diff_line(line):
+    line = escape(line)
+    if line[0] == '+':
+        return '<ins>' + line + '</ins>'
+    elif line[0] == '-':
+        return '<del>' + line + '</del>'
+    else:
+        return line
+
+
+def show_changes(request, in_username, tag, vnum=-1):
+    try:
+        rm_dict = get_roadmap_objs(in_username, tag)
+    except:
+        return HttpResponse(status=404)
+
+    roadmap = rm_dict["roadmap"]
+    roadmap_settings = rm_dict["settings"]
+
+    if not roadmap_settings.viewable_by(request.user):
+        return HttpResponse(status=404)
+
+    vnum = int(vnum)
+    versions = _get_versions_obj(roadmap)
+    num_versions = len(versions)
+
+    if num_versions > vnum >= 0:
+        roadmap = versions[vnum].object_version.object
+
+    curr_body = roadmap.body
+    curr_lines = curr_body.splitlines()
+
+    if vnum > 0:
+        prev_roadmap = versions[vnum - 1].object_version.object
+        prev_body = prev_roadmap.body
+    else:
+        prev_body = ''
+    prev_lines = prev_body.splitlines()
+
+    differ = difflib.Differ()
+    diff_lines = differ.compare(prev_lines, curr_lines)
+    diff_lines = filter(lambda l: l[0] != '?', diff_lines)
+    diff = '\n'.join(map(format_diff_line, diff_lines))
+
+    common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
+
+    return render(request, 'roadmap-diff.html', dict({
+        'diff': diff,
+    }, **common_rm_dict))
+
 
 def show_history(request, in_username, tag):
     try:
@@ -120,25 +179,27 @@ def show_history(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     cur_version_num = roadmap.version_num
 
-    revs = get_versions_obj(roadmap)[::-1]
+    revs = _get_versions_obj(roadmap)[::-1]
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
     return render(request, 'roadmap-history.html',
                   dict({"revs": revs,
                         'page_class': "history",
-                        'cur_version_num':cur_version_num,
-                    }, **common_rm_dict))
+                        'cur_version_num': cur_version_num,
+                        'show_change_button': True,
+                        'show_preview_button': True
+                        }, **common_rm_dict))
+
 
 @csrf_exempt
 def update_to_revision(request, in_username, tag, vnum):
     """
     update the given roadmap to the specified reversion number (simply copies over the previous entry)
     """
-
     if not request.method == "PUT":
         return HttpResponse(status=403)
 
@@ -155,18 +216,19 @@ def update_to_revision(request, in_username, tag, vnum):
         return HttpResponse(status=401)
 
     vnum = int(vnum)
-    versions = get_versions_obj(roadmap)
+    versions = _get_versions_obj(roadmap)
     num_versions = len(versions)
 
     if 0 > vnum or vnum >= num_versions:
         return HttpResponse(status=404)
-
-    versions[vnum].revert()
+    versions[vnum].revision.revert()
 
     return HttpResponse(status=200)
 
-def get_versions_obj(obj):
+
+def _get_versions_obj(obj):
     return reversion.get_for_object(obj).order_by("id")
+
 
 @transaction.atomic
 def edit(request, in_username, tag):
@@ -178,7 +240,7 @@ def edit(request, in_username, tag):
     roadmap = rm_dict["roadmap"]
     roadmap_settings = rm_dict["settings"]
 
-    if not roadmap_settings.is_published() and not roadmap_settings.editable_by(request.user):
+    if not roadmap_settings.viewable_by(request.user):
         return HttpResponse(status=404)
 
     common_rm_dict = get_common_roadmap_dict(roadmap, roadmap_settings, request.user, in_username, tag)
@@ -193,7 +255,7 @@ def edit(request, in_username, tag):
         form = RoadmapForm(request.POST, instance=roadmap)
 
         if form.is_valid():
-            versions = get_versions_obj(roadmap)
+            versions = _get_versions_obj(roadmap)
             cur_vn = len(versions) + 1
             smodel = form.save(commit=False)
             smodel.version_num = cur_vn
@@ -215,7 +277,8 @@ def edit(request, in_username, tag):
     return render(request, 'roadmap-edit.html', dict({
         'form': form,
         'page_class': "edit",
-        }, **common_rm_dict))
+    }, **common_rm_dict))
+
 
 def settings(request, in_username, tag):
     # check that the user is logged in
@@ -315,7 +378,7 @@ def preview(request):
         'title': request.POST['title'] if 'title' in request.POST else '',
         'author': request.POST['author'] if 'author' in request.POST else '',
         'audience': request.POST['audience'] if 'audience' in request.POST else '',
-        }
+    }
     body = request.POST['body'] if 'body' in request.POST else ''
 
     body_html = markdown_to_html(body)
@@ -324,19 +387,20 @@ def preview(request):
         'roadmap': roadmap,
         'body_html': safestring.mark_safe(body_html),
         'show_edit_link': False
-        })
+    })
 
 
 def list(request):
     roadmaps = models.Roadmap.objects.all()
-    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and r.roadmapsettings.is_published() , roadmaps)
+    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and r.roadmapsettings.is_published(), roadmaps)
     roadmaps = sorted(roadmaps, key=lambda x: x.title.lower())
 
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
         'include_create': True,
         'empty_message': 'Nobody has made any roadmaps yet.'
-        })
+    })
+
 
 def list_by_user(request, in_username):
     try:
@@ -354,10 +418,11 @@ def list_by_user(request, in_username):
         'roadmaps': roadmaps,
         'include_create': include_create,
         'empty_message': 'This user has not made any public roadmaps.'
-        })
+    })
+
 
 def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
-    base_url = '/roadmaps/%s/%s' % (rm_username, tag) # TODO remove hardcoding
+    base_url = '/roadmaps/%s/%s' % (rm_username, tag)  # TODO remove hardcoding
     return {
         'roadmap': roadmap,
         'roadmap_settings': roadmap_settings,
@@ -369,8 +434,10 @@ def get_common_roadmap_dict(roadmap, roadmap_settings, user, rm_username, tag):
         'history_url': base_url + "/history",
         'settings_url': base_url + '/settings',
         'can_change_settings': roadmap_settings.can_change_settings(user),
-        'can_edit': roadmap_settings.editable_by(user)
+        'can_edit': roadmap_settings.editable_by(user),
+        'base_rev_url': base_url + '/version/'
     }
+
 
 def get_roadmap_objs(username, tag):
     roadmap_settings = models.load_roadmap_settings(username, tag)

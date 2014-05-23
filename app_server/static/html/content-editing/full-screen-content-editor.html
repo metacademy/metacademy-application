@@ -1,5 +1,4 @@
 <script type="text/template" id="full-screen-content-editor">
-
   <div class="ec-title">
     <input type="text" class="title-input" placeholder="title of concept" value="<%- title %>">
   </div>
@@ -7,12 +6,16 @@
   <div class="ec-tabs">
     <ul>
       <li><button id="btn-summary">Summary</button></li>
+      <li><button id="btn-goals">Learning Goals</button></li>
       <li><button id="btn-dependencies">Prerequisites</button></li>
       <li><button id="btn-resources">Resources</button></li>
-      <li><button id="btn-goals">Goals</button></li>
-      <li><button id="btn-exercises">Exercises</button></li>
-      <li><button id="btn-software">Software</button></li>
+      <!-- <li><button id="btn-exercises">Exercises</button></li> -->
+      <!-- <li><button id="btn-software">Software</button></li> -->
       <li><button id="btn-pointers">See Also</button></li>
+      <% if (window.IS_META_SUPERUSER) {%>
+      <li><button id="btn-settings">Settings</button></li>
+      <% } %>
+      <!-- <li><button id="btn-history">History</button></li> -->
     </ul>
   </div>
 
@@ -25,7 +28,7 @@
         instructions
       </div>
       <div class="instructions-text">
-        Provide a brief summary of the concept (typically 3-5 sentences) that specifies the essential information for the concept -- see other concepts or the first paragraph of wikipedia articles for examples.
+        Provide a brief summary of the concept (typically 1-4 sentences) that specifies the essential information for the concept -- see existing concepts or the first paragraph of wikipedia articles for examples.
       </div>
     </div>
     <textarea><%=summary%></textarea>
@@ -40,10 +43,9 @@
         Provide learning resources that the reader can consult in order to learn about the topic. These will generally be textbooks, video lectures, lecture notes, and review papers, although other sources such as Ph.D. theses or individual papers are also possible. The resource list means "read one of the following," rather than "read all of the following."
       </div>
     </div>
-    <div id="resources-tidbit-wrap">
-      <button id="add-resource-button">+ Add Resource</button>
-
-    </div>
+    <ul id="resources-tidbit-wrap" class="tidbit-wrap">
+      <button class="add-item-button" id="add-resource-button">+ Add Resource</button>
+    </ul>
   </div>
 
   <div class="ec-display-wrap" id="dependencies">
@@ -55,12 +57,40 @@
         This list specifies the the prerequisites for the given concept. Add prerequisites using the graph (see the instructions in the bottom right of the graph view).
       </div>
     </div>
+    <% if (dependencies.length==0) { %>
+    <p class="no-content-info">
+      This concept has no prerequisites specified.
+    </p>
+    <%}%>
+    <ul class="sortable" id="dependencies-list">
     <% dependencies.each(function(dep){ %>
-    <div class="dep-entry">
-      <h3> <%- dep.get("source").get("title") %> </h3>
+    <li class="dep-entry input-form" id="<%= dep.cid + "-dep"%>">
+      <% var src = dep.get("source"); %>
+      <h3> <%- src.get("title") %> </h3>
       <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">
-    </div>
+
+  <button class="expand-content ec-button"> + show goal relationships</button>
+  <button class="contract-content ec-button"> - hide goal relationships</button>
+      <div class="detailed-info">
+        <% if (src.get("goals").length) { %>
+        <label>What goals from "<%-src.get("title")%>" are relevant to "<%-title%>"?</label>
+
+        <% src.get("goals").each(function(goal){ %>
+          <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="source_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("source_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
+        <%});%>
+        <%} %>
+
+        <% if (goals.length) { %>
+        <label>What "<%-title%>" goals depend on "<%-src.get("title")%>"?</label>
+        <% goals.each(function(goal){ %>
+        <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="target_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("target_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
+        <%});%>
+        <%}%>
+
+      </div>
+    </li>
     <% }) %>
+    </ul>
   </div>
 
   <div class="ec-display-wrap" id="pointers">
@@ -84,7 +114,9 @@
         Specify the goals for the user using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
       </div>
     </div>
-    <textarea><%=goals%></textarea>
+    <ul id="goals-tidbit-wrap" class="tidbit-wrap sortable">
+      <button class="add-item-button" id="add-goal-button">+ Add Goal</button>
+    </ul>
   </div>
 
   <div class="ec-display-wrap" id="exercises">
@@ -111,4 +143,14 @@
     <textarea><%=software%></textarea>
   </div>
 
+  <div class="ec-display-wrap" id="history">
+  </div>
+
+  <div class="ec-display-wrap" id="settings">
+    <label>url tag</label>
+    <input type="text" class="tag-input" placeholder="url tag for concept" value="<%- tag %>">
+    <p>
+      note: these settings are only visible to moderators
+    </p>
+  </div>
 </script>

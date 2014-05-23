@@ -3,13 +3,6 @@
 /* ---------->>> Learn View Styles <<<----------------*/
 /* ---------------------------------------------------*/
 
-/* #learn-view-wrapper{ */
-/*     display: none; */
-/*     width: 100%; */
-/*     background: white; */
-/*     height: inherit; */
-/* } */
-
 #learn-view{
     height: inherit;
 }
@@ -25,6 +18,7 @@
    color: #23240D;
    padding: 0.3em 0 1em 1.5em;
    width: 90%;
+   max-width: 1100px;
    margin: auto;
    line-height: 1.2em;
 }
@@ -33,6 +27,18 @@
     font-size: 1.2em;
     text-align: center;
     font-weight: bold;
+}
+
+/* waitbar */
+.fetching-detail-waitbar {
+    top: 0em;
+    bottom: 0em;
+    position: absolute;
+    background: white;
+    width: 100%;
+    background-image: url('/static/images/ajax-loader-bar.gif');
+    background-repeat: no-repeat;
+    background-position: 30% 20%;
 }
 
 h1 .learn-view-check, h1 .learn-view-star{
@@ -255,12 +261,23 @@ h1 .learn-view-star{
     padding-right: 5px;
 }
 
+.notrel-goal {
+    color: rgb(197, 197, 197);
+}
+
 .key-resource-star{
     font-size: 0.8em;
     display: inline-block;
     margin-right: 0.25em;
 }
 
+.missing-link {
+    color: #666666;
+}
+
+.missing-link:hover {
+    color: #555555;
+}
 
 @media only screen and  (max-width: 760px){
     #learn-concept-wrapper{

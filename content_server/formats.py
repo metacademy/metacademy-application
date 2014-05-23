@@ -44,7 +44,7 @@ def read_text_db(instr, fields, list_fields={}, require_all=True, check=False):
     for k, v in fields.items():
         if not isinstance(v, tuple):
             fields[k] = (v, Missing)
-    
+
     for line_ in instr:
         if is_comment(line_):
             continue
@@ -137,7 +137,7 @@ def check_resources_format(f):
     fields['source'] = str
     list_fields = dict(resources.RESOURCE_LIST_FIELDS)
     return check_text_db_format(f, fields, list_fields, require_all=False)
-    
+
 
 def read_node_resources(f):
     fields = dict(resources.RESOURCE_FIELDS)
@@ -202,10 +202,11 @@ class Link:
         return 'Link(%r, %r)' % (self.text, self.link)
 
     def json_repr(self, nodes):
-        if self.link in nodes:
-            return {'text': self.text, 'link': self.link}
-        else:
-            return {'text': self.text}
+        # FIXME all links shown for database migration CJR
+        #if self.link in nodes:
+        return {'text': self.text, 'link': self.link}
+        #else:
+        #    return {'text': self.text}
 
 class OldLink:
     def __init__(self, link):
@@ -227,7 +228,7 @@ class Line:
     re_depth = re.compile(r'(\**)\s*(.*)')
     re_old_link = re.compile(r'(.*)\[([^\]]+)\]\s*$')
     re_link = re.compile(r'([^"]*)"([^"]*)":(\w*)(.*)')
-    
+
     def __init__(self, depth, items):
         self.depth = depth
         self.items = items
@@ -239,7 +240,7 @@ class Line:
     def parse(line):
         if line.strip() == '':
             return None
-        
+
         # compute depth
         m = Line.re_depth.match(line)
         if not m:
@@ -280,8 +281,8 @@ class Line:
         item_list = [item.json_repr(nodes) for item in self.items]
         item_list = [item for item in item_list if item is not None]
         return {'depth': self.depth, 'items': item_list}
-        
-        
+
+
 
 def read_nested_list(f):
     lines = [Line.parse(line) for line in remove_comments_stream(f)]
@@ -367,11 +368,9 @@ def write_graph_json(db, full_tags, shortcut_tags, outstr=None):
         node_items[tag] = db.shortcuts[tag].json_repr(db)
 
     titles = {node.tag: node.title for node in db.nodes.values()}
-    
+
     items = {'nodes': node_items, 'titles': titles}
     json.dump(items, outstr)
 
 def node_resources(node, resource_defaults):
     return [resources.add_defaults(r, resource_defaults) for r in node.resources]
-
-

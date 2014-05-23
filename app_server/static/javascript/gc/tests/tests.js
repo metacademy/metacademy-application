@@ -80,101 +80,101 @@ define(["chai", "gc/models/editable-graph-model"], function(chai, EditGraphModel
       newJsonObj,
       newGraph = new EditGraphModel();
 
-  describe('GC: Graph IO', function(){
-    describe('export graph', function(){
-      it('should obtain a valid json representation of the graph', function(){
-        jsonObj = graphObj.toJSON();
-      });
+  // describe('GC: Graph IO', function(){
+  //   describe('export graph', function(){
+  //     it('should obtain a valid json representation of the graph', function(){
+  //       jsonObj = graphObj.toJSON();
+  //     });
 
-      it('should be able to obtain a string representation of the graph', function(){
-        jsonStr = JSON.stringify(jsonObj);
-      });
-    });
+  //     it('should be able to obtain a string representation of the graph', function(){
+  //       jsonStr = JSON.stringify(jsonObj);
+  //     });
+  //   });
 
-    describe('import graph', function(){
-      it('should be able to parse string to json', function(){
-        newJsonObj = JSON.parse(jsonStr);
-      });
+    // describe('import graph', function(){
+    //   it('should be able to parse string to json', function(){
+    //     newJsonObj = JSON.parse(jsonStr);
+    //   });
 
-      it('should be able to create a new graph from the json object', function(){
-        newGraph.addJsonNodesToGraph(newJsonObj);
-      });
+    //   it('should be able to create a new graph from the json object', function(){
+    //     newGraph.addJsonNodesToGraph(newJsonObj);
+    //   });
 
-      it('should have same number of nodes', function(){
-        newGraph.getNodes().length.should.equal(graphObj.getNodes().length);
-      });
+    //   it('should have same number of nodes', function(){
+    //     newGraph.getNodes().length.should.equal(graphObj.getNodes().length);
+    //   });
 
-      it('should have same number of edges', function(){
-        newGraph.getEdges().length.should.equal(graphObj.getEdges().length);
-      });
+    //   it('should have same number of edges', function(){
+    //     newGraph.getEdges().length.should.equal(graphObj.getEdges().length);
+    //   });
 
-      it('should have the same nodes as the original graph', function(){
-        graphObj.getNodes().forEach(function(oldNode) {
-          var node = graphObj.getNode(oldNode.id),
-              attribs = oldNode.attributes,
-              collFields = oldNode.collFields;
-          // compare txt fields
-          for (var attr in attribs) {
-            if (attribs.hasOwnProperty(attr) && collFields.indexOf(attr) === -1){
-              oldNode.get(attr).should.equal(node.get(attr));
-            }
-          }
+    //   it('should have the same nodes as the original graph', function(){
+    //     graphObj.getNodes().forEach(function(oldNode) {
+    //       var node = graphObj.getNode(oldNode.id),
+    //           attribs = oldNode.attributes,
+    //           collFields = oldNode.collFields;
+    //       // compare txt fields
+    //       for (var attr in attribs) {
+    //         if (attribs.hasOwnProperty(attr) && collFields.indexOf(attr) === -1){
+    //           oldNode.get(attr).should.equal(node.get(attr));
+    //         }
+    //       }
 
-          // compare dependencies and outlinks
-          ["dependencies", "outlinks"].forEach(function(edgeType) {
-            node.get(edgeType).forEach(function(dep) {
-              var matchOldNodes = oldNode.get(edgeType).filter(function(oldDep) {
-                return dep.get("source").id === oldDep.get("source").id
-                  && dep.get("target").id === oldDep.get("target").id
-                  && dep.get("reason") === oldDep.get("reason");
-              });
-              matchOldNodes.length.should.equal(1);
-            });
-          });
+    //       // compare dependencies and outlinks
+    //       ["dependencies", "outlinks"].forEach(function(edgeType) {
+    //         node.get(edgeType).forEach(function(dep) {
+    //           var matchOldNodes = oldNode.get(edgeType).filter(function(oldDep) {
+    //             return dep.get("source").id === oldDep.get("source").id
+    //               && dep.get("target").id === oldDep.get("target").id
+    //               && dep.get("reason") === oldDep.get("reason");
+    //           });
+    //           matchOldNodes.length.should.equal(1);
+    //         });
+    //       });
 
-          // compare resources
-          node.get("resources").forEach(function(rsrc){
-            var rattrs = rsrc.attributes;
-            var filtRes = oldNode.get("resources").filter(function(oldRsrc){
-              for (attr in rattrs) {
-                if (rattrs.hasOwnProperty(attr)) {
-                  if (rsrc.get(attr) !== oldRsrc.get(attr)) {
-                    return false;
-                  }
-                }
-              }
-              return true;
-            });
-            filtRes.length.should.equal(1);
-          });
-          // TODO compare exercises once the schema is figured out
-        }); // end forEach node comparison
-      }); // end it()
+    //       // compare resources
+    //       node.get("resources").forEach(function(rsrc){
+    //         var rattrs = rsrc.attributes;
+    //         var filtRes = oldNode.get("resources").filter(function(oldRsrc){
+    //           for (attr in rattrs) {
+    //             if (rattrs.hasOwnProperty(attr)) {
+    //               if (rsrc.get(attr) !== oldRsrc.get(attr)) {
+    //                 return false;
+    //               }
+    //             }
+    //           }
+    //           return true;
+    //         });
+    //         filtRes.length.should.equal(1);
+    //       });
+    //       // TODO compare exercises once the schema is figured out
+    //     }); // end forEach node comparison
+    //   }); // end it()
 
-      it('should have the same edges as the original graph', function(){
-        graphObj.getEdges().forEach(function(oldEdge) {
-          var matchEdge = newGraph.getEdges().filter(function(edge) {
-            if (oldEdge.id !== edge.id){ return false;}
-            for (var attr in oldEdge.attributes) {
-              if (oldEdge.attributes.hasOwnProperty(attr)) {
-                if (oldEdge.get(attr) !== edge.get(attr) && oldEdge.get(attr).id !== oldEdge.get(attr).id) {
-                  return false;
-                }
-              }
-            }
-            return true;
-          });
-          matchEdge.length.should.equal(1);
-        });
-      }); // end it()
+    //   it('should have the same edges as the original graph', function(){
+    //     graphObj.getEdges().forEach(function(oldEdge) {
+    //       var matchEdge = newGraph.getEdges().filter(function(edge) {
+    //         if (oldEdge.id !== edge.id){ return false;}
+    //         for (var attr in oldEdge.attributes) {
+    //           if (oldEdge.attributes.hasOwnProperty(attr)) {
+    //             if (oldEdge.get(attr) !== edge.get(attr) && oldEdge.get(attr).id !== oldEdge.get(attr).id) {
+    //               return false;
+    //             }
+    //           }
+    //         }
+    //         return true;
+    //       });
+    //       matchEdge.length.should.equal(1);
+    //     });
+    //   }); // end it()
 
-      it('should be able to add collection elements to the newGraph', function(){
-        newGraph.getNodes().get(nodeIds.parent).get("resources").add(exampleResource);
-      });
+    //   it('should be able to add collection elements to the newGraph', function(){
+    //     newGraph.getNodes().get(nodeIds.parent).get("resources").add(exampleResource);
+    //   });
 
-      // TODO add server grabbing test! -- how to tell when it's finished parsing? -- use trigger events
+    //   // TODO add server grabbing test! -- how to tell when it's finished parsing? -- use trigger events
 
-    }); // end describe("import graph...
-  }); // end describe ("graph IO..
+    // }); // end describe("import graph...
+//  }); // end describe ("graph IO..
 
 }); // end define

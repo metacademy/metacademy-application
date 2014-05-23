@@ -27,7 +27,7 @@ def parse_location(loc):
             m = re_pages.search(rest)
             if not m:
                 break
-            
+
             first_str, last_str, rest = m.group(2), m.group(5), m.group(6)
             try:
                 first, last = int(first_str), int(last_str)
@@ -39,7 +39,6 @@ def parse_location(loc):
         return 'page', max(count, 1)
 
     return 'location', 1
-    
 
 
 class Names:
@@ -59,7 +58,7 @@ class Observation:
 
     def concept_tag(self):
         return self.names.concepts[self.concept_id]
-    
+
     def resource_key(self):
         return self.names.resources[self.resource_id]
 
@@ -71,7 +70,7 @@ class Observation:
 
     @staticmethod
     def from_names(concept_tag, resource_key, ltype, count, names):
-        return Observation(names.concepts.index(concept_tag), names.resources.index(resource_key), 
+        return Observation(names.concepts.index(concept_tag), names.resources.index(resource_key),
                            names.location_types.index(ltype), count, names)
 
     @staticmethod
@@ -97,8 +96,8 @@ class Observation:
 
         return Observation.from_names(concept_tag, key, ltype, count, names)
 
-            
-        
+
+
 
 
 class ModelParams:
@@ -205,7 +204,7 @@ def poisson_loglik(lam, k):
     return -lam + \
            k * np.log(lam) + \
            -scipy.special.gammaln(k + 1)
-    
+
 
 class PoissonModel:
     def __init__(self, observations, names, reg_weight):
@@ -228,10 +227,10 @@ class PoissonModel:
             ltype_factor = params.ltype_factors[obs.ltype_id]
         if resource_factor is None:
             resource_factor = params.resource_factors[obs.resource_id]
-        
+
         pred = concept_work * ltype_factor * resource_factor
         return poisson_loglik(pred, obs.count)
-    
+
     def regularization_term(self, params):
         return self.reg_weight * np.sum((params.resource_factors - 1.) ** 2)
 
@@ -251,7 +250,7 @@ class PoissonModel:
         loglik = np.sum([self.obs_loglik(o, params, resource_factor=resource_factor)
                          for o in self.obs_by_resource[resource_id]])
         return -loglik + self.reg_weight * (resource_factor - 1.) ** 2
-    
+
     def update_concept_work(self, params):
         concept_work = params.concept_work.copy()
         for i in range(len(self.names.concepts)):
@@ -301,11 +300,11 @@ def fit_model(db, model_name='poisson'):
     obs = []
     for tag, node in db.nodes.items():
         for resource in node.resources:
-            if 'mark' in resource and 'star' in resource['mark']:
+            if 'core' in resource and resource['core']:
                 obs.append(Observation.from_resource((tag, False), resource, names))
     for tag, shortcut in db.shortcuts.items():
         for resource in shortcut.resources:
-            if 'mark' in resource and 'star' in resource['mark']:
+            if 'core' in resource and resource['core']:
                 obs.append(Observation.from_resource((tag, True), resource, names))
 
     if model_name == 'least_squares':
@@ -318,7 +317,7 @@ def fit_model(db, model_name='poisson'):
         raise RuntimeError('Unknown model: %s' % model_name)
 
     concept_times, shortcut_times = {}, {}
-    
+
     for idx, (tag, is_shortcut) in enumerate(names.concepts):
         if not any([o.concept_id == idx for o in obs]):
             continue
@@ -329,5 +328,3 @@ def fit_model(db, model_name='poisson'):
             concept_times[tag] = CONVERSION_FACTOR * params.concept_work[idx]
 
     return concept_times, shortcut_times
-            
-

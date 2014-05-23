@@ -6,6 +6,12 @@
     </div>
   </h1>
 
+  <% if (is_partial) { %>
+  <div class="fetching-detail-waitbar">
+    Fetching content
+  </div>
+  <% } %>
+
   <div class="detail-time-est">
     <% if (time) { %>
         <span class="info-text">(<%- time %> to learn)</span>
@@ -30,22 +36,48 @@
 
     <h2 class="node-detail-title">Context</h2>
     <div class="node-detail-comp-wrap">
-    <% if (dependencies.length > 0) { %>
+    <% if (dependencies.length && dependencies.any(function(dep){return !dep.get("source").get("notGoalRelevant");})) { %>
       <p>This concept has the prerequisites:</p>
-      <ul class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>"></ul>
+      <ul class="node-detail-comp-wrap dep-wrap" id="node-detail-deps-<%- id %>">
+        <% dependencies.each(function(dep){ %>
+          <% var src = dep.get('source') %>
+          <% if (!src.get("notGoalRelevant")) { %>
+          <li id="outlink-details-<%= dep.cid %>" class="outlink-view">
+          <a class="outlink focus-link" data-focus="<%= src.get('tag') %>" href="#focus=<%= src.get('tag')%>" target="_self"> <%- src.get('title') %></a><% if (dep.get("reason")) {%> <span class="dependency-reason">(<%- dep.get("reason") %>)</span><% } %>
+          </li>
+          <% } %>
+        <% }); %>
+
+      </ul>
     <% } else { %>
       <p class="no-content-msg">-this concept has no prerequisites-</p>
     <% } %>
 
-    <% if (neededFor.length > 0) { %>
+    <% if (outlinks.length && outlinks.any(function(ol){return !ol.get("target").get("notGoalRelevant");})) { %>
       <p>This concept is needed for:</p>
-      <ul class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>"></ul>
+      <ul class="node-detail-comp-wrap outlinks-wrap" id="node-detail-outlinks-<%- id %>">
+        <% outlinks.each(function(ol){ %>
+        <% if (!ol.get("notGoalRelevant")) { %>
+        <% var tar = ol.get('target') %>
+        <li id="outlink-details-<%= ol.cid %>" class="outlink-view">
+          <a class="outlink focus-link" href="#focus=<%= tar.get('tag')%>" data-focus="<%= tar.get('tag')%>" target="_self"> <%- tar.get('title') %></a>
+        </li>
+        <% } %>
+        <% }); %>
+      </ul>
     <% } %>
     </div>
 
     <% if (goals.length > 0) { %>
+      <% var relGoals = window.agfkGlobals.auxModel.relevantGoals; %>
       <h2 class="node-detail-title">Goals</h2>
       <div class="node-detail-comp-wrap goals-wrap" id="node-detail-goals-<%- id %>">
+        <% goals.each(function(goal){ %>
+           <% var isRel = relGoals.hasOwnProperty(goal.id); %>
+           <%= isRel ? "" : '<div class="notrel-goal">' %>
+           <%= goal.getParsedText() %>
+           <%= isRel ? "" : '</div>' %>
+         <% }); %>
       </div>
     <% } %>
 
@@ -54,12 +86,12 @@
 
     <h2 class="node-detail-title">See also</h2>
     <div class="node-detail-comp-wrap pointers-wrap" id="node-detail-anotes-<%- id %>">
-      <%= pointers.length > 0 ? "" : '<span class="no-content-msg">-No Additional Notes-</span>' %>
+      <%=  this.parsedPointers || '<span class="no-content-msg">-No Additional Notes-</span>' %>
     </div>
 
-    
+
 </script>
 
 <script type="text/template" id="node-detail-resource-template">
-  
+
 </script>

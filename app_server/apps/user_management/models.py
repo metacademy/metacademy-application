@@ -7,7 +7,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import validate_email
 
 from captcha.fields import CaptchaField
-from apps.cserver_comm.cserver_communicator import get_id_to_concept_dict
 
 class UserCreateForm(UserCreationForm):
     email = forms.CharField(validators=[validate_email],
@@ -48,6 +47,7 @@ class Profile(models.Model):
     def __unicode__(self):
         return self.user.username
 
+# FIXME WE NEED TO REMOVE THIS MODEL
 class Concepts(models.Model):
     learned_uprofs = models.ManyToManyField(Profile, related_name="learned")
     starred_uprofs = models.ManyToManyField(Profile, related_name="starred")

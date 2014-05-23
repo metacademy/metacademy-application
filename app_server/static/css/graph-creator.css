@@ -10,7 +10,6 @@ p{
 }
 
 input{
-    border-radius: 5px;
     padding: 0.2em;
 }
 
@@ -33,36 +32,110 @@ body{
 }
 
 /************
+Overrides
+************/
+#cboxLoadedContent {
+    position: relative;
+}
+
+/************
+Input form
+************/
+
+.input-form, .sortable-placeholder{
+    position: relative;
+    border: 2px solid #B4ADAD;
+    border-radius: 4px;
+    padding: 1em;
+    padding-left: 10%;
+    text-align: left;
+}
+
+.sortable-placeholder{
+    border-style: dashed;
+    height: 77px;
+}
+
+.input-form label{
+    margin-top: 1em;
+    font-size: 0.9em;
+    font-weight: bold;
+    display: block;
+}
+.input-form + .input-form, .sortable-placeholder + .input-form, .input-form + .sortable-placeholder{
+    margin-top: 2em;
+}
+
+.input-form input,
+.input-form select {
+    display: block;
+}
+.input-form input[type="radio"], .input-form input[type="checkbox"]{
+    display: inline;
+    width: auto;
+}
+
+.input-form textarea{
+    height: 5em;
+}
+
+.input-form input[type="text"], .input-form textarea{
+    width: 85%;
+    line-height: 1.4em;
+    display: block;
+    margin:  0;
+}
+
+.input-form input[type="text"] + input[type="text"], .input-form textarea + textarea{
+    margin:  0 0 1.5em 0;
+}
+
+
+/************
 Instructions
 ************/
+.instructions, #create-instructions{
+    font-size: 0.8em;
+    background: #fffef1;
+    border: 1px solid #e5e2c8;
+    border-radius: 4px 0 0 4px;
+    color: #6b694f;
+    display: inline-block;
+    position: absolute;
+    top: 8em;
+    right: 0;
+    z-index: 10;
+}
+
 #create-instructions{
     position: absolute;
     bottom: 0;
+    top: auto;
     right: 0;
-}
-
-.instructions{
-    font-size: 0.8em;
-    background-color: #F0F0F0;
-    color: rgb(143, 126, 139);
-    border-radius: 5px;
-    padding: 0.5em;
-    display: inline-block;
-    margin-top: 0.4em;
 }
 
 .instructions-icon{
     text-align: center;
+    cursor: pointer;
+    padding: 0.5em;
 }
 
 .instructions:hover .instructions-icon{
     display: none;
 }
 
+.instructions:hover .instructions-text{
+    display: block;
+}
+
+#create-instructions.expanded .instructions-icon{
+    display: none;
+}
 .instructions-text{
     display: none;
     font-size: 1.1em;
     padding: 1em;
+    width: 330px;
     line-height: 1.5em;
 }
 
@@ -80,11 +153,31 @@ Instructions
     display: block;
 }
 
-.instructions:hover .instructions-text{
+#create-instructions.expanded .instructions-text{
     display: block;
 }
 
-/** **/
+.instructions-minimize {
+    display: none;
+    background-color: #FFF2F2;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    right: 14px;
+    font-size: 20pt;
+    cursor: pointer;
+}
+.expanded .instructions-minimize {
+    display: block;
+}
+
+.instructions-minimize:hover {
+    font-weight: bold;
+    color: #333;
+}
 
 #gc-wrap svg{
     height: 100%;
@@ -97,13 +190,28 @@ Instructions
 }
 
 /* Graph editor specific styles */
-g.concept-g circle.to-edit-circle{
-    fill: #C2DBFC;
+g.concept-g .to-edit-circle-g{
     display: none;
+    cursor: pointer;
 }
 
-g.concept-g.hovered circle.to-edit-circle{
+g.concept-g .to-edit-circle-g circle{
+    fill: #f5fffa;
+    stroke-width: 1px;
+}
+
+g.concept-g .to-edit-circle-g text{
+    font-style: italic;
+    font-weight: normal;
+    font-size: 0.6em;
+}
+
+g.concept-g.hovered .to-edit-circle-g{
     display: block;
+}
+
+g.concept-g.hovered .to-edit-circle-g{
+    fill: #333333;
 }
 
 g.connect-node circle{
@@ -150,7 +258,6 @@ g.connect-node circle{
    margin:0 0 0 1px;
    padding:3px 10px;
    background:#ddd;
-   color:##ECECEC;
    text-decoration:none;
    line-height:1.3em;
    border: 0;
@@ -163,7 +270,7 @@ g.connect-node circle{
 .ec-tabs button.active,
 .ec-tabs button.active:hover {
    color:#fff;
-   background:#4D4747;
+   background:#706d68;
    font-weight:bold;
 }
 
@@ -180,8 +287,7 @@ g.connect-node circle{
 
 .ec-tabs {
    width:100%;
-   background:#fff;
-   border-bottom: 2px solid #4D4747;
+   border-bottom: 2px solid #54514e;
    overflow:hidden;
    position:relative;
 }
@@ -212,9 +318,9 @@ g.connect-node circle{
 }
 
 .ec-display-wrap{
-    position: relative;
     margin: 1em auto;
-    display:none;
+    padding-top: 1em;
+    display: none;
     margin: auto;
     width: 70%;
     text-align: center;
@@ -222,44 +328,55 @@ g.connect-node circle{
 
 .ec-display-wrap.active{
     display:block;
+    padding-bottom: 2em;
 }
 
 .ec-display-wrap > h3{
     margin: 0.5em;
 }
 
-.ec-display-wrap textarea{
+.ec-display-wrap > textarea{
     width: 100%;
     height: 15em;
-    margin-top: 1em;
 }
 
 .dep-entry{
-    text-align: center;
     margin-top: 1em;
     margin-bottom: 2em;
-    border: 2px solid #C9B8C7;
-    background-color: rgb(244, 240, 245);
-    border-radius: 5px;
+    border: 1px solid #6b694f;
+    background-color: #FDFEFF;
+    color: #333333;
     padding: 1em;
+    padding-bottom: 2.5em;
 }
 
 .dep-entry h3{
     font-size: 1.2em;
     font-weight: bold;
     margin-bottom: 0.3em;
+    text-align: center;
 }
 
-.dep-entry input{
+.dep-entry input {
     width: 70%;
 }
 
-#resources-tidbit-wrap{
-    position: relative;
-    margin-top: 1.5em;
+.detailed-info {
+    display: none;
 }
 
-#add-resource-button{
+.expanded .detailed-info {
+    display: block;
+}
+
+.tidbit-wrap{
+    position: relative;
+    margin-top: 1.5em;
+    margin-top: 0.6em;
+    padding-top: 0.3em;
+}
+
+.add-item-button{
     border: 0;
     cursor: pointer;
     border-radius: 4px;
@@ -273,85 +390,145 @@ g.connect-node circle{
     color: white;
     position: absolute;
     left: 0;
-    top: -2em;
+    bottom: -2.5em;
     font-size: .7em;
+}
+
+/* Resource editing CSS*/
+
+/* Global/Concept Resource Tabs*/
+.res-tabs {
+    border-bottom: none;
+}
+.res-tabs ul li:first-child button {
+    border-radius: 4px 0 0 4px;
+}
+.res-tabs ul li:last-child button {
+    border-radius: 0 4px 4px 0;
+}
+
+.gresource-title-wrap {
+    position: relative;
+}
+
+.gresource-title-wrap .ac-list {
+    top: 25px;
+}
+
+.resource-form textarea {
+    height: 5em;
 }
 
 #add-resource-button:hover{
     background: #A01F70;
 }
 
+.resource-goals-covered {
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+    background-color: #FFFFF9;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-bottom: 1em;
+    color: #6b694f;
+    font-size: 0.9em;
+}
+.resource-goals-covered label {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 1em;
+    text-align: center;
+    margin-top: 0.2em;
+    padding-bottom: 0.5em;
+    padding-left: 24px;
+    text-indent: -24px;
+    line-height: 1.3em;
+    display: block;
+}
+.resource-goals-covered label.rgc-goal,
+label.itm-label {
+    text-align: left;
+    font-style: normal;
+    font-weight: normal;
+    padding-left: 24px;
+    text-indent: -24px;
+    margin-left: 2em;
+    margin-top: 0.2em;
+}
+
+label.itm-label + label.itm-label {
+    margin-top: 1em;
+}
+
+/**
+ * Resource location
+ */
+#add-location-button {
+    position: relative;
+    top: 0;
+}
+
+.resource-location {
+    border: 1px solid #666666;
+    border-radius: 3px;
+    padding-left: 1em;
+    padding-right: 1.5em;
+    padding-bottom: 1em;
+    margin-top: 1em;
+}
+
+.resource-location-wrapper input[type="text"],
+.resource-location-wrapper textarea {
+    width: 100%;
+}
+
 .ec-button{
     position: absolute;
-    bottom: 0em;
+    bottom: 0.2em;
     left: 50%;
-    width: 10em;
-    margin-left: -5em;
+    width: 18em;
+    margin-left: -9em;
     border: none;
-    background: rgb(226, 226, 226);
+    background: #FCFCFF;
+    border: 1px solid #696969;
     border-radius: 5px;
     font-weight: bold;
     color: #696969;
     cursor: pointer;
 }
 .ec-button:hover{
-    background-color: rgb(245, 223, 237);
-}
-
-.expanded .expand-resource{
-    display: none;
-}
-
-.contract-resource{
-    display: none;
-}
-
-.expanded .contract-resource{
-    display: block;
-}
-
-.expand-content{
-    display: none;
+    background-color: #F4F4FF;
 }
 
 .expanded .expand-content{
+    display: none;
+}
+
+.contract-content{
+    display: none;
+}
+
+.expanded .contract-content{
     display: block;
 }
 
-.resource-form{
-    position: relative;
-    border: 2px solid #B4ADAD;
-    border-radius: 4px;
-    padding: 1em;
-    text-align: left;
+.concept-specific-fields,
+.global-resource-fields {
+    display: none;
 }
 
-.resource-form label{
-    margin-left: 15%;
+.concept-specific-fields.active,
+.global-resource-fields.active {
+    display: block;
+}
+
+#goals-tidbit-wrap input{
+    margin: 0;
+}
+
+.no-content-info {
+    margin-top: 1em;
     font-size: 0.9em;
-    font-weight: bold;
-    display: block;
-}
-.resource-form + .resource-form{
-    margin-top: 2em;
-}
-
-.resource-form input{
-    margin-left: 15%;
-    display: block;
-    margin-bottom: 1.5em;
-}
-.resource-form input[type="radio"]{
-    display: inline;
-}
-
-.resource-form textarea{
-    height: 5em;
-}
-
-.resource-form input[type="text"], .resource-form textarea{
-    width: 70%;
-    line-height: 1.4em;
-    display: block;
-    margin: 0 auto 1.5em auto;
+    font-style: italic;
 }

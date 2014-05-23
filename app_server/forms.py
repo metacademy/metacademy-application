@@ -1,4 +1,4 @@
-# forms.py
+import pdb
 from django import forms
 from django.core.mail import send_mail
 try:
@@ -25,4 +25,3 @@ class ContactForm(forms.Form):
             send_mail(subject, msg, EMAIL_HOST_USER, [to_email], fail_silently=False)
         except:
             print "Unable to send feedback message"
-

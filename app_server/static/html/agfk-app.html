@@ -24,7 +24,7 @@
 {% block main %}
 
 <div id="nojs-content">
-  {% include "concept-presentation.html" %}
+  {{ nojs_content | safe}}
 </div>
 
 {% include "agfk-structure-loader.html" %}
@@ -39,8 +39,10 @@
     <script>
       window.agfkGlobals = {};
       agfkGlobals.userInitData = {{ user_data|safe }};
-      agfkGlobals.auxData = {{ full_graph_skeleton|safe }};
+      agfkGlobals.targetId = "{{ leaf.id | safe}}";
       agfkGlobals.auxModel = null; // init in main js app
+      agfkGlobals.globalResources = {};
+      agfkGlobals.graphInitData = {{ graph_init_data|safe }}
     </script>
   {% if debug %}
   <script data-main="{% static "javascript/main.js" %}" type="text/javascript" src="{% static "javascript/lib/require-min.js" %}"></script>

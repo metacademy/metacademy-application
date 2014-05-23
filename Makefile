@@ -11,26 +11,24 @@ BASE_DIR := $(realpath $(MAKEFILE_DIR)/..)
 LOCAL_DBS_DIR = $(BASE_DIR)/local_dbs
 # custom vars: define names of local database directories
 DJANGO_DB_DIR = django_db
-CONTENT_INDEX_DIR = content_index
 APP_INDEX_DIR = app_index
 # virtual environment directory location
 VENV = $(BASE_DIR)/meta_venv
 VENV_ACTIVATE = $(VENV)/bin/activate
 
 # derived vars
-LOCAL_DBS = $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR) $(LOCAL_DBS_DIR)/$(CONTENT_INDEX_DIR) $(LOCAL_DBS_DIR)/$(APP_INDEX_DIR)
+LOCAL_DBS = $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR) $(LOCAL_DBS_DIR)/$(APP_INDEX_DIR)
 DJANGO_DB_FILE := $(LOCAL_DBS_DIR)/$(DJANGO_DB_DIR)/django_db.sqlite
-CONTENT_DIR = $(BASE_DIR)/metacademy-content
 
-$(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | app_server/static/lib/kmap/* python_path $(CONTENT_DIR)
+$(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | app_server/static/lib/kmap/* python_path
 	. $(VENV_ACTIVATE); python app_server/manage.py syncdb --noinput
 	. $(VENV_ACTIVATE); python app_server/manage.py migrate
 
-$(CONTENT_DIR):
-	git clone https://github.com/metacademy/metacademy-content.git $(CONTENT_DIR)
-
 app_server/static/lib/kmap/*:
 	git clone https://github.com/cjrd/kmap.git app_server/static/lib/kmap
+
+test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs app_server/settings_local.py config.py python_path
+	./Tests.sh
 
 config.py:
 	cp config-template.py config.py
@@ -69,9 +67,6 @@ cleandist:
 
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf
-
-test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs
-	./Tests.sh
 
 build_production:
 	cd app_server/static/javascript; node lib/r.js -o build.js

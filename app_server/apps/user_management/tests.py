@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 
 from apps.user_management.models import Concepts, Profile
+from apps.graph.models import Concept
 from apps.user_management.views import user_main
 
 class TestUserManagementViews(TestCase):
@@ -24,11 +25,12 @@ class TestUserManagementViews(TestCase):
         self.prof = Profile(user=self.user)
         self.prof.save()
 
-        # create 5 learned concepts and add the previously created user to each concepts learned list
+        # create 3 learned concepts and add the previously created user to each concepts learned list
         learned_concepts = ['7yjmqglq', 'dvwtwwnk', '1toqv2qm']
         for learned_concept_id in learned_concepts:
             lc, created = Concepts.objects.get_or_create(id=learned_concept_id)
             lc.learned_uprofs.add(self.prof)
+            Concept.objects.get_or_create(id=learned_concept_id, tag=learned_concept_id)
 
         # check the /user page before authentication
         resp = self.client.get(reverse('user:user_main'))
@@ -40,5 +42,4 @@ class TestUserManagementViews(TestCase):
         # should not redirect
         self.assertEqual(resp.status_code, 200)
         # learned concepts should contain the added concepts
-        self.assertEqual(set([lc['id'] for lc in
-                              resp.context['lconcepts']]), set(learned_concepts))
+        self.assertEqual(set([ilc.id for ilc in resp.context['lconcepts']]), set(learned_concepts))

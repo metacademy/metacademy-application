@@ -165,12 +165,6 @@ a.external-link{
     margin: 1.3em 0 0 0;
 }
 
-.history-header{
-    font-size: 1.3em;
-    font-weight: bold;
-    text-align: center;
-}
-
 .content h1 {
     font-weight: bold;
     font-size: 2em;
@@ -405,6 +399,20 @@ a.link-image-wrap{
     border: 2px solid #333;
     background: aliceblue;
     border-radius: 5px;
+}
+
+.roadmap-diff {
+    line-height: 1.2em;
+}
+
+.roadmap-diff ins {
+    background: #AAFFAA;
+    text-decoration: none;
+}
+
+.roadmap-diff del {
+    background: #FFAAAA;
+    text-decoration: none;
 }
 
 @media only screen and (max-width: 769px){

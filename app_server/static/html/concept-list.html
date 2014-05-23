@@ -14,13 +14,25 @@ Concepts - Metacademy
 
 {% block jscript-extend %}
 <script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
-<script type="text/javascript" src="{% static "javascript/show-concepts-list.js" %}"></script>
 {% endblock %}
 
 {% block main%}
 
 <div class="list-concepts-wrapper">
-
+{% for citm in citms %}
+  {% if citm.tag %}
+<li class="list-concepts-li">
+      <a class="list-concepts-link internal-link" href="{% url 'graphs:concepts' citm.tag %}"> {{citm.title}} </a>
+    </li>
+  {% else %}
+    {% if forloop.counter0 != 0 %}
+      </ul>
+    {% endif %}
+    <h2>{{citm}}</h2>
+    <ul>
+  {% endif %}
+{% endfor %}
+</ul>
 </div>
 
 {% include "concept-list-item.html" %}

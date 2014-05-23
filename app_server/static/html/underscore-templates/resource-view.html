@@ -1,56 +1,64 @@
 <script type="text/template" id="resource-view-template">
   <div class="resource-title-display">
-    <% var titleDisp = title ? title : "-no title-" %>
+    <% gres = this.model.get("global_resource") %>
+    <% var titleDisp = gres.get("title") %>
     <% var yearDisp = yearString ? "(" + yearString + ")" : "" %>
-    <span class="res-arrow">→ </span><%= titleDisp %> <%- yearDisp %>
+    <span class="res-arrow">→ </span><%= titleDisp || "-no title-" %> <%- yearDisp %>
   </div>
 
   <div class="resource-content-wrap">
-    <% if (description){ %>
+    <% if (gres.get("description")){ %>
       <div class="resource-description-display">
-        <span class="resource-description"> <%- description %> </span>
+        <span class="resource-description"> <%- this.model.get("global_resource").get("description") %> </span>
       </div>
     <% } %>
 
-    <% if (location.length){ %>
+    <% if (locations && locations.length){ %>
     <div class="resource-location-display">
-      <span class="resource-location"> Location: </span>
 
-      <% if (location.length === 1){ %>
-      <% if (location[0].link) { %>
+    <% if (locations.length === 1){ %>
+    <% loc = locations.models[0] %>
+    <% loc_url = loc.get("url") %>
+    <% loc_text = loc.get("location_text") %>
+      <% if (loc_url) { %>
+      <span class="resource-location"> Location: </span>
       <span class="resource-location-item">
-	<a class="external-link" href="<%- location[0].link %>"> <%- location[0].text %> </a>
+	<a class="external-link" href="<%- loc_url %>"> <%- loc_text || loc_url %> </a>
       </span>
-      <% } else { %>
-      <span class="resource-location-item"> <%- location[0].text %> </span></li>
+      <% } else if (loc_text) { %>
+      <span class="resource-location"> Location: </span>
+      <span class="resource-location-item"> <%- loc_text %> </span></li>
 <% } %>
 <% } else { %>
 <ul>
-  <% for (var i = 0; i < location.length; i++) { %>
-     <% if (location[i].link) { %>
+  <% locations.each(function(loc){ %>
+    <% loc_url = loc.get("url") %>
+    <% loc_text = loc.get("location_text") %>
+     <% if (loc_url) { %>
      <li>
        <span class="resource-location-item">
-	 <a class="external-link" href="<%- location[i].link %>"> <%- location[i].text %> </a>
+	 <a class="external-link" href="<%- loc_url %>"> <%- loc_text %> </a>
        </span>
      </li>
      <% } else { %>
-     <li><span class="resource-location-item"> <%- location[i].text %> </span>
+     <li><span class="resource-location-item"> <%- loc_text %> </span>
      </li>
      <% } %>
-     <% } %>
+     <% }) %>
 </ul>
 <% } %>
 </div>
 <% } %>
 
-<% if (url){ %>
+<% if (gres.get("url")){ %>
 <div class="resource-url-display">
-  <span class="resource-link"><a class="external-link" href="<%= url %>">[external website]</a> </span>
+  <span class="resource-link"><a class="external-link" href="<%= gres.get("url") %>">[external website]</a> </span>
 </div>
 <% }%>
 
 
 <div class="resource-author-display">
+  <% authors = gres.get("authors") %>
   <% if (authors.length > 1) { %>
   <span class="resource-author"> Authors: <%= authors %> </span>
   <% } else if (authors.length == 1) { %>
@@ -58,31 +66,36 @@
   <% } %>
 </div>
 
+<% level = gres.get("level"); description = gres.get("description") %>
 <div class="resource-level-display">
   <% if (level && !description){ %>
   <span class="resource-level"> Level: <%= level %> </span>
   <% } %>
 </div>
 
-<% if (dependencies.length > 0) { %>
+<% if (additional_dependencies.length > 0) { %>
 <div class="resource-dependencies-display">
   <span class="resource-dependencies"> Additional dependencies:</span>
   <ul>
-    <% for (var i = 0; i < dependencies.length; i++) { %>
+    <% for (var i = 0; i < additional_dependencies.length; i++) { %>
        <li><span class="resource-dependencies-item">
-	   <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + dependencies[i].link + '#focus=' + dependencies[i].link %>"> <%- dependencies[i].title %> </a>
+           <% if (additional_dependencies[i].link) { %>
+	         <a class="internal-link" href="<%= GRAPH_CONCEPT_PATH + additional_dependencies[i].link + '#focus=' + additional_dependencies[i].link %>"> <%- additional_dependencies[i].title %> </a>
+           <% } else { %>
+           <%- additional_dependencies[i].title %>
+           <% } %>
        </span></li>
        <% } %>
   </ul>
 </div>
 <% } %>
 
-<% if (extra.length > 0){ %>
+<% if (notes.length > 0){ %>
     <div class="resource-extra-display">
       <span class="resource-extra"> Other notes: </span>
       <ul>
-        <% for (var i = 0; i < extra.length; i++ ){ %>
-           <li><span class="resource-extra-item"> <%= extra[i] %> </span></li>
+        <% for (var i = 0; i < notes.length; i++ ){ %>
+           <li><span class="resource-extra-item"> <%= notes[i] %> </span></li>
            <% } %>
       </ul>
 </li>

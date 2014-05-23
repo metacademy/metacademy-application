@@ -51,19 +51,19 @@ define(["backbone", "underscore", "lib/kmapjs/views/concept-list-item"], functio
           learnedClass = consts.learnedClass,
           implicitLearnedClass = consts.implicitLearnedClass,
           starredClass = consts.starredClass,
-          nodeTag = thisView.model.id,
+          nodeId = thisView.model.id,
           aux = window.agfkGlobals.auxModel,
           gConsts = aux.getConsts();
       // set the app router
       thisView.appRouter = inp.appRouter;
 
-      thisView.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
+      thisView.listenTo(aux, gConsts.learnedTrigger + nodeId, function(nodeId, status){
         thisView.changeTitleClass(learnedClass, status);
       });
-      thisView.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
+      thisView.listenTo(aux, gConsts.starredTrigger + nodeId, function(nodeId, status){
         thisView.changeTitleClass(starredClass, status);
       });
-      thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
+      thisView.listenTo(thisView.model, "change:implicitLearnStatus", function(nodeId, status){
         thisView.changeTitleClass(implicitLearnedClass, status);
       });
     },
@@ -86,10 +86,8 @@ define(["backbone", "underscore", "lib/kmapjs/views/concept-list-item"], functio
     toggleConceptState: function(evt, state){
       evt.stopPropagation();
       var aux = window.agfkGlobals.auxModel,
-          nodeTag = this.model.id;
-      state === "learn" ? aux.toggleLearnedStatus(nodeTag) : aux.toggleStarredStatus(nodeTag);
+          nodeId = this.model.id;
+      state === "learn" ? aux.toggleLearnedStatus(nodeId) : aux.toggleStarredStatus(nodeId);
     }
-
-
   });
 });

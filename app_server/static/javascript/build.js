@@ -12,11 +12,16 @@
     "colorbox": "lib/jquery.colorbox-min",
     "sidr": "lib/jquery.sidr.min",
     "filesaver": "lib/FileSaver",
-    "completely": "lib/complete.ly.1.0.1"
+    "noty": "lib/jquery.noty.packaged.min",
+    "sortable": "lib/jquery.sortable"
   },
   shim: {
     completely: {
       exports: "completely"
+    },
+    noty: {
+      exports: "noty",
+      deps: ["jquery"]
     },
     d3: {
       exports: "d3"

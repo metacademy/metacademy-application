@@ -16,6 +16,7 @@ full_graph_json_str = None
 full_graph_json = None
 tag_to_data = {}
 
+
 def get_concept_data(concept_tag):
     """
     get the dependency data for concept_tag from the server
@@ -34,6 +35,7 @@ def get_search_json(search_term):
     json_res = _get_json(url_req, 'search term %s' % search_term)
     return json_res
 
+
 def _get_json(req, json_title):
     """
     get json data using HTTPRequest object given in req
@@ -45,6 +47,7 @@ def _get_json(req, json_title):
         sobj = None
         print 'Error parsing json from content server: %s \n returning None' % json_title
     return sobj
+
 
 def _load_dicts():
     global id_to_concept_dict, tag_to_concept_dict, tag_to_title_dict, title_to_tag_dict
@@ -62,17 +65,20 @@ def _load_dicts():
             tag_to_title_dict[entry['tag']] = entry['title']
             title_to_tag_dict[entry['title']] = entry['tag']
 
+
 def _load_full_graph_json_str():
     global full_graph_json_str, full_graph_json
     url_req = urllib2.Request("%s/full_graph" % CONTENT_SERVER)
     full_graph_json = _get_json(url_req, 'full_graph')
     full_graph_json_str = json.dumps(full_graph_json)
 
+
 def get_full_graph_json_str():
     global full_graph_json_str
     if not full_graph_json_str:
         _load_full_graph_json_str()
     return full_graph_json_str
+
 
 def get_full_graph_data():
     global full_graph_json
@@ -88,12 +94,22 @@ def get_id_to_concept_dict():
     _load_dicts()
     return id_to_concept_dict
 
+
+def get_tag_to_concept_dict():
+    """
+    obtain the id to title dictionary from the content server
+    """
+    _load_dicts()
+    return tag_to_concept_dict
+
+
 def get_title_to_tag_dict():
     """
     obtain title-to-id dictionary
     """
     _load_dicts()
     return title_to_tag_dict
+
 
 def is_node_present(tag):
     """

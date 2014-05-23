@@ -32,6 +32,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
       summaryRightClass: "tright",
       dataConceptTagProp: "data-concept",
       infoBoxId: "explore-info-box",
+      textboxClass: "textbox",
       // message to display in explore view when no summary is present
       NO_SUMMARY_MSG: "-- Sorry, this concept is under construction and currently does not have a summary. --",
       // ----- rendering options ----- //
@@ -73,7 +74,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
             .attr("class", consts.elIconClass)
             .attr("height", consts.elIconHeight + "px")
             .attr("width", consts.elIconWidth + "px")
-            .attr(consts.dataConceptTagProp, d.id)
+            .attr(consts.dataConceptTagProp, d.get("tag"))
             .on("mouseup", function () {
               thisView.handleEToLConceptClick.call(thisView, this.getAttribute(consts.dataConceptTagProp), this);
             }
@@ -164,19 +165,19 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         thisView.scopeNode = null;
 
         // dim nodes that are [implicitly] learned or starred
-        thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, nodeSid, status){
+        thisView.listenTo(aux, gConsts.learnedTrigger, function(nodeId, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
             thisView.toggleNodeProps(thisModel.getNode(nodeId), d3El, status, "learned");
           }
         });
-        thisView.listenTo(aux, gConsts.starredTrigger, function(nodeId, nodeSid, status){
+        thisView.listenTo(aux, gConsts.starredTrigger, function(nodeId, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
             thisView.toggleNodeProps(thisModel.getNode(nodeId), d3El, status, "starred");
           }
         });
-        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, nodeSid, status){
+        thisView.listenTo(nodes, "change:implicitLearnStatus", function(nodeId, status){
           var d3El = d3.select("#" + thisView.getCircleGId(nodeId));
           if (d3El.node() !== null){
             thisView.toggleNodeProps(thisModel.getNode(nodeId), d3El, status, "implicitLearned");
@@ -226,7 +227,7 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
         if (!thisView.$infoTextBox) {
           var $infoTextBoxEl = $(document.createElement("div"));
           $infoTextBoxEl.attr("id", consts.infoBoxId);
-          var $infoTextBox = $(document.createElement("div")).addClass("textbox");
+          var $infoTextBox = $(document.createElement("div")).addClass(consts.textboxClass);
           $infoTextBoxEl.append($infoTextBox);
           var $button = $(document.createElement("button"));
           $button.text("show all");
@@ -235,7 +236,9 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
           thisView.$infoTextBox = $infoTextBox;
         }
         if (thisView.focusNode) {
-          thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
+          if (thisView.numHiddenNodes) {
+            thisView.$infoTextBox.text(thisView.numHiddenNodes + " concepts currently hidden");
+          }
         }
       },
 
@@ -404,10 +407,11 @@ define(["backbone", "d3", "jquery", "underscore", "lib/kmapjs/views/graph-view",
        */
       isNodeVisible: function(node){
         var aux = window.agfkGlobals.auxModel,
-            thisView = this;
+             thisView = this;
         return !node.get("isContracted")
-          && ( !node.isLearnedOrImplicitLearned()
-               ||  thisView.model.get("options").get("showLearnedConcepts")); // FIXME change this logic after removing options model
+           && !node.get("notGoalRelevant")
+           && ( !node.isLearnedOrImplicitLearned()
+           ||  thisView.model.get("options").get("showLearnedConcepts"));
       }
     }); // end Backbone.View.extend({
   })();

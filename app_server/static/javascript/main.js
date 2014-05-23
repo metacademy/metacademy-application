@@ -10,23 +10,31 @@ requirejs.config({
   paths: {
     jquery:"lib/jquery-1.10.2",
     underscore: "lib/underscore",
-    backbone: "lib/backbone-min",
+    backbone: "lib/backbone",
     d3: "lib/d3",
     "dagre": "lib/dagre",
     "btouch": "lib/backbone.touch",
     "colorbox": "lib/jquery.colorbox-min",
     "sidr": "lib/jquery.sidr.min",
     "filesaver": "lib/FileSaver",
-    "completely": "lib/complete.ly.1.0.1"
+    "noty": "lib/jquery.noty.packaged.min",
+    "sortable": "lib/jquery.sortable"
   },
   shim: {
     completely: {
       exports: "completely"
     },
+    noty: {
+      exports: "noty",
+      deps: ["jquery"]
+    },
     d3: {
       exports: "d3"
     },
     colorbox: {
+      deps: ["jquery"]
+    },
+    sortable: {
       deps: ["jquery"]
     },
     filesaver: {
@@ -71,21 +79,22 @@ if (window.PRODUCTION){
 }
 
 // agfk app & gen-utils
-requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr", "colorbox"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
+requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router", "gen-utils","agfk/models/aux-model", "jquery", "btouch", "sidr", "colorbox", "noty", "sortable"], function(Backbone, Utils, AppRouter, GCRouter, GenPageUtils, AuxModel, $){
   "use strict";
 
   // handle noscript content
   $("body").css("overflow", "hidden");
 
   // initialize global auxData
-  window.agfkGlobals.auxModel = new AuxModel(window.agfkGlobals.auxData, {parse: true});
+  window.agfkGlobals.auxModel = new AuxModel(); //window.agfkGlobals.auxData, {parse: true});
 
   // shim for CSRF token integration with backbone and django
   var oldSync = Backbone.sync;
   Backbone.sync = function(method, model, options){
     options.beforeSend = function(xhr){
       if (model.get("useCsrf")){
-        xhr.setRequestHeader('X-CSRFToken', window.CSRF_TOKEN);
+        var csrf = Utils.readCookie("csrftoken") || window.CSRF_TOKEN;
+        xhr.setRequestHeader('X-CSRFToken', csrf);
       }
     };
     return oldSync(method, model, options);
@@ -116,7 +125,7 @@ requirejs(["backbone", "utils/utils", "agfk/routers/router", "gc/routers/router"
   var appRouter;
   // start the appropriate router
   // FIXME hardcoded hack
-  if (window.location.pathname.split("/").pop() === "new"){
+  if (window.agfkGlobals.isCreating) {
     appRouter = new GCRouter();
   } else {
     appRouter = new AppRouter();  }

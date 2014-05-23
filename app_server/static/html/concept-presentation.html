@@ -1,14 +1,18 @@
 {% load std_extras %}
 
+
+<!-- DEPRECATED FILE -->
+
+
 <section class="node-detail-view" style="width:100%;">
   <h1>
-    {{ concept_data.title }}
+    {{ leaf.title }}
   </h1>
 
   <h2 class="node-detail-title">Summary</h2>
   <div class="node-detail-comp-wrap node-detail-summary-text">
-    {% if concept_data.summary %}
-    {{ concept_data.summary }}
+    {% if leaf.summary %}
+    {{ leaf.summary }}
     {% else %}
     <span class="no-content-msg">-No Summary-</span>
     {% endif %}
@@ -16,13 +20,13 @@
 
   <h2 class="node-detail-title">Context</h2>
   <div class="node-detail-comp-wrap">
-    {% if concept_data.dependencies  %}
+    {% if leaf.dep_target.all  %}
     <p>This concept has the prerequisites:</p>
     <ul class="node-detail-comp-wrap dep-wrap">
-      {% for preq in concept_data.dependencies %}
+      {% for preq in leaf.dep_target.all %}
       <li>
-        <a href="/graphs/concepts/{{ preq.from_tag }}" class="focus-link dependency-link" target="_self">
-          {{preq.from_tag|replace_uscores}}
+        <a href="/graphs/concepts/{{ preq.source.tag }}" class="focus-link dependency-link" target="_self">
+          {{preq.source.title}}
         </a>
         {% if preq.reason %}
         <span class="dependency-reason">({{preq.reason}})</span>
@@ -35,27 +39,29 @@
     {% endif %}
   </div>
 
-  {% if concept_data.goals %}
+  {% if leaf.goals.all %}
   <h2 class="node-detail-title">Goals</h2>
   <div class="node-detail-comp-wrap goals-wrap" >
-    {{ concept_data.goals|parse_txt_url_obj|safe}}
+    {% for goal in leaf.goals.all %}
+    {{goal.text}}
+    {% endfor %}}
   </div>
   {% endif %}
 
-  {% if concept_data.resources %}
+  {% if leaf.resources %}
   <h2 class="node-detail-title">
     Resources
   </h2>
 
   <div class="node-detail-comp-wrap">
-    {% for rsrc in concept_data.resources %}
+    {% for rsrc in leaf.resources %}
 
     <div class="resource-view">
 
       <div class="resource-title-display">
-        <span class="res-arrow">→ </span>{{rsrc.title}}
+        <span class="res-arrow">→ </span>{{rsrc.global_resource.title}}
       </div>
-      
+
       <div class="resource-content-wrap">
         {% if rsrc.location %}
         <div class="resource-location-display">
@@ -81,7 +87,7 @@
           </ul>
         </div>
         {% endif %}
-        
+
         {% if rsrc.url %}
         <div class="resource-url-display">
           <span class="resource-link"><a class="external-link" href="{{ rsrc.url }}">[external website]</a> </span>

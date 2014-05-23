@@ -15,39 +15,28 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     // define private variables and methods
     var pvt = {};
 
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "resource-view-template",
       viewClass: "resource-view",
-      viewIdPrefix: "resource-details-",
-      extraResourceInfoClass: "extra-resource-details"
+      viewIdPrefix: "resource-details-"
     };
 
     // return public object
     return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-
-      events: {
-        'click .more-resource-info': 'toggleAdditionalInfo'
-      },
+      template: _.template(document.getElementById( pvt.consts.templateId).innerHTML),
+      id: function(){ return pvt.consts.viewIdPrefix +  this.model.cid;},
+      className: pvt.consts.viewClass,
 
       /**
        * Render the learning view given the supplied model
        */
       render: function(){
         var thisView = this;
-        var temp = _.extend(thisView.model.toJSON(), {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH,
+        var temp = _.extend(thisView.model.attributes, {GRAPH_CONCEPT_PATH: window.GRAPH_CONCEPT_PATH,
                                                       yearString: this.model.getYearString()});
         thisView.$el.html(thisView.template(temp));
         return thisView;
-      },
-
-      toggleAdditionalInfo: function(evt){
-        this.$el.find("." + pvt.viewConsts.extraResourceInfoClass).toggle();
-        $(evt.currentTarget).remove();
       }
-
     });
   })();
 
@@ -58,7 +47,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
     // define private variables and methods
     var pvt = {};
 
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "resources-section-view-template",
       viewClass: "resources-wrapper",
       viewIdPrefix: "resources-wrapper-"
@@ -66,9 +55,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
 
     // return public object
     return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.options.conceptId;},
-      className: pvt.viewConsts.viewClass,
+      template: _.template(document.getElementById( pvt.consts.templateId).innerHTML),
+      id: function(){ return pvt.consts.viewIdPrefix +  this.options.conceptId;},
+      className: pvt.consts.viewClass,
 
       /**
        * Render the learning view given the supplied model
@@ -130,257 +119,36 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.delegateEvents();
         return thisView;
       }
-
     });
   })();
 
-
   /**
-   * View to display details of all provided resources (wrapper view)
-   */
-  var DependencyView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      templateId: "dependency-view-template",
-      viewClass: "dependency-view",
-      viewIdPrefix: "dependency-details-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-      tagName: "li",
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this,
-            thisModel = thisView.model;
-        thisView.$el.html(thisView.template(thisModel.toJSON()));
-        return thisView;
-      }
-
-    });
-  })();
-
-
-  /**
-   * Wrapper view to display all dependencies
-   */
-  var DependencySectionView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      viewClass: "dependencies-wrapper",
-      viewIdPrefix: "dependencies-wrapper-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this;
-        thisView.$el.html("");
-        thisView.model.each(function(itm){
-          thisView.$el.append(new DependencyView({model: itm}).render().el);
-        });
-        thisView.delegateEvents();
-        return thisView;
-      }
-
-    });
-  })();
-
-
-  /**
-   * View to display details of all provided resources (wrapper view)
-   */
-  var OutlinkView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      templateId: "outlink-view-template",
-      viewClass: "outlink-view",
-      viewIdPrefix: "outlink-details-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-      tagName: "li",
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this,
-            thisModel = thisView.model;
-        thisView.$el.html(thisView.template(_.extend(thisModel.toJSON(), {toTitle: window.agfkGlobals.auxModel.getTitleFromId(thisModel.get("to_tag"))})));
-        return thisView;
-      }
-
-    });
-  })();
-
-
-  /**
-   * Wrapper view to display all outlinks
-   */
-  var OutlinkSectionView = (function(){
-    // define private variables and methods
-    var pvt = {};
-
-    pvt.viewConsts = {
-      viewClass: "outlinks-wrapper",
-      viewIdPrefix: "outlinks-wrapper-"
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      id: function(){ return pvt.viewConsts.viewIdPrefix +  this.model.cid;},
-      className: pvt.viewConsts.viewClass,
-
-      /**
-       * Render the view given the supplied model
-       */
-      render: function(){
-        var thisView = this;
-        thisView.$el.html("");
-        thisView.model.each(function(itm){
-          thisView.$el.append(new OutlinkView({model: itm}).render().el);
-        });
-        thisView.delegateEvents();
-        return thisView;
-      }
-    });
-  })();
-
-
-  /**
-   * View to display additional notes/pointers
-   * NOTE: expects a javascript model as input (for now) with one field: text
-   */
-  var NestedListView = (function(){
-    // define private variables and methods
-    var pvt = {
-    };
-
-    pvt.viewConsts = {
-      templateId: "pointers-view-template"
-    };
-
-    pvt.itemToStr = function(item){
-      if (item.link) {
-        return '<a class="internal-link" href="' + window.GRAPH_CONCEPT_PATH + item.link + '">' + item.text + '</a>';
-      } else {
-        return item.text;
-      }
-    };
-
-    pvt.lineToStr = function(parts){
-      var i, result = '';
-      for (i = 0; i < parts.length; i++){
-        result += pvt.itemToStr(parts[i]);
-      }
-      return result;
-    };
-
-    // return public object
-    return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return this.prefix + "-view-" + this.model.cid; },
-      className: function() { return this.prefix + "-view"; },
-
-      /**
-       * Render the learning view given the supplied model
-       */
-      render: function(){
-        var thisView = this;
-        thisView.$el.html(thisView.template({htmlStr: thisView.parsePtrTextToHtml(thisView.model.text)}));
-        return thisView;
-      },
-
-      /**
-       * Parse the markup-style pointer text to html list
-       * TODO separate HTML generation better
-       */
-      parsePtrTextToHtml: function(lines){
-        var i,
-            prevDepth = 0,
-            htmlStr = "",
-            liStr;
-
-        // array depth corresponds to list depth
-        for (i = 0; i < lines.length; i++){
-          var line = lines[i],
-              depth = line.depth;
-
-          while (depth < prevDepth){
-            htmlStr += '</ul>\n';
-            depth++;
-          }
-
-          while (depth > prevDepth){
-            htmlStr += '<ul>';
-            depth--;
-          }
-          liStr = pvt.lineToStr(line.items);
-          htmlStr += "<li>" + liStr + "</li>\n";
-          prevDepth = line.depth;
-        }
-
-        while (prevDepth--){
-          htmlStr += '</ul>\n';
-        }
-
-        return htmlStr;
-      }
-    });
-  })();
-
-
-  /**
-   * Return view thad displays the detailed node information
+   * Return view that displays the detailed node information
    */
   return  (function(){
     // define private variables and methods
     var pvt = {};
 
-    pvt.viewConsts = {
+    pvt.consts = {
       templateId: "node-detail-view-template", // name of view template (warning: hardcoded in html)
       viewTag: "section",
       viewIdPrefix: "node-detail-view-",
       viewClass: "node-detail-view",
       resourcesLocClass: 'resources-wrap', // classes are specified in the node-detail template
-      depLocClass: 'dep-wrap',
-      ptrLocClass: 'pointers-wrap',
-      goalsLocClass: 'goals-wrap',
-      outlinkLocClass: 'outlinks-wrap',
       learnViewCheckClass: 'learn-view-check',
       learnViewStarClass: 'learn-view-star',
       learnedClass: "learned-concept",
       starredClass: "starred-concept", // TODO this needs to be refactored with learn view title
-      implicitLearnedClass: "implicit-learned-concept"
+      implicitLearnedClass: "implicit-learned-concept",
+      internalLinkClass: "internal-link",
+      missingLinkClass: "missing-link"
+
     };
 
     // return public object for detailed node view
     return Backbone.View.extend({
-      template: _.template(document.getElementById( pvt.viewConsts.templateId).innerHTML),
-      id: function(){ return pvt.viewConsts.viewIdPrefix + this.model.get("id");},
+      template: _.template(document.getElementById( pvt.consts.templateId).innerHTML),
+      id: function(){ return pvt.consts.viewIdPrefix + this.model.get("id");},
 
       events: {
         "click .learn-view-check": function(evt){
@@ -390,30 +158,32 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         "click .learn-view-star": function(evt){
           evt.stopPropagation();
           this.toggleConceptState(evt, "star");
-        }
+        },
+        "mousedown .focus-link": "changeFocusNode"
       },
 
-      tagName: pvt.viewConsts.viewTag,
+      tagName: pvt.consts.viewTag,
 
       className: function(){
-        var viewConsts = pvt.viewConsts,
+        var consts = pvt.consts,
             thisView = this,
             thisModel = thisView.model,
             id = thisModel.id,
             aux = window.agfkGlobals.auxModel;
 
-        return pvt.viewConsts.viewClass
-          + (aux.conceptIsStarred(id) ? " " + viewConsts.starredClass : "")
-          + (aux.conceptIsLearned(id) ? " " + viewConsts.learnedClass : "")
-          + (thisModel.getImplicitLearnStatus() ? " " + viewConsts.implicitLearnedClass : "");
+        return pvt.consts.viewClass
+          + (aux.conceptIsStarred(id) ? " " + consts.starredClass : "")
+          + (aux.conceptIsLearned(id) ? " " + consts.learnedClass : "")
+          + (thisModel.getImplicitLearnStatus() ? " " + consts.implicitLearnedClass : "");
       },
 
-      initialize: function(){
-        var viewConsts = pvt.viewConsts,
+      initialize: function(inp){
+        var consts = pvt.consts,
             thisView = this,
             aux = window.agfkGlobals.auxModel,
             nodeTag = thisView.model.id,
             gConsts = aux.getConsts();
+            thisView.appRouter = inp.appRouter;
 
         function changeClass(sel, className, status){
           if(status){
@@ -425,11 +195,11 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         }
 
         // TODO refactor this code if we keep the star and check in current location
-        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, nodeSid, status){
-          changeClass("." + viewConsts.learnViewCheckClass, viewConsts.learnedClass, status);
+        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, status){
+          changeClass("." + consts.learnViewCheckClass, consts.learnedClass, status);
         });
-        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, nodeSid, status){
-          changeClass("." + viewConsts.starViewStarClass, viewConsts.starredClass, status);
+        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, status){
+          changeClass("." + consts.starViewStarClass, consts.starredClass, status);
         });
 
       },
@@ -440,55 +210,60 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
        */
       render: function(){
         var thisView = this,
-            viewConsts = pvt.viewConsts,
+            consts = pvt.consts,
             assignObj = {},
-            resourcesLocClass = "." + viewConsts.resourcesLocClass,
-            depLocClass = "." + viewConsts.depLocClass,
-            outlinkLocClass = "." + viewConsts.outlinkLocClass,
-            ptrLocClass = "." + viewConsts.ptrLocClass,
-            goalsLocClass = "." + viewConsts.goalsLocClass;
+            resourcesLocClass = "." + consts.resourcesLocClass;
+
+        if (thisView.model.get("is_partial")) {
+          thisView.model.fetch({remove:false,  success: function (resp) {
+            thisView.model.set("is_partial", false);
+            thisView.render();
+          }});
+        }
 
         thisView.isRendered = false;
-        var templateVars = _.extend(thisView.model.toJSON(), {"neededFor": thisView.model.computeNeededFor(),
-                                                              "notes": thisView.notesList(),
-                                                              "time": Utils.formatTimeEstimate(thisView.model.get("time")),
-                                                              "displayTitle": thisView.model.getLearnViewTitle()});
+        var templateVars = _.extend(thisView.model.attributes, {
+                             "notes": thisView.notesList(),
+                             "time": Utils.formatTimeEstimate(thisView.model.get("learn_time")),
+                             "displayTitle": thisView.model.getLearnViewTitle()});
+
+        if (!thisView.parsedPointers) {
+          thisView.parsedPointers = Utils.simpleMdToHtml(thisView.model.get("pointers"));
+          var checkTags = [];
+          $(thisView.parsedPointers).find("." + pvt.consts.internalLinkClass).each(function (i, ael) {
+            checkTags.push(ael.getAttribute("data-tag"));
+          });
+          if (checkTags.length) {
+            // TODO remove hardcoded url
+            $.ajax({
+              dataType: "json",
+              url: "/graphs/tagschecker/",
+              data: {"tags": window.JSON.stringify(checkTags)},
+              success: function (resp) {
+                for (var tag in resp) {
+                  if (!resp[tag]) {
+                    thisView.$el.find("[data-tag=" + tag + "]").addClass(pvt.consts.missingLinkClass);
+                  }
+                };
+              }
+            });
+          }
+
+          // check that all pointer tags exist
+        }
+
         thisView.$el.html(thisView.template(templateVars));
         thisView.resources = thisView.resources
             || new ResourcesSectionView({model: thisView.model.get("resources"),
                                                                              conceptId: thisView.model.get("id")});
-        thisView.dependencies = thisView.dependencies
-            || new DependencySectionView({model: thisView.model.get("dependencies")});
-        thisView.outlinks = thisView.outlinks
-            || new OutlinkSectionView({model: thisView.model.computeNeededFor()});
-        thisView.pointers = thisView.pointers
-            || new NestedListView({model: {text: thisView.model.get("pointers")},
-                                                                     prefix: "pointers"});
-        thisView.goals = thisView.goals
-            || new NestedListView({model: {text: thisView.model.get("goals")},
-                                                               prefix: "goals"});
         if (thisView.resources.model.length > 0){
           assignObj[resourcesLocClass] = thisView.resources;
-        }
-        if (thisView.dependencies.model.length > 0){
-          assignObj[depLocClass] = thisView.dependencies;
-        }
-        if (thisView.outlinks.model.length > 0){
-          assignObj[outlinkLocClass] = thisView.outlinks;
-        }
-        if (thisView.pointers.model.text.length > 0){
-          assignObj[ptrLocClass] = thisView.pointers;
-        }
-        if (thisView.goals.model.text.length > 0){
-          assignObj[goalsLocClass] = thisView.goals;
         }
 
         // update the hovertext when nodes are marked learned/unlearned
         var aux = window.agfkGlobals.auxModel;
-        thisView.listenTo(aux, "reset:estimates", thisView.addHoverText);
 
         thisView.assign(assignObj);
-        thisView.addHoverText();
         thisView.delegateEvents();
         thisView.$el.scrollTop(0);
 
@@ -499,7 +274,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       /**
        * Assign subviews: method groked from http://ianstormtaylor.com/assigning-backbone-subviews-made-even-cleaner/
        */
-      assign : function (selector, view) {
+      assign: function (selector, view) {
         var selectors;
         if (_.isObject(selector)) {
           selectors = selector;
@@ -524,54 +299,69 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         state === "learn" ? aux.toggleLearnedStatus(nodeTag) : aux.toggleStarredStatus(nodeTag);
       },
 
-
-      getHoverText: function(conceptTag) {
-        var aux = window.agfkGlobals.auxModel;
-        if (aux.conceptIsLearned(conceptTag)) {
-          return "You have learned this concept.";
-        } else {
-          var timeEstimate = aux.computeTimeEstimate(conceptTag);
-          if (timeEstimate) {
-            return "Time estimate: " + Utils.formatTimeEstimate(timeEstimate);
-          } else {
-            return "";
-          }
-        }
+      /**
+       * Set the focus node
+       */
+      changeFocusNode: function (evt) {
+        var thisView = this,
+            focus = $(evt.currentTarget).data("focus");
+        evt.preventDefault();
+        thisView.appRouter.changeUrlParams({focus: focus});
       },
 
-      addHoverText: function() {
-        var thisView = this;
-        this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
-          var temp = _.last(this.href.split("/"));
-          var concept = _.last(temp.split("="));
-          return thisView.getHoverText(concept);
-        });
-      },
+      // /**
+      //  * Returns the concept hover text
+      //  */
+      // getHoverText: function(conceptTag) {
+      //   var aux = window.agfkGlobals.auxModel;
+      //   if (aux.conceptIsLearned(conceptTag)) {
+      //     return "You have learned this concept.";
+      //   } else {
+      //     // TODO FIXME
+      //     return "You have not learned this concept";
+      //     // var timeEstimate = aux.computeTimeEstimate(conceptTag);
+      //     // if (timeEstimate) {
+      //     //   return "Time estimate: " + Utils.formatTimeEstimate(timeEstimate);
+      //     // } else {
+      //     //   return "";
+      //     // }
+      //   }
+      // },
+
+      // addHoverText: function() {
+      //   var thisView = this;
+      //   this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
+      //     var temp = _.last(this.href.split("/")),
+      //         concept = _.last(temp.split("="));
+      //     return thisView.getHoverText(concept);
+      //   });
+      // },
 
       /**
        * Compute the list of notes to display.
        */
       notesList: function() {
-        var notes = [];
-        if (this.model.get("is_shortcut")) {
-          notes.push(this.shortcutNote());
+        var thisView = this,
+            notes = [];
+        if (thisView.model.get("is_shortcut")) {
+          notes.push(thisView.shortcutNote());
         }
-        if (this.model.get("flags")) {
-          notes = notes.concat(this.model.get("flags"));
+        if (thisView.model.get("flags")) {
+          notes = notes.concat(thisView.model.get("flags"));
         }
-        if (!this.model.isFinished()) {
+        if (!thisView.model.get("is_partial") && !thisView.model.isFinished()) {
           notes.push("This concept is still under construction.");
         }
         return notes;
       },
 
-      /**
-       * The note telling the user the node is a shortcut.
-       */
-      shortcutNote: function() {
-        var link = this.model.get("id");
-        return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>';
-      },
+      // /**
+      //  * The note telling the user the node is a shortcut.
+      //  */
+      // shortcutNote: function() {
+      //   var link = this.model.get("id");
+      //   return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>';
+      // },
 
       /**
        * Clean Up the view properly
@@ -587,9 +377,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       isViewRendered: function(){
         return this.isRendered;
       }
-
     });
   })();
-
-
 });

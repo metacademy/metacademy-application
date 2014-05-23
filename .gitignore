@@ -54,3 +54,5 @@ sandbox.py
 
 # tern server
 .tern-port
+
+node_modules

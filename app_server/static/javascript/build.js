@@ -11,11 +11,17 @@
     "btouch": "lib/backbone.touch",
     "colorbox": "lib/jquery.colorbox-min",
     "sidr": "lib/jquery.sidr.min",
-    "filesaver": "lib/FileSaver"
+    "filesaver": "lib/FileSaver",
+    "noty": "lib/jquery.noty.packaged.min",
+    "sortable": "lib/jquery.sortable"
   },
   shim: {
     completely: {
       exports: "completely"
+    },
+    noty: {
+      exports: "noty",
+      deps: ["jquery"]
     },
     d3: {
       exports: "d3"

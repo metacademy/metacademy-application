@@ -27,7 +27,7 @@ $(DJANGO_DB_FILE): config.py app_server/settings_local.py $VENV $(LOCAL_DBS) | a
 app_server/static/lib/kmap/*:
 	git clone https://github.com/cjrd/kmap.git app_server/static/lib/kmap
 
-test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs app_server/settings_local.py config.py
+test: $(VENV_ACTIVATE) | node_modules/mocha-phantomjs app_server/settings_local.py config.py python_path
 	./Tests.sh
 
 config.py:

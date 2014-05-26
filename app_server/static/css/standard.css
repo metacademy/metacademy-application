@@ -109,6 +109,17 @@ input{
     display: none;
 }
 
+#sidr-id-meta-heading-search {
+    display: none;
+}
+
+.sidr-class-ac-list li.sidr-class-ac-hidden {
+    display: none;
+}
+a.sidr-class-ac-li-a {
+    display: none;
+}
+
 #responsive-menu-button{
     font-size: 100%;
 }
@@ -324,7 +335,7 @@ a.home-nav{
     top: 1.4em;
 }
 
-.ac-hidden {
+.ac-hidden, .header-menu ul li.ac-hidden {
   display: none;
 }
 

@@ -1,8 +1,12 @@
 // want to test parsing
 /*global define*/
-define(["chai", "agfk/models/explore-graph-model"], function(chai, ExploreGraphModel){
+define(["chai", "agfk/models/explore-graph-model", "agfk/models/aux-model"], function(chai, ExploreGraphModel, AuxModel){
   var it = window.it,
       describe = window.describe;
+
+  // initialize global auxData TODO refactor so this isn't necessary
+  window.agfkGlobals = {};
+  window.agfkGlobals.auxModel = new AuxModel();
 
   // initialize aux testing objects
   var graphObj,

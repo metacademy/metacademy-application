@@ -12,7 +12,6 @@ define(["underscore", "lib/kmapjs/models/node-model", "agfk/collections/concept-
         return _.union(Node.prototype.txtFields(),  ["tag", "exercises", "summary", "pointers", "learn_time", "is_partial", "x", "y", "isContracted", "software", "hasContractedDeps", "hasContractedOLs"]);
     },
 
-
     defaults: function(){
       var dnDefaults = {
         dependencies: new DetailedEdgeCollection(),

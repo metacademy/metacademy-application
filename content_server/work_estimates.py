@@ -1,5 +1,8 @@
 import collections
-import numpy as np
+try:
+    import numpy as np
+except:
+    pass
 import re
 try:
     import scipy.optimize, scipy.special

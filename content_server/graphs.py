@@ -1,5 +1,8 @@
 import collections
-import numpy as np
+try:
+    import numpy as np
+except:
+    pass
 try:
     import scipy.linalg
 except:
@@ -35,7 +38,7 @@ class Graph:
         """Construct the dependency graph from a dict of nodes. Expects all the links to be present in the
         graph (so call remove_missing_links on nodes first)."""
         graph = Graph.init_empty(nodes.keys())
-        
+
         for tag, node in nodes.items():
             for dep in node.dependencies:
                 graph.add_edge(dep.tag, tag)
@@ -61,7 +64,7 @@ class Graph:
         where shortcuts are represented separately from the concept nodes."""
         vertices = [('concept', tag) for tag in nodes] + [('shortcut', tag) for tag in shortcuts]
         graph = Graph.init_empty(vertices)
-        
+
         for tag, node in nodes.items():
             for dep in node.dependencies:
                 if dep.shortcut and dep.tag in shortcuts:
@@ -189,14 +192,14 @@ def remove_missing_links(nodes):
 
 
 
-    
 
 
-    
+
+
 def count_dependencies(graph, ignore=[]):
     """Count the total number of long-distance dependencies in a graph."""
     all_deps = graph.gather_dependencies()
-    
+
     total = 0
     for vertex, deps in all_deps.items():
         if vertex[0] == 'concept' and vertex[1] not in ignore:
@@ -220,7 +223,7 @@ def bottleneck_score(graph, tag):
     graph_rem.remove_vertex(('concept', tag))
     if ('shortcut', tag) in graph_rem.vertices:
         graph_rem.remove_vertex(('shortcut', tag))
-    
+
     orig = count_dependencies(graph, ignore=[tag])
     diff = orig - count_dependencies(graph_rem)
     return diff / float(orig)
@@ -280,10 +283,10 @@ def explain_edge_bottleneck_score(nodes, graph, from_node, to_node):
                 print '   ', get_label(nodes, k2)
             print
 
-    
 
 
-        
+
+
 
 
 def page_rank(nodes, damping=0.25, pointers_weight=0.75):
@@ -300,7 +303,7 @@ def page_rank(nodes, damping=0.25, pointers_weight=0.75):
     id2tag = nodes.keys()
     tag2id = {tag: i for i, tag in enumerate(id2tag)}
     N = len(id2tag)
-    
+
     T = np.zeros((N, N))
     for i, tag in enumerate(id2tag):
         if pgraph.outgoing[tag] or dgraph.incoming[tag]:
@@ -327,7 +330,7 @@ def page_rank(nodes, damping=0.25, pointers_weight=0.75):
 
     return {t: v[tag2id[t]] for t in nodes.keys()}
 
-    
+
 
 def print_page_ranks(nodes, damping=0.25, pointers_weight=0.75):
     """Print the list of nodes sorted by their page ranks."""
@@ -343,7 +346,7 @@ def print_centrality(nodes, damping=0.25, pointers_weight=0.75):
     for tag in order:
         centrality = 10. * (np.log(scores[tag]) - mn) / (mx - mn)
         print '%10.2f %s' % (centrality, nodes[tag].title)
-            
+
 def missing_titles(nodes):
     """List the tags of all nodes with missing titles."""
     return [tag for tag in nodes if nodes[tag].title is None]

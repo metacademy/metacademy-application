@@ -57,12 +57,18 @@ For Windows installation/requirements, please see the readme located in [/window
 
 #### Optional: create a superuser
 
-        python app_server/manage.py createsuperuser
+    python app_server/manage.py createsuperuser
+
+#### Very Optional: Install numpy and pandas (needed for some legacy/aux function calls)
+
+    pip install numpy
+
+    pip install pandas
 
 #### Very Optional: Scipy dependency
 Some of metacademy's ancillary functions currently depend on `scipy`. Scipy can be tricky to install (`pip install scipy` won't work unless you have all of the systems-level dependencies) so we have made it an optional dependency. Once you have scipy installed on your machine (google will help here...), link it's site-packages folder to to your virtual environment's `lib/python2.7/site-packages/` folder. On my machine, this command was:
 
-        ln -s /usr/local/lib/python2.7/site-packages/scipy lib/python2.7/site-packages/
+    ln -s /usr/local/lib/python2.7/site-packages/scipy lib/python2.7/site-packages/
 
 
 ## Execution

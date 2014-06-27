@@ -2,13 +2,12 @@
 
 # set the env
 source ../meta_venv/bin/activate
+python app_server/manage.py runserver 8080 &
+rserver_id=$!
 
 # run the django tests
 echo "Django Tests"
 python app_server/manage.py test
-
-python app_server/manage.py runserver 8080 &
-rserver_id=$!
 
 # run the browser tests
 echo "Browser Tests"

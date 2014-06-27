@@ -35,7 +35,6 @@ class SimpleSelTest(unittest.TestCase):
             self.caps['tunnel-identifier'] = os.environ['TRAVIS_JOB_NUMBER']
             self.caps['build'] = os.environ['TRAVIS_BUILD_NUMBER']
             self.caps['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], 'CI']
-        #self.url = 'http://localhost:8080/'
             self.username = os.environ['SAUCE_USERNAME']
             self.key = os.environ['SAUCE_ACCESS_KEY']
             hub_url = "%s:%s@localhost:4445" % (self.username, self.key)

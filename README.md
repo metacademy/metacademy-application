@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/metacademy/metacademy-application.png)](https://travis-ci.org/metacademy/metacademy-application)
-
 <p align="center">
 <img src="http://obphio.us/media/images/meta-logo.png" alt="Metacademy Logo" height="150px"/>
 </p>

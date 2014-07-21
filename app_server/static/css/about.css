@@ -41,6 +41,25 @@
     margin-top: 1em;
 }
 
+.social-icons {
+    text-align: center;
+    margin-top: -20px;
+    font-size: 0.8em;
+}
+
+.social-icons i {
+    color: rgb(51, 51, 51);
+    margin-right: 0.5em;
+}
+
+.social-icons .icon-twitter:hover {
+    color: #55ACEE;
+}
+
+.social-icons .icon-github-circled:hover {
+    color: #4183c4;
+}
+
 @media only screen and (max-width: 769px){
     section.about-meta{
         width: 95%;

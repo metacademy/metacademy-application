@@ -43,6 +43,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         var assignObj = {};
         thisView.globalResourceView = thisView.globalResourceView || new GlobalResourceEditorView({model: thisView.model.get("global_resource")});
         thisView.globalResourceView.conceptModel = thisView.model;
+        thisView.globalResourceView.parentView = thisView;
         thisView.resourceLocationsView = thisView.resourceLocationsView || new ResourceLocationsView({model: thisView.model.get("locations")});
 
         // make sure we have at least one resource location
@@ -53,6 +54,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         assignObj["." + consts.globalResClass] = thisView.globalResourceView;
         assignObj["." + consts.resLocWrapperClass] = thisView.resourceLocationsView;
 
+        thisView.model.grSelected = thisView.model.get("global_resource").get("title").length > 0;
         thisView.$el.html(thisView.template(thisView.model.attributes));
 
         // assign the subviews

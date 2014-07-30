@@ -1,16 +1,19 @@
 <script type="text/template" id="resource-editor-template">
 
-  <div class="ec-tabs res-tabs">
-    <ul>
-      <li ><button class="btn-global-resource-fields">Resource Selection</button></li>
-      <li ><button class="btn-concept-specific-fields">Resource Info for the Concept</button></li>
-    </ul>
-  </div>
+  <!-- <div class="ec-tabs res-tabs"> -->
+  <!--   <ul> -->
+  <!--     <li ><button class="btn-global-resource-fields">Resource Selection</button></li> -->
+  <!--     <li ><button class="btn-concept-specific-fields">Resource Info for the Concept</button></li> -->
+  <!--   </ul> -->
+  <!-- </div> -->
 
   <div class="global-resource-fields">
   </div>
 
+  <hr>
+
   <div class="concept-specific-fields">
+    <% if (global_resource.get("title")) { %>
     <div class="resource-core-fields">
       <label>Does this resource cover all of the learning goals?</label>
       <input type="radio" class="core-radio-field" name="core-<%=this.cid%>" value="core"  <%= core ? "checked" : "" %>>Yes
@@ -40,5 +43,7 @@
     <label>Notes</label>
     <textarea class="array-text-field" name="notes-<%=this.cid%>" placeholder="e.g. section 2 provides an overview of machine learning; notation is found on pg. 7"><%= notes %></textarea>
   </div>
+
+  <% } %>
 
 </script>

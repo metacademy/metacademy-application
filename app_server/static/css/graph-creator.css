@@ -1,19 +1,14 @@
-#main{
-    position: relative;
-    overflow-y: scroll;
-}
-
-p{
+p {
      text-align: center;
      overflow: overlay;
      position: relative;
 }
 
-input{
+input {
     padding: 0.2em;
 }
 
-body{
+body {
     margin: 0;
     padding: 0;
     overflow:hidden;
@@ -23,6 +18,15 @@ body{
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+hr {
+    margin: 1.5em;
+}
+
+#main{
+    position: relative;
+    overflow-y: scroll;
 }
 
 #gc-wrap{
@@ -46,8 +50,7 @@ Input form
     position: relative;
     border: 2px solid #B4ADAD;
     border-radius: 4px;
-    padding: 1em;
-    padding-left: 10%;
+    padding: 1em 10%;
     text-align: left;
 }
 
@@ -390,7 +393,7 @@ g.connect-node circle{
     color: white;
     position: absolute;
     left: 0;
-    bottom: -2.5em;
+    top: -20px;
     font-size: .7em;
 }
 
@@ -513,16 +516,6 @@ label.itm-label + label.itm-label {
     display: block;
 }
 
-.concept-specific-fields,
-.global-resource-fields {
-    display: none;
-}
-
-.concept-specific-fields.active,
-.global-resource-fields.active {
-    display: block;
-}
-
 #goals-tidbit-wrap input{
     margin: 0;
 }
@@ -531,4 +524,89 @@ label.itm-label + label.itm-label {
     margin-top: 1em;
     font-size: 0.9em;
     font-style: italic;
+}
+
+.grres {
+    margin: 0.7em 0;
+}
+
+.grres:hover {
+    background: #eeeeee;
+    cursor: pointer;
+}
+
+.grres h1 {
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.edit-gr {
+    color: blue;
+    text-decoration: underline;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.edit-gr span {
+    cursor: pointer;
+}
+
+.fields h1 {
+    margin: 1em 0;
+    font-weight: bold;
+}
+
+.warning {
+    background: rgb(255, 245, 253);
+    padding: 1em;
+    border-radius: 5px;
+    line-height: 1.5em;
+}
+
+
+.locked-resource-info {
+    background-color: rgb(247, 247, 247);
+    padding: 0 0.5em;
+}
+.locked-resource-info a {
+    font-size: 0.8em;
+}
+.locked-resource-info h1 {
+    text-align: center;
+    font-weight: bold;
+
+}
+.locked-resource-info p{
+    text-align: left;
+    font-size: 0.8em;
+    line-height: 0.9em;
+}
+.locked-resource-info label{
+    margin-top: 0.5em;
+}
+
+.grsearch, .end-gr-edit, .add-new-gr {
+    margin-top: 1em;
+    border: 1px solid #777777;
+    background: rgb(250, 253, 255);
+    padding: 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.end-gr-edit {
+    font-size: 0.9em;
+    font-weight: bold;
+    display: block;
+    margin: 2em auto;
+}
+
+.no-results {
+    margin: 1em 0;
+    text-align: center;
+}
+
+.add-new-gr {
+    display: block;
+    margin: 1em auto;
 }

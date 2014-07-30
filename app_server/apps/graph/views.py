@@ -82,11 +82,12 @@ def get_concept_history(request, concept_tag=""):
     revs = _get_versions_obj(concept)[::-1]
     return render(request, 'concept_history.html', {'concept': concept, "revs": revs})
 
+
 def _get_ac_string(res):
     rstr = res.title
-    if len(res.authors) > 2:
-        rstr += " (" + ", ".join(ast.literal_eval(res.authors)) + ")"
+    rstr += " (" + ", ".join(ast.literal_eval(res.authors)) + ")"
     return rstr
+
 
 def get_autocomplete(request):
     """
@@ -207,6 +208,18 @@ def get_user_data(request):
         concepts = {"concepts": []}
 
     return concepts
+
+
+def get_gresource_search(request):
+    """
+    Perform the global resource search
+    """
+    acinp = request.GET.get("searchtext")
+    if not acinp:
+        return HttpResponse(status=400)
+    sqs = SearchQuerySet().models(GlobalResource).autocomplete(title=acinp)[:10]
+    resp = [{"title": acres.title, "authors": ", ".join(ast.literal_eval(acres.authors)), "id": acres.id.split(".")[-1]} for acres in sqs if acres]
+    return HttpResponse(json.dumps(resp), "application/json")
 
 
 def _get_versions_obj(obj):

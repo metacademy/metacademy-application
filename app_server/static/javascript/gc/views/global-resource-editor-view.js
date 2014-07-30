@@ -8,7 +8,12 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
     pvt.consts = {
       templateId: "global-resource-editor-template",
       ecClass: "expanded",
-      addGRTitleWrapClass: "gresource-title-wrap"
+      addGRTitleWrapClass: "gresource-title-wrap",
+      grSearchButtonClass: "grsearch",
+      grFinishEditingClass: "end-gr-edit",
+      grSearchInputClass: "gresource-search",
+      searchResId: "global-resource-search-result-template",
+      grsearchResClass: "grsearch-results"
     };
 
     return BaseEditorView.extend({
@@ -16,13 +21,19 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
 
       events: function () {
         var oevts = BaseEditorView.prototype.events();
+        oevts["click ." + pvt.consts.grSearchButtonClass] = "clickSearchButton";
         oevts["blur .author-field"] = "blurAuthorField";
-        oevts["blur .gresource-title"] = "blurGlobalResourceTitle";
+        oevts["click .grres"] = "clickSearchRes";
+        oevts["click .edit-gr span"] = "clickEditGR";
+        oevts["click .end-gr-edit"] = "clickEndGR";
+        oevts["click .add-new-gr"] = "clickNewGR";
+        //oevts["blur .gresource-title"] = "blurGlobalResourceTitle";
         return oevts;
       },
 
       initialize: function () {
-          _.bindAll(this);
+        _.bindAll(this);
+        this.sresTemp = _.template(document.getElementById(pvt.consts.searchResId).innerHTML);
       },
 
       /**
@@ -33,15 +44,15 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
         thisView.isRendered = false;
 
         thisView.$el.html(thisView.template(thisView.model.attributes));
-        var acOpts = {
-          containerEl: thisView.$el.find("." + pvt.consts.addGRTitleWrapClass)[0],
-          acUrl: "/graphs/autocomplete"
-        };
-        var obtainGETData = function (val) {
-          return {ac: val, type: "globalresource"};
-        };
+        // var acOpts = {
+        //   containerEl: thisView.$el.find("." + pvt.consts.addGRTitleWrapClass)[0],
+        //   acUrl: "/graphs/autocomplete"
+        // };
+        // var obtainGETData = function (val) {
+        //   return {ac: val, type: "globalresource"};
+        // };
 
-        thisView.autocomplete = new GenUtils.Autocomplete(acOpts, obtainGETData, null, thisView.loadGResource);
+        //thisView.autocomplete = new GenUtils.Autocomplete(acOpts, obtainGETData, null, thisView.loadGResource);
 
         thisView.isRendered = true;
         return thisView;
@@ -50,11 +61,12 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
       /**
        * Load a global resource into the model from an ajax request
        */
-      loadGResource: function (inpText, evt) {
-        var thisView = this,
-            thisModel = thisView.model,
-            id = evt.target.getAttribute("data-id");
+      loadGResource: function (id) {
+        console.log(id);
         if (!id) {return;}
+
+        var thisView = this,
+            thisModel = thisView.model;
 
         // check if it's in the global gresources
         var grs = window.agfkGlobals.globalResources;
@@ -63,7 +75,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
           thisView.model = grs[id];
           thisModel = grs[id];
           thisView.loadingFromAc = true;
-          thisView.render();
+          thisView.parentView.render();
           thisView.conceptModel.save(null, {parse: false, error: thisView.attrErrorHandler});
           thisView.loadingFromAc = false;
         } else {
@@ -72,7 +84,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
           thisView.loadingFromAc = true;
           thisModel.fetch({parse: true, success: function () {
             thisView.conceptModel.save(null, {parse: false, error: thisView.attrErrorHandler});
-            thisView.render();
+            thisView.parentView.render();
             thisView.loadingFromAc = false;
           },
                            error: function () {
@@ -116,6 +128,39 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
           saveObj[attrName] = authors;
           thisView.model.save(saveObj, {parse: false, patch: true, error: thisView.attrErrorHandler});
         }
+      },
+
+      clickSearchButton: function (evt) {
+        var thisView = this,
+            searchText = thisView.$el.find("." + pvt.consts.grSearchInputClass).val(),
+            htmlRes = "";
+        $.getJSON("/graphs/gresource-search", {"searchtext": searchText}, function (data) {
+          var htmlStr = data.map(function (val) {
+            return thisView.sresTemp(val);
+          }).join("\n");
+
+          htmlStr = htmlStr || "<h2 class='no-results'>No Search Results</h2>";
+          htmlStr += "\n" + "<button class='add-new-gr'>Add New Resource</button>";
+          thisView.$el.find("." + pvt.consts.grsearchResClass).html(htmlStr);
+        });
+      },
+
+      clickSearchRes: function (evt) {
+        this.loadGResource($(evt.currentTarget).find("input").val());
+      },
+
+      clickEditGR: function () {
+        this.gredit = true;
+        this.render();
+      },
+
+      clickEndGR: function () {
+        this.gredit = false;
+        this.render();
+      },
+
+      clickNewGR: function () {
+        this.clickEditGR();
       }
     });
   })();

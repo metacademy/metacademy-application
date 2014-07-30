@@ -24,6 +24,7 @@ v1_api.register(GoalResource())
 urlpatterns = patterns('',
                        url(r'^$', "django.views.defaults.page_not_found"),
                        url(r'^concept-triplet/?$', get_concept_triplet, name='concept_triplet'),
+                       url(r'^gresource-search/?$', get_gresource_search, name='resource_search'),
                        url(r'^autocomplete/?$', get_autocomplete, name='autocomplete'),
                        url(r'^(?i)concepts/([^/]+)/history/?$', get_concept_history, name="concept-history"),
                        url(r'^(?i)concepts/([^/]+)/?$', get_concept_dep_graph, name="concepts"),

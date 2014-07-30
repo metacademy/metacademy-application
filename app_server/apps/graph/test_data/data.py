@@ -142,7 +142,7 @@ def concept4(tag_match=True):
                            'global_resource': {'access': 'reg',
                                                'authors': ['somebody', 'nobody'],
                                                'description': "yet another resource",
-                                               'edition_years': [],
+                                               'edition_years': "['4', 5, '?']",
                                                'id': 'c985jdic',
                                                'notes': '',
                                                'resource_type': 'some type!',

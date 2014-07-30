@@ -145,7 +145,7 @@ class BaseResourceTest(ResourceTestCase):
 
         # verify resources
         res_flat_attrs = ["id", "title", "url", "specific_url_base", "resource_type", "edition", "extra", "note", "level", "description"]
-        res_eval_attrs = ["location", "additional_dependencies", "authors"]
+        res_eval_attrs = ["location", "additional_dependencies", "authors", "edition_years"]
         res_int_attrs = ["year"]
         res_boolean_attrs = ["core", "free", "requires_signup"]
         res_m2m_attrs = ["goals_covered"]

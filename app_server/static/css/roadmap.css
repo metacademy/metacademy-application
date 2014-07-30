@@ -387,6 +387,11 @@ ol.history-list{
     margin: auto;
 }
 
+.block-center-text {
+  display: block;
+  text-align: center;
+}
+
 a.link-image-wrap{
     background: none;
 }

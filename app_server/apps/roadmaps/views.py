@@ -27,7 +27,7 @@ import models
 
 BLEACH_TAG_WHITELIST = ['a', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
                         'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'pre',
-                        'table', 'tr', 'th', 'tbody', 'thead', 'td', 'img']
+                        'table', 'tr', 'th', 'tbody', 'thead', 'td', 'img', 'div']
 BLEACH_ATTR_WHITELIST = {
     '*': ['id', 'class'],
     'a': ['href', 'rel'],

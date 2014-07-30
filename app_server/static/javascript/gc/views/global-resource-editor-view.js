@@ -96,7 +96,6 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
                                text: "Unable to get global resource from the server."
                              });
                            }});
-
         }
       },
 
@@ -104,7 +103,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
         var thisView = this,
             globalGResources = window.agfkGlobals.globalResources,
             gid = thisView.model.id;
-        if (!evt.currentTarget.value || thisView.loadingFromAc || $(evt.relatedTarget).hasClass("ac-li-a")) {
+        if (!evt.currentTarget.value || thisView.loadingFromAc || $(evt.relatedTarget).hasClass(pvt.consts.acLiClass)) {
           return;
         }
         if (!globalGResources.hasOwnProperty(gid)){

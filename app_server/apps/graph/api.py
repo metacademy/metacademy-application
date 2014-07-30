@@ -264,6 +264,22 @@ class GlobalResourceResource(CustomSaveHookResource):
             except:
                 gresource["year"]  = None
 
+            # expect edition_years array
+            try:
+                if gresource.get("edition_years"):
+                    arrType = ast.literal_eval(gresource["edition_years"])
+                    assert(isinstance(arrType, (list, tuple)))
+            except:
+                raise Exception("unable to parse edition_years -- must be an array " + bundle.data["title"])
+
+            # expect authors array -- TODO DRY with edition years
+            try:
+                if gresource.get("authors") and not isinstance(gresource.get("authors"), (list, tuple)):
+                    arrType = ast.literal_eval(gresource["authors"])
+                    assert(isinstance(arrType, (list, tuple)))
+            except:
+                raise Exception("unable to parse authors -- must be an array " + bundle.data["title"])
+
         return bundle
 
     class Meta(CustomSaveHookResource.Meta):
@@ -358,9 +374,6 @@ class ConceptResourceResource(CustomSaveHookResource):
         # hack because hydrate can be called twice (https://github.com/toastdriven/django-tastypie/issues/390)
         if type(resource) != dict:
             return bundle
-
-        # if "concept" in resource:
-        #     del resource["concept"]
 
         # create new id if necessary
         if not resource["id"]:

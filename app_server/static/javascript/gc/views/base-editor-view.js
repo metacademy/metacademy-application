@@ -16,9 +16,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       // TODO why are some of these events firing twice?
         return {
           "blur .text-field": "blurTextField",
+          "blur .array-field": "blurArrayField",
           "change .boolean-field": "changeBooleanField",
           "change .select-field": "changeSelectField",
-          /*"blur .composite-field": "changeCompositeField",*/
           "click .ec-button": "toggleEC"
         };
       },
@@ -71,7 +71,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
           saveObj[attrName] = curTar.value;
           thisView.model.save(saveObj, {parse: false, patch: !thisView.model.doSaveUpdate, error: thisView.attrErrorHandler});
         }
-
         // so event is only fired on child views
         evt.stopPropagation();
       },
@@ -108,7 +107,23 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         }
         // so event is only fired on child views
         evt.stopPropagation();
+      },
+
+      /**
+       * blurArrayField
+       */
+      blurArrayField: function (evt) {
+        var thisView = this,
+            curTar = evt.currentTarget,
+            attrName = curTar.name.split("-")[0],
+            inpText = curTar.value;
+        var saveArr = inpText.split(","),
+            saveObj = {};
+        saveObj[attrName] = saveArr;
+        thisView.model.save(saveObj, {parse: false, patch: true, error: thisView.attrErrorHandler});
+        evt.stopPropagation();
       }
+
     });
   })();
 });

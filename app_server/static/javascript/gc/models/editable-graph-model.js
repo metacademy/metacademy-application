@@ -24,6 +24,13 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
     /**
      * @Override
      */
+    postRemoveEdge: function (edge) {
+      edge.destroy();
+    },
+
+    /**
+     * @Override
+     */
     postAddEdge: function (edge, isNewEdge) {
       var thisModel = this;
       // if it needs the server id it'll be saved after the node id returns
@@ -45,6 +52,13 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
                    }
                   });
       }
+    },
+
+    /**
+     * @Override
+     */
+    postRemoveNode: function (node) {
+      node.destroy();
     },
 
     /**

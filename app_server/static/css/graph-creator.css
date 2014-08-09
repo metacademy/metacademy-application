@@ -543,8 +543,32 @@ label.itm-label + label.itm-label {
     font-style: italic;
 }
 
+/* GR Search */
+
+.grsearch, .end-gr-edit, .add-new-gr {
+    margin-top: 1em;
+    border: 1px solid #777777;
+    background: rgb(250, 253, 255);
+    padding: 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.grsearch-results {
+    margin-top: 5px;
+}
+
 .grres {
-    margin: 0.7em 0;
+    margin: 0;
+    padding: 10px 0
+}
+
+.grres h2 {
+    font-style: italic;
+}
+
+.grres + .grres {
+    border-top: 1px solid #777777;
 }
 
 .grres:hover {
@@ -600,15 +624,6 @@ label.itm-label + label.itm-label {
 }
 .locked-resource-info label{
     margin-top: 0.5em;
-}
-
-.grsearch, .end-gr-edit, .add-new-gr {
-    margin-top: 1em;
-    border: 1px solid #777777;
-    background: rgb(250, 253, 255);
-    padding: 0.5em;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .end-gr-edit {

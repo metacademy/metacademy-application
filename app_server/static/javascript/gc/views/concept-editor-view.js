@@ -103,11 +103,13 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // add the resources and goals (they're the tricky parts)
         thisView.model.get("resources").each(function (res) {
           var rev = new ResourceEditorView({model: res});
+          rev.parentView = thisView;
           thisView.$el.find("#" + consts.resourcesTidbitWrapId).append(rev.render().$el);
         });
         // TODO DRY with resources, problems, etc
         thisView.model.get("goals").each(function (goal) {
           var gev = new GoalEditorView({model:goal});
+          gev.parentView = thisView;
           thisView.$el.find("#" + consts.goalsTidbitWrapId).append(gev.render().$el);
         });
 

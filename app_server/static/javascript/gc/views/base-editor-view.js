@@ -19,7 +19,8 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
           "blur .array-field": "blurArrayField",
           "change .boolean-field": "changeBooleanField",
           "change .select-field": "changeSelectField",
-          "click .ec-button": "toggleEC"
+          "click .ec-button": "toggleEC",
+          "click .destroy-model": "destroyModel"
         };
       },
 
@@ -55,6 +56,9 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         $(evt.currentTarget.parentElement).toggleClass(pvt.consts.ecClass);
       },
 
+      /**
+       * Handle errors when syncing the attributes with the server
+       */
       attrErrorHandler: function (robj, resp) {
         Utils.errorNotify("unable to sync attribute with the server: " + (resp.status === 401 ? "create an account to save your changes" : resp.responseText));
       },
@@ -122,8 +126,36 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         saveObj[attrName] = saveArr;
         thisView.model.save(saveObj, {parse: false, patch: true, error: thisView.attrErrorHandler});
         evt.stopPropagation();
-      }
+      },
 
+      destroyModel: function (evt) {
+        evt.stopPropagation();
+        var thisView = this;
+        if (confirm("Are you sure you want to delete this resource location (this action can't be undon)?")) {
+          thisView.model.destroy(
+            {
+              success: function () {
+                if (thisView.parentView) {
+                  thisView.parentView.render();
+                }
+              },
+              error: function (mdl, jqxhr) {
+                var etext = "Unable to delete resource location";
+                if (jqxhr.status == 401) {
+                  etext += " -- you do not have permission";
+                } else if (jqxhr.status == 404) {
+                  etext += " -- it may already be deleted";
+                }
+                window.noty({
+                  timeout: 5000,
+                  type: 'error',
+                  maxVisible: 1,
+                  dismissQueue: false,
+                  text: etext
+                });
+              }});
+        }
+      }
     });
   })();
 });

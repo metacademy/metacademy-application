@@ -1,7 +1,7 @@
 // FIXME TODO - must return errors to the user in an elegant way, both client side (here) and from the server
 
 /*global define*/
-define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-utils"], function(Backbone, _, $, BaseEditorView, GenUtils){
+define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-utils", "noty"], function(Backbone, _, $, BaseEditorView, GenUtils){
   return  (function(){
 
     var pvt = {};
@@ -24,6 +24,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
         oevts["click ." + pvt.consts.grSearchButtonClass] = "clickSearchButton";
         oevts["blur .author-field"] = "blurAuthorField";
         oevts["click .grres"] = "clickSearchRes";
+        oevts["keyup .gresource-search"] = "keyupGresourceSearch";
         oevts["click .edit-gr span"] = "clickEditGR";
         oevts["click .end-gr-edit"] = "clickEndGR";
         oevts["click .add-new-gr"] = "clickNewGR";
@@ -160,6 +161,12 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
 
       clickNewGR: function () {
         this.clickEditGR();
+      },
+
+      keyupGresourceSearch: function (evt) {
+        if (evt.keyCode === 13) {            // enter key
+          this.clickSearchButton();
+        }
       }
     });
   })();

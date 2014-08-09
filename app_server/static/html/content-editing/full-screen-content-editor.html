@@ -65,6 +65,7 @@
     <ul class="sortable" id="dependencies-list">
     <% dependencies.each(function(dep){ %>
     <li class="dep-entry input-form" id="<%= dep.cid + "-dep"%>">
+      <div class="destroy-model ion-close-circled"></div>
       <% var src = dep.get("source"); %>
       <h3> <%- src.get("title") %> </h3>
       <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">

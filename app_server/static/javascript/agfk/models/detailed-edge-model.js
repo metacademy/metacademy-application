@@ -86,7 +86,6 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
               resp.target_goals.push(targetGoals.get(tid));
             }
           });
-
         }
       } else {
         // add all goals from target when the goals are not specified
@@ -102,6 +101,7 @@ define(["backbone", "underscore", "lib/kmapjs/models/edge-model", "agfk/collecti
         sgColl.add(resp.source_goals);
         resp.source_goals = sgColl;
       }
+
       if (!(resp.target_goals instanceof GoalCollection)) {
         tgColl.add(resp.target_goals);
         resp.target_goals = tgColl;

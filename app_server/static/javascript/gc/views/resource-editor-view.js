@@ -24,6 +24,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gc/vie
         var oevts = BaseEditorView.prototype.events(),
             consts = pvt.consts;
         oevts["click .res-tabs button"] = "changeDispResSec";
+        oevts["click .delete-res"] = "destroyModel";
         oevts["blur .deps-field"] = "changeDepsField";
         oevts["blur .array-text-field"] = "changeArrayTextField";
         oevts["change ." + consts.crfClass] = "changeCoreRadioField";

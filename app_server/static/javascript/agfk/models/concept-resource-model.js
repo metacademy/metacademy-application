@@ -102,7 +102,9 @@ define(["backbone", "agfk/collections/resource-location-collection", "agfk/model
       retObj["global_resource"] = thisModel.get("global_resource").toJSON();
       var goals = thisModel.get("concept").get("goals");
       retObj["goals_covered"] = thisModel.get("goals_covered")
-        .map(function (gid) {
+        .filter(function(gid){
+          return goals.get(gid);
+        }).map(function (gid) {
           return goals.get(gid).url();
         });
       return retObj;

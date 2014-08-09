@@ -218,7 +218,16 @@ def get_gresource_search(request):
     if not acinp:
         return HttpResponse(status=400)
     sqs = SearchQuerySet().models(GlobalResource).autocomplete(title=acinp)[:10]
-    resp = [{"title": acres.title, "authors": acres.authors, "id": acres.id.split(".")[-1]} for acres in sqs if acres]
+    resp = []
+    for acres in sqs:
+        authors = acres.authors
+        try:
+            auths = ast.literal_eval(authors)
+            authors = ", ".join(auths)
+        except:
+            print "Warning:", auths, "did not literal eval"
+        resp.append({"title": acres.title, "authors": authors, "id": acres.id.split(".")[-1]})
+
     return HttpResponse(json.dumps(resp), "application/json")
 
 

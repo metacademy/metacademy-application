@@ -1,4 +1,4 @@
-import pdb
+import ipdb
 import string
 import random
 import ast
@@ -99,7 +99,7 @@ class ModAndUserObjectsOnlyAuthorization(DjangoAuthorization):
         raise Unauthorized("Sorry, no deletes yet. TODO")
 
     def delete_detail(self, object_list, bundle):
-        raise Unauthorized("Sorry, no deletes yet. TODO")
+        return bundle.obj.editable_by(bundle.request.user)
 
 
 class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
@@ -119,7 +119,7 @@ class ConceptAuthorization(ModAndUserObjectsOnlyAuthorization):
 class BaseResource(NamespacedModelResource):
     class Meta:
         list_allowed_methods = ('get', 'post')
-        detail_allowed_methods = ('get', 'put', 'patch')
+        detail_allowed_methods = ('get', 'put', 'patch', 'delete')
         max_limit = 0
         always_return_data = True
         authorization = ModAndUserObjectsOnlyAuthorization()

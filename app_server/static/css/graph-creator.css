@@ -473,6 +473,10 @@ label.itm-label + label.itm-label {
 }
 
 .resource-location {
+    position: relative;
+}
+
+.resource-location {
     border: 1px solid #666666;
     border-radius: 3px;
     padding-left: 1em;
@@ -484,6 +488,19 @@ label.itm-label + label.itm-label {
 .resource-location-wrapper input[type="text"],
 .resource-location-wrapper textarea {
     width: 100%;
+}
+
+.destroy-model {
+    position: absolute;
+    right: 3px;
+    color: #444444;
+    top: 2px;
+    font-size: 12pt;
+    cursor: pointer;
+}
+
+.destroy-model:hover {
+    color: red;
 }
 
 .ec-button{

@@ -1,4 +1,4 @@
-import pdb
+import ipdb
 import ast
 import json
 import copy
@@ -17,9 +17,9 @@ from test_data.data import three_node_graph
 # TODO  patch to lists is now allowed -- test
 
 ALLOWED_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'),
-                 ('post', 'list')]
+                 ('post', 'list'), ('delete', 'detail')]
 
-ALLOWED_DEP_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'), ('post', 'list'), ('patch', 'list')]
+ALLOWED_DEP_PAIRS = [('get', 'detail'), ('get', 'list'), ('put', 'detail'), ('patch', 'detail'), ('post', 'list'), ('patch', 'list'), ('delete', 'detail')]
 
 
 def concept_list_url():
@@ -105,6 +105,11 @@ class BaseResourceTest(ResourceTestCase):
     def do_request(self, url, verb, vtype, data, user_type):
         resp = None
 
+        if verb == "delete":
+            self.api_client.client.login(username=self.super_username, password=self.super_username)
+            self.api_client.put(url, format='json', data=data)
+            self.api_client.client.logout()
+
         if user_type == "super":
             self.api_client.client.login(username=self.super_username, password=self.super_username)
         elif user_type == "auth":
@@ -122,6 +127,8 @@ class BaseResourceTest(ResourceTestCase):
             resp = self.api_client.patch(url, format='json', data=data)
         elif verb == "get":
             resp = self.api_client.get(url, data={"full": "true"})
+        elif verb == "delete":
+            resp = self.api_client.delete(url)
         else:
             raise RuntimeError("Unknown verb: %s" % verb)
 
@@ -171,11 +178,11 @@ class BaseResourceTest(ResourceTestCase):
                             try:
                                 api_keys = [api_uri.split("/")[-2] for api_uri in in_res[atrb]]
                             except:
-                                pdb.set_trace()
+                                ipdb.set_trace()
                             db_keys = map(lambda g: g.id, res.goals_covered.all())
                             for akey in api_keys:
                                 if akey not in db_keys:
-                                    pdb.set_trace()
+                                    ipdb.set_trace()
                                 self.assertEqual(akey in db_keys, True)
 
     def check_result(self, resp, data):
@@ -277,7 +284,7 @@ class ConceptResourceAuthTest(ResourceAuthTest):
 
     def user_can_edit(self):
         return self.user_type == 'super' or \
-            (self.user_type == 'auth' and self.tag_match and self.existing_concept != 'accepted')
+            (self.user_type == 'auth' and self.tag_match and (self.existing_concept != 'accepted' or self.verb == "delete"))
 
     def list_data(self):
         if self.existing_concept in ['provisional', 'accepted']:
@@ -512,7 +519,7 @@ class GraphResourceTest(BaseResourceTest):
 
 
 def load_tests(loader, suite, pattern):
-    for verb in ['get', 'post', 'put', 'patch']:
+    for verb in ['get', 'post', 'put', 'patch', 'delete']:
         for vtype in ['detail', 'list']:
             if (verb, vtype) in ALLOWED_PAIRS:
                 for user_type in ['unauth', 'auth', 'super']:
@@ -523,7 +530,7 @@ def load_tests(loader, suite, pattern):
             else:
                 suite.addTest(ConceptResourceAuthTest(verb, vtype, 'super', True, 'none'))
 
-    for verb in ['get', 'post', 'put', 'patch']:
+    for verb in ['get', 'post', 'put', 'patch', 'delete']:
         for vtype in ['detail', 'list']:
             if (verb, vtype) in ALLOWED_DEP_PAIRS:
                 for user_type in ['unauth', 'auth', 'super']:

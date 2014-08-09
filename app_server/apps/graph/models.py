@@ -78,7 +78,7 @@ class Dependency(Model):
     ordering = IntegerField(default=-1)
 
     def editable_by(self, user):
-        return user.is_superuser or self.target.is_provisional()
+        return user.is_superuser or self.target.editable_by(user)
 
 # maintain version control for the goal but only access thru the target concept
 reversion.register(Dependency)

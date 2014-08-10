@@ -1,9 +1,13 @@
-#!/bin/bash -e
+#!/bin/bash -mx
+
+# from `help set`
+#
+#      -m  Job control is enabled. # needed for use of `&`
+#      -x  Print commands and their arguments as they are executed. # as we are testing here.
 
 # set the env
 source ../meta_venv/bin/activate
-python app_server/manage.py runserver 8080 &
-rserver_id=$!
+python app_server/manage.py runserver 8080 --noreload & # `&` sends the process to the background
 
 # run the django tests
 echo "Django Tests"
@@ -15,4 +19,5 @@ echo "Browser Tests"
 
 # run the selenium tests
 python selenium_tests/simple_selenium_tests.py
-pkill -TERM -P $rserver_id
+
+kill %1 # kills the first, in this case our app_server background process

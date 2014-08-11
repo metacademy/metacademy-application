@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/metacademy/metacademy-application.svg?branch=master)](https://travis-ci.org/metacademy/metacademy-application)
+
 <p align="center">
 <img src="http://obphio.us/media/images/meta-logo.png" alt="Metacademy Logo" height="150px"/>
 </p>
@@ -35,7 +37,7 @@ For Windows installation/requirements, please see the README located in [/window
 
 ### Mac OS X and *nix
 
-1. Create an empty top-level Metacademy directory in a desired location, e.g. `mkdir -p ~/MyProjects/metacademy`. 
+1. Create an empty top-level Metacademy directory in a desired location, e.g. `mkdir -p ~/MyProjects/metacademy`.
 
 > It will be used for (1) the actual application, (2) storing the database and (3) the respective virtual Python environment.
 
@@ -64,7 +66,7 @@ For Windows installation/requirements, please see the README located in [/window
 
 ## Optional
 
-The following tasks are not neccessarily needed to run Metacademy. 
+The following tasks are not neccessarily needed to run Metacademy.
 
 ### Create a Django superuser
 

@@ -225,7 +225,7 @@ def get_gresource_search(request):
             auths = ast.literal_eval(authors)
             authors = ", ".join(auths)
         except:
-            print "Warning:", auths, "did not literal eval"
+            print "Warning:", authors, "did not literal eval"
         resp.append({"title": acres.title, "authors": authors, "id": acres.id.split(".")[-1]})
 
     return HttpResponse(json.dumps(resp), "application/json")

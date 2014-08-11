@@ -28,7 +28,7 @@
         instructions
       </div>
       <div class="instructions-text">
-        Provide a brief summary of the concept (typically 1-4 sentences) that specifies the essential information for the concept -- see existing concepts or the first paragraph of wikipedia articles for examples.
+        Provide a brief summary of the concept (typically 1-4 sentences) that allows the reader to determine whether they know the concept -- see existing concepts or the first paragraph of wikipedia articles for examples.
       </div>
     </div>
     <textarea><%=summary%></textarea>
@@ -54,7 +54,7 @@
         instructions
       </div>
       <div class="instructions-text">
-        This list specifies the the prerequisites for the given concept. Add prerequisites using the graph (see the instructions in the bottom right of the graph view).
+        This list specifies the prerequisites for the given concept. Add prerequisites using the graph (see the instructions in the bottom right of the graph view).
       </div>
     </div>
     <% if (dependencies.length==0) { %>
@@ -100,7 +100,7 @@
         instructions
       </div>
       <div class="instructions-text">
-        Specify relationships to other concepts using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+        Specify relationships to other concepts using simplified markdown syntax, e.g"* Logistic regression is a kind of [generalized linear model](generalized_linear_models)". Where the link syntax is "[display text](concept_tag_from_url)".
       </div>
     </div>
     <textarea><%=pointers%></textarea>
@@ -112,7 +112,7 @@
         instructions
       </div>
       <div class="instructions-text">
-        Specify the goals for the user using simplified markdown syntax (TODO provide example of markdown syntax once finalized).
+        Specify the goals for the user. The goals can contain embedded lists by using asterisks for bullet points "* a list item" or "** a doubly embedded list item".
       </div>
     </div>
     <ul id="goals-tidbit-wrap" class="tidbit-wrap sortable">

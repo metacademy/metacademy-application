@@ -1,0 +1,26 @@
+<script type="text/template" id="dependency-editor-template">
+      <div class="destroy-model ion-close-circled"></div>
+      <h3> <%- source.get("title") %> </h3>
+      <input id="<%- this.model.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- reason%>">
+
+      <% if (source.get("goals").length || target.get("goals").length) { %>
+      <button class="expand-content ec-button"> + show goal relationships</button>
+      <% } %>
+      <button class="contract-content ec-button"> - hide goal relationships</button>
+      <div class="detailed-info">
+        <% if (source.get("goals").length) { %>
+        <label>What goals from "<%-source.get("title")%>" are relevant to "<%-target.get("title")%>"?</label>
+
+        <% source.get("goals").each(function(goal){ %>
+        <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- id %>" name="source_goals-<%- goal.id %>" value="<%- goal.id %>" <%- source_goals.get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
+        <%});%>
+        <%} %>
+
+        <% if (target.get("goals").length) { %>
+        <label>What "<%-target.get("title")%>" goals depend on "<%-source.get("title")%>"?</label>
+        <% target.get("goals").each(function(goal){ %>
+        <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- id %>" name="target_goals-<%- goal.id %>" value="<%- goal.id %>" <%- target_goals.get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
+        <%});%>
+        <%}%>
+      </div>
+</script>

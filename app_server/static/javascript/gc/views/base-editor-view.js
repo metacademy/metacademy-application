@@ -131,7 +131,7 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
       destroyModel: function (evt) {
         evt.stopPropagation();
         var thisView = this;
-        if (confirm("Are you sure you want to delete this resource location (this action can't be undon)?")) {
+        if (confirm("Are you sure you want to delete this data (this action can't be undon)?")) {
           thisView.model.destroy(
             {
               success: function () {
@@ -155,7 +155,11 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
                 });
               }});
         }
-      }
+      }, // end function
+
+      // override in child
+      postDestroy: function () {}
+
     });
   })();
 });

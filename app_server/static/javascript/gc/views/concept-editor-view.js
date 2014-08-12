@@ -1,6 +1,6 @@
 
 /*global define*/
-define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model", "gc/views/goal-editor-view", "utils/utils"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel, GoalEditorView, Utils){
+define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "agfk/models/concept-resource-model", "agfk/models/goal-model", "gc/views/goal-editor-view", "gc/views/dependency-editor-view", "utils/utils"], function($, Backbone, _, ResourceEditorView, ConceptResource, GoalModel, GoalEditorView, DepEditorView, Utils){
 
   return (function(){
     var pvt = {};
@@ -15,11 +15,11 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       contentItemClass: "ec-display-wrap",
       resourcesTidbitWrapId: "resources-tidbit-wrap",
       goalsTidbitWrapId: "goals-tidbit-wrap",
+      depsTidbitWrapId: "dependencies-list",
       historyId: "history",
       sortableClass: "sortable",
       reversionsClass: "reversions",
-      depUlId: "dependencies-list",
-      expClass: "expanded"
+      depUlId: "dependencies-list"
     };
 
     pvt.failFun = function failFun (resp){
@@ -34,13 +34,10 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         "blur .title-input": "blurTitleField",
         "blur .tag-input": "blurTagField",
         "blur .ec-display-wrap > textarea": "blurTextField",
-        "blur input.dep-reason": "blurDepReason",
         "click #btn-history": "loadConceptHistory",
         "click .ec-title + .ec-tabs button": "changeDisplayedSection",
         "click #add-resource-button": "addResource",
-        "click #add-goal-button": "addGoal",
-        "change .goal-check-input .check-field": "changeDepGoal",
-        "click .ec-button": "togglePreqDetails"
+        "click #add-goal-button": "addGoal"
       },
 
       render: function(){
@@ -108,9 +105,16 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         });
         // TODO DRY with resources, problems, etc
         thisView.model.get("goals").each(function (goal) {
-          var gev = new GoalEditorView({model:goal});
+          var gev = new GoalEditorView({model: goal});
           gev.parentView = thisView;
           thisView.$el.find("#" + consts.goalsTidbitWrapId).append(gev.render().$el);
+        });
+
+        // add the dependencies
+        thisView.model.get("dependencies").each(function (dep) {
+          var dev = new DepEditorView({model: dep});
+          dev.parentView = thisView;
+          thisView.$el.find("#" + consts.depsTidbitWrapId).append(dev.render().$el);
         });
 
         pvt.state.rendered = true;
@@ -182,28 +186,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         });
 
         thisView.render();
-      },
-
-      changeDepGoal: function (evt) {
-        var thisView = this,
-            thisModel = thisView.model,
-            $domEl = $(evt.currentTarget),
-            depId = $domEl.data("dep"),
-            goalId = $domEl.prop("value"),
-            goalType = $domEl.prop("name").split("-")[0],
-            goal = goalType === "target_goals"
-            ? thisModel.get("goals").get(goalId)
-            : thisModel.get("dependencies").get(depId).get("source").get("goals").get(goalId),
-            dep = thisModel.get("dependencies").get(depId);
-
-        if ($domEl.prop("checked")) {
-          dep.get(goalType).add(goal);
-        } else {
-          dep.get(goalType).remove(goal);
-        }
-        var saveObj = {};
-        saveObj[goalType] = dep.get(goalType);
-        dep.save(saveObj, {patch: true, parse: false, error: thisView.attrErrorHandler});
       },
 
       addResource: function () {
@@ -279,20 +261,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
       },
 
       /**
-       * Blur the dependency reason: save changes to server
-       */
-      blurDepReason: function(evt){
-        var thisView = this,
-            curTarget = evt.currentTarget,
-            cid = curTarget.id.split("-")[0], // cid-reason
-            reason = curTarget.value,
-            dep = thisView.model.get("dependencies").get(cid);
-        if (reason !== dep.get("reason")) {
-          dep.save({"reason": reason}, {patch: true, parse: false, error: thisView.attrErrorHandler});
-        }
-      },
-
-      /**
        * Load the reversion history for the given concept
        */
       loadConceptHistory: function (evt) {
@@ -308,12 +276,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         .fail(function () {
             Utils.errorNotify("unable to load concept reversion history");
         });
-      },
-
-      // TODO create standalone views for the preqs
-      togglePreqDetails: function (evt) {
-        var parEl = evt.currentTarget.parentElement;
-        $(parEl).toggleClass(pvt.consts.expClass);
       },
 
       isViewRendered: function(){

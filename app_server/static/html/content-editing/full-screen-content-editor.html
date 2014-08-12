@@ -63,35 +63,10 @@
     </p>
     <%}%>
     <ul class="sortable" id="dependencies-list">
-    <% dependencies.each(function(dep){ %>
-    <li class="dep-entry input-form" id="<%= dep.cid + "-dep"%>">
-      <div class="destroy-model ion-close-circled"></div>
-      <% var src = dep.get("source"); %>
-      <h3> <%- src.get("title") %> </h3>
-      <input id="<%- dep.cid %>-reason" type="text" class="dep-reason" placeholder="reason for prerequisite" value="<%- dep.get("reason")%>">
 
-  <button class="expand-content ec-button"> + show goal relationships</button>
-  <button class="contract-content ec-button"> - hide goal relationships</button>
-      <div class="detailed-info">
-        <% if (src.get("goals").length) { %>
-        <label>What goals from "<%-src.get("title")%>" are relevant to "<%-title%>"?</label>
-
-        <% src.get("goals").each(function(goal){ %>
-          <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="source_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("source_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
-        <%});%>
-        <%} %>
-
-        <% if (goals.length) { %>
-        <label>What "<%-title%>" goals depend on "<%-src.get("title")%>"?</label>
-        <% goals.each(function(goal){ %>
-        <label class="itm-label goal-check-input"><input class="check-field" type="checkbox" data-dep="<%- dep.id %>" name="target_goals-<%- goal.id %>" value="<%- goal.id %>" <%- dep.get("target_goals").get(goal.id) ? "checked" : ""%>><%-goal.get("text")%></label>
-        <%});%>
-        <%}%>
-
-      </div>
-    </li>
-    <% }) %>
     </ul>
+
+
   </div>
 
   <div class="ec-display-wrap" id="pointers">

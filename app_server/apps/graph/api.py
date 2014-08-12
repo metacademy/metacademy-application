@@ -19,6 +19,7 @@ from apps.user_management.models import Profile
 
 # global TODOs
 # hydrate should prepare bundle.obj, not bundle.data (probably the reason hydrate is called so many times)
+# should use pre/post save signals insteak of user-defined hooks
 
 
 class CreatesCycleException(Exception):

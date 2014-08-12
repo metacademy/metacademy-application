@@ -389,7 +389,9 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
         var newEdge = {source: mouseDownNode, target: d};
         var filtRes = thisView.gPaths.filter(function(d){
           if (d.get("source") === newEdge.target && d.get("target") === newEdge.source){
-            thisView.model.removeEdge(d);
+            alert("You attempted to switch the direction of an edge. Please delete the existing edge first and then create the new edge in the opposite direction.");
+            return true;
+            // thisView.model.removeEdge(d);
           }
           return d.get("source") === newEdge.source && d.get("target") === newEdge.target;
         });
@@ -531,7 +533,9 @@ define(["jquery", "backbone", "d3",  "underscore", "lib/kmapjs/views/graph-view"
         d3.event.preventDefault();
         if (selectedNode){
           if (confirm("remove node: " + selectedNode.get("title") + " from the graph?\nNote: ALL associated data will be removed")){
+            window.dontDestroyEdge = true; // bad
             thisView.model.removeNode(selectedNode);
+            window.dontDestroyEdge = true; // bad
             state.selectedNode = null;
             thisView.render();
           }

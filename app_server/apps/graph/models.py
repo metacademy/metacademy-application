@@ -1,6 +1,8 @@
-import pdb
+import ipdb
 
 import django.db.models as dbmodels
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
     Model, IntegerField, OneToOneField, ManyToManyField, FloatField
@@ -52,6 +54,48 @@ class Concept(Model):
 reversion.register(Concept, follow=["goals", "dep_target", "concept_resource"])
 
 
+@receiver(pre_delete, sender=Concept)
+def pre_concept_delete(sender, **kwargs):
+    print "===== pre delete concept ======"
+    # find all target graphs that include the given concept and recompute without traversing the given concept
+    # recompute target graphs
+
+    dcon = kwargs['instance']
+    inlinks = dcon.dep_target.all()
+    for ilink in inlinks:
+        ilink.delete()
+    outlinks = dcon.dep_source.all()
+    for olink in outlinks:
+        olink.delete()
+
+    # tgraphs = dcon.target_graphs.all()
+    # dcon_id = dcon.id
+
+    # for tg in tgraphs:
+    #     if tg.leaf.id == dcon_id:
+    #         tg.delete()
+    #         continue
+
+    #     # reset the tg
+    #     tg.concepts.clear()
+    #     tg.dependencies.clear()
+
+    #     to_traverse = [tg.leaf]
+    #     added = {}
+    #     while len(to_traverse):
+    #         curnode = to_traverse.pop()
+    #         tg.concepts.add(curnode)
+    #         deps = curnode.dep_target.all()
+    #         for dep in deps:
+    #             srcid = dep.source.id
+    #             if srcid != dcon_id:
+    #                 tg.dependencies.add(dep)
+    #                 if not added.get(srcid):
+    #                     to_traverse.append(dep.source)
+    #                     added[srcid] = True
+    #     tg.save()
+
+
 class Goal(Model):
     id = CharField(max_length=16, primary_key=True)
     concept = ForeignKey(Concept, related_name="goals")
@@ -82,6 +126,36 @@ class Dependency(Model):
 
 # maintain version control for the goal but only access thru the target concept
 reversion.register(Dependency)
+
+
+# pre-delete: update all necessary target graphs
+@receiver(pre_delete, sender=Dependency)
+def pre_dep_delete(sender, **kwargs):
+    print "===== pre delete dep ======"
+
+    ddep = kwargs['instance']
+    tgraphs = ddep.targetgraph_dependencies.all()
+    ddep_id = ddep.id
+
+    for tg in tgraphs:
+        # reset the tg
+        tg.concepts.clear()
+        tg.dependencies.clear()
+
+        to_traverse = [tg.leaf]
+        added = {}
+        while len(to_traverse):
+            curnode = to_traverse.pop()
+            tg.concepts.add(curnode)
+            deps = curnode.dep_target.all()
+            for dep in deps:
+                if dep.id != ddep_id:
+                    tg.dependencies.add(dep)
+                    srcid = dep.source.id
+                    if not added.get(srcid):
+                        to_traverse.append(dep.source)
+                        added[srcid] = True
+        tg.save()
 
 
 class ConceptSettings(Model, LoggedInEditable):

@@ -25,7 +25,10 @@ define(["jquery", "backbone", "underscore", "dagre", "gc/collections/editable-ed
      * @Override
      */
     postRemoveEdge: function (edge) {
-      edge.destroy();
+      // use global var to make sure we don't delete an edge multiple times on the server
+      if (!window.dontDestroyEdge) {
+        edge.destroy();
+      }
     },
 
     /**

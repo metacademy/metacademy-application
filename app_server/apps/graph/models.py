@@ -1,11 +1,12 @@
 import ipdb
 
+from datetime import datetime
 import django.db.models as dbmodels
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
-    Model, IntegerField, OneToOneField, ManyToManyField, FloatField
+    Model, IntegerField, OneToOneField, ManyToManyField, FloatField, DateTimeField
 from django.core.urlresolvers import reverse
 from haystack.exceptions import SearchBackendError
 
@@ -34,6 +35,7 @@ class Concept(Model):
     version_num = IntegerField(default=0, null=True, blank=True)
     is_shortcut = BooleanField(default=False)
     learn_time = FloatField(null=True, blank=True)
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
     def is_listed_in_main_str(self):
         ret_str = "False"
@@ -68,39 +70,13 @@ def pre_concept_delete(sender, **kwargs):
     for olink in outlinks:
         olink.delete()
 
-    # tgraphs = dcon.target_graphs.all()
-    # dcon_id = dcon.id
-
-    # for tg in tgraphs:
-    #     if tg.leaf.id == dcon_id:
-    #         tg.delete()
-    #         continue
-
-    #     # reset the tg
-    #     tg.concepts.clear()
-    #     tg.dependencies.clear()
-
-    #     to_traverse = [tg.leaf]
-    #     added = {}
-    #     while len(to_traverse):
-    #         curnode = to_traverse.pop()
-    #         tg.concepts.add(curnode)
-    #         deps = curnode.dep_target.all()
-    #         for dep in deps:
-    #             srcid = dep.source.id
-    #             if srcid != dcon_id:
-    #                 tg.dependencies.add(dep)
-    #                 if not added.get(srcid):
-    #                     to_traverse.append(dep.source)
-    #                     added[srcid] = True
-    #     tg.save()
-
 
 class Goal(Model):
     id = CharField(max_length=16, primary_key=True)
     concept = ForeignKey(Concept, related_name="goals")
     text = CharField(max_length=500)
     ordering = IntegerField(default=-1)
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
     def editable_by(self, user):
         return self.concept.editable_by(user)
@@ -120,6 +96,7 @@ class Dependency(Model):
     source_goals = ManyToManyField(Goal, related_name="source_goals")
     target_goals = ManyToManyField(Goal, related_name="target_goals")
     ordering = IntegerField(default=-1)
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
     def editable_by(self, user):
         return user.is_superuser or self.target.editable_by(user)
@@ -197,6 +174,7 @@ class GlobalResource(Model):
     description = CharField(max_length=100)
     notes = CharField(max_length=200)
     version_num = IntegerField(default=0, null=True, blank=True)
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
     # fields that can be overwritten/used by ConceptResource
     access = CharField(max_length=4, choices=(("free", "free"), ("reg", "free but requires registration"), ("paid", "costs money")))
@@ -228,6 +206,7 @@ class ConceptResource(Model):
     edition = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
     ordering = IntegerField(default=-1)
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
     # concats GlobalResource field ?
     notes = CharField(max_length=500, null=True, blank=True)
@@ -251,6 +230,7 @@ class ResourceLocation(Model):
     location_text = CharField(max_length=100, null=True, blank=True)
     version_num = IntegerField(default=0, null=True, blank=True)
     ordering = IntegerField(default=-1)
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
     def editable_by(self, user):
         return self.cresource.editable_by(user)
@@ -268,6 +248,7 @@ class Graph(Model, LoggedInEditable):
     title = CharField(max_length=100)
     concepts = ManyToManyField(Concept, related_name="graph_concepts")
     dependencies = ManyToManyField(Dependency, related_name="graph_dependencies")
+    last_mod = DateTimeField(auto_now=True, default=datetime.now)
 
 
 class GraphSettings(Model, LoggedInEditable):

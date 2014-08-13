@@ -5,21 +5,23 @@ from django.db.models import Count
 
 from models import Profile, Concepts
 
+
 class UserProfileInline(admin.StackedInline):
     model = Profile
     max_num = 1
     can_delete = False
 
+
 class UserAdmin(AuthUserAdmin):
     inlines = [UserProfileInline]
 
-class ConceptsInline(admin.StackedInline):
-    model = Concepts
-    max_num = 1
-    can_delete = False
+# class ConceptsInline(admin.StackedInline):
+#     model = Concepts
+#     max_num = 1
+#     can_delete = False
 
-class ConceptsAdmin(admin.ModelAdmin):
-    inlines = [ConceptsInline]
+# class ConceptsAdmin(admin.ModelAdmin):
+#     inlines = [ConceptsInline]
 
 #     list_display = ('get_title', 'show_uprofile_count',)
 #     filter_horizontal = ('uprofiles',)
@@ -35,4 +37,4 @@ class ConceptsAdmin(admin.ModelAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(Concepts, ConceptsAdmin)
+#admin.site.register(Concepts, ConceptsAdmin)

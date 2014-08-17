@@ -43,6 +43,12 @@ class Concept(Model):
             ret_str = "True"
         return ret_str
 
+    def get_edit_usernames(self):
+        return [usr for usr in self.conceptsettings.edited_by.all()]
+
+    def get_concept_graph_ids(self):
+        return [gc.id for gc in self.graph_concepts.all()]
+
     def is_provisional(self):
         # "approved" concepts get their very own tag
         return self.tag == self.id

@@ -19,6 +19,9 @@
 <link rel="stylesheet" href="{% static "css/concept-details.css" %}"/>
 <link rel="stylesheet" href="{% static "css/explore-graph.css" %}"/>
 <link rel="stylesheet" href="{% static "css/lib/ionicons.css" %}"/>
+<link rel="stylesheet" href="{% static "css/lib/colorbox.css" %}"
+media="screen" />
+<link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
 {% endblock %}
 
 {% block main %}
@@ -42,6 +45,8 @@
       agfkGlobals.targetId = "{{ leaf.id | safe}}";
       agfkGlobals.auxModel = null; // init in main js app
       agfkGlobals.globalResources = {};
+      agfkGlobals.idcheckUrl = "{% url 'graphs:idchecker' %}";
+      agfkGlobals.auxData = {};
       agfkGlobals.graphInitData = {{ graph_init_data|safe }}
     </script>
   {% if debug %}

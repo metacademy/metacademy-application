@@ -195,10 +195,10 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         }
 
         // TODO refactor this code if we keep the star and check in current location
-        this.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, status){
+        thisView.listenTo(aux, gConsts.learnedTrigger + nodeTag, function(nodeId, status){
           changeClass("." + consts.learnViewCheckClass, consts.learnedClass, status);
         });
-        this.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, status){
+        thisView.listenTo(aux, gConsts.starredTrigger + nodeTag, function(nodeId, status){
           changeClass("." + consts.starViewStarClass, consts.starredClass, status);
         });
 
@@ -309,34 +309,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         thisView.appRouter.changeUrlParams({focus: focus});
       },
 
-      // /**
-      //  * Returns the concept hover text
-      //  */
-      // getHoverText: function(conceptTag) {
-      //   var aux = window.agfkGlobals.auxModel;
-      //   if (aux.conceptIsLearned(conceptTag)) {
-      //     return "You have learned this concept.";
-      //   } else {
-      //     // TODO FIXME
-      //     return "You have not learned this concept";
-      //     // var timeEstimate = aux.computeTimeEstimate(conceptTag);
-      //     // if (timeEstimate) {
-      //     //   return "Time estimate: " + Utils.formatTimeEstimate(timeEstimate);
-      //     // } else {
-      //     //   return "";
-      //     // }
-      //   }
-      // },
-
-      // addHoverText: function() {
-      //   var thisView = this;
-      //   this.$el.find("a.internal-link, a.focus-link").attr("title", function(){
-      //     var temp = _.last(this.href.split("/")),
-      //         concept = _.last(temp.split("="));
-      //     return thisView.getHoverText(concept);
-      //   });
-      // },
-
       /**
        * Compute the list of notes to display.
        */
@@ -354,14 +326,6 @@ define(["backbone", "underscore", "jquery", "utils/utils"], function(Backbone, _
         }
         return notes;
       },
-
-      // /**
-      //  * The note telling the user the node is a shortcut.
-      //  */
-      // shortcutNote: function() {
-      //   var link = this.model.get("id");
-      //   return '<p>This is a shortcut node, which introduces you to the very basics of the concept. You can find the more comprehensive version <a class="internal-link" href="' + link + '">here</a>.</p>';
-      // },
 
       /**
        * Clean Up the view properly

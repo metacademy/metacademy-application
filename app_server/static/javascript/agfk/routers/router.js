@@ -57,6 +57,13 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
              initialize: function(){
                var thisRoute = this;
+
+               $(window.document).on("keypress", function (evt) {
+                 if (evt.ctrlKey && evt.keyCode === 5){
+                   thisRoute.changeUrlParams({mode: "edit"});
+                 }
+               });
+               
                // url parameters
                thisRoute.prevUrlParams = {};
 
@@ -97,8 +104,12 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                if (useColorBox) {
                  pvt.colorboxOptions.href = inView.$el;
                  pvt.colorboxOptions.onClosed = function () {
+                   if (thisRoute.learnView) {
+                     thisRoute.learnView.render();
+                   }
                    thisRoute.navigate(prevPath);
                    thisRoute.prevPath = prevPath; // incase event is not fired
+                   
                  };
                }
 

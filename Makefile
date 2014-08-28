@@ -72,11 +72,10 @@ build_production:
 	cd app_server/static/javascript; node lib/r.js -o build.js
 	$(VENV); python app_server/manage.py collectstatic --noinput
 
-# update_db:
-	# create migration
-	# do migration
-	# update fixture
-
+update_db:
+	python app_server/manage.py schemamigration apps.graph --auto
+	python app_server/manage.py migrate
+	python app_server/manage.py dumpdata > app_server/apps/graph/fixtures/graph_fixture.json
 
 update:
 	git pull

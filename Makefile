@@ -72,6 +72,12 @@ build_production:
 	cd app_server/static/javascript; node lib/r.js -o build.js
 	$(VENV); python app_server/manage.py collectstatic --noinput
 
+# update_db:
+	# create migration
+	# do migration
+	# update fixture
+
+
 update:
 	git pull
 	cd app_server/static/lib/kmap; git pull

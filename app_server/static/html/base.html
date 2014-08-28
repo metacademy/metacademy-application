@@ -72,7 +72,7 @@
     {% endblock %}
   </head>
 
-  <body>
+  <body class="{% block body-class %}{% endblock %}">
     {% block body %}
 
     <div class="header-pull-right header-menu" id="header">

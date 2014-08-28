@@ -26,7 +26,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
         oevts["click .grres"] = "clickSearchRes";
         oevts["keyup .gresource-search"] = "keyupGresourceSearch";
         oevts["click .edit-gr span"] = "clickEditGR";
-        oevts["click .end-gr-edit"] = "clickEndGR";
+        oevts["click ." + pvt.consts.grFinishEditingClass] = "clickEndGR";
         oevts["click .add-new-gr"] = "clickNewGR";
         //oevts["blur .gresource-title"] = "blurGlobalResourceTitle";
         return oevts;
@@ -156,7 +156,7 @@ define(["backbone", "underscore", "jquery", "gc/views/base-editor-view", "gen-ut
 
       clickEndGR: function () {
         this.gredit = false;
-        this.render();
+        this.parentView.render();
       },
 
       clickNewGR: function () {

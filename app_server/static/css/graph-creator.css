@@ -1,14 +1,14 @@
-p {
+.editing-area p {
      text-align: center;
      overflow: overlay;
      position: relative;
 }
 
-input {
+.editing-area input {
     padding: 0.2em;
 }
 
-body {
+body.geditor {
     margin: 0;
     padding: 0;
     overflow:hidden;
@@ -20,11 +20,11 @@ body {
     user-select: none;
 }
 
-hr {
+.editing-area hr {
     margin: 1.5em;
 }
 
-#main{
+.geditor #main{
     position: relative;
     overflow-y: scroll;
 }
@@ -472,11 +472,8 @@ label.itm-label + label.itm-label {
     top: 0;
 }
 
-.resource-location {
+.editing-area .resource-location {
     position: relative;
-}
-
-.resource-location {
     border: 1px solid #666666;
     border-radius: 3px;
     padding-left: 1em;

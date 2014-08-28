@@ -35,7 +35,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
              editViewId: "concept-editor-wrap",
              noContentErrorKey: "nocontent", // must also change in error-view.js
              ajaxErrorKey: "ajax", // must also change in error-view.js
-             unsupportedBrowserKey: "unsupportedbrowser" // must also change in error-view.js
+             unsupportedBrowserKey: "unsupportedbrowser", // must also change in error-view.js
+             editingClass: "editing-area"
            };
 
            pvt.colorboxOptions = {inline: true,
@@ -43,7 +44,8 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                                   width: "80%",
                                   height: "95%",
                                   closeButton: false,
-                                  opacity: 0.6
+                                  opacity: 0.6,
+                                  className: pvt.consts.editingClass
                                   };
 
            // return public object
@@ -60,6 +62,16 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
 
                $(window.document).on("keypress", function (evt) {
                  if (evt.ctrlKey && evt.keyCode === 5){
+                   // load css <link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
+                   if (!thisRoute.loadedCreatorCSS) {
+                     $.get("/static/css/graph-creator.css", function(css)
+                           {
+                             $('<style type="text/css"></style>')
+                               .html(css)
+                               .appendTo("head");
+                           });
+                     thisRoute.loadedCreatorCSS = true;
+                   }
                    thisRoute.changeUrlParams({mode: "edit"});
                  }
                });

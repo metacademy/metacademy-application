@@ -193,6 +193,10 @@ Instructions
 }
 
 /* Graph editor specific styles */
+#active-editing {
+    text-align: center;
+}
+
 g.concept-g .to-edit-circle-g{
     display: none;
     cursor: pointer;

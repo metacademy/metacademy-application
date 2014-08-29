@@ -27,6 +27,8 @@
     <label>Edition years</label>
     <p><%-edition_years || "-"%></p>
 
+    <label>Extra notes</label>
+    <p><%-notes || "-"%></p>
 
   </div>
 
@@ -76,7 +78,14 @@
       <input type="text" class="text-field" name="year-<%=this.cid%>" placeholder="e.g. 2012" value="<%= year %>">
 
       <label>Edition years (separate with a comma)</label>
-      <input type="text" class="array-field" name="edition_years-<%=this.cid%>" placeholder="e.g. 1996, 2004, 2012" value="<%= edition_years %>">
+      <input type="text" class="array-field"
+      name="edition_years-<%=this.cid%>" placeholder="e.g. 1996, 2004,
+      2012" value="<%= edition_years %>">
+
+      <label>Extra notes</label>
+      <input type="text" class="text-field" name="notes-<%=this.cid%>"
+      placeholder="e.g. click on the previous button to see the videos" value="<%= url %>">
+
 
     <button class="end-gr-edit">Finished Editing Resource Fields</button>
 

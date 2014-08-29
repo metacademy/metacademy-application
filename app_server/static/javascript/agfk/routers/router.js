@@ -61,7 +61,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                var thisRoute = this;
 
                $(window.document).on("keypress", function (evt) {
-                 if (evt.ctrlKey && evt.keyCode === 5){
+                 if (!window.agfkGlobals.isCreating && evt.ctrlKey && evt.keyCode === 5){
                    // load css <link rel="stylesheet" href="{% static "css/graph-creator.css" %}" />
                    if (!thisRoute.loadedCreatorCSS) {
                      $.get("/static/css/graph-creator.css", function(css)

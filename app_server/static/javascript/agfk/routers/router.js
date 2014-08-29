@@ -117,6 +117,7 @@ define(["backbone", "underscore", "jquery", "agfk/views/explore-graph-view", "ag
                  pvt.colorboxOptions.href = inView.$el;
                  pvt.colorboxOptions.onClosed = function () {
                    if (thisRoute.learnView) {
+                     delete thisRoute.prevUrlParams.mode;
                      thisRoute.learnView.render();
                    }
                    thisRoute.navigate(prevPath);

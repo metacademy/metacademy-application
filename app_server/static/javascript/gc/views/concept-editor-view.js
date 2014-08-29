@@ -57,7 +57,7 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
           var qfield = thisModel.get(freeFormFields[ffl]);
 
           // if the field does not exist: set to ""
-          if (qfield === undefined){
+          if (qfield === undefined || qfield === null){
             thisModel.set(freeFormFields[ffl], "");
             qfield = "";
           }

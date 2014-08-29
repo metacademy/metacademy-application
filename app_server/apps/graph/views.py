@@ -220,6 +220,8 @@ def get_gresource_search(request):
     sqs = SearchQuerySet().models(GlobalResource).autocomplete(title=acinp)[:10]
     resp = []
     for acres in sqs:
+        if not acres:
+            continue
         authors = acres.authors
         try:
             auths = ast.literal_eval(authors)

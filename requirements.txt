@@ -14,7 +14,7 @@ coverage==3.7.1
 django-appconf==0.6
 django-compressor==1.3
 django-devserver==0.7.0
--e git+https://github.com/toastdriven/django-haystack.git@366e7489169d460d36ac4d942c22c0e97e58c26b#egg=django_haystack-master
+-e git+https://github.com/toastdriven/django-haystack.git@a3a2fc3a385ea35e76941482bf18460724b6421c#egg=django_haystack-master
 django-lazysignup==0.12.2
 django-reversion==1.8.0
 django-simple-captcha==0.4.0

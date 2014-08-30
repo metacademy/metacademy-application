@@ -23,9 +23,9 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
     };
 
     pvt.failFun = function failFun (resp){
-          // failure
+      // failure
       Utils.errorNotify("unable to verify sync learning resource with the server -- " + resp.responseText);
-        };
+    };
 
     return Backbone.View.extend({
       template: _.template(document.getElementById(pvt.consts.templateId).innerHTML),
@@ -176,14 +176,20 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
           ol.get("source_goals").add(newGoal);
         });
 
-        newGoal.save(null, {parse: false, error: thisView.attrErrorHandler, success: function () {
-          // FIXME this is an awkward way to update the deps and ols
-          deps.save(null, {parse: false, error: thisView.attrErrorHandler});
-          ols.save(null, {parse: false, error: thisView.attrErrorHandler});
-        },
-        error: function () {
-         Utils.errorNotify("unable to save goal");
-        }});
+        newGoal
+          .save(null,
+
+          {
+                       parse: false,
+                       error: thisView.attrErrorHandler,
+                       success: function () {
+                         // FIXME this is an awkward way to update the deps and ols
+                         deps.save(null, {parse: false, error: thisView.attrErrorHandler});
+                         ols.save(null, {parse: false, error: thisView.attrErrorHandler});
+                       },
+                       error: function () {
+                         Utils.errorNotify("unable to save goal");
+                       }});
         thisView.render();
       },
 
@@ -197,11 +203,11 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         newRes.set("concept", thisView.model);
 
         $.get(window.agfkGlobals.idcheckUrl, {id: rid, type: "resource" })
-        .success(function (resp) {
+          .success(function (resp) {
             newRes.set("id", resp.id);
             newRes.save(null, {parse: false, error: thisView.attrErrorHandler});
-        })
-        .fail(pvt.failFun);
+          })
+          .fail(pvt.failFun);
 
         $.get(window.agfkGlobals.idcheckUrl, {id: grid, type: "global_resource" })
           .success(function (resp) {
@@ -269,12 +275,12 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
 
         // TODO remove hardcoding
         $.get("/concepts/" + conceptTag + "/history")
-        .success(function (resp, xhr) {
-          $("#" + consts.historyId).append($(resp).find("." + consts.reversionsClass));
-        })
-        .fail(function () {
+          .success(function (resp, xhr) {
+            $("#" + consts.historyId).append($(resp).find("." + consts.reversionsClass));
+          })
+          .fail(function () {
             Utils.errorNotify("unable to load concept reversion history");
-        });
+          });
       },
 
       isViewRendered: function(){

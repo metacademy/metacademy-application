@@ -2,7 +2,7 @@ import ipdb
 
 from datetime import datetime
 import django.db.models as dbmodels
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 import reversion
 from django.db.models import CharField, BooleanField, ForeignKey,\
@@ -89,6 +89,16 @@ class Goal(Model):
 
 # maintain version control for the goal but only access thru the concept
 reversion.register(Goal)
+@receiver(post_save, sender=Goal)
+def post_goal_save(sender, **kwargs):
+    if kwargs.get("created"):
+        print "new goal created"
+        # add the new goal to all of the outlinks of the dependency
+        goal = kwargs['instance']
+        outlinks = goal.concept.dep_source.all()
+        for olink in outlinks:
+            olink.source_goals.add(goal)
+            olink.save()
 
 
 class Dependency(Model):

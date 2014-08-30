@@ -168,6 +168,14 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         // add goal to goal list
         thisView.model.get("goals").add(newGoal);
 
+        // add goal to all preq and postreq dep lists by default
+        deps.each(function (dep) {
+          dep.get("target_goals").add(newGoal);
+        });
+        ols.each(function (ol) {
+          ol.get("source_goals").add(newGoal);
+        });
+
         newGoal.save(null, {parse: false, error: thisView.attrErrorHandler, success: function () {
           // FIXME this is an awkward way to update the deps and ols
           deps.save(null, {parse: false, error: thisView.attrErrorHandler});
@@ -176,15 +184,6 @@ define(["jquery", "backbone", "underscore", "gc/views/resource-editor-view", "ag
         error: function () {
          Utils.errorNotify("unable to save goal");
         }});
-
-        // add goal to all preq and postreq dep lists by default
-        deps.each(function (dep) {
-            dep.get("target_goals").add(newGoal);
-        });
-        ols.each(function (ol) {
-          ol.get("source_goals").add(newGoal);
-        });
-
         thisView.render();
       },
 

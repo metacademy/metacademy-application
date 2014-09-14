@@ -32,8 +32,7 @@ class TagAdminForm(forms.ModelForm):
 
   def save(self, commit=True):
     tag = super(TagAdminForm, self).save(commit=False)
-    if commit:
-      tag.save()
+    tag.save()
 
     if tag.pk:
       try:

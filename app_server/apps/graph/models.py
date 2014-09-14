@@ -18,6 +18,13 @@ class LoggedInEditable:
         return user.is_authenticated()
 
 
+class Tag(Model):
+    id = CharField(max_length=16, primary_key=True)
+    title = CharField(max_length=16)
+
+    def __unicode__(self):
+        return self.title
+    
 class Concept(Model):
     """
     Model that contains the concept data under version control
@@ -36,6 +43,11 @@ class Concept(Model):
     is_shortcut = BooleanField(default=False)
     learn_time = FloatField(null=True, blank=True)
     last_mod = DateTimeField(auto_now=True, default=datetime.now)
+    tags = ManyToManyField(Tag, related_name="concepts")
+
+
+    def __unicode__(self):
+        return self.title
 
     def is_listed_in_main_str(self):
         ret_str = "False"
@@ -64,7 +76,6 @@ reversion.register(Concept, follow=["goals", "dep_target", "concept_resource"])
 
 @receiver(pre_delete, sender=Concept)
 def pre_concept_delete(sender, **kwargs):
-    print "===== pre delete concept ======"
     # find all target graphs that include the given concept and recompute without traversing the given concept
     # recompute target graphs
 
@@ -75,7 +86,6 @@ def pre_concept_delete(sender, **kwargs):
     outlinks = dcon.dep_source.all()
     for olink in outlinks:
         olink.delete()
-
 
 class Goal(Model):
     id = CharField(max_length=16, primary_key=True)
@@ -92,7 +102,6 @@ reversion.register(Goal)
 @receiver(post_save, sender=Goal)
 def post_goal_save(sender, **kwargs):
     if kwargs.get("created"):
-        print "new goal created"
         # add the new goal to all of the outlinks of the dependency
         goal = kwargs['instance']
         outlinks = goal.concept.dep_source.all()
@@ -124,7 +133,6 @@ reversion.register(Dependency)
 # pre-delete: update all necessary target graphs
 @receiver(pre_delete, sender=Dependency)
 def pre_dep_delete(sender, **kwargs):
-    print "===== pre delete dep ======"
 
     ddep = kwargs['instance']
     tgraphs = ddep.targetgraph_dependencies.all()

@@ -20,6 +20,7 @@ class Migration(SchemaMigration):
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('is_shortcut', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('learn_time', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['Concept'])
 
@@ -29,6 +30,7 @@ class Migration(SchemaMigration):
             ('concept', self.gf('django.db.models.fields.related.ForeignKey')(related_name='goals', to=orm['graph.Concept'])),
             ('text', self.gf('django.db.models.fields.CharField')(max_length=500)),
             ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['Goal'])
 
@@ -39,6 +41,7 @@ class Migration(SchemaMigration):
             ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='dep_target', to=orm['graph.Concept'])),
             ('reason', self.gf('django.db.models.fields.CharField')(max_length=500)),
             ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['Dependency'])
 
@@ -87,6 +90,7 @@ class Migration(SchemaMigration):
             ('description', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('notes', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
             ('access', self.gf('django.db.models.fields.CharField')(max_length=4)),
             ('url', self.gf('django.db.models.fields.CharField')(max_length=200)),
         ))
@@ -102,6 +106,7 @@ class Migration(SchemaMigration):
             ('edition', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
             ('notes', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['ConceptResource'])
@@ -124,6 +129,7 @@ class Migration(SchemaMigration):
             ('location_text', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('version_num', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('ordering', self.gf('django.db.models.fields.IntegerField')(default=-1)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['ResourceLocation'])
 
@@ -131,6 +137,7 @@ class Migration(SchemaMigration):
         db.create_table(u'graph_graph', (
             ('id', self.gf('django.db.models.fields.CharField')(max_length=16, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('last_mod', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'graph', ['Graph'])
 
@@ -295,6 +302,7 @@ class Migration(SchemaMigration):
             'exercises': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'is_shortcut': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'learn_time': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'pointers': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
             'software': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'null': 'True', 'blank': 'True'}),
@@ -312,6 +320,7 @@ class Migration(SchemaMigration):
             'global_resource': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cresources'", 'to': u"orm['graph.GlobalResource']"}),
             'goals_covered': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'goals_covered'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['graph.Goal']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'notes': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'version_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
@@ -325,6 +334,7 @@ class Migration(SchemaMigration):
         u'graph.dependency': {
             'Meta': {'object_name': 'Dependency'},
             'id': ('django.db.models.fields.CharField', [], {'max_length': '32', 'primary_key': 'True'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'reason': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dep_source'", 'to': u"orm['graph.Concept']"}),
@@ -339,6 +349,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'edition_years': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'notes': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'resource_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -350,6 +361,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Goal'},
             'concept': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'goals'", 'to': u"orm['graph.Concept']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'text': ('django.db.models.fields.CharField', [], {'max_length': '500'})
         },
@@ -358,6 +370,7 @@ class Migration(SchemaMigration):
             'concepts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_concepts'", 'symmetrical': 'False', 'to': u"orm['graph.Concept']"}),
             'dependencies': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'graph_dependencies'", 'symmetrical': 'False', 'to': u"orm['graph.Dependency']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'graph.graphsettings': {
@@ -370,6 +383,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ResourceLocation'},
             'cresource': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'locations'", 'to': u"orm['graph.ConceptResource']"}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
+            'last_mod': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             'location_text': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'location_type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'ordering': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),

@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from haystack.views import SearchView
 from haystack.query import SearchQuerySet
 
-from apps.graph.models import Concept
+from apps.graph.models import Concept, Tag
 from apps.roadmaps.models import Roadmap
 from forms import ContactForm
 
@@ -39,6 +39,16 @@ def get_list_view(request):
         citms.append(concept)
 
     return render(request, "concept-list.html", {"citms": citms})
+
+def get_browsing_view(request):
+    """
+    Return the list of concepts and roadmaps, sorted by category
+    """
+    tags = Tag.objects.extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+
+    return render(request, "browsing.html", {'tags': tags})
+    
+    
 
 
 def autocomplete(request):

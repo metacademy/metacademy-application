@@ -8,7 +8,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from haystack.views import search_view_factory
 from haystack.query import SearchQuerySet
 
-from views import MultiSearchView, ContactView, get_list_view, autocomplete
+from views import MultiSearchView, ContactView, get_list_view, get_browsing_view, autocomplete
 
 admin.autodiscover()
 
@@ -24,6 +24,7 @@ urlpatterns = patterns('',
                        url(r'^(?i)autocomplete/?$', autocomplete, name="autocomplete"),
                        url(r'^(?i)search$', search_inst, name="haystack_search"),
                        url(r'^(?i)list$', get_list_view),
+                       url(r'^(?i)browse$', get_browsing_view),
                        url(r'^(?i)concepts/((?P<anything>.*))',
                            RedirectView.as_view(url="/graphs/concepts/%(anything)s", query_string=True), name='concepts'),
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),

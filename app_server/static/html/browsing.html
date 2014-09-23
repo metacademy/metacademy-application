@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block targetblank %}
+{% endblock %}
+
+{% block title %}
+Concepts - Metacademy
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/browsing.css" %}"> </rel>
+{% endblock %}
+
+{% block jscript-extend %}
+<script type="text/javascript" src="{% static "javascript/lib/underscore-min.js" %}"></script>
+{% endblock %}
+
+{% block main%}
+
+<div class="browsing-wrapper">
+{% for tag in tags %}
+  <h2>{{tag.title}} </h2>
+  <div class="browsing-section">
+
+    {% if tag.roadmaps.count %}
+      <h3>Roadmaps</h3>
+      <ul>
+        {% for roadmap in tag.roadmaps.all %}
+          <li> <a class="internal-link" href="{{ roadmap.roadmapsettings.get_absolute_url }}"> {{ roadmap.title }} </a> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if tag.concepts.count %}
+      <h3>Concepts</h3>
+      <ul>
+        {% for concept in tag.concepts.all %}
+          <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+  </div>
+{% endfor %}
+</div>
+
+
+
+{% endblock %}

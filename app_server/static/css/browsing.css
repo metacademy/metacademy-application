@@ -1,0 +1,47 @@
+.browsing-wrapper{
+    margin: 1em 5%;
+}
+
+.browsing-wrapper h2{
+    margin-bottom: 0.3em;
+    overflow: hidden;
+    padding-top: 1.5em;
+    padding-bottom: .3em;
+    border-bottom: 1px solid #aaa;
+    font-size: 1.35em;
+}
+
+.browsing-wrapper h3{
+    overflow: hidden;
+    padding-top: .8em;
+    padding-bottom: .5em;
+    font-size: 1.2em;
+}
+
+.browsing-section {
+    padding-left: 1em;
+}
+
+.browsing-section ul {
+    list-style: none;
+    margin-left: 1em;
+    padding-left: 0;
+}
+
+.browsing-section li{
+    padding-left: 1em;
+    text-indent: -1em;
+    margin-top: 0.2em;
+}
+
+.browsing-section li ~ li {
+    margin-top: 0.4em;
+}
+
+
+.browsing-section ul li:before {
+    content: "+";
+    padding-right: 5px;
+}
+
+

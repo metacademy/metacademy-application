@@ -6,6 +6,7 @@ from django.db.models import CharField, BooleanField, ForeignKey, Model, SlugFie
 from haystack.exceptions import SearchBackendError
 
 from apps.user_management.models import Profile
+from apps.graph.models import Tag
 
 
 MAX_USERNAME_LENGTH = 30   # max length in Django's User class
@@ -20,6 +21,11 @@ class Roadmap(Model):
     blurb = TextField('Blurb', blank=True)
     body = TextField()
     version_num = IntegerField(default=0)
+    tags = ManyToManyField(Tag, related_name='roadmaps')
+
+
+    def __unicode__(self):
+        return self.title
 
     def is_listed_in_main_str(self):
         ret_str = "False"

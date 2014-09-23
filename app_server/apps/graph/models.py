@@ -24,6 +24,14 @@ class Tag(Model):
 
     def __unicode__(self):
         return self.title
+
+    def sorted_concepts(self):
+        concepts = self.concepts.extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+        return filter(Concept.is_listed_in_main, concepts)
+
+    def sorted_roadmaps(self):
+        roadmaps = self.roadmaps.extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+        return filter(lambda r: r.is_listed_in_main(), roadmaps)
     
 class Concept(Model):
     """
@@ -49,11 +57,14 @@ class Concept(Model):
     def __unicode__(self):
         return self.title
 
+    def is_listed_in_main(self):
+        return not self.is_provisional() and len(self.title) > 0
+
     def is_listed_in_main_str(self):
-        ret_str = "False"
-        if not self.is_provisional():
-            ret_str = "True"
-        return ret_str
+        if self.is_listed_in_main():
+            return 'True'
+        else:
+            return 'False'
 
     def get_edit_usernames(self):
         return [usr for usr in self.conceptsettings.edited_by.all()]

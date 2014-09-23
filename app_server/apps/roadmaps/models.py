@@ -27,11 +27,14 @@ class Roadmap(Model):
     def __unicode__(self):
         return self.title
 
+    def is_listed_in_main(self):
+        return hasattr(self, 'roadmapsettings') and self.roadmapsettings.is_listed_in_main()
+
     def is_listed_in_main_str(self):
-        ret_str = "False"
-        if hasattr(self, "roadmapsettings") and self.roadmapsettings.is_listed_in_main():
-            ret_str = "True"
-        return ret_str
+        if self.is_listed_in_main():
+            return 'True'
+        else:
+            return 'False'
 
     def is_published_str(self):
         ret_str = "False"

@@ -44,9 +44,16 @@ def get_browsing_view(request):
     """
     Return the list of concepts and roadmaps, sorted by category
     """
-    tags = Tag.objects.extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+    tags = Tag.objects.exclude(title='Meta').extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+    tags = list(Tag.objects.filter(title='Meta').all()) + list(tags)     # Meta tag should appear first
 
-    return render(request, "browsing.html", {'tags': tags})
+    uncat_concepts = Concept.objects.filter(tags=None).extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+    uncat_concepts = filter(Concept.is_listed_in_main, uncat_concepts)
+    
+    uncat_roadmaps = Roadmap.objects.filter(tags=None).extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+    uncat_roadmaps = filter(Roadmap.is_listed_in_main, uncat_roadmaps)
+
+    return render(request, "browsing.html", {'tags': tags, 'uncat_concepts': uncat_concepts, 'uncat_roadmaps': uncat_roadmaps})
     
     
 

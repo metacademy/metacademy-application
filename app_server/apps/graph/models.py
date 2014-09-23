@@ -19,8 +19,8 @@ class LoggedInEditable:
 
 
 class Tag(Model):
-    id = CharField(max_length=16, primary_key=True)
-    title = CharField(max_length=16)
+    id = CharField(max_length=30, primary_key=True)
+    title = CharField(max_length=100)
 
     def __unicode__(self):
         return self.title

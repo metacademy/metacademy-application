@@ -44,4 +44,31 @@
     padding-right: 5px;
 }
 
+/* based on http://stackoverflow.com/questions/22536800/css3-multi-column-list */
+.browsing-concept-list {
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    -ms-column-count: 3;
+    -o-column-count: 3;
+    column-count: 3;
+    -webkit-column-gap: 1em;
+    -moz-column-gap: 1em;
+    -ms-column-gap: 1em;
+    -o-column-gap: 1em;
+    column-gap: 1em;
+    columns: 3;
+}
 
+.browsing-concept-list ul {
+    list-style: none;
+}
+
+.browsing-concept-list ul li {
+    display: inline-block;
+    width: 100%;
+}
+
+.browsing-concept-list ul li:before {
+    content: "";
+    padding-right: 0;
+}

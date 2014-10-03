@@ -1,3 +1,12 @@
+#main {
+    min-width: 800px;
+}
+
+#header {
+    position: fixed;
+    top: 0;
+}
+
 .browsing-wrapper{
     margin: 1em 5%;
 }
@@ -35,7 +44,7 @@
 }
 
 .browsing-section li ~ li {
-    margin-top: 0.4em;
+    margin-top: 0.8em;
 }
 
 

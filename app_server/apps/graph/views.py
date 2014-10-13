@@ -251,6 +251,12 @@ def get_time_estimates(request):
     concepts = Concept.objects.all()
     concepts = [c for c in concepts if c.id in new_times]
 
+    if request.method == 'POST':
+        for concept in concepts:
+            # intentionally not creating a new revision
+            concept.learn_time = new_times[concept.id]
+            concept.save(update_fields=['learn_time'])
+
     def format_time(t):
         if t:
             return '{:1.3f}'.format(t)

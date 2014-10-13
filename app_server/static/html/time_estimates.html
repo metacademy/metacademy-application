@@ -30,5 +30,10 @@ Learning times - Metacademy
 {% endfor %}
 </table>
 
+<form method="post" action="">
+  {% csrf_token %}
+  <button class="submit-button" type="submit"> Apply </button>
+</form>
+
 {% endblock %}
 

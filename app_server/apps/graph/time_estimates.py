@@ -169,7 +169,7 @@ class PoissonModel:
     
     def fit(self):
         init_vec = Params.zeros(self.mappings).to_vec()
-        param_vec = scipy.optimize.fmin_cg(self.objfn, init_vec, self.grad)
+        param_vec = scipy.optimize.fmin_bfgs(self.objfn, init_vec, self.grad)
         return Params.from_vec(param_vec, self.mappings)
 
     
@@ -189,7 +189,7 @@ def run_model(reg_weight=1.):
     
     concept_resources = models.ConceptResource.objects.all()
     concept_resources = [r for r in concept_resources
-                         if not r.concept.is_provisional()]
+                         if r.is_core() and not r.concept.is_provisional()]
     observations = [Observation.from_resource(r, mappings) for r in concept_resources]
     model = PoissonModel(observations, reg_weight, mappings)
 
@@ -197,11 +197,10 @@ def run_model(reg_weight=1.):
 
     idxs = np.argsort(params.concept_weights)[::-1]
 
-    old_mean = np.mean([c.learn_time for c in concepts if c.learn_time])
-    new_mean = np.mean(np.exp(params.concept_weights))
+    existing_idxs = [i for i in range(len(concepts)) if concepts[i].learn_time]
+    old_mean = np.mean([concepts[i].learn_time for i in existing_idxs])
+    new_mean = np.mean(np.exp(params.concept_weights[existing_idxs]))
     mult = old_mean / new_mean
-
-    
 
     for i in idxs:
         old_lt = concepts[i].learn_time

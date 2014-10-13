@@ -15,6 +15,7 @@ from apps.user_management.models import Profile
 from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation, Goal
 from apps.graph.models import ConceptResource as CResource
 from apps.graph import api_communicator
+from apps.graph import time_estimates
 from config import NOJS_CONCEPT_CACHE_PATH
 
 # TODO refactor into two class based views: graphs and concepts
@@ -235,3 +236,36 @@ def get_gresource_search(request):
 
 def _get_versions_obj(obj):
     return reversion.get_for_object(obj).order_by("id")
+
+
+def get_time_estimates(request):
+    if not (request.user.is_authenticated() and request.user.is_superuser):
+        return HttpResponse(status=403)   # Forbidden
+
+    # if SciPy is not installed
+    if not hasattr(time_estimates, 'scipy'):
+        return HttpResponse(status=501)   # Not implemented
+
+    new_times = time_estimates.fit_model()
+
+    concepts = Concept.objects.all()
+    concepts = [c for c in concepts if c.id in new_times]
+
+    def format_time(t):
+        if t:
+            return '{:1.3f}'.format(t)
+        else:
+            return '???'
+
+    items = [{'title': c.title,
+              'old_time': format_time(c.learn_time),
+              'new_time': format_time(new_times[c.id])}
+             for c in concepts if c.id in new_times]
+    items = sorted(items, key=lambda it: float(it['new_time']), reverse=True)
+
+    return render(request, 'time_estimates.html',
+                  {'items': items})
+    
+
+
+    

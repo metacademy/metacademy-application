@@ -250,7 +250,7 @@ class ConceptResource(Model):
         return self.concept.editable_by(user)
 
     def is_core(self):
-        return self.goals_covered.count() == self.concept.goals.count()
+        return self.core or self.goals_covered.count() == self.concept.goals.count()
 
 
 # maintain version control for the concept

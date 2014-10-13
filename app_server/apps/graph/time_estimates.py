@@ -174,7 +174,7 @@ class PoissonModel:
 
     
 
-def run_model(reg_weight=1.):
+def fit_model(reg_weight=1.):
     concepts = models.Concept.objects.all()
     concepts = [c for c in concepts if not c.is_provisional()]
     concept_names = [c.id for c in concepts]
@@ -195,18 +195,22 @@ def run_model(reg_weight=1.):
 
     params = model.fit()
 
-    idxs = np.argsort(params.concept_weights)[::-1]
+    #idxs = np.argsort(params.concept_weights)[::-1]
 
     existing_idxs = [i for i in range(len(concepts)) if concepts[i].learn_time]
     old_mean = np.mean([concepts[i].learn_time for i in existing_idxs])
     new_mean = np.mean(np.exp(params.concept_weights[existing_idxs]))
     mult = old_mean / new_mean
 
-    for i in idxs:
-        old_lt = concepts[i].learn_time
-        if not old_lt:
-            old_lt = 0.
-        print '{:60s} {:1.3f}      {:1.3f}'.format(concepts[i].title, mult * np.exp(params.concept_weights[i]), old_lt)
+    ## if prnt:
+    ##     for i in idxs:
+    ##         old_lt = concepts[i].learn_time
+    ##         if not old_lt:
+    ##             old_lt = 0.
+    ##         print '{:60s} {:1.3f}      {:1.3f}'.format(concepts[i].title, mult * np.exp(params.concept_weights[i]), old_lt)
+
+    return {c.id: mult * np.exp(w) for c, w in zip(concepts, params.concept_weights)}
+
 
 
 

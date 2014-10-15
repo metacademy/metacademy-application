@@ -81,6 +81,10 @@ class Concept(Model):
                                      and (self.is_provisional() or (hasattr(self, "conceptsettings")
                                                                     and self.conceptsettings.is_editor(user))))
 
+    def is_finished(self):
+        return len(self.summary) > 0 and \
+               self.concept_resource.count() > 0
+
 # maintain version control for the concept
 reversion.register(Concept, follow=["goals", "dep_target", "concept_resource"])
 

@@ -42,7 +42,9 @@ Concepts - Metacademy
         <div class="browsing-concept-list">
           <ul>
             {% for concept in tag.sorted_concepts %}
-              <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+              {% if concept.is_finished %}
+                <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+              {% endif %}
             {% endfor %}
           </ul>
         </div>
@@ -67,7 +69,9 @@ Concepts - Metacademy
       <div class="browsing-concept-list">
         <ul>
           {% for concept in uncat_concepts %}
-            <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+            {% if concept.is_finished %}
+              <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+            {% endif %}
           {% endfor %}
         </ul>
       </div>

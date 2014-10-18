@@ -1,14 +1,24 @@
-#main{
-    text-align: center;
+a {
+  text-decoration: none;
+  color: #50094A;
 }
 
-.main-search-wrap{
-    margin: 5em auto 1em auto;
-    display: inline-block;
+a:hover {
+    color: #690259;
+    text-decoration: underline;
 }
 
-#main-search-input{
-    width: 700px;
+#main {
+    height: 100vh;
+}
+
+#main-search-wrap {
+    width: 80%;
+    margin: auto;
+}
+
+#main-search-input {
+    width: 100%;
     display: block;
     padding: 0.2ex 1ex;
     margin-top: 0.3em;
@@ -30,8 +40,22 @@
 #main-search-input:hover{
    box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
-#main-search-logo{
-    display: inline-block;
+
+/* Main Logo */
+#main-logo-wrap {
+    padding: 3rem 0;
+    text-align: center;
+}
+
+#main-logo {
+    height: 8rem;
+    max-height: 300px;
+}
+
+#tagline {
+   font-family: "Bad Script", sans-serif;
+   font-size: 1.4rem;
+   margin-top: -0.5rem;
 }
 
 .dev-update {
@@ -46,6 +70,62 @@
     display: block;
 }
 
+/* qblocks */
+
+.qblock-wrap {
+    margin: auto;
+}
+
+.qblock {
+    height: 7rem;
+    text-align: center;
+    border: 1px solid #999999;
+    border-radius: 5px;
+    margin-bottom: 3rem;
+}
+
+.qblock header {
+    font-size: 1.8rem;
+    color: #555555;
+    margin-top: 1rem;
+    margin-bottom: 0.6rem;
+}
+
+.qblock-tl, .qblock-bl {
+    margin-left: 8%;
+    margin-right: 2%
+}
+
+.qblock-tr, .qblock-br {
+    margin-left: 2%;
+    margin-right: 8%;
+}
+
+.qblock-bl, .qblock-br {
+    height: 11rem;
+}
+
+#browse-by-topic {
+    width: 48%;
+}
+
+.main-nav-link {
+    text-decoration: none;
+    font-size: 1.5rem;
+}
+
+.main-nav-link i {
+    margin: auto;
+}
+
+.info-list {
+    font-size: 1.4em;
+    line-height: 1.5em;
+}
+
+
+
+/* media */
 
 @media only screen and (max-width: 767px){
     #main-search-input{

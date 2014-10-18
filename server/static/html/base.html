@@ -75,6 +75,7 @@
   <body class="{% block body-class %}{% endblock %}">
     {% block body %}
 
+    {% block header %}
     <div class="header-pull-right header-menu" id="header">
       {% block header-search %}
       <div id="meta-heading-search" class="header-title"> <a class="home-nav" href="/" target="_self"><span class="meta-home-link">&nbsp;</span></a>  <div class="db-search-wrap"> <input type="text" id="header-search-input" class="searchbox" placeholder="search" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1"></div> </div>
@@ -127,7 +128,7 @@
         <button id="responsive-menu-button">Menu</button>
       </div>
     </div>
-
+    {% endblock %}
     <div id="main">
       {% block main %}
 

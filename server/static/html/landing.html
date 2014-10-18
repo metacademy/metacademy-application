@@ -1,36 +1,84 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block header %}
+{% endblock %}
+
+{% block meta-viewport %}
+{% endblock %}
+
 {% block extra-css %}
     <link rel="stylesheet" href="{% static "css/landing.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/lib/ionicons.css"%}"/>
+    <link href="//fonts.googleapis.com/css?family=Bad Script&subset=latin" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block header-search %}
 {% endblock %}
 
 {% block jscript-extend %}
-<script type="text/javascript" src="{% static "javascript/landing.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/landing.js" %}"></script>
 {% endblock %}
 
 {% block main %}
+<div id="main-logo-wrap">
+    <img id="main-logo" class="mlogo" src="{% static "images/meta-logo2-wletters.png" %}" alt="Metacademy Logo" />
+  <h2 id="tagline">showing you where to start learning and what to
+  learn next</h2>
+</div>
 
-<div class="main-search-wrap">
-  <img id="main-search-logo" class="mlogo" src="{% static "images/banner2-meta.png" %}" alt="Metacademy Logo" />
-  <div class="db-search-wrap">
-    <input type="text" class="searchbox" id="main-search-input" placeholder="Search for concept you want to learn, e.g. logistic regression" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
+<div class="col-2-5 qblock qblock-tl">
+  <header>
+    Browse
+  </header>
+
+  <div id="browse-by-topic" class="col-1-2">
+    <a href="/browse" class="internal-link main-nav-link">
+      <i class="ion-eye nav-icon"></i>
+      By Topic
+    </a>
+  </div>
+  <div class="col-1-2">
+    <a href="/roadmaps" class="internal-link main-nav-link">
+      <i class="ion-map"></i>
+      Learning Roadmaps
+    </a>
   </div>
 </div>
 
-  <div class="dev-note">
-<p>
-    Metacademy helps you find resources to improve the skills you care about.
-</p>
-<p class="dev-update">
-  Check out the new roadmap: <a href="/roadmaps/cjrd/level-up-your-ml" class="internal-link">Level-Up Your Machine Learning</a>
-</p>
+<div class="col-2-5 qblock qblock-tr">
+  <header>
+    Search
+  </header>
+  <div id="main-search-wrap">
+    <div class="db-search-wrap">
+      <input type="text" class="searchbox" id="main-search-input" placeholder="Search for concept you want to learn, e.g. logistic regression" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
+    </div>
   </div>
 
+</div>
 
+<div class="col-2-5 qblock qblock-bl">
+  <header>
+  What is Metacademy?
+  </header>
+  <ul class="info-list">
+    <li>We have a <a class="internal-link" href="/about">philosophy</a></li>
+    <li>We're <a class="external-link" href="https://github.com/metacademy/metacademy-application">open source</a></li>
+    <li>We <a class="external-link" href="https://twitter.com/meta_learning">Twitter</a> sometimes</li>
+  </ul>
+</div>
+
+<div class="col-2-5 qblock  qblock-br">
+  <header>
+  Join the Community
+  </header>
+  <ul class="info-list">
+    <li><a class="internal-link" href="/user/register">Create an account</a></li>
+    <li><a class="internal-link" href="/graphs/edit/new">Contribute new concepts</a></li>
+    <li><a class="internal-link"
+  href="/roadmaps/new">Write a roadmap</a></li>
+  </ul>
 </div>
 
 {% endblock %}

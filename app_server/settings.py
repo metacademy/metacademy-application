@@ -129,7 +129,6 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'apps.graph',
     'apps.user_management',
-    'apps.cserver_comm',
     'apps.roadmaps',
     'apps.browser_tests',
     'haystack',

@@ -12,7 +12,7 @@ import pdb
 from django.core.management.base import BaseCommand
 from apps.graph.api_communicator import post_concept, post_dependency
 from apps.graph.views import check_model_id
-from app_server.apps.cserver_comm.cserver_communicator import get_full_graph_data, get_concept_data, get_tag_to_concept_dict
+from cserver_communicator import get_full_graph_data, get_concept_data, get_tag_to_concept_dict
 from apps.graph.models import Concept
 
 

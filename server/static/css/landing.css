@@ -123,6 +123,19 @@ a:hover {
     line-height: 1.5em;
 }
 
+#sign-in {
+    position: absolute;
+    right: 10%;
+    top: 1em;
+    font-size: 0.9em;
+}
+
+#feedback {
+    font-size: 0.9em;
+    bottom: 1.5em;
+    text-align: center;
+    display: block;
+}
 
 
 /* media */

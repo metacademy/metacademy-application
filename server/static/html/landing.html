@@ -2,6 +2,9 @@
 {% load staticfiles %}
 
 {% block header %}
+    <a href="/user/login" id="sign-in">
+      Sign in
+    </a>
 {% endblock %}
 
 {% block meta-viewport %}
@@ -13,22 +16,30 @@
     <link href="//fonts.googleapis.com/css?family=Bad Script&subset=latin" rel="stylesheet" type="text/css">
 {% endblock %}
 
-{% block header-search %}
-{% endblock %}
-
 {% block jscript-extend %}
     <script type="text/javascript" src="{% static "javascript/landing.js" %}"></script>
 {% endblock %}
 
 {% block main %}
 <div id="main-logo-wrap">
-    <img id="main-logo" class="mlogo" src="{% static "images/meta-logo2-wletters.png" %}" alt="Metacademy Logo" />
-  <h2 id="tagline">showing you where to start learning and what to
-  learn next</h2>
+    <img id="main-logo" class="mlogo" src="{% static "images/meta-logo2.1-wletters.png" %}" alt="Metacademy Logo" />
+  <h2 id="tagline">your package manager for knowledge</h2>
 </div>
 
 <div class="col-2-5 qblock qblock-tl">
   <header>
+    Search
+  </header>
+  <div id="main-search-wrap">
+    <div class="db-search-wrap">
+      <input type="text" class="searchbox" id="main-search-input"
+  placeholder="Search for concept you want to learn, e.g. b-trees" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
+    </div>
+  </div>
+</div>
+
+<div class="col-2-5 qblock qblock-tr">
+    <header>
     Browse
   </header>
 
@@ -46,26 +57,14 @@
   </div>
 </div>
 
-<div class="col-2-5 qblock qblock-tr">
-  <header>
-    Search
-  </header>
-  <div id="main-search-wrap">
-    <div class="db-search-wrap">
-      <input type="text" class="searchbox" id="main-search-input" placeholder="Search for concept you want to learn, e.g. logistic regression" value="{% block search-text %}{% endblock %}" autocapitalize="off" tabindex="1">
-    </div>
-  </div>
-
-</div>
-
 <div class="col-2-5 qblock qblock-bl">
   <header>
   What is Metacademy?
   </header>
   <ul class="info-list">
-    <li>We have a <a class="internal-link" href="/about">philosophy</a></li>
-    <li>We're <a class="external-link" href="https://github.com/metacademy/metacademy-application">open source</a></li>
-    <li>We <a class="external-link" href="https://twitter.com/meta_learning">Twitter</a> sometimes</li>
+    <li>Read our <a class="internal-link" href="/about">philosophy</a></li>
+    <li>Check out our <a class="external-link" href="https://github.com/metacademy/metacademy-application">code</a></li>
+    <li>Read some <a class="external-link" href="https://twitter.com/meta_learning">tweets</a></li>
   </ul>
 </div>
 
@@ -80,5 +79,12 @@
   href="/roadmaps/new">Write a roadmap</a></li>
   </ul>
 </div>
+
+<div id="feedback">
+  <a href="/feedback">
+      - send us a message -
+  <a/>
+</div>
+
 
 {% endblock %}

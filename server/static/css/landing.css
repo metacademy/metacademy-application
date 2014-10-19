@@ -1,7 +1,3 @@
-body {
-    min-width: 800px;
-}
-
 a {
   text-decoration: none;
   color: #50094A;
@@ -13,8 +9,7 @@ a:hover {
 }
 
 #main {
-    height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 #main-search-wrap {
@@ -53,8 +48,8 @@ a:hover {
 }
 
 #main-logo {
-    height: 8rem;
-    max-height: 300px;
+    max-width: 600px;
+    width: 95%;
 }
 
 #tagline {
@@ -132,7 +127,8 @@ a:hover {
 }
 
 #sign-in {
-    position: fixed;
+    background-color: white;
+    position: absolute;
     right: 10%;
     top: 1em;
     font-size: 0.9em;
@@ -149,23 +145,13 @@ a:hover {
 /* media */
 
 @media only screen and (max-width: 767px){
-    #main-search-input{
-        width: 95%;
-        display: inline-block;
+    .qblock {
+        width: 80%;
+        margin: 0 0 2rem 10%;
     }
 
-    #main-search-logo{
-        width: 500px;
-    }
-
-    .ac-list {
-        margin-left: 2.5%;
-        top: 32px;
-    }
-}
-
-@media only screen and (max-width: 500px){
-    #main-search-logo{
-        width: 310px;
+    #tagline {
+        top: 0;
+        left: 0;
     }
 }

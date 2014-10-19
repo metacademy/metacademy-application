@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     'apps.graph',
     'apps.user_management',
     'apps.roadmaps',
-    'apps.browser_tests',
+    # 'apps.browser_tests',
     'haystack',
     'captcha',
     'south',
@@ -166,7 +166,7 @@ TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
                                "django.core.context_processors.static",
                                "django.core.context_processors.tz",
                                "django.contrib.messages.context_processors.messages",
-                               "context_processors.global_cp.settings_cp")
+                               )
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -208,13 +208,11 @@ LOGIN_REDIRECT_URL = '/user'
 
 INTERNAL_IPS = ("127.0.0.1",)
 
-CONTENT_SERVER = 'http://' + str(config.CONTENT_SERVER_IP) + ":" + str(config.CONTENT_SERVER_PORT)
-
 APP_SERVER = 'http://' + str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONTEND_SERVER_PORT)
 
 from settings_local import *
 
-if DEBUG:
+if DEBUG and len(sys.argv) > 1:
     TESTING = sys.argv[1] == 'test'
 else:
     TESTING= False

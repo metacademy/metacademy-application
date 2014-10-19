@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block meta-description %} A detailed list of machine learning
+projects to help you improve your applicable machine learning skills
+{% endblock %}
+
+{% block title %}
+Machine Learning Project Path
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static "css/ppaths.css" %}"> </link>
+{% endblock %}
+
+
+{% block main %}
+<h1>Machine Learning Project Path<h1>
+<div id="main-description">Justify using a project path to learn
+  machine learning</div>
+
+  <ol>
+    <li>
+      <h3>Project 0: Setting Up Your Development Tools </h3>
+      <div class="proj-description">
+        
+      </div>
+    </li>
+    <li>
+      <h3>Project 1: A Simple Prediction </h3>
+      <div class="proj-description">
+        Using <a class="external-link"
+    href="https://archive.ics.uci.edu/ml/datasets/Auto+MPG"
+    target="_blank">the UCI Auto MPG Data Set</a>, predict the MPG of the car given all of its other attributes. This will test your ability to manipulate data for a desired machine learning task, and also your ability to apply the correct machine learning technique to a somewhat vague problem.
+      </div>
+    </li>
+  <ol>
+{% endblock %}

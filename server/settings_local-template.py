@@ -1,7 +1,5 @@
 import config
 
-CONTENT_SERVER = 'http://localhost:' + str(config.CONTENT_SERVER_PORT)
-
 DEBUG = config.DEBUG
 TEMPLATE_DEBUG = DEBUG
 

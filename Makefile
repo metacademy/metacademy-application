@@ -90,4 +90,3 @@ vars:
 	$(info LOCAL_DBS has the value $(LOCAL_DBS))
 	$(info LOCAL_DBS_DIR has the value $(LOCAL_DBS_DIR))
 	$(info DJANGO_DB_FILE has the value $(DJANGO_DB_FILE))
-	$(info )

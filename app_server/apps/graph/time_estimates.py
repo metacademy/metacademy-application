@@ -169,7 +169,7 @@ class PoissonModel:
     
     def fit(self):
         init_vec = Params.zeros(self.mappings).to_vec()
-        param_vec = scipy.optimize.fmin_bfgs(self.objfn, init_vec, self.grad)
+        param_vec = scipy.optimize.fmin_cg(self.objfn, init_vec, self.grad)
         return Params.from_vec(param_vec, self.mappings)
 
     

@@ -30,7 +30,13 @@ class Tag(Model):
         return filter(Concept.is_listed_in_main, concepts)
 
     def sorted_roadmaps(self):
-        roadmaps = self.roadmaps.extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+        roadmaps = self.roadmaps.filter(roadmapsettings__doc_type='Roadmap').extra(select={'lower_title': 'lower(title)'}) \
+                   .order_by("lower_title").all()
+        return filter(lambda r: r.is_listed_in_main(), roadmaps)
+
+    def sorted_course_guides(self):
+        roadmaps = self.roadmaps.filter(roadmapsettings__doc_type='Course Guide').extra(select={'lower_title': 'lower(title)'}) \
+                   .order_by("lower_title").all()
         return filter(lambda r: r.is_listed_in_main(), roadmaps)
     
 class Concept(Model):

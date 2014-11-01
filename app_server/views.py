@@ -50,10 +50,17 @@ def get_browsing_view(request):
     uncat_concepts = Concept.objects.filter(tags=None).extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
     uncat_concepts = filter(Concept.is_listed_in_main, uncat_concepts)
     
-    uncat_roadmaps = Roadmap.objects.filter(tags=None).extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+    uncat_roadmaps = Roadmap.objects.filter(tags=None, roadmapsettings__doc_type='Roadmap') \
+                     .extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
     uncat_roadmaps = filter(Roadmap.is_listed_in_main, uncat_roadmaps)
 
-    return render(request, "browsing.html", {'tags': tags, 'uncat_concepts': uncat_concepts, 'uncat_roadmaps': uncat_roadmaps})
+    uncat_course_guides = Roadmap.objects.filter(tags=None, roadmapsettings__doc_type='Course Guide') \
+                          .extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+    uncat_course_guides = filter(Roadmap.is_listed_in_main, uncat_course_guides)
+    
+
+    return render(request, "browsing.html", {'tags': tags, 'uncat_concepts': uncat_concepts, 'uncat_roadmaps': uncat_roadmaps,
+                                             'uncat_course_guides': uncat_course_guides})
     
     
 

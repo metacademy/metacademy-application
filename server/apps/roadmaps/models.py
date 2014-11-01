@@ -50,6 +50,9 @@ class RoadmapSettings(Model):
     """
     Model that contains the roadmap settings
     """
+    DOC_TYPES = (('Roadmap', 'Roadmap'),
+                 ('Course Guide', 'Course Guide'))
+    
     roadmap = OneToOneField(Roadmap, primary_key=True)
     creator = ForeignKey(Profile, related_name="roadmap_creator") # TODO should this be a part of RoadmapSettings?
     owners = ManyToManyField(Profile, related_name="roadmap_owners")
@@ -59,6 +62,7 @@ class RoadmapSettings(Model):
     sudo_listed_in_main = BooleanField('superuser only: allow this roadmap in the search results', default=True)
     published = BooleanField(default=False)
     url_tag = SlugField('URL tag', max_length=30, help_text='only letters, numbers, underscores, hyphens')
+    doc_type = CharField('Document Type', max_length=20, choices=DOC_TYPES, default='Roadmap')
 
     class Meta:
         unique_together = ('creator', 'url_tag')

@@ -28,21 +28,36 @@ Concepts - Metacademy
     <h2>{{tag.title}} </h2>
     <div class="browsing-section">
 
-      {% if tag.roadmaps.count %}
-        <h3>Roadmaps</h3>
-        <ul>
-          {% for roadmap in tag.sorted_roadmaps %}
+      {% with tag_roadmaps=tag.sorted_roadmaps %}
+        {% if tag_roadmaps %}
+          <h3>Roadmaps</h3>
+          <ul>
+          {% for roadmap in tag_roadmaps %}
             <li> <a class="internal-link" href="{{ roadmap.roadmapsettings.get_absolute_url }}"> {{ roadmap.title }} </a> </li>
           {% endfor %}
-        </ul>
-      {% endif %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      {% with tag_course_guides=tag.sorted_course_guides %}
+        {% if tag_course_guides %}
+          <h3>Course Guides</h3>
+          <ul>
+          {% for course_guide in tag_course_guides %}
+            <li> <a class="internal-link" href="{{ course_guide.roadmapsettings.get_absolute_url }}"> {{ course_guide.title }} </a> </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
 
       {% if tag.concepts.count %}
         <h3>Concepts</h3>
         <div class="browsing-concept-list">
           <ul>
             {% for concept in tag.sorted_concepts %}
-              <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+              {% if concept.is_finished %}
+                <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+              {% endif %}
             {% endfor %}
           </ul>
         </div>
@@ -62,12 +77,23 @@ Concepts - Metacademy
       </ul>
     {% endif %}
 
+    {% if uncat_course_guides %}
+      <h3>Course Guides</h3>
+      <ul>
+        {% for course_guide in uncat_course_guides %}
+          <li> <a class="internal-link" href="{{ course_guide.roadmapsettings.get_absolute_url }}"> {{ course_guide.title }} </a> </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
     {% if uncat_concepts %}
       <h3>Concepts</h3>
       <div class="browsing-concept-list">
         <ul>
           {% for concept in uncat_concepts %}
-            <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+            {% if concept.is_finished %}
+              <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+            {% endif %}
           {% endfor %}
         </ul>
       </div>

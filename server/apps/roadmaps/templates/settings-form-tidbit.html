@@ -9,6 +9,15 @@
     {% endif %}
   </div>
   <div class="form-field">
+    {{ settings_form.doc_type.label_tag }}
+    {{ settings_form.doc_type }}
+    {% if settings_form.doc_type.errors  %}
+    <div class="form-errors">
+      {{ settings_form.doc_type.errors }}
+    </div>
+    {% endif %}
+  </div>
+  <div class="form-field">
     {{ settings_form.owners.label_tag }}
     {{ settings_form.owners }}
     {% if settings_form.owners.errors  %}

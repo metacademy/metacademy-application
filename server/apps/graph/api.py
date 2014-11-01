@@ -268,8 +268,9 @@ class GlobalResourceResource(CustomSaveHookResource):
             # expect edition_years array
             try:
                 if gresource.get("edition_years"):
-                    arrType = ast.literal_eval(gresource["edition_years"])
-                    assert(isinstance(arrType, (list, tuple)))
+                    if not isinstance(gresource["edition_years"], (list, tuple)):
+                        arrType = ast.literal_eval(gresource["edition_years"])
+                        assert(isinstance(arrType, (list, tuple)))
             except:
                 raise Exception("unable to parse edition_years -- must be an array " + bundle.data["title"])
 

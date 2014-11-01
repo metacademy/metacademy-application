@@ -30,7 +30,13 @@ class Tag(Model):
         return filter(Concept.is_listed_in_main, concepts)
 
     def sorted_roadmaps(self):
-        roadmaps = self.roadmaps.extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
+        roadmaps = self.roadmaps.filter(roadmapsettings__doc_type='Roadmap').extra(select={'lower_title': 'lower(title)'}) \
+                   .order_by("lower_title").all()
+        return filter(lambda r: r.is_listed_in_main(), roadmaps)
+
+    def sorted_course_guides(self):
+        roadmaps = self.roadmaps.filter(roadmapsettings__doc_type='Course Guide').extra(select={'lower_title': 'lower(title)'}) \
+                   .order_by("lower_title").all()
         return filter(lambda r: r.is_listed_in_main(), roadmaps)
     
 class Concept(Model):
@@ -80,6 +86,10 @@ class Concept(Model):
         return user.is_superuser or (user.is_authenticated()
                                      and (self.is_provisional() or (hasattr(self, "conceptsettings")
                                                                     and self.conceptsettings.is_editor(user))))
+
+    def is_finished(self):
+        return len(self.summary) > 0 and \
+               self.concept_resource.count() > 0
 
 # maintain version control for the concept
 reversion.register(Concept, follow=["goals", "dep_target", "concept_resource"])
@@ -248,6 +258,9 @@ class ConceptResource(Model):
 
     def editable_by(self, user):
         return self.concept.editable_by(user)
+
+    def is_core(self):
+        return self.core or self.goals_covered.count() == self.concept.goals.count()
 
 
 # maintain version control for the concept

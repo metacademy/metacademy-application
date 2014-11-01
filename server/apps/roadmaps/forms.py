@@ -29,4 +29,4 @@ class RoadmapForm(ModelForm):
 class RoadmapSettingsForm(ModelForm):
     class Meta:
         model = models.RoadmapSettings
-        fields = ('listed_in_main', 'url_tag', 'sudo_listed_in_main', 'anyone_can_edit')
+        fields = ('doc_type', 'listed_in_main', 'url_tag', 'sudo_listed_in_main', 'anyone_can_edit')

@@ -109,7 +109,7 @@ a:hover {
 }
 
 #browse-by-topic {
-    width: 48%;
+    width: 32%;
 }
 
 .main-nav-link {
@@ -122,8 +122,13 @@ a:hover {
 }
 
 .info-list {
-    font-size: 1.4em;
-    line-height: 1.5em;
+    font-size: 1.3em;
+    line-height: 1.4em;
+}
+
+.browse-list {
+    font-size: 1.3em;
+    line-height: 1.4em;
 }
 
 #sign-in {

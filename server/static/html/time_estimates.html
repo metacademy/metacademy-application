@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block targetblank %}
+{% endblock %}
+
+{% block meta-viewport %}
+<meta name="viewport" content="initial-scale=1">
+{% endblock %}
+
+
+{% block title %}
+Learning times - Metacademy
+{% endblock %}
+
+{% block main%}
+
+<table>
+  <tr>
+    <td><b>Title</b></td>
+    <td><b>New</b></td>
+    <td><b>Old</b></td>
+  </tr>
+{% for item in items %}
+  <tr>
+    <td>{{ item.title }}</td> 
+    <td>{{ item.new_time }} &nbsp &nbsp &nbsp</td> 
+    <td>{{ item.old_time }}</td>
+  </tr>
+{% endfor %}
+</table>
+
+<form method="post" action="">
+  {% csrf_token %}
+  <button class="submit-button" type="submit"> Apply </button>
+</form>
+
+{% endblock %}
+

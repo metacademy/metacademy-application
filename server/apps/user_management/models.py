@@ -12,10 +12,11 @@ class UserCreateForm(UserCreationForm):
     email = forms.CharField(validators=[validate_email],
         error_messages={'invalid': ('Please enter a valid email address.')})
     captcha = CaptchaField()
+    tou = forms.BooleanField(initial=False)
 
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2", "captcha")
+        fields = ("username", "email", "password1", "password2", "captcha", "tou")
 
     def save(self, commit=True):
         user = super(UserCreateForm, self).save(commit=False)
@@ -23,6 +24,11 @@ class UserCreateForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+    def clean_tou(self):
+        tou = self.cleaned_data["tou"]
+        if not tou:
+            raise forms.ValidationError("You must agree to our terms of use.")
 
     def clean_email(self):
         email = self.cleaned_data["email"]

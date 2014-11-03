@@ -43,7 +43,16 @@
     {{form.password2.errors}}
   </div>
   {% endif %}
+</div>
 
+<div class="user-form-field">
+  <label for="id_password2">I agree to the <a target="_blank" href="/terms" class="internal-link">Terms of Use</a>:</label>
+  {{ form.tou }}
+  {% if form.tou.errors %}
+  <div class="form-errors">
+    {{form.tou.errors}}
+  </div>
+  {% endif %}
 </div>
 
 <div class="user-form-field">

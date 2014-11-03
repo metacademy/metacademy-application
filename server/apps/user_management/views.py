@@ -47,7 +47,7 @@ def user_main(request):
     else:
         sconcepts = []
 
-    return render_to_response('user.html',
+    return render_to_response('user_management/user.html',
                               {
                                   "lconcepts": lconcepts,
                                   "sconcepts": sconcepts,

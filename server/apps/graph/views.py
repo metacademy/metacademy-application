@@ -202,8 +202,8 @@ def get_user_data(request):
         uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
         lset = set()
         sset = set()
-        [lset.add(lc.id) for lc in uprof.learned.all()]
-        [sset.add(sc.id) for sc in uprof.starred.all()]
+        [lset.add(lc.id) for lc in uprof.learned_concepts.all()]
+        [sset.add(sc.id) for sc in uprof.starred_concepts.all()]
         concepts = {"concepts": [{"id": uid, "learned": uid in lset, "starred": uid in sset} for uid in lset.union(sset)]}
     else:
         concepts = {"concepts": []}

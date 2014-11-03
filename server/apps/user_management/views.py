@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render
-from apps.user_management.models import Concepts, Profile, UserCreateForm
+from apps.user_management.models import Profile, UserCreateForm
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate, login
 
@@ -33,8 +33,8 @@ def user_main(request):
     roadmaps = [rs.roadmap for rs in uprof.roadmap_owners.all()]
 
     # obtain an array of learned concept ids for the user
-    lids = [l.id for l in uprof.learned.all()]
-    sids = [s.id for s in uprof.starred.all()]
+    lids = [l.id for l in uprof.learned_concepts.all()]
+    sids = [s.id for s in uprof.starred_concepts.all()]
 
     # FIXME TODO refactor and use the new database
     if len(lids) > 0:
@@ -119,21 +119,18 @@ def handle_concepts(request, cid=""):
         starred = rbody["starred"]
 
         uprof, created = Profile.objects.get_or_create(pk=request.user.pk)
-        dbConceptObj, ucreated = Concepts.objects.get_or_create(id=cid)
+        concept_obj, ucreated = Concept.objects.get_or_create(id=cid)
 
         if learned:
-            dbConceptObj.learned_uprofs.add(uprof)
+            uprof.learned_concepts.add(concept_obj)
         else:
-            dbConceptObj.learned_uprofs.remove(uprof)
+            uprof.learned_concepts.remove(concept_obj)
         if starred:
-            dbConceptObj.starred_uprofs.add(uprof)
+            uprof.starred_concepts.add(concept_obj)
         else:
-            dbConceptObj.starred_uprofs.remove(uprof)
+            uprof.starred_concepts.remove(concept_obj)
 
-        dbConceptObj.save()
         hresp = HttpResponse(status=200)
-        hresp.set_cookie("csrftoken", "hiay")
         return hresp
-
     else:
         return HttpResponse(status=405)

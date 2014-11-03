@@ -58,6 +58,8 @@ class Concept(Model):
     learn_time = FloatField(null=True, blank=True)
     last_mod = DateTimeField(auto_now=True, default=datetime.now)
     tags = ManyToManyField(Tag, related_name="concepts")
+    learned_by = ManyToManyField(Profile, related_name="learned_concepts")
+    starred_by = ManyToManyField(Profile, related_name="starred_concepts")
 
 
     def __unicode__(self):

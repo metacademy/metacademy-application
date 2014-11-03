@@ -6,10 +6,12 @@ import pdb
 import os
 
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from haystack.query import SearchQuerySet
 import reversion
+from lazysignup.templatetags.lazysignup_tags import is_lazy_user
 
 from apps.user_management.models import Profile
 from apps.graph.models import Graph, Concept, GlobalResource, ResourceLocation, Goal
@@ -152,6 +154,9 @@ def show_graph(request, gid):
 
 
 def edit_existing_graph(request, gid):
+    if not request.user.is_authenticated() or is_lazy_user(request.user):
+        return HttpResponseRedirect(reverse("user:login"))
+    
     return render_graph_view(request, gid, "graph-creator.html")
 
 
@@ -183,6 +188,9 @@ def get_concept_dep_graph(request, concept_tag=""):
 
 def new_graph(request):
     if request.method == "GET":
+        if not request.user.is_authenticated() or is_lazy_user(request.user):
+            return HttpResponseRedirect(reverse("user:login"))
+        
         concepts = get_user_data(request)
         used = True
         while used:

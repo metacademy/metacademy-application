@@ -8,6 +8,8 @@ from django.views.generic.base import TemplateView, RedirectView
 from haystack.views import search_view_factory
 from haystack.query import SearchQuerySet
 
+from apps.roadmaps import views as roadmap_views
+
 from views import MultiSearchView, ContactView, get_list_view, get_browsing_view, autocomplete
 
 admin.autodiscover()
@@ -30,6 +32,7 @@ urlpatterns = patterns('',
                        url(r'^(?i)graphs/', include('apps.graph.urls', namespace="graphs") ),
                        url(r'^user/', include('apps.user_management.urls', namespace='user') ),
                        url(r'^roadmaps/', include('apps.roadmaps.urls', namespace='roadmaps')),
+                       url(r'^course_guides/', roadmap_views.course_guide_list),
                        url(r'^captcha/', include('captcha.urls')),
                        url(r'^about/?$', TemplateView.as_view(template_name='about.html')),
                        url(r'^feedback/?$', ContactView.as_view()),

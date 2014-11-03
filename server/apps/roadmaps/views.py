@@ -390,17 +390,27 @@ def preview(request):
     })
 
 
-def list(request):
+def list_for_type(request, doc_type, pl_doc_type):
     roadmaps = models.Roadmap.objects.all()
-    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and r.roadmapsettings.is_published(), roadmaps)
+    roadmaps = filter(lambda r: r.roadmapsettings.is_listed_in_main() and \
+                      r.roadmapsettings.is_published() and \
+                      r.roadmapsettings.doc_type == doc_type, roadmaps)
     roadmaps = sorted(roadmaps, key=lambda x: x.title.lower())
 
     return render(request, 'roadmap-list.html', {
         'roadmaps': roadmaps,
         'include_create': True,
-        'empty_message': 'Nobody has made any roadmaps yet.'
+        'empty_message': 'Nobody has made any roadmaps yet.',
+        'doc_type': doc_type,
+        'pl_doc_type': pl_doc_type,
     })
 
+
+def list(request):
+    return list_for_type(request, 'Roadmap', 'Roadmaps')
+
+def course_guide_list(request):
+    return list_for_type(request, 'Course Guide', 'Course Guides')
 
 def list_by_user(request, in_username):
     try:

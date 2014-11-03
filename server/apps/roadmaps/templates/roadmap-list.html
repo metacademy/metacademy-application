@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block title %}
-  Metacademy - Roadmaps
+  Metacademy - {{ pl_doc_type }}
 {% endblock %}
 
 {% block extra-css %}
@@ -20,8 +20,8 @@
   <div class="search-res-wrapper">
 
     <h1>
-      Public Roadmaps
-      <a id="new-roadmap-link" href="{% url 'roadmaps:new' %}">+ New Roadmap</a>
+      Public {{ pl_doc_type }}
+      <a id="new-roadmap-link" href="{% url 'roadmaps:new' %}">+ New {{ doc_type }}</a>
     </h1>
 
     <div class="search-res">

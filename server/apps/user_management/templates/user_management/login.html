@@ -27,6 +27,9 @@
 
 {% block post-form-text %}
 <div class="forgot-pw-link">
+     <a href="{% url "user:register" %}">create an account</a>
+</div>
+<div class="forgot-pw-link">
      <a href="{% url "user:password_reset" %}">forgot your username/password?</a>
 </div>
 {% endblock %}

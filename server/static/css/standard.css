@@ -237,12 +237,12 @@ a.home-nav{
     box-sizing: border-box;
     width: 16em;
 }
-#header-search-input:focus, .user-form-field input:focus{
+#header-search-input[type="text"]:focus, .user-form-field input[type="text"]:focus{
     border-color: #501644;
     box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
 
-#header-search-input:hover, .user-form-field input:hover{
+#header-search-input[type="text"]:hover, .user-form-field input[type="text"]:hover{
     box-shadow: inset 3px 3px 4px rgba(0,0,0,0.075);
 }
 

@@ -213,7 +213,7 @@ APP_SERVER = 'http://' + str(config.FRONTEND_SERVER_IP) + ":" + str(config.FRONT
 from settings_local import *
 
 if DEBUG and len(sys.argv) > 1:
-    TESTING = sys.argv[1] == 'test'
+    TESTING = False # sys.argv[1] == 'test'
 else:
     TESTING= False
 

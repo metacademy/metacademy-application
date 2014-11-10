@@ -22,8 +22,12 @@
 {% block extra-css %}
     <link rel="stylesheet" href="{% static "css/landing.css" %}"/>
     <link rel="stylesheet" href="{% static "css/lib/ionicons.css"%}"/>
-    <link href="//fonts.googleapis.com/css?family=Bad Script&subset=latin" rel="stylesheet" type="text/css">
 {% endblock %}
+
+{% block fonts %}
+    <link href="http://fonts.googleapis.com/css?family=Bad%20Script&subset=latin" rel="stylesheet" type="text/css">
+{% endblock %}
+
 
 {% block jscript-extend %}
     <script type="text/javascript" src="{% static "javascript/landing.js" %}"></script>

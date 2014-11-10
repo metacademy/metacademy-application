@@ -131,7 +131,7 @@ a:hover {
     line-height: 1.4em;
 }
 
-#sign-in {
+.user-links {
     background-color: white;
     position: absolute;
     right: 10%;

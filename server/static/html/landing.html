@@ -2,9 +2,21 @@
 {% load staticfiles %}
 
 {% block header %}
-    <a href="/user/login" id="sign-in">
-      Sign in
-    </a>
+  <div class="user-links">
+    {% if user.is_authenticated and not user.is_lazy_user %}
+      <a href="{% url 'user:user_main' %}"> 
+        {{ user.username }} 
+      </a>
+      &#124;
+      <a href="{% url 'user:logout' %}">
+        Sign out 
+      </a>
+    {% else %}
+      <a href="{% url 'user:login' %}" id="sign-in">
+        Sign in
+      </a>
+    {% endif %}
+  </div>
 {% endblock %}
 
 {% block extra-css %}

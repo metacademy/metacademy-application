@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load i18n lazysignup_tags %}
 
 {% block header %}
   <div class="user-links">
-    {% if user.is_authenticated and not user.is_lazy_user %}
+    {% if user.is_authenticated and not user|is_lazy_user %}
       <a href="{% url 'user:user_main' %}"> 
         {{ user.username }} 
       </a>

@@ -7,11 +7,11 @@
 
 # set the env
 source ../meta_venv/bin/activate
-python app_server/manage.py runserver 8080 --noreload & # `&` sends the process to the background
+python server/manage.py runserver 8080 --noreload & # `&` sends the process to the background
 
 # run the django tests
 echo "Django Tests"
-#python app_server/manage.py test
+#python server/manage.py test
 
 # run the browser tests
 echo "Browser Tests"

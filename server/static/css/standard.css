@@ -146,6 +146,14 @@ a.sidr-class-ac-li-a {
 }
 
 
+.internal-link.known-concept{
+    color: #BB9CB0;
+    text-decoration: none;
+}
+.internal-link.known-concept:hover{
+    text-decoration:underline;
+    color:#B25291;
+}
 .internal-link, .focus-link{
     color: #A01F70;
     text-decoration: none;

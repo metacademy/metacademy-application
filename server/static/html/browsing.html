@@ -92,7 +92,7 @@ Metacademy - Browse
         <ul>
           {% for concept in uncat_concepts %}
             {% if concept.is_finished %}
-              <li> <a class="internal-link" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
+            <li> <a class="internal-link{% if concept in known_concepts %} known-concept{% endif %}" href="{% url 'graphs:concepts' concept.tag %}"> {{concept.title}} </a> </li>
             {% endif %}
           {% endfor %}
         </ul>

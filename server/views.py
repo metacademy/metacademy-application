@@ -11,6 +11,7 @@ from haystack.query import SearchQuerySet
 
 from apps.graph.models import Concept, Tag
 from apps.roadmaps.models import Roadmap
+from apps.user_management.models import Profile
 from forms import ContactForm
 
 
@@ -57,10 +58,14 @@ def get_browsing_view(request):
     uncat_course_guides = Roadmap.objects.filter(tags=None, roadmapsettings__doc_type='Course Guide') \
                           .extra(select={'lower_title': 'lower(title)'}).order_by("lower_title").all()
     uncat_course_guides = filter(Roadmap.is_listed_in_main, uncat_course_guides)
-    
+
+    learned = None
+    if request.user.is_authenticated():
+        uprof, _ = Profile.objects.get_or_create(pk=request.user.pk)
+        learned = [concept for cs in uprof.learned.all() for concept in Concept.objects.filter(id=cs.id).all()]
 
     return render(request, "browsing.html", {'tags': tags, 'uncat_concepts': uncat_concepts, 'uncat_roadmaps': uncat_roadmaps,
-                                             'uncat_course_guides': uncat_course_guides})
+                                             'uncat_course_guides': uncat_course_guides, 'known_concepts': learned})
     
     
 

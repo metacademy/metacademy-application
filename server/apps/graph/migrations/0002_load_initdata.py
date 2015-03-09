@@ -14,33 +14,33 @@ class Migration(DataMigration):
         "Write your forwards methods here."
         from django.core.management import call_command
 
-        if not TESTING:
-            load = True
-            while True:
-                ans = raw_input("Populate the db with metacademy data [Y/n]? ")
-                if not ans:
-                    break
-                if ans not in ['y', 'Y', 'n', 'N']:
-                    print 'please enter y or n.'
-                    continue
-                if ans == 'y' or ans == 'Y':
-                    break
-                if ans == 'n' or ans == 'N':
-                    load = False
-                    break
-            if load:
-                print "loading graph data "
-                original_get_model = models.get_model
+        # if not TESTING:
+        #     load = True
+        #     while True:
+        #         ans = raw_input("Populate the db with metacademy data [Y/n]? ")
+        #         if not ans:
+        #             break
+        #         if ans not in ['y', 'Y', 'n', 'N']:
+        #             print 'please enter y or n.'
+        #             continue
+        #         if ans == 'y' or ans == 'Y':
+        #             break
+        #         if ans == 'n' or ans == 'N':
+        #             load = False
+        #             break
+        #     if load:
+        #         print "loading graph data "
+        #         original_get_model = models.get_model
     
-                def get_model_southern_style(*args):
-                    try:
-                        return orm['.'.join(args)]
-                    except:
-                        return original_get_model(*args)
+        #         def get_model_southern_style(*args):
+        #             try:
+        #                 return orm['.'.join(args)]
+        #             except:
+        #                 return original_get_model(*args)
                     
-                models.get_model = get_model_southern_style
-                call_command("loaddata", "graph_fixture.json")
-                models.get_model = original_get_model
+        #         models.get_model = get_model_southern_style
+        #         call_command("loaddata", "graph_fixture.json")
+        #         models.get_model = original_get_model
 
     def backwards(self, orm):
         "Write your backwards methods here."

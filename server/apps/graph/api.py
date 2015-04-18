@@ -350,21 +350,23 @@ class ConceptResourceResource(CustomSaveHookResource):
 
         if type(adeps) == unicode:
             adeps = ast.literal_eval(adeps)
+        new_adeps = []
         for dep in adeps:
             if "id" in dep:
                 dconcept = Concept.objects.get(id=dep["id"])
                 dep["title"] = dconcept.title
                 dep["tag"] = dconcept.tag
+                new_adeps.append(dep)
             elif "title" in dep:
-                try:
-                    dconcept = Concept.objects.get(title=dep["title"])
-                    dep["title"] = dconcept.title
-                    dep["tag"] = dconcept.tag
-                    dep["id"] = dconcept.id
-                except ObjectDoesNotExist:
-                    # TODO
-                    pass
-        bundle.data["additional_dependencies"] = adeps
+                dconcepts = Concept.objects.filter(title=dep["title"])
+                for dconcept in dconcepts:
+                    if not dconcept.is_provisional():
+                        dep["title"] = dconcept.title
+                        dep["tag"] = dconcept.tag
+                        dep["id"] = dconcept.id
+                        new_adeps.append(dep)
+                        break
+        bundle.data["additional_dependencies"] = new_adeps
 
         return bundle
 

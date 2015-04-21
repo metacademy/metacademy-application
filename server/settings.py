@@ -133,7 +133,6 @@ INSTALLED_APPS = (
     # 'apps.browser_tests',
     'haystack',
     'captcha',
-    'south',
     'compressor',
     'lazysignup',
     'reversion',

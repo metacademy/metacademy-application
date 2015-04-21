@@ -34,6 +34,7 @@ class TagAdminForm(forms.ModelForm):
 
   class Meta:
     model = Tag
+    fields = '__all__'
 
   def __init__(self, *args, **kwargs):
     super(TagAdminForm, self).__init__(*args, **kwargs)

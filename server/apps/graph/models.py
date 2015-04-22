@@ -13,12 +13,8 @@ from haystack.exceptions import SearchBackendError
 from apps.user_management.models import Profile
 
 
-class LoggedInEditable(Model):
-    def editable_by(self, user):
-        return user.is_authenticated()
-
-
 class Tag(Model):
+    id = CharField(max_length=30, primary_key=True)
     title = CharField(max_length=100)
 
     def __unicode__(self):
@@ -45,6 +41,7 @@ class Concept(Model):
     """
     # charfield for backwards compatability
     # charfield for backwards compatability with text system
+    id = CharField(max_length=30, primary_key=True)
     tag = CharField(max_length=30, unique=True, null=False)
     title = CharField(max_length=100)
     summary = CharField(max_length=1000, null=True, blank=True)
@@ -107,6 +104,7 @@ def pre_concept_delete(sender, **kwargs):
         olink.delete()
 
 class Goal(Model):
+    id = CharField(max_length=30, primary_key=True)
     concept = ForeignKey(Concept, related_name="goals")
     text = CharField(max_length=500)
     ordering = IntegerField(default=-1)
@@ -132,6 +130,7 @@ class Dependency(Model):
     """
     Concept edge
     """
+    id = CharField(max_length=30, primary_key=True)
     source = ForeignKey(Concept, related_name="dep_source")
     target = ForeignKey(Concept, related_name="dep_target")
     reason = CharField(max_length=500)
@@ -176,13 +175,15 @@ def pre_dep_delete(sender, **kwargs):
         tg.save()
 
 
-class ConceptSettings(LoggedInEditable):
+class ConceptSettings(Model):
     """
     Model that contains the concept data not under version control
     """
     concept = OneToOneField(Concept, primary_key=True)
     status = CharField(max_length=100)
     edited_by = ManyToManyField(Profile, related_name="edited_concept")
+    def editable_by(self, user):
+        return user.is_authenticated()    
 
     def is_editor(self, user):
         return self.edited_by.filter(user=user).exists()
@@ -205,6 +206,7 @@ class GlobalResource(Model):
     """
     Model to maintain resources used across concepts
     """
+    id = CharField(max_length=30, primary_key=True)
     # fields specific to GlobalResource
     title = CharField(max_length=100)
     authors = CharField(max_length=200, default='')
@@ -236,6 +238,7 @@ class ConceptResource(Model):
     Model to maintain concept specific resources
     NOTE: should use functions to obtain fields
     """
+    id = CharField(max_length=30, primary_key=True)
     # ConceptResource specific
     global_resource = ForeignKey(GlobalResource, related_name="cresources")
     concept = ForeignKey(Concept, related_name="concept_resource")
@@ -265,6 +268,7 @@ class ResourceLocation(Model):
     """
     Specifies the location of the resources
     """
+    id = CharField(max_length=30, primary_key=True)
     cresource = ForeignKey(ConceptResource, related_name='locations')
     url = CharField(max_length=100, null=True, blank=True)
     location_type = CharField(max_length=30)
@@ -280,30 +284,37 @@ class ResourceLocation(Model):
 reversion.register(ResourceLocation)
 
 
-class Graph(LoggedInEditable):
+class Graph(Model):
     """
     Model that contains graph data under version control
     """
+    id = CharField(max_length=30, primary_key=True)
     # TODO the concepts should save a freeze of the concept revisions
     title = CharField(max_length=100)
     concepts = ManyToManyField(Concept, related_name="graph_concepts")
     dependencies = ManyToManyField(Dependency, related_name="graph_dependencies")
     last_mod = DateTimeField(auto_now=True)
+    def editable_by(self, user):
+        return user.is_authenticated()
 
 
-class GraphSettings(LoggedInEditable):
+class GraphSettings(Model):
     """
     Model that contains graph data under version control.
     Effectively, a graph is a set of nodes, and for now, it's mostly used in the context of users creating graphs
     """
+    id = CharField(max_length=30, primary_key=True)
     graph = OneToOneField(Graph)
     edited_by = ManyToManyField(Profile, related_name="edited_graph")
+
+    def editable_by(self, user):
+        return user.is_authenticated()
 
     def get_absolute_url(self):
         return reverse("graphs:existing-edit", args=(self.graph.id,))
 
 
-class TargetGraph(LoggedInEditable):
+class TargetGraph(Model):
     """
     Model that contains target graph concept and dependency references
     """
@@ -311,3 +322,5 @@ class TargetGraph(LoggedInEditable):
     depth = IntegerField(default=0)
     concepts = ManyToManyField(Concept, related_name="target_graphs")
     dependencies = ManyToManyField(Dependency, related_name="targetgraph_dependencies")
+    def editable_by(self, user):
+        return user.is_authenticated()

@@ -1,4 +1,4 @@
-.PHONY: clean cleandist test vars build_production
+.PHONY: clean cleandist test vars build_production remove_sensitive_data
 
 # obtain the absolute path to metacademy-application
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -81,6 +81,13 @@ update:
 	git pull
 	cd server/static/lib/kmap; git pull
 
+remove_sensitive_data:
+	python server/manage.py remove_provisional_concepts
+	python server/manage.py remove_user_accounts
+	python server/manage.py remove_provisional_roadmaps
+	python server/manage.py clearsessions
+	./dev_utils/remove_sensitive_aux_data_from_db.sh
+
 # print the vars used in the makefile
 vars:
 	$(info BASE_DIR has the value $(BASE_DIR))
@@ -90,3 +97,4 @@ vars:
 	$(info LOCAL_DBS has the value $(LOCAL_DBS))
 	$(info LOCAL_DBS_DIR has the value $(LOCAL_DBS_DIR))
 	$(info DJANGO_DB_FILE has the value $(DJANGO_DB_FILE))
+

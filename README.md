@@ -18,7 +18,7 @@ For Windows installation/requirements, please see the README located in [/window
 
 
 ### Preliminary requirements
-* `Python 2.7.X` *Nota bene*: install `python-devel`/`python-dev` if you're using a package manager such as `yum` or `apt-get`. The following command should then print a path. If this command raises an exception, make sure that you have `python-devel`/`-dev` for your installed version of python installed:
+* `Python 2.7.X` *Note*: install `python-devel`/`python-dev` if you're using a package manager such as `yum` or `apt-get`. The following command should then print a path. If this command raises an exception, make sure that you have `python-devel`/`-dev` for your installed version of python installed:
 
         python -c 'from distutils.sysconfig import get_makefile_filename as m; print m()'
 
@@ -68,6 +68,11 @@ For Windows installation/requirements, please see the README located in [/window
 
 The following tasks are not neccessarily needed to run Metacademy.
 
+### Load `metacademy.org` data
+Load the public data from metacademy.org
+
+    python server/manage.py loaddata dev_utils/graph_data.json
+
 ### Create a Django superuser
 
 A Django superuser will allow you to login at `/admin` to perform additional management tasks.
@@ -78,7 +83,7 @@ Given you are still in the `metacademy-application` directory, activate the virt
 
 Then create the Django superuser.
 
-    python app_server/manage.py createsuperuser
+    python server/manage.py createsuperuser
 
 You can leave the virtual environment again simply by invoking
 
@@ -123,7 +128,7 @@ or still from within the `metacademy-application` directory on a 64 bit RHEL-bas
 
 2. Start the development server
 
-        python app_server/manage.py runserver 8080
+        python server/manage.py runserver 8080
 
 3. Open [localhost:8080](http://localhost:8080) in a modern JavaScript-enabled browser
 

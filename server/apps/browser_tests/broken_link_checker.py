@@ -1,12 +1,12 @@
-# """
-# Testing class for checking broken links
-# Due to computational demand, this script should not be executed
-# from a URL -- executing from the admin interface seems reasonable
+# # """
+# # Testing class for checking broken links
+# # Due to computational demand, this script should not be executed
+# # from a URL -- executing from the admin interface seems reasonable
 
-# This script should write a list of broken links to current_broken_links.txt
-# in this directory
+# # This script should write a list of broken links to current_broken_links.txt
+# # in this directory
 
-# """
+# # """
 # import pdb
 # import urllib2
 # import urllib

@@ -29,7 +29,7 @@ class TestRoadmapCreation(TestCase):
 
     def setUp(self):
         common_setup(self)
-        self.base_roadmap = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': 'publish_public_roadmap', 'listed_in_main': 'on', 'body':'some test [[text]]', 'submitbutton':'Save'}
+        self.base_roadmap = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': 'publish_public_roadmap', 'listed_in_main': 'on', 'doc_type': 'Roadmap', 'body':'some test [[text]]', 'submitbutton':'Save'}
 
     ######
     # published public roadmap
@@ -185,6 +185,7 @@ class TestRoadmapCreation(TestCase):
         del rm_dict['listed_in_main']
         resp = client.post(reverse('roadmaps:new'), rm_dict)
 
+
         self.assertEqual(resp.status_code, 302)
         view_url = reverse("roadmaps:show", args=(self.rcreator_username, rmap_url_tag,))
         self.assertEqual(resp.url, 'http://testserver' + view_url)
@@ -267,7 +268,7 @@ class RoadmapViewTestCase(TestCase):
         # publish initial roadmap
         client = Client()
         client.login(username=self.rcreator_username, password=self.rcreator_username)
-        rm_dict = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': self.roadmap_name, 'listed_in_main': 'on', 'body':'some test [[text]]', 'submitbutton':'Publish'}
+        rm_dict = {'title':'test publish_public_roadmap title', 'author': 'author 1 and author 2', 'audience': 'test programs!', 'blurb': 'this should work', 'url_tag': self.roadmap_name, 'listed_in_main': 'on', 'body':'some test [[text]]', 'submitbutton':'Publish', 'doc_type': 'Roadmap'}
         resp = client.post(reverse('roadmaps:new'), rm_dict)
 
     def client_get_rm_login(self, reverse_str, un, url_args, resp_code):

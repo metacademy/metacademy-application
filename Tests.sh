@@ -7,17 +7,19 @@
 
 # set the env
 source ../meta_venv/bin/activate
-python server/manage.py runserver 8080 --noreload & # `&` sends the process to the background
 
 # run the django tests
 echo "Django Tests"
-#python server/manage.py test
+python server/manage.py test
+
+
+python server/manage.py runserver 8080 --noreload & # `&` sends the process to the background
 
 # run the browser tests
 echo "Browser Tests"
 ./node_modules/mocha-phantomjs/bin/mocha-phantomjs http://127.0.0.1:8080/browser-tests
 
 # run the selenium tests
-python selenium_tests/simple_selenium_tests.py
+# python selenium_tests/simple_selenium_tests.py
 
 kill %1 # kills the first, in this case our app_server background process

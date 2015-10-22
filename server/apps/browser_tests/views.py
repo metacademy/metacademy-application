@@ -1,6 +1,6 @@
-# from django.shortcuts import render_to_response
-# from django.template import RequestContext
-# from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.admin.views.decorators import staff_member_required
 
 # from broken_link_checker import get_broken_links_concepts
 
@@ -9,5 +9,5 @@
 #     blinks = get_broken_links_concepts()
 #     return render_to_response("display-broken-links.html", {"blinks": blinks}, context_instance=RequestContext(request))
 
-# def show_btests(request):
-#     return render_to_response("btests.html", context_instance=RequestContext(request))
+def show_btests(request):
+    return render_to_response("btests.html", context_instance=RequestContext(request))

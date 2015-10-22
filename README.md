@@ -18,7 +18,7 @@ For Windows installation/requirements, please see the README located in [/window
 
 
 ### Preliminary requirements
-* `Python 2.7.X` *Nota bene*: install `python-devel`/`python-dev` if you're using a package manager such as `yum` or `apt-get`. The following command should then print a path. If this command raises an exception, make sure that you have `python-devel`/`-dev` for your installed version of python installed:
+* `Python 2.7.X` *Note*: install `python-devel`/`python-dev` if you're using a package manager such as `yum` or `apt-get`. The following command should then print a path. If this command raises an exception, make sure that you have `python-devel`/`-dev` for your installed version of python installed:
 
         python -c 'from distutils.sysconfig import get_makefile_filename as m; print m()'
 

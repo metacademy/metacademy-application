@@ -13,11 +13,11 @@ coverage==3.7.1
 django-appconf==1.0.1
 django-compressor==1.5
 django-devserver==0.8.0
--e git+https://github.com/toastdriven/django-haystack.git@a3a2fc3a385ea35e76941482bf18460724b6421c#egg=django_haystack-dev
+django-haystack==2.3.1
 django-lazysignup==0.12.2
 django-reversion==1.8.6
 django-simple-captcha==0.4.5
-django-tastypie==0.12.1
+-e git+https://github.com/django-tastypie/django-tastypie@256ebe1de9a78dfb5d4d6e938b813cf4c5c4ac1b#egg=django_tastypie-master
 html5lib==0.999
 ipdb==0.8
 ipython==3.1.0

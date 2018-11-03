@@ -2,13 +2,15 @@
 
 # Django settings for django_agfk project.
 import os
-import config
 import sys
 
 SETTINGS_PATH = os.path.realpath(os.path.dirname(__file__))
 CLIENT_SERVER_PATH = SETTINGS_PATH
 AGFK_PATH = os.path.realpath(os.path.join(SETTINGS_PATH, '../'))
 
+sys.path.append(AGFK_PATH)
+
+import config
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

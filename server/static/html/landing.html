@@ -5,12 +5,12 @@
 {% block header %}
   <div class="user-links">
     {% if user.is_authenticated and not user|is_lazy_user %}
-      <a href="{% url 'user:user_main' %}"> 
-        {{ user.username }} 
+      <a href="{% url 'user:user_main' %}">
+        {{ user.username }}
       </a>
       &#124;
       <a href="{% url 'user:logout' %}">
-        Sign out 
+        Sign out
       </a>
     {% else %}
       <a href="{% url 'user:login' %}" id="sign-in">
@@ -102,14 +102,14 @@
 
 <div style="clear: both;"></div>
 <div id="feedback">
-  - 
+  -
   <a href="/feedback">
     send us a message
-  <a/>
+  </a>
   -
     <a href="/terms">
       read our terms of use
-  <a/>
+  </a>
   -
 </div>
 

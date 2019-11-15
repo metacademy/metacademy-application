@@ -2,7 +2,7 @@
 {% load compress %}
 {% load i18n lazysignup_tags %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     {% block head %}
     {% block meta %}
@@ -18,7 +18,7 @@
 
     {% block social-media-tags %}
     <!-- Twitter Card data -->
-    <meta name="twitter:card" value="Metacademy - a free open source platform for efficient, personalized learning." />
+    <meta name="twitter:card" content="Metacademy - a free open source platform for efficient, personalized learning." />
     <!-- Open Graph data -->
     <meta property="og:image" content="//www.metacademy.org/static/images/meta-square.png" />
     <meta property="og:description" content="Metacademy - a free open source platform for efficient, personalized learning." />
@@ -53,7 +53,7 @@
     {% endblock %}
 
     {% block hackscript %}
-    <script type="text/javascript">
+    <script>
       // current hack for multiple development environments will change for server
       window.CONTENT_SERVER = "{{ content_server }}";
       window.STATIC_PATH = "{% static "" %}";

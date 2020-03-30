@@ -8,7 +8,7 @@ Pillow==6.2.0
 Werkzeug==0.15.3
 Whoosh==2.7.0
 beautifulsoup4==4.3.2
-bleach==1.4.1
+bleach==3.1.4
 coverage==3.7.1
 django-appconf==1.0.1
 django-compressor==1.5

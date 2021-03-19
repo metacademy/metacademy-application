@@ -1,7 +1,7 @@
 Django==1.11.23
 Flask==0.10.1
 Flask-Cache==0.13.1
-Jinja2==2.7.3
+Jinja2==2.11.3
 Markdown==2.6.2
 MarkupSafe==0.23
 Pillow==6.2.0

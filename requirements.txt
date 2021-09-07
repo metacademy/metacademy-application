@@ -4,7 +4,7 @@ Flask-Cache==0.13.1
 Jinja2==2.7.3
 Markdown==2.6.2
 MarkupSafe==0.23
-Pillow==6.2.0
+Pillow==8.3.2
 Werkzeug==0.15.3
 Whoosh==2.7.0
 beautifulsoup4==4.3.2

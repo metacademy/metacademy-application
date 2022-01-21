@@ -20,7 +20,7 @@ django-simple-captcha==0.4.5
 -e git+https://github.com/django-tastypie/django-tastypie@256ebe1de9a78dfb5d4d6e938b813cf4c5c4ac1b#egg=django_tastypie-master
 html5lib==0.999
 ipdb==0.8
-ipython==3.1.0
+ipython==7.16.3
 itsdangerous==0.24
 nose==1.3.6
 numpy==1.9.2
